@@ -83,10 +83,16 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 	if ((line->Contents = MyAllocPooled(msg->PoolHandle,len+2)))
 	{
 		unsigned char *dest = (unsigned char*)line->Contents;
+
 		int current_style = 0;
 		int new_style = 0;
 		int cur_styles = 0;
 		int max_styles = 0;
+
+		int current_color = 0;
+		int new_color = 0;
+		int cur_colors = 0;
+		int max_colors = 0;
 
 		/* Copy loop */
 		while (src < eol)
@@ -99,7 +105,7 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 					case	'b': new_style |= BOLD; break;
 					case	'i': new_style |= ITALIC; break;
 					case	'u': new_style |= UNDERLINE; break;
-					case	'h': new_style |= COLOURED; break;
+					case	'h': line->Color = TRUE; break;
 					case	'n': new_style = ~new_style; break;
 					case	'l': line->Flow = 0; break;
 					case	'c': line->Flow = 1; break;
@@ -111,11 +117,15 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 									LONG chars;
 
 									src++;
-									chars = StrToLong(src,&pen) ;
+									chars = StrToLong(src,&pen);
 									if (chars != -1)
 									{
 										src += chars;
-										if (*src == ']') src++;
+										if (*src == ']')
+										{
+											new_color = pen;
+											src++;
+										}
 									}
 								}
 								break;
@@ -148,12 +158,40 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 
 			*dest++ = c;
 
+			/* Handle color changes */
+			if (new_color != current_color)
+			{
+				if (cur_colors >= max_colors)
+				{
+					UWORD *new_colors;
+					if ((new_colors = MyAllocPooled(msg->PoolHandle, sizeof(line->Colors[0])*2*(max_colors+9)))) /* we reserve one more for the ending */
+					{
+						if (line->Colors)
+						{
+							memcpy(new_colors,line->Colors,sizeof(line->Colors[0])*2*max_colors);
+							MyFreePooled(msg->PoolHandle,line->Colors);
+						}
+						line->Colors = new_colors;
+						max_colors += 8;
+					}
+				}
+
+				if (cur_colors < max_colors)
+				{
+					line->Colors[cur_colors*2] = dest - (unsigned char*)line->Contents;
+					line->Colors[cur_colors*2+1] = new_color;
+					cur_colors++;
+			  }
+				current_color = new_color;
+			}
+
+			/* Handle style changes */
 			if (new_style != current_style)
 			{
 				if (cur_styles >= max_styles)
 				{
 					UWORD *new_styles;
-					if ((new_styles = MyAllocPooled(msg->PoolHandle, sizeof(line->Styles[0])*2*(max_styles+9)))) /* we reserve one for the ending */
+					if ((new_styles = MyAllocPooled(msg->PoolHandle, sizeof(line->Styles[0])*2*(max_styles+9)))) /* we reserve one more for the ending */
 					{
 						if (line->Styles)
 						{
@@ -165,15 +203,21 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 					}
 				}
 
-				if (line->Styles)
+				if (cur_styles < max_styles)
 				{
 					line->Styles[cur_styles*2] = dest - (unsigned char*)line->Contents;
 					line->Styles[cur_styles*2+1] = new_style;
 					cur_styles++;
 				}
-
 				current_style = new_style;
 			}
+		}
+
+		/* Mark the end of the color array */
+		if (line->Colors)
+		{
+			line->Colors[cur_colors*2] = ~0;
+			line->Colors[cur_colors*2+1] = 0;
 		}
 
 		/* Mark the end of the style array */
