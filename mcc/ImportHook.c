@@ -437,7 +437,8 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 
 			if (wrap && ((ULONG)(dest - dest_start)) >= wrap)
 			{
-				/* Only leave the loop, if we really have added some characters to the line */
+				/* Only leave the loop, if we really have added some characters
+				 * (at least one word) to the line */
 				if (dest_word_start != dest_start)
 				{
 					/* src points to the real word start, but we add one when we return eol */
