@@ -25,6 +25,7 @@
 
 #include <libraries/iffparse.h>
 
+#include <clib/alib_protos.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/intuition.h>
@@ -34,6 +35,11 @@
 
 #include "TextEditor_mcc.h"
 #include "private.h"
+
+#ifdef __MORPHOS__
+// doesnt belong here -itix
+#define DebugPrintF(x) NewRawDoFmt(x, (APTR)1, NULL, NULL)
+#endif
 
 VOID RedrawArea(UWORD startx, struct line_node *startline, UWORD stopx, struct line_node *stopline, struct InstData *data)
 {

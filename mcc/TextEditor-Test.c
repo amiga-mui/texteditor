@@ -26,6 +26,7 @@
 #include <exec/tasks.h>
 #include <libraries/mui.h>
 #include <libraries/iffparse.h>
+#include <clib/alib_protos.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/muimaster.h>

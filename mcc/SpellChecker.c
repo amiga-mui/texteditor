@@ -25,6 +25,7 @@
 
 #include <dos/dos.h>
 #include <dos/dostags.h>
+#include <clib/alib_protos.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/intuition.h>
