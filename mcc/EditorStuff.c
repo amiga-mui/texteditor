@@ -111,7 +111,7 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
   
     data->clipboard->io_Data    = (void *)header;
     data->clipboard->io_Length    = 12;
-    DoIO(data->iorequest);
+    DoIO((struct IORequest*)data->clipboard);
   
     if(data->clipboard->io_Actual != 12)
     {
@@ -135,7 +135,7 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
   
           data->clipboard->io_Data  = (void *)header;
           data->clipboard->io_Length  = 8;
-          DoIO(data->iorequest);
+          DoIO((struct IORequest*)data->clipboard);
           chunksize = (header[1]+1) & (ULONG)-2;
           length -= 8 + chunksize;
   
@@ -147,7 +147,7 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
               {
                 data->clipboard->io_Data  = (APTR)&flow;
                 data->clipboard->io_Length  = 2;
-                DoIO(data->iorequest);
+                DoIO((struct IORequest*)data->clipboard);
                 if(flow > MUIV_TextEditor_Flow_Right)
                   flow = MUIV_TextEditor_Flow_Left;
                 chunk_used = TRUE;
@@ -159,7 +159,7 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
               {
                 data->clipboard->io_Data  = (APTR)&color;
                 data->clipboard->io_Length  = 2;
-                DoIO(data->iorequest);
+                DoIO((struct IORequest*)data->clipboard);
                 chunk_used = TRUE;
               }
               break;
@@ -169,7 +169,7 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
               {
                 data->clipboard->io_Data  = (APTR)&separator;
                 data->clipboard->io_Length  = 2;
-                DoIO(data->iorequest);
+                DoIO((struct IORequest*)data->clipboard);
                 chunk_used = TRUE;
               }
               break;
@@ -183,7 +183,7 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
               {
                 data->clipboard->io_Data  = (void *)colors;
                 data->clipboard->io_Length  = header[1];
-                DoIO(data->iorequest);
+                DoIO((struct IORequest*)data->clipboard);
                 colors[header[1]/2] = 0xffff;
                 chunk_used = TRUE;
               }
@@ -199,7 +199,7 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
               {
                 data->clipboard->io_Data  = (void *)styles;
                 data->clipboard->io_Length  = header[1];
-                DoIO(data->iorequest);
+                DoIO((struct IORequest*)data->clipboard);
                 styles[header[1]/2] = EOS;
                 chunk_used = TRUE;
               }
@@ -215,7 +215,7 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
                 {
                   data->clipboard->io_Data    = contents;
                   data->clipboard->io_Length    = header[1];
-                  DoIO(data->iorequest);
+                  DoIO((struct IORequest*)data->clipboard);
                   data->clipboard->io_Offset    += header[1] & 1;
   
                   if(*(contents+header[1]-1) != '\n')
@@ -256,7 +256,7 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
                 {
                   data->clipboard->io_Data    = textline;
                   data->clipboard->io_Length    = header[1];
-                  DoIO(data->iorequest);
+                  DoIO((struct IORequest*)data->clipboard);
                   data->clipboard->io_Offset    += header[1] & 1;
                   if(textline[header[1]-1] != '\n')
                   {
@@ -318,7 +318,7 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
         data->clipboard->io_Data  = NULL;
         data->clipboard->io_Length  = (ULONG)-1;
         data->clipboard->io_Offset  = (ULONG)-1;
-        DoIO(data->iorequest);
+        DoIO((struct IORequest*)data->clipboard);
   
         if(line)
         {
@@ -363,10 +363,10 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
     data->clipboard->io_Data  = NULL;
     data->clipboard->io_Length  = (ULONG)-1;
     data->clipboard->io_Offset  = (ULONG)-1;
-    DoIO(data->iorequest);
+    DoIO((struct IORequest*)data->clipboard);
   
-    CloseDevice(data->iorequest);
-    DeleteIORequest(data->iorequest);
+    CloseDevice((struct IORequest*)data->clipboard);
+    DeleteIORequest((struct IORequest*)data->clipboard);
     DeleteMsgPort(data->clipport);
   
     if(data->update)

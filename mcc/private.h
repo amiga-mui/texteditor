@@ -134,9 +134,8 @@ struct InstData
   struct  line_node *firstline;
   BOOL    shown;
   BOOL    update;
-  struct  MsgPort   *clipport;
 
-  struct  IORequest *iorequest;
+  struct  MsgPort   *clipport;
   struct  IOClipReq *clipboard;
 
   ULONG   StartSecs, StartMicros;

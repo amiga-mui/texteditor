@@ -327,33 +327,20 @@ void NiceBlock (struct marking *realblock, struct marking *newblock)
   newblock->stopline  = stopline;
 }
 
-struct Device *ConsoleDevice = NULL;
-
-#ifdef __amigaos4__
-struct ConsoleIFace *IConsole = NULL;
-#endif
-
 BOOL InitClipboard (struct InstData *data)
 {
   if((data->clipport = CreateMsgPort()))
   {
-    if((data->iorequest = CreateIORequest(data->clipport, sizeof(struct IOClipReq))))
+    if((data->clipboard = (struct IOClipReq*)CreateIORequest(data->clipport, sizeof(struct IOClipReq))))
     {
-      if(!OpenDevice("clipboard.device", 0, data->iorequest, 0))
+      if(!OpenDevice("clipboard.device", 0, (struct IORequest*)data->clipboard, 0))
       {
-        ConsoleDevice = (APTR)data->iorequest;
-
-        if(GETINTERFACE(IConsole, ConsoleDevice))
-        {
-          return TRUE;
-        }
-
-        DROPINTERFACE(IConsole);
+        return TRUE;
       }
 
-      CloseDevice(data->iorequest);
+      CloseDevice((struct IORequest*)data->clipboard);
     }
-    DeleteIORequest(data->iorequest);
+    DeleteIORequest((struct IORequest*)data->clipboard);
   }
   DeleteMsgPort(data->clipport);
   return(FALSE);
@@ -367,14 +354,13 @@ void EndClipSession (struct InstData *data)
   data->clipboard->io_Offset    = 0;
   data->clipboard->io_Data    = (STRPTR)clipheader;
   data->clipboard->io_Length    = sizeof(clipheader);
-  DoIO(data->iorequest);
+  DoIO((struct IORequest*)data->clipboard);
 
   data->clipboard->io_Command = CMD_UPDATE;
-  DoIO(data->iorequest);
+  DoIO((struct IORequest*)data->clipboard);
 
-  DROPINTERFACE(IConsole);
-  CloseDevice(data->iorequest);
-  DeleteIORequest(data->iorequest);
+  CloseDevice((struct IORequest*)data->clipboard);
+  DeleteIORequest((struct IORequest*)data->clipboard);
   DeleteMsgPort(data->clipport);
 }
 
@@ -388,30 +374,30 @@ void ClipInfo (struct line_node *line, struct InstData *data)
   {
     data->clipboard->io_Data    = (STRPTR)flowheader;
     data->clipboard->io_Length    = sizeof(flowheader);
-    DoIO(data->iorequest);
+    DoIO((struct IORequest*)data->clipboard);
     data->clipboard->io_Data    = (STRPTR)&line->line.Flow;
     data->clipboard->io_Length    = flowheader[1];
-    DoIO(data->iorequest);
+    DoIO((struct IORequest*)data->clipboard);
   }
 
   if(line->line.Separator)
   {
     data->clipboard->io_Data    = (STRPTR)separatorheader;
     data->clipboard->io_Length    = sizeof(separatorheader);
-    DoIO(data->iorequest);
+    DoIO((struct IORequest*)data->clipboard);
     data->clipboard->io_Data    = (STRPTR)&line->line.Separator;
     data->clipboard->io_Length    = separatorheader[1];
-    DoIO(data->iorequest);
+    DoIO((struct IORequest*)data->clipboard);
   }
 
   if(line->line.Color)
   {
     data->clipboard->io_Data    = (STRPTR)highlightheader;
     data->clipboard->io_Length    = sizeof(highlightheader);
-    DoIO(data->iorequest);
+    DoIO((struct IORequest*)data->clipboard);
     data->clipboard->io_Data    = (STRPTR)&line->line.Color;
     data->clipboard->io_Length    = highlightheader[1];
-    DoIO(data->iorequest);
+    DoIO((struct IORequest*)data->clipboard);
   }
 }
 
@@ -441,7 +427,7 @@ void ClipChars (LONG x, struct line_node *line, LONG length, struct InstData *da
 
     if(color[1] != 0 && *colors-x != 1)
     {
-      DoIO(data->iorequest);
+      DoIO((struct IORequest*)data->clipboard);
     }
 
     if(*colors != 0xffff)
@@ -450,7 +436,7 @@ void ClipChars (LONG x, struct line_node *line, LONG length, struct InstData *da
       {
         color[0] = *colors++ - x;
         color[1] = *colors++;
-        DoIO(data->iorequest);
+        DoIO((struct IORequest*)data->clipboard);
       }
     }
 
@@ -460,7 +446,7 @@ void ClipChars (LONG x, struct line_node *line, LONG length, struct InstData *da
     {
       data->clipboard->io_Data    = (STRPTR)colorheader;
       data->clipboard->io_Length    = sizeof(colorheader);
-      DoIO(data->iorequest);
+      DoIO((struct IORequest*)data->clipboard);
       data->clipboard->io_Offset    += colorheader[1];
     }
   }
@@ -478,17 +464,17 @@ void ClipChars (LONG x, struct line_node *line, LONG length, struct InstData *da
     if(t_style & BOLD)
     {
       style[1] = BOLD;
-      DoIO(data->iorequest);
+      DoIO((struct IORequest*)data->clipboard);
     }
     if(t_style & ITALIC)
     {
       style[1] = ITALIC;
-      DoIO(data->iorequest);
+      DoIO((struct IORequest*)data->clipboard);
     }
     if(t_style & UNDERLINE)
     {
       style[1] = UNDERLINE;
-      DoIO(data->iorequest);
+      DoIO((struct IORequest*)data->clipboard);
     }
   }
 
@@ -505,7 +491,7 @@ void ClipChars (LONG x, struct line_node *line, LONG length, struct InstData *da
       {
         style[0] = *styles++ - x;
         style[1] = *styles++;
-        DoIO(data->iorequest);
+        DoIO((struct IORequest*)data->clipboard);
       }
       style[0] = length+1;
       style[1] = GetStyle(x+length-1, line);
@@ -516,17 +502,17 @@ void ClipChars (LONG x, struct line_node *line, LONG length, struct InstData *da
         if(t_style & BOLD)
         {
           style[1] = ~BOLD;
-          DoIO(data->iorequest);
+          DoIO((struct IORequest*)data->clipboard);
         }
         if(t_style & ITALIC)
         {
           style[1] = ~ITALIC;
-          DoIO(data->iorequest);
+          DoIO((struct IORequest*)data->clipboard);
         }
         if(t_style & UNDERLINE)
         {
           style[1] = ~UNDERLINE;
-          DoIO(data->iorequest);
+          DoIO((struct IORequest*)data->clipboard);
         }
       }
     }
@@ -536,16 +522,16 @@ void ClipChars (LONG x, struct line_node *line, LONG length, struct InstData *da
   data->clipboard->io_Offset    = t_offset - sizeof(styleheader);
   data->clipboard->io_Data    = (STRPTR)styleheader;
   data->clipboard->io_Length    = sizeof(styleheader);
-  DoIO(data->iorequest);
+  DoIO((struct IORequest*)data->clipboard);
   data->clipboard->io_Offset    += styleheader[1];
 
   textheader[1] = length;
   data->clipboard->io_Data    = (STRPTR)textheader;
   data->clipboard->io_Length    = sizeof(textheader);
-  DoIO(data->iorequest);
+  DoIO((struct IORequest*)data->clipboard);
   data->clipboard->io_Data    = line->line.Contents+x;
   data->clipboard->io_Length    = length;
-  DoIO(data->iorequest);
+  DoIO((struct IORequest*)data->clipboard);
 
   data->clipboard->io_Offset += data->clipboard->io_Offset & 1;
 }
@@ -569,10 +555,10 @@ void ClipLine (struct line_node *line, struct InstData *data)
     }
     data->clipboard->io_Data    = (STRPTR)colorheader;
     data->clipboard->io_Length    = sizeof(colorheader);
-    DoIO(data->iorequest);
+    DoIO((struct IORequest*)data->clipboard);
     data->clipboard->io_Data    = (STRPTR)line->line.Colors;
     data->clipboard->io_Length    = colorheader[1];
-    DoIO(data->iorequest);
+    DoIO((struct IORequest*)data->clipboard);
   }
 
   if(styles)
@@ -586,18 +572,18 @@ void ClipLine (struct line_node *line, struct InstData *data)
 
   data->clipboard->io_Data    = (STRPTR)styleheader;
   data->clipboard->io_Length    = sizeof(styleheader);
-  DoIO(data->iorequest);
+  DoIO((struct IORequest*)data->clipboard);
   data->clipboard->io_Data    = (STRPTR)line->line.Styles;
   data->clipboard->io_Length    = styleheader[1];
-  DoIO(data->iorequest);
+  DoIO((struct IORequest*)data->clipboard);
 
   textheader[1] = line->line.Length;
   data->clipboard->io_Data    = (STRPTR)textheader;
   data->clipboard->io_Length    = sizeof(textheader);
-  DoIO(data->iorequest);
+  DoIO((struct IORequest*)data->clipboard);
   data->clipboard->io_Data    = (STRPTR)line->line.Contents;
   data->clipboard->io_Length    = textheader[1];
-  DoIO(data->iorequest);
+  DoIO((struct IORequest*)data->clipboard);
 
   data->clipboard->io_Offset += data->clipboard->io_Offset & 1;
 }
@@ -675,11 +661,9 @@ LONG CutBlock2 (struct InstData *data, long Clipboard, long NoCut, struct markin
   stopx     = newblock->stopx;
   startline = newblock->startline;
   stopline  = newblock->stopline;
-
   if(startline != stopline)
   {
       struct  line_node *c_startline = startline->next;
-
     data->update = FALSE;
     if(Clipboard)
     {
@@ -688,7 +672,6 @@ LONG CutBlock2 (struct InstData *data, long Clipboard, long NoCut, struct markin
         data->clipboard->io_ClipID    = 0;
         data->clipboard->io_Command = CMD_WRITE;
         data->clipboard->io_Offset    = 12;
-
         ClipChars(startx, startline, startline->line.Length-startx, data);
       }
       else
@@ -717,6 +700,7 @@ LONG CutBlock2 (struct InstData *data, long Clipboard, long NoCut, struct markin
       }
       else  c_startline = c_startline->next;
     }
+DebugPrintF("4\n");
 
     if(Clipboard)
     {
@@ -725,6 +709,7 @@ LONG CutBlock2 (struct InstData *data, long Clipboard, long NoCut, struct markin
 
       EndClipSession(data);
     }
+DebugPrintF("5\n");
 
     if(!NoCut)
     {
