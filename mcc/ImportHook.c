@@ -100,7 +100,6 @@ STATIC BOOL GetLong(char **src_ptr, LONG *val)
 /************************************************************************
  Returns the end of line in the current line (pointing at the linefeed).
  If a 0 byte is encountered it returns the pointer to the 0 byte.
- If src contains only a 0 byte, NULL is returnded
 
  This function also counts the number of tabs within this line.
 *************************************************************************/
@@ -121,7 +120,6 @@ STATIC char *FindEOL(char *src, int *tabs_ptr)
 	}
 
 	if (tabs_ptr) *tabs_ptr = tabs;
-	if (src[0] == 0) return NULL;
 	return eol;
 }
 
