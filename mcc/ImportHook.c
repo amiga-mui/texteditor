@@ -321,7 +321,8 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 
 		line->Length = dest - line->Contents; /* this excludes \n */
 	}
-  return eol+1;
+	if (eol[0] == 0) return NULL;
+	return eol + 1;
 }
 MakeHook(ImPlainHook, PlainImportHookFunc);
 
@@ -507,7 +508,8 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 		line->Length = dest - dest_start; /* this excludes \n */
 	}
 
-  return eol?eol + 1:NULL;
+	if (!eol || eol[0] == 0) return NULL;
+	return eol + 1;
 }
 
 HOOKPROTONHNO(EMailImportHookFunc, STRPTR , struct ImportMessage *msg)
