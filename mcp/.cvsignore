@@ -1,0 +1,4 @@
+.obj_*
+locale.h
+locale.c
+bin_*
