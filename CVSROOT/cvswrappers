@@ -1,5 +1,9 @@
 # This file affects handling of files based on their names.
 #
+# The -t/-f options allow one to treat directories of files
+# as a single file, or to transform a file in other ways on
+# its way in and out of CVS.
+#
 # The -m option specifies whether CVS attempts to merge files.
 #
 # The -k option specifies keyword expansion (e.g. -kb for binary).
@@ -16,4 +20,16 @@
 #
 #  and value is a single-quote delimited value.
 # For example:
-#*.gif -k 'b'
+*.gif -k 'b'
+*.jpg -k 'b'
+*.jpeg -k 'b'
+*.png -k 'b'
+*.iff -k 'b'
+*.exe -k 'b'
+*.o -k 'b'
+*.lib -k 'b'
+*.library -k 'b'
+*.info -k 'b'
+*.lzx -k 'b'
+*.lha -k 'b'
+*.zip -k 'b'
