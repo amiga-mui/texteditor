@@ -29,6 +29,33 @@
 #include "TextEditor_mcc.h"
 #include "private.h"
 
+/************************************************************************
+ The plain import hook. It supports following escape sequences:
+
+  <ESC> + u      Set the soft style to underline.
+  <ESC> + b      Set the soft style to bold.
+  <ESC> + i      Set the soft style to italic.
+  <ESC> + n      Set the soft style back to normal.
+  <ESC> + h      Highlight the current line.
+  <ESC> + p[x]   Change to color x, where x is taken from the colormap.
+                 0 means normal. The color is reset for each new line.
+
+
+ The following sequences are only valid at the beginning of a line.
+
+  <ESC> + l      Left justify current and following lines.
+  <ESC> + r      Right justify current and following lines.
+  <ESC> + c      Center current and following lines.
+  <ESC> + [s:x]  Create a separator. x is a bit combination of flags:
+                 Placement (mutually exclusive):
+                     1 = Top
+                     2 = Middle
+                     4 = Bottom
+                 Cosmetical:
+                     8 = StrikeThru   - Draw separator ontop of text.
+                     16 = Thick        - Make separator extra thick.
+
+*************************************************************************/
 HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 {
 	char *eol;
@@ -43,7 +70,7 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 	{
 		int len = strlen(src);
 		if (!len) return NULL;
-		eol = msg->Data + len;
+		eol = src + len;
 		ret = NULL;
 	} else
 	{
@@ -74,6 +101,9 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 					case	'u': new_style |= UNDERLINE; break;
 					case	'h': new_style |= COLOURED; break;
 					case	'n': new_style = ~new_style; break;
+					case	'l': line->Flow = 0; break;
+					case	'c': line->Flow = 1; break;
+					case	'r': line->Flow = 2; break;
 					case	'p':
 								if (*src == '[')
 								{
@@ -103,7 +133,11 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 										if (chars != -1)
 										{
 											src += chars;
-											if (*src == ']') src++;
+											if (*src == ']')
+											{
+												src++;
+												line->Separator = flags;
+											}
 										}
 									}
 								}
