@@ -6,13 +6,15 @@ $Id$
 $Source$
 
 2005-03-31  Sebastian Bauer <mail@sebastianbauer.info>
+
     * mcc: Fixed buffer overflow which happened if the font name was 
       longer than 27 chars.
     * all: Enforce amiga align for the keybinding structure because
       this is exported to the settings file and has to be compatible
       with the 68k version.
 
-2005-03-31  Gunther Nikl
+2005-03-31  Gunther Nikl <gni@gecko.de>
+
     * all: Source cleanup and minor OS3 makefile changes.
 
 2005-03-31  Jens Langner <Jens.Langner@light-speed.de>
