@@ -52,12 +52,12 @@ VOID MangleCharacters(UBYTE (*change)(UBYTE c), struct InstData *data)
 
   while(startline != stopline->next)
   {
-    while(startline->contents[startx] != '\n')
+    while(startline->line.Contents[startx] != '\n')
     {
       if(startx == stopx && startline == stopline)
         break;
 
-      startline->contents[startx] = change(startline->contents[startx]);
+      startline->line.Contents[startx] = change(startline->line.Contents[startx]);
 
       startx++;
     }

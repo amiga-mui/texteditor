@@ -195,7 +195,7 @@ void SuggestWord (struct InstData *data)
     struct  pos_info pos;
     struct  line_node *line = data->actualline;
 
-  if(IsAlpha(data->mylocale, *(line->contents+data->CPos_X)))
+  if(IsAlpha(data->mylocale, *(line->line.Contents+data->CPos_X)))
   {
     if(Enabled(data))
     {
@@ -208,7 +208,7 @@ void SuggestWord (struct InstData *data)
     }
 */  
 
-    while(data->CPos_X && (IsAlpha(data->mylocale, *(line->contents+data->CPos_X-1)) || *(line->contents+data->CPos_X-1) == '-') || (*(line->contents+data->CPos_X-1) == '\''))
+    while(data->CPos_X && (IsAlpha(data->mylocale, *(line->line.Contents+data->CPos_X-1)) || *(line->line.Contents+data->CPos_X-1) == '-') || (*(line->line.Contents+data->CPos_X-1) == '\''))
     {
       GoPreviousWord(data);
     }
@@ -220,10 +220,10 @@ void SuggestWord (struct InstData *data)
     OffsetToLines(data->CPos_X, line, &pos, data);
     get(_win(data->object), MUIA_Window_LeftEdge, &left);
     get(_win(data->object), MUIA_Window_TopEdge, &top);
-    left  += data->xpos + FlowSpace(line->flow, line->contents+(data->CPos_X-pos.x), data) + MyTextLength(data->font, line->contents+(data->CPos_X-pos.x), pos.x);
+    left  += data->xpos + FlowSpace(line->line.Flow, line->line.Contents+(data->CPos_X-pos.x), data) + MyTextLength(data->font, line->line.Contents+(data->CPos_X-pos.x), pos.x);
     top += data->ypos + (data->height * (line_nr + pos.lines));
 
-    while(data->CPos_X < line->length && (IsAlpha(data->mylocale, *(line->contents+data->CPos_X)) || *(line->contents+data->CPos_X) == '-' || *(line->contents+data->CPos_X) == '\''))
+    while(data->CPos_X < line->line.Length && (IsAlpha(data->mylocale, *(line->line.Contents+data->CPos_X)) || *(line->line.Contents+data->CPos_X) == '-' || *(line->line.Contents+data->CPos_X) == '\''))
     {
       data->CPos_X++;
     }
@@ -244,7 +244,7 @@ void SuggestWord (struct InstData *data)
         char word[256];
         long res;
 
-      strncpy(word, line->contents+data->blockinfo.startx, data->blockinfo.stopx-data->blockinfo.startx);
+      strncpy(word, line->line.Contents+data->blockinfo.startx, data->blockinfo.stopx-data->blockinfo.startx);
       word[data->blockinfo.stopx-data->blockinfo.startx] = '\0';
 
       set(_win(data->object), MUIA_Window_Sleep, TRUE);
@@ -304,7 +304,7 @@ void SuggestWord (struct InstData *data)
 
 void CheckWord (struct InstData *data)
 {
-  if(data->TypeAndSpell && data->CPos_X && IsAlpha(data->mylocale, *(data->actualline->contents+data->CPos_X-1)))
+  if(data->TypeAndSpell && data->CPos_X && IsAlpha(data->mylocale, *(data->actualline->line.Contents+data->CPos_X-1)))
   {
       char word[256];
       LONG  start, end = data->CPos_X;
@@ -314,14 +314,14 @@ void CheckWord (struct InstData *data)
 
       GoPreviousWord(data);
 
-    } while(data->CPos_X && data->actualline == line && (*(data->actualline->contents+data->CPos_X-1) == '-' || *(data->actualline->contents+data->CPos_X-1) == '\''));
+    } while(data->CPos_X && data->actualline == line && (*(data->actualline->line.Contents+data->CPos_X-1) == '-' || *(data->actualline->line.Contents+data->CPos_X-1) == '\''));
 
     start = data->CPos_X;
     data->CPos_X = end;
 
     if(start-end < 256 && data->actualline == line)
     {
-      strncpy(word, data->actualline->contents+start, end-start);
+      strncpy(word, data->actualline->line.Contents+start, end-start);
       word[end-start] = '\0';
       if(!LookupWord(word, data))
         DisplayBeep(NULL);

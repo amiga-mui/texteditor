@@ -49,8 +49,8 @@ ULONG FlowSpace (UWORD flow, STRPTR text, struct InstData *data)
 ULONG CursorOffset (struct InstData *data)
 {
     struct line_node *line = data->actualline;
-    STRPTR text = line->contents+data->CPos_X;
-    LONG  offset = data->pixel_x-FlowSpace(line->flow, text, data);
+    STRPTR text = line->line.Contents+data->CPos_X;
+    LONG  offset = data->pixel_x-FlowSpace(line->line.Flow, text, data);
 
   if(offset < 1)
     offset = 1;
@@ -81,8 +81,8 @@ VOID GotoBookmark (UWORD nr, struct InstData *data)
         {
           data->actualline = actual;
           data->CPos_X = data->bookmarks[nr].x;
-          if(data->CPos_X >= actual->length)
-            data->CPos_X = actual->length-1;
+          if(data->CPos_X >= actual->line.Length)
+            data->CPos_X = actual->line.Length-1;
           break;
         }
         actual = actual->next;
@@ -150,7 +150,7 @@ void  GoPreviousPage (struct InstData *data)
         }
         while(linemove--)
         {
-          data->CPos_X += LineCharsWidth(data->actualline->contents+data->CPos_X, data);
+          data->CPos_X += LineCharsWidth(data->actualline->line.Contents+data->CPos_X, data);
         }
       }
       data->CPos_X += CursorOffset(data);
@@ -189,7 +189,7 @@ void  GoUp  (struct InstData *data)
     {
       while(--pos.lines)
       {
-        data->CPos_X += LineCharsWidth(data->actualline->contents+data->CPos_X, data);
+        data->CPos_X += LineCharsWidth(data->actualline->line.Contents+data->CPos_X, data);
       }
       data->CPos_X += CursorOffset(data);
     }
@@ -203,7 +203,7 @@ void  GoBottom (struct InstData *data)
 {
   while(data->actualline->next)
     data->actualline = data->actualline->next;
-  data->CPos_X = data->actualline->length-1;
+  data->CPos_X = data->actualline->line.Length-1;
 }
 
 void  GoNextLine  (struct InstData *data)
@@ -211,7 +211,7 @@ void  GoNextLine  (struct InstData *data)
   data->CPos_X = 0;
   if(data->actualline->next)
       data->actualline = data->actualline->next;
-  else  data->CPos_X = data->actualline->length-1;
+  else  data->CPos_X = data->actualline->line.Length-1;
 }
 
 void  GoNextPage  (struct InstData *data)
@@ -273,7 +273,7 @@ void  GoDown   (struct InstData *data)
       }
       else
       {
-//        data->CPos_X = data->actualline->length-1;
+//        data->CPos_X = data->actualline->line.Length-1;
       }
     }
     else
@@ -291,27 +291,27 @@ void  GoEndOfLine (struct InstData *data)
   if(data->shown)
   {
     OffsetToLines(data->CPos_X, data->actualline, &pos, data);
-    data->CPos_X = pos.bytes + LineCharsWidth(data->actualline->contents+pos.bytes, data) - 1;
+    data->CPos_X = pos.bytes + LineCharsWidth(data->actualline->line.Contents+pos.bytes, data) - 1;
   }
 }
 
 void  GoNextWord  (struct InstData *data)
 {
-  BOOL EOL = (data->CPos_X == data->actualline->length);
+  BOOL EOL = (data->CPos_X == data->actualline->line.Length);
 
-  if(!CheckSep(*(data->actualline->contents+data->CPos_X), data) && (data->CPos_X < data->actualline->length))
+  if(!CheckSep(*(data->actualline->line.Contents+data->CPos_X), data) && (data->CPos_X < data->actualline->line.Length))
   {
-    while(!CheckSep(*(data->actualline->contents+data->CPos_X), data) && (data->CPos_X < data->actualline->length))
+    while(!CheckSep(*(data->actualline->line.Contents+data->CPos_X), data) && (data->CPos_X < data->actualline->line.Length))
       data->CPos_X++;
   }
 
 FindNextWord:
 
-  while((CheckSep(*(data->actualline->contents+data->CPos_X), data)) && (data->CPos_X < data->actualline->length))
+  while((CheckSep(*(data->actualline->line.Contents+data->CPos_X), data)) && (data->CPos_X < data->actualline->line.Length))
   {
     data->CPos_X++;
   }
-  if(data->CPos_X == data->actualline->length)
+  if(data->CPos_X == data->actualline->line.Length)
   {
     if(data->actualline->next)
     {
@@ -325,24 +325,24 @@ FindNextWord:
 
 void  GoNextSentence (struct InstData *data)
 {
-  while((!CheckSent(*(data->actualline->contents+data->CPos_X), data)) && (data->CPos_X < data->actualline->length))
+  while((!CheckSent(*(data->actualline->line.Contents+data->CPos_X), data)) && (data->CPos_X < data->actualline->line.Length))
     data->CPos_X++;
-  while(CheckSent(*(data->actualline->contents+data->CPos_X), data) && (data->CPos_X < data->actualline->length))
+  while(CheckSent(*(data->actualline->line.Contents+data->CPos_X), data) && (data->CPos_X < data->actualline->line.Length))
     data->CPos_X++;
-  if(data->CPos_X >= data->actualline->length-1)
+  if(data->CPos_X >= data->actualline->line.Length-1)
     NextLine(data);
   else
   {
-    while((*(data->actualline->contents+data->CPos_X) == ' ') && (data->CPos_X < data->actualline->length))
+    while((*(data->actualline->line.Contents+data->CPos_X) == ' ') && (data->CPos_X < data->actualline->line.Length))
       data->CPos_X++;
-    if(data->CPos_X == data->actualline->length-1)
+    if(data->CPos_X == data->actualline->line.Length-1)
       NextLine(data);
   }
 }
 
 void  GoRight  (struct InstData *data)
 {
-  if(data->actualline->length > (data->CPos_X+1))
+  if(data->actualline->line.Length > (data->CPos_X+1))
       data->CPos_X++;
   else  NextLine(data);
 }
@@ -366,27 +366,27 @@ void  GoPreviousWord (struct InstData *data)
 
 FindWord:
 
-  if(CheckSep(*(data->actualline->contents+data->CPos_X-1), data) && (data->CPos_X > 0))
+  if(CheckSep(*(data->actualline->line.Contents+data->CPos_X-1), data) && (data->CPos_X > 0))
   {
     data->CPos_X--;
     moved = TRUE;
   }
-  if(CheckSep(*(data->actualline->contents+data->CPos_X), data) && (data->CPos_X > 0))
+  if(CheckSep(*(data->actualline->line.Contents+data->CPos_X), data) && (data->CPos_X > 0))
   {
-    while(CheckSep(*(data->actualline->contents+data->CPos_X), data) && (data->CPos_X > 0))
+    while(CheckSep(*(data->actualline->line.Contents+data->CPos_X), data) && (data->CPos_X > 0))
     {
       data->CPos_X--;
       moved = TRUE;
     }
   }
-  if((data->CPos_X == 0) && (data->actualline->previous) && ((!moved) || (CheckSep(*data->actualline->contents, data))))
+  if((data->CPos_X == 0) && (data->actualline->previous) && ((!moved) || (CheckSep(*data->actualline->line.Contents, data))))
   {
     data->actualline = data->actualline->previous;
-    data->CPos_X = data->actualline->length-1;
+    data->CPos_X = data->actualline->line.Length-1;
     goto FindWord;
   }
 
-  while((!CheckSep(*(data->actualline->contents+data->CPos_X-1), data)) && (data->CPos_X > 0))
+  while((!CheckSep(*(data->actualline->line.Contents+data->CPos_X-1), data)) && (data->CPos_X > 0))
   {
     data->CPos_X--;
   }
@@ -398,21 +398,21 @@ void  GoPreviousSentence   (struct InstData *data)
   while(data->CPos_X == 0 && data->actualline->previous)
   {
     data->actualline = data->actualline->previous;
-    data->CPos_X = data->actualline->length-1;
+    data->CPos_X = data->actualline->line.Length-1;
   }
   if(data->CPos_X != 0)
   {
     data->CPos_X--;
-    while((*(data->actualline->contents+data->CPos_X) == ' ') && (data->CPos_X > 0))
+    while((*(data->actualline->line.Contents+data->CPos_X) == ' ') && (data->CPos_X > 0))
       data->CPos_X--;
-    while(CheckSent(*(data->actualline->contents+data->CPos_X), data) && (data->CPos_X > 0))
+    while(CheckSent(*(data->actualline->line.Contents+data->CPos_X), data) && (data->CPos_X > 0))
       data->CPos_X--;
-    while((!CheckSent(*(data->actualline->contents+data->CPos_X), data)) && (data->CPos_X > 0))
+    while((!CheckSent(*(data->actualline->line.Contents+data->CPos_X), data)) && (data->CPos_X > 0))
       data->CPos_X--;
     if(data->CPos_X > 0)
     {
       data->CPos_X++;
-      while((*(data->actualline->contents+data->CPos_X) == ' ') && (data->CPos_X < data->actualline->length))
+      while((*(data->actualline->line.Contents+data->CPos_X) == ' ') && (data->CPos_X < data->actualline->line.Length))
         data->CPos_X++;
     }
   }
@@ -427,7 +427,7 @@ void  GoLeft   (struct InstData *data)
     if(data->actualline->previous)
     {
       data->actualline = data->actualline->previous;
-      data->CPos_X = data->actualline->length-1;
+      data->CPos_X = data->actualline->line.Length-1;
     }
   }
 }
@@ -466,7 +466,7 @@ void  NextLine (struct InstData *data)
   }
   else
   {
-    data->CPos_X = data->actualline->length-1;
+    data->CPos_X = data->actualline->line.Length-1;
   }
 }
 /*---------------------------------------*
@@ -474,12 +474,12 @@ void  NextLine (struct InstData *data)
  *---------------------------------------*/
 LONG   GetPosInPixels (LONG bytes, LONG x, struct InstData *data)
 {
-    LONG  pos = MyTextLength(data->font, data->actualline->contents+bytes, x);
+    LONG  pos = MyTextLength(data->font, data->actualline->line.Contents+bytes, x);
 
-  if(*(data->actualline->contents+data->CPos_X) == '\n')
+  if(*(data->actualline->line.Contents+data->CPos_X) == '\n')
       pos += MyTextLength(data->font, " ", 1)/2;
-  else  pos += MyTextLength(data->font, data->actualline->contents+data->CPos_X, 1)/2;
-  pos += FlowSpace(data->actualline->flow, data->actualline->contents+bytes, data);
+  else  pos += MyTextLength(data->font, data->actualline->line.Contents+data->CPos_X, 1)/2;
+  pos += FlowSpace(data->actualline->line.Flow, data->actualline->line.Contents+bytes, data);
   return(pos);
 }
 

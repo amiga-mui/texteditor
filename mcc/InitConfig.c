@@ -223,7 +223,7 @@ void InitConfig (void *obj, struct InstData *data)
     }
   }
 
-  data->Flow = data->actualline->flow;
+  data->Flow = data->actualline->line.Flow;
   data->Pen = GetColor(data->CPos_X, data->actualline);
 
   if(~data->flags & FLG_FirstInit)

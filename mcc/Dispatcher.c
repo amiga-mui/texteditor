@@ -71,8 +71,8 @@ void ResetDisplay(struct InstData *data)
     data->totallines = lines;
 
     data->Pen = GetColor(data->CPos_X, data->actualline);
-    data->Flow = data->actualline->flow;
-    data->Separator = data->actualline->separator;
+    data->Flow = data->actualline->line.Flow;
+    data->Separator = data->actualline->line.Separator;
     data->NoNotify = TRUE;
     SetAttrs(data->object,  MUIA_TextEditor_Pen,            data->Pen,
                     MUIA_TextEditor_Flow,         data->Flow,
@@ -340,7 +340,7 @@ ULONG Show(struct IClass *cl, Object *obj, Msg msg)
     struct line_node  *line;
     struct MUI_AreaData *ad = muiAreaData(obj);
     LONG  lines = 0;
-
+DebugPrintF("1\n");
   DoSuperMethodA(cl, obj, msg);
 
   if(!data->font)
@@ -352,7 +352,7 @@ ULONG Show(struct IClass *cl, Object *obj, Msg msg)
   data->maxlines      = (ad->mad_Box.Height - ad->mad_subheight) / data->height;
   data->ypos        = ad->mad_Box.Top + ad->mad_addtop + ((ad->mad_Box.Height-ad->mad_subheight)%data->height)/2;
   data->realypos      = data->ypos;
-
+DebugPrintF("2\n");
   line = data->firstline;
   while(line)
   {
@@ -364,12 +364,15 @@ ULONG Show(struct IClass *cl, Object *obj, Msg msg)
     line = line->next;
   }
   data->totallines = lines;
+DebugPrintF("3\n");
 
   data->shown   = TRUE;
   data->update  = FALSE;
   ScrollIntoDisplay(data);
   data->update  = TRUE;
   data->shown   = FALSE;
+DebugPrintF("4\n");
+
   SetAttrs(obj, MUIA_TextEditor_Prop_DeltaFactor, data->height,
             MUIA_TextEditor_Prop_Entries,
               ((lines-(data->visual_y-1) < data->maxlines) ?
@@ -742,15 +745,15 @@ DISPATCHERPROTO(_Dispatcher)
     set(obj, MUIA_TextEditor_Pen, data->Pen);
   }
 
-  if(data->actualline->flow != data->Flow)
+  if(data->actualline->line.Flow != data->Flow)
   {
-    data->Flow = data->actualline->flow;
-    set(obj, MUIA_TextEditor_Flow, data->actualline->flow);
+    data->Flow = data->actualline->line.Flow;
+    set(obj, MUIA_TextEditor_Flow, data->actualline->line.Flow);
   }
-  if(data->actualline->separator != data->Separator)
+  if(data->actualline->line.Separator != data->Separator)
   {
-    data->Separator = data->actualline->separator;
-    set(obj, MUIA_TextEditor_Separator, data->actualline->separator);
+    data->Separator = data->actualline->line.Separator;
+    set(obj, MUIA_TextEditor_Separator, data->actualline->line.Separator);
   }
   if(areamarked != Enabled(data))
   {

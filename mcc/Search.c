@@ -99,7 +99,7 @@ ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
     while(line)
     {
       LONG skip;
-      STRPTR contents = line->contents + cursor + len-1, upper = line->contents + line->length;
+      STRPTR contents = line->line.Contents + cursor + len-1, upper = line->line.Contents + line->line.Length;
       while(contents < upper)
       {
         skip = map[*contents];
@@ -108,7 +108,7 @@ ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
         {
           if(!StrCmp(contents, msg->SearchString, len))
           {
-            UWORD startx = contents - line->contents;
+            UWORD startx = contents - line->line.Contents;
             SimpleMarkText(startx, line, startx+len, line, data);
             return TRUE;
           }

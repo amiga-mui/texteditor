@@ -266,10 +266,10 @@ ULONG CallFunction (UWORD function, LONG *args, STRPTR txtargs, struct InstData 
       {
           STRPTR buffer;
 
-        if((buffer = AllocVec(data->actualline->length+1, MEMF_ANY)))
+        if((buffer = AllocVec(data->actualline->line.Length+1, MEMF_ANY)))
         {
-          CopyMem(data->actualline->contents, buffer, data->actualline->length);
-          buffer[data->actualline->length] = '\0';
+          CopyMem(data->actualline->line.Contents, buffer, data->actualline->line.Length);
+          buffer[data->actualline->line.Length] = '\0';
           result = (ULONG)buffer;
         }
         break;

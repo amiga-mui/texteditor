@@ -81,7 +81,7 @@ VOID DrawSeparator (struct RastPort *rp, WORD X, WORD Y, WORD Width, WORD Height
 
 LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, struct InstData *data)
 {
-    STRPTR  text    = line->contents;
+    STRPTR  text    = line->line.Contents;
     LONG    length  = LineCharsWidth(text+x, data);
     struct RastPort *rp = &data->doublerp;
 
@@ -111,13 +111,13 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
       LONG  startx = 0, stopx = 0;
       LONG  starty = 0, xoffset = ((data->height-rp->TxBaseline+1)>>1)+1;
       LONG  flow = 0;
-      UWORD *styles = line->styles;
-      UWORD *colors = line->colors;
+      UWORD *styles = line->line.Styles;
+      UWORD *colors = line->line.Colors;
       struct marking block;
       BOOL  cursor = FALSE;
 
-    if(line->color && x == 0 && line->length == 1)
-      line->color = FALSE;
+    if(line->line.Color && x == 0 && line->line.Length == 1)
+      line->line.Color = FALSE;
 
     if(!doublebuffer)
     {
@@ -125,7 +125,7 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
       xoffset = data->xpos;
     }
 
-    flow = FlowSpace(line->flow, text+x, data);
+    flow = FlowSpace(line->line.Flow, text+x, data);
     Move(rp, xoffset+flow, starty+rp->TxBaseline);
 
     if(Enabled(data))
@@ -147,7 +147,7 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
         if(block.startline == line)
         {
           startx = block.startx;
-          stopx = line->length;
+          stopx = line->line.Length;
         }
         else
         {
@@ -161,7 +161,7 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
             {
               if(blkline == line)
               {
-                stopx = line->length;
+                stopx = line->line.Length;
               }
               blkline = blkline->next;
             }
@@ -249,7 +249,7 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
       AddClipping(data);
     }
 
-    SetAPen(rp, (line->color ? data->highlightcolor : data->textcolor));
+    SetAPen(rp, (line->line.Color ? data->highlightcolor : data->textcolor));
     while(c_length)
     {
         LONG p_length = c_length;
@@ -271,7 +271,7 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
       {
         while(*colors-1 <= x)
         {
-          SetAPen(rp, ConvertPen(*(colors+1), line->color, data));
+          SetAPen(rp, ConvertPen(*(colors+1), line->line.Color, data));
           colors += 2;
         }
         if(*colors-x-1 < p_length)
@@ -303,7 +303,7 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
       c_length -= p_length;
     }
 
-    if(line->separator)
+    if(line->line.Separator)
     {
         WORD  LeftX, LeftWidth,
             RightX, RightWidth,
@@ -314,17 +314,17 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
       RightX = rp->cp_x+3;
       RightWidth = xoffset+data->innerwidth - RightX;
       Y = starty;
-      Height = (line->separator & LNSF_Thick) ? 2 : 1;
+      Height = (line->line.Separator & LNSF_Thick) ? 2 : 1;
 
-      if(line->separator & LNSF_Middle)
+      if(line->line.Separator & LNSF_Middle)
         Y += (data->height/2)-Height;
       else
       {
-        if(line->separator & LNSF_Bottom)
+        if(line->line.Separator & LNSF_Bottom)
           Y += data->height-(2*Height);
       }
 
-      if(line->separator & LNSF_StrikeThru || line->length == 1)
+      if(line->line.Separator & LNSF_StrikeThru || line->line.Length == 1)
       {
         LeftWidth = data->innerwidth;
       }
@@ -411,7 +411,7 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
   }
 
   if(data->flags & FLG_HScroll)
-    length = line->length;
+    length = line->line.Length;
 
   return(length);
 }

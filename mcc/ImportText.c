@@ -29,9 +29,7 @@
 #include "TextEditor_mcc.h"
 #include "private.h"
 
-struct line_node *ImportText(char *contents, void *mempool, struct Hook *importHook, LONG len, LONG wraplength)
+struct line_node *ImportText(char *contents, void *mempool, struct Hook *importHook, LONG wraplength)
 {
-  #warning "ImportText() implementation missing";
-
-  return NULL;
+	return NULL;
 }
