@@ -43,6 +43,44 @@ struct grow
 
 /*************************************************************************/
 
+
+
+/*************************************************************************/
+
+STATIC LONG GetHex(char *src)
+{
+	if ((src[0] >= '0' && src[0] <= '9')) return src[0] - '0';
+	if ((src[0] >= 'a' && src[0] <= 'f')) return src[0] - 'a' + 10;
+	if ((src[0] >= 'A' && src[0] <= 'F')) return src[0] - 'A' + 10;
+	return -1;
+}
+
+/************************************************************************
+ 
+*************************************************************************/
+STATIC BOOL GetQP(char **src_ptr, unsigned char *val)
+{
+	unsigned char v;
+	char *src = *src_ptr;
+	int rc;
+
+	rc = GetHex(src);
+	if (rc != -1)
+	{
+		v = rc << 4;
+
+		rc = GetHex(&src[1]);
+		if (rc != -1)
+		{
+			v |= rc;
+			*val = v;
+			*src_ptr = src + 2;
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 /************************************************************************
  Reads out the next value at *src_ptr and advances src_ptr.
  Returns TRUE if succedded else FALSE
@@ -57,6 +95,27 @@ STATIC BOOL GetLong(char **src_ptr, LONG *val)
 	}
 	return FALSE;
 }
+
+/************************************************************************
+ Returns the last character in the current line
+*************************************************************************/
+STATIC char *FindEOL(char *src)
+{
+	/* Find the end of the line */
+	char *eol = strchr(src,'\n');
+	if (!eol)
+	{
+		int len = strlen(src);
+		if (!len) return NULL;
+		eol = src + len - 1;
+	}
+
+	if (eol > src && eol[-1] == '\r')
+		eol--;
+
+	return eol;
+}
+
 
 /************************************************************************
  Adds two new values to the given grow. This function guarantees
@@ -253,28 +312,18 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 }
 MakeHook(ImPlainHook, PlainImportHookFunc);
 
-HOOKPROTONO(EMailImportHookFunc, STRPTR , struct ImportMessage *msg)
+/************************************************************************
+ The MIME import hook. It supports following escape sequences:
+*************************************************************************/
+STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 {
 	char *eol;
-	char *ret;
 	char *src = msg->Data;
 	int len;
 	struct LineNode *line = msg->linenode;
 
-	/* Find the end of the line */
-	eol = strchr(src,'\n');
-	if (!eol)
-	{
-		int len = strlen(src);
-		if (!len) return NULL;
-		eol = src + len;
-		ret = NULL;
-	} else
-	{
-		ret = eol + 1;
-		if (eol != (char*)msg->Data && eol[-1] == '\r')
-			eol--;
-	}
+	if (!(eol = FindEOL(src)))
+		return NULL;
 
 	/* Clear the flow */
 	line->Flow = 0;
@@ -339,6 +388,25 @@ HOOKPROTONO(EMailImportHookFunc, STRPTR , struct ImportMessage *msg)
 				AddToGrow(&color_grow, dest - line->Contents + 1, (state & COLOURED)?0:7);
 				state ^= COLOURED;
 				continue;
+			} else
+			if (c == '=' && type > 0)
+			{
+				if (!GetQP(&src,&c))
+				{
+					int i;
+					
+					i = 0;
+					if (src[0] == '\r') i++;
+
+					if (src[i] == '\n')
+					{
+						src += i + 1;
+
+						if (!(eol = FindEOL(src)))
+							break;
+						continue;
+					}
+				}
 			}
 
 			*dest++ = c;
@@ -366,20 +434,24 @@ HOOKPROTONO(EMailImportHookFunc, STRPTR , struct ImportMessage *msg)
 
 		line->Length = dest - line->Contents; /* this excludes \n */
 	}
-  return ret;
+
+  return eol?eol + 1:NULL;
+}
+
+HOOKPROTONO(EMailImportHookFunc, STRPTR , struct ImportMessage *msg)
+{
+	return MimeImport(msg,0);
 }
 MakeHook(ImEMailHook, EMailImportHookFunc);
 
 HOOKPROTONO(MIMEImportHookFunc, STRPTR, struct ImportMessage *msg)
 {
-  #warning "ImportHook not finished yet!!";
-  return PlainImportHookFunc(hook, NULL, msg);
+	return MimeImport(msg,1);
 }
 MakeHook(ImMIMEHook, MIMEImportHookFunc);
 
 HOOKPROTONO(MIMEQuoteImportHookFunc, STRPTR, struct ImportMessage *msg)
 {
-  #warning "ImportHook not finished yet!!";
-  return PlainImportHookFunc(hook, NULL, msg);
+	return MimeImport(msg,2);
 }
 MakeHook(ImMIMEQuoteHook, MIMEQuoteImportHookFunc);
