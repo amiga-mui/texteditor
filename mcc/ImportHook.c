@@ -308,6 +308,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 	char *src = msg->Data;
 	int len;
 	struct LineNode *line = msg->linenode;
+	ULONG wrap = msg->ImportWrap;
 
 	if (!(eol = FindEOL(src)))
 		return NULL;
@@ -318,8 +319,12 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 	len = eol - src;
 	if ((line->Contents = MyAllocPooled(msg->PoolHandle,len+2)))
 	{
-		unsigned char *dest = (unsigned char*)line->Contents;
+		unsigned char *dest_start = (unsigned char*)line->Contents;
+		unsigned char *dest = dest_start;
+		unsigned char *src_word_start = src;
+		unsigned char *dest_word_start = dest_start;
 
+		/* Style and color state */
 		int state = 0;
 
 		struct grow style_grow;
@@ -354,25 +359,25 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 
 			if (c == '/')
 			{
-				AddToGrow(&style_grow, dest - line->Contents + 1, (state & ITALIC)?~ITALIC:ITALIC);
+				AddToGrow(&style_grow, dest - dest_start + 1, (state & ITALIC)?~ITALIC:ITALIC);
 				state ^= ITALIC;
 				continue;
 			} else
 			if (c == '*')
 			{
-				AddToGrow(&style_grow, dest - line->Contents + 1, (state & BOLD)?~BOLD:BOLD);
+				AddToGrow(&style_grow, dest - dest_start + 1, (state & BOLD)?~BOLD:BOLD);
 				state ^= BOLD;
 				continue;
 			} else
 			if (c == '_')
 			{
-				AddToGrow(&style_grow, dest - line->Contents + 1, (state & UNDERLINE)?~UNDERLINE:UNDERLINE);
+				AddToGrow(&style_grow, dest - dest_start + 1, (state & UNDERLINE)?~UNDERLINE:UNDERLINE);
 				state ^= UNDERLINE;
 				continue;
 			} else
 			if (c == '#')
 			{
-				AddToGrow(&color_grow, dest - line->Contents + 1, (state & COLOURED)?0:7);
+				AddToGrow(&color_grow, dest - dest_start + 1, (state & COLOURED)?0:7);
 				state ^= COLOURED;
 				continue;
 			} else
@@ -393,6 +398,25 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 							break;
 						continue;
 					}
+				}
+			}
+
+			if (c == ' ')
+			{
+				/* src is already advanced */
+				src_word_start = src;
+				dest_word_start = dest;
+			}
+
+			if (wrap && ((ULONG)(dest - dest_start)) >= wrap)
+			{
+				/* Only leave the loop, if we really have added some characters to the line */
+				if (dest_word_start != dest_start)
+				{
+					/* src points to the real word start, but we add one when we return eol */
+					eol = src_word_start - 1;
+					dest = dest_word_start;
+					break;
 				}
 			}
 
