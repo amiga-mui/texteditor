@@ -7,6 +7,10 @@ $Source$
 
 2005-04-05  Sebastian Bauer <mail@sebastianbauer.info>
 
+    * mcc: Clipboard handling for copy/paste was totaly broken (don't
+      confuse clipboard.device with console.device ;) ). Now only one 
+      pointer is used within the instace data for the clipboard io
+      request.
     * mcc: Reimplemented Workbench path search support when starting shell
       commands (e.g. for the spell checkers). This however requires at
       least version 44 of workbench.library (coming with OS3.5)
