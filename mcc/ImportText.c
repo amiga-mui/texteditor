@@ -83,6 +83,10 @@ struct line_node *ImportText(char *contents, void *mempool, struct Hook *importH
             ctext[1] = '\0';
             line->line.Contents = ctext;
             line->line.Length   = 1;
+          } else
+          {
+	  				FreePooled(mempool,first_line,sizeof(struct line_node));
+          	first_line = NULL;
           }
 				}
 			}
