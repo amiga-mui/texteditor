@@ -20,18 +20,39 @@
 
 ***************************************************************************/
 
-#include <stdio.h>
 #include <string.h>
-#include <exec/types.h>
-#include <clib/dos_protos.h>
+
 #include <proto/exec.h>
+#include <proto/utility.h>
 
 #include "TextEditor_mcc.h"
 #include "private.h"
 
 void *ExportText(struct line_node *node, struct Hook *exportHook, LONG wraplen)
 {
-  #warning "ExportText() implementation missing!!";
+	struct ExportMessage emsg;
+	void *user_data = NULL;
 
-  return NULL;
+	memset(&emsg,0,sizeof(emsg));
+
+	while (node)
+	{
+		struct line_node *next_node = node->next;
+
+		emsg.UserData = user_data;
+		emsg.Contents = node->line.Contents;
+		emsg.Length = node->line.Length;
+		emsg.Styles = node->line.Styles;
+		emsg.Colors = node->line.Colors;
+		emsg.Highlight = node->line.Color;
+		emsg.Flow = node->line.Flow;
+		emsg.Separator = node->line.Separator;
+		emsg.ExportWrap = wraplen;
+		emsg.Last = !next_node;
+
+		user_data = (void*)CallHookPkt(exportHook, NULL, &emsg);
+
+		node = next_node;
+	}
+  return user_data;
 }
