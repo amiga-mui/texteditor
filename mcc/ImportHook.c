@@ -98,22 +98,30 @@ STATIC BOOL GetLong(char **src_ptr, LONG *val)
 }
 
 /************************************************************************
- Returns the last character in the current line
+ Returns the end of line in the current line (pointing at the linefeed).
+ If a 0 byte is encountered it returns the pointer to the 0 byte.
+ If src contains only a 0 byte, NULL is returnded
+
+ This function also counts the number of tabs within this line.
 *************************************************************************/
-STATIC char *FindEOL(char *src)
+STATIC char *FindEOL(char *src, int *tabs_ptr)
 {
-	/* Find the end of the line */
-	char *eol = strchr(src,'\n');
-	if (!eol)
+	int tabs;
+	char c;
+	char *eol;
+
+	tabs = 0;
+	eol = src;
+
+	while ((c = *eol))
 	{
-		int len = strlen(src);
-		if (!len) return NULL;
-		eol = src + len - 1;
+		if (c == '\t') tabs++;
+		else if (c == '\r' || c == '\n') break;
+		eol++;
 	}
 
-	if (eol > src && eol[-1] == '\r')
-		eol--;
-
+	if (tabs_ptr) *tabs_ptr = tabs;
+	if (src[0] == 0) return NULL;
 	return eol;
 }
 
@@ -175,19 +183,21 @@ STATIC VOID AddToGrow(struct grow *grow, UWORD val1, UWORD val2)
                      8 = StrikeThru   - Draw separator ontop of text.
                      16 = Thick        - Make separator extra thick.
 
+ Note: Tabs are converted to spaces with a tab size of 4.
 *************************************************************************/
 HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 {
 	char *eol;
 	char *src = msg->Data;
 	int len;
+	int tabs;
 	struct LineNode *line = msg->linenode;
 
-	if (!(eol = FindEOL(src)))
+	if (!(eol = FindEOL(src,&tabs)))
 		return NULL;
 
 	len = eol - src;
-	if ((line->Contents = MyAllocPooled(msg->PoolHandle,len+2)))
+	if ((line->Contents = MyAllocPooled(msg->PoolHandle,len+2+tabs*4)))
 	{
 		unsigned char *dest = (unsigned char*)line->Contents;
 
@@ -198,6 +208,8 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 		int current_color = 0;
 		int new_color = 0;
 		struct grow color_grow;
+
+		int pos = 0;
 
 		memset(&color_grow,0,sizeof(color_grow));
 		memset(&style_grow,0,sizeof(style_grow));
@@ -257,7 +269,20 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 				continue;
 			}
 
+			if (c == '\t')
+			{
+				int i;
+
+				for (i=(pos )% 4; i < 4; i++)
+				{
+					*dest++ = ' ';
+					pos++;
+				}
+				continue;
+			}
+
 			*dest++ = c;
+			pos++;
 
 			/* Handle color changes */
 			if (new_color != current_color)
@@ -311,7 +336,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 	struct LineNode *line = msg->linenode;
 	ULONG wrap = msg->ImportWrap;
 
-	if (!(eol = FindEOL(src)))
+	if (!(eol = FindEOL(src,NULL)))
 		return NULL;
 
 	/* Clear the flow */
@@ -407,7 +432,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 
 						src += i + 1;
 
-						if (!(eol = FindEOL(src)))
+						if (!(eol = FindEOL(src,NULL)))
 							break;
 
 						/* The size of the dest buffer has to be increased now */
@@ -471,7 +496,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 		*dest++ = '\n';
 		*dest = 0;
 
-		line->Length = dest - line->Contents; /* this excludes \n */
+		line->Length = dest - dest_start; /* this excludes \n */
 	}
 
   return eol?eol + 1:NULL;
