@@ -419,6 +419,8 @@ extern struct Hook ExportHook;
     UWORD action;
   };
 
+#include "amiga-align.h"
+
   struct te_key
   {
     UWORD code;
@@ -430,6 +432,8 @@ extern struct Hook ExportHook;
   {
     struct  te_key  keydata;
   };
+
+#include "default-align.h"
 
   struct line_node
   {
