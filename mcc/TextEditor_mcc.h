@@ -207,8 +207,8 @@ struct LineNode
 {
   STRPTR   Contents;      /* Set this to the linecontents (allocated via the poolhandle) */
   ULONG    Length;        /* The length of the line (including the '\n') */
-  UWORD    *Styles;       /* Set this to the styles used for this line (allocated via the poolhandle) */
-  UWORD   *Colors;
+  UWORD    *Styles;       /* Set this to the styles used for this line (allocated via the poolhandle) the format is: pos,style,pos,style,...,-1,0*/
+  UWORD    *Colors;       /* The colors to use (allocated via the poolhandle) the format is: pos,color,pos,color,...,-1,-0 */
   BOOL     Color;         /* Set this to TRUE if you want the line to be highlighted */
   UWORD    Flow;          /* Use the MUIV_TextEditor_Flow_xxx values... */
   UWORD    Separator;     /* See definitions bellow */
