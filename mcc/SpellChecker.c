@@ -31,6 +31,7 @@
 #include <proto/locale.h>
 #include <proto/muimaster.h>
 #include <proto/rexxsyslib.h>
+#include <proto/wb.h>
 #include <rexx/storage.h>
 
 #include "TextEditor_mcc.h"
@@ -100,25 +101,31 @@ long SendRexx (char *word, char *command, struct InstData *data)
   return result;
 }
 
-//void *CloneWBPath(struct WBStartup *, struct  Library *);
-//void FreeWBPath(void *, struct  Library *);
-
 long SendCLI(char *word, char *command, UNUSED struct InstData *data)
 {
   char buffer[512];
   long result = TRUE;
-  BPTR path;
+  BPTR path = ZERO;
 
   sprintf(buffer, command, word);
 
-  #warning "CloneWB/FreeWB necessary?"
-  //path = CloneWBPath(NULL, DOSBase);
-  if(SystemTags(buffer, /*NP_Path, path,*/ TAG_DONE) == -1)
+	/* Find out workbench path */
+	if (WorkbenchBase && WorkbenchBase->lib_Version >= 44)
+	{
+		WorkbenchControl(NULL, WBCTRLA_DuplicateSearchPath, &path, TAG_DONE);
+	}
+
+  if (SystemTags(buffer, path?NP_Path:TAG_IGNORE, path, TAG_DONE) == -1)
   {
     result = FALSE;
-    //FreeWBPath(path, DOSBase);
+    
+    /* Free the path */
+		if (path)
+		{
+			WorkbenchControl(NULL, WBCTRLA_FreeSearchPath, path, TAG_DONE);
+		}
   }
-  return(result);
+  return result;
 }
 
 void *SuggestWindow (struct InstData *data)
