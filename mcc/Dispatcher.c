@@ -340,7 +340,7 @@ ULONG Show(struct IClass *cl, Object *obj, Msg msg)
     struct line_node  *line;
     struct MUI_AreaData *ad = muiAreaData(obj);
     LONG  lines = 0;
-DebugPrintF("1\n");
+
   DoSuperMethodA(cl, obj, msg);
 
   if(!data->font)
@@ -352,7 +352,7 @@ DebugPrintF("1\n");
   data->maxlines      = (ad->mad_Box.Height - ad->mad_subheight) / data->height;
   data->ypos        = ad->mad_Box.Top + ad->mad_addtop + ((ad->mad_Box.Height-ad->mad_subheight)%data->height)/2;
   data->realypos      = data->ypos;
-DebugPrintF("2\n");
+
   line = data->firstline;
   while(line)
   {
@@ -364,14 +364,12 @@ DebugPrintF("2\n");
     line = line->next;
   }
   data->totallines = lines;
-DebugPrintF("3\n");
 
   data->shown   = TRUE;
   data->update  = FALSE;
   ScrollIntoDisplay(data);
   data->update  = TRUE;
   data->shown   = FALSE;
-DebugPrintF("4\n");
 
   SetAttrs(obj, MUIA_TextEditor_Prop_DeltaFactor, data->height,
             MUIA_TextEditor_Prop_Entries,
