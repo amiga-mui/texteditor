@@ -5,6 +5,9 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-03-31  Gunther Nikl
+    * all: Source cleanup and minor OS3 makefile changes.
+
 2005-03-31  Jens Langner <Jens.Langner@light-speed.de>
 
     * mcp: modified preferences sources to use flexcat to generate

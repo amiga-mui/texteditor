@@ -32,7 +32,7 @@
 #include <libraries/mui.h>
 #include "muiextra.h"
 #else
-#include <Exec/Semaphores.h>
+#include <exec/semaphores.h>
 #define MUIM_DrawBackground 0x804238ca
 #define MUIM_GetConfigItem  0x80423edb
 #define set(obj,attr,value) SetAttrs(obj,attr,value,TAG_DONE)
@@ -476,4 +476,3 @@ extern struct Hook ExportHook;
 #define  MUIM_TextEditor_ToggleCursor     0xad000102
 
 #endif /* TEXTEDITOR_MCC_PRIV_H */
-
