@@ -32,27 +32,27 @@
 HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 {
   #warning "ImportHook not finished yet!!";
-  return(msg->Data);
+  return NULL;
 }
 MakeHook(ImPlainHook, PlainImportHookFunc);
 
 HOOKPROTONO(EMailImportHookFunc, STRPTR, struct ImportMessage *msg)
 {
   #warning "ImportHook not finished yet!!";
-  return(msg->Data);
+  return NULL;
 }
 MakeHook(ImEMailHook, EMailImportHookFunc);
 
 HOOKPROTONO(MIMEImportHookFunc, STRPTR, struct ImportMessage *msg)
 {
   #warning "ImportHook not finished yet!!";
-  return(msg->Data);
+  return NULL;
 }
 MakeHook(ImMIMEHook, MIMEImportHookFunc);
 
 HOOKPROTONO(MIMEQuoteImportHookFunc, STRPTR, struct ImportMessage *msg)
 {
   #warning "ImportHook not finished yet!!";
-  return(msg->Data);
+  return NULL;
 }
 MakeHook(ImMIMEQuoteHook, MIMEQuoteImportHookFunc);
