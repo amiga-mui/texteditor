@@ -111,12 +111,16 @@ struct KeyAction
   UWORD action;
 };
 
+#include "amiga-align.h"
+
 struct te_key
 {
   UWORD code;
   ULONG qual;
   UWORD act;
 };
+
+#include "default-align.h"
 
 // extern dispatcher protos of other internal MUI classes
 extern SAVEDS ASM ULONG Text_Dispatcher(REG(a0, struct IClass * cl), REG(a2, Object * obj), REG(a1, Msg msg));
