@@ -102,11 +102,18 @@ long SendRexx (char *word, char *command, struct InstData *data)
   return result;
 }
 
+#if !defined(__amigaos4__) && !defined(__MORPHOS__)
+BOOL WorkbenchControl(STRPTR name, ...)
+{
+  return WorkbenchControlA(name, (struct TagItem *)(&name+1));
+}
+#endif
+
 long SendCLI(char *word, char *command, UNUSED struct InstData *data)
 {
   char buffer[512];
   long result = TRUE;
-  BPTR path = ZERO;
+  BPTR path = ((BPTR)NULL);
 
   sprintf(buffer, command, word);
 

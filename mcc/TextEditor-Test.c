@@ -131,7 +131,7 @@ int main(void)
     GETINTERFACE(IDiskfont, DiskfontBase))
   if((GfxBase = OpenLibrary("graphics.library", 38)) &&
     GETINTERFACE(IGraphics, GfxBase))
-  if((IntuitionBase = OpenLibrary("intuition.library", 38)) &&
+  if((IntuitionBase = (APTR)OpenLibrary("intuition.library", 38)) &&
     GETINTERFACE(IIntuition, IntuitionBase))
   if((KeymapBase = OpenLibrary("keymap.library", 38)) &&
     GETINTERFACE(IKeymap, KeymapBase))
@@ -546,7 +546,7 @@ int main(void)
   if(IntuitionBase)
   {
     DROPINTERFACE(IIntuition);
-    CloseLibrary(IntuitionBase);
+    CloseLibrary((struct Library *)IntuitionBase);
   }
 
   if(GfxBase)

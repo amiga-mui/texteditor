@@ -134,7 +134,7 @@ char *GetBlock (struct marking *block, struct InstData *data)
       emsg.Flow = startline->line.Flow;
       emsg.Separator = startline->line.Separator;
       emsg.Highlight = startline->line.Color;
-      emsg.UserData = (APTR)CallHookA(&ExPlainHook, &ExPlainHook, &emsg);
+      emsg.UserData = (APTR)CallHookA(&ExPlainHook, (APTR)&ExPlainHook, &emsg);
       MyFreePooled(data->mypool, emsg.Contents);
     }
 
@@ -152,7 +152,7 @@ char *GetBlock (struct marking *block, struct InstData *data)
       emsg.Flow   = act->line.Flow;
       emsg.Separator = act->line.Separator;
       emsg.Highlight = act->line.Color;
-      emsg.UserData = (APTR)CallHookA(&ExPlainHook, &ExPlainHook, &emsg);
+      emsg.UserData = (APTR)CallHookA(&ExPlainHook, (APTR)&ExPlainHook, &emsg);
       act = act->next;
     }
 
@@ -199,7 +199,7 @@ char *GetBlock (struct marking *block, struct InstData *data)
       emsg.Separator = stopline->line.Separator;
       emsg.Highlight = stopline->line.Color;
       emsg.Last = TRUE;
-      text = (STRPTR)CallHookA(&ExPlainHook, &ExPlainHook, &emsg);
+      text = (STRPTR)CallHookA(&ExPlainHook, (APTR)&ExPlainHook, &emsg);
       MyFreePooled(data->mypool, emsg.Contents);
     }
 
@@ -269,7 +269,7 @@ char *GetBlock (struct marking *block, struct InstData *data)
       emsg.Separator = startline->line.Separator;
       emsg.Highlight = startline->line.Color;
       emsg.Last = TRUE;
-      text = (STRPTR)CallHookA(&ExPlainHook, &ExPlainHook, &emsg);
+      text = (STRPTR)CallHookA(&ExPlainHook, (APTR)&ExPlainHook, &emsg);
       MyFreePooled(data->mypool, emsg.Contents);
     }
 
@@ -706,7 +706,6 @@ LONG CutBlock2 (struct InstData *data, long Clipboard, long NoCut, struct markin
       }
       else  c_startline = c_startline->next;
     }
-DebugPrintF("4\n");
 
     if(Clipboard)
     {
@@ -715,7 +714,6 @@ DebugPrintF("4\n");
 
       EndClipSession(data);
     }
-DebugPrintF("5\n");
 
     if(!NoCut)
     {

@@ -7,8 +7,10 @@ $Source$
 
 2005-04-06  Jens Langner <Jens.Langner@light-speed.de>
  
+    * mcc: fixed OS3 build as well and removed all remaining compiler
+      warnings.
     * mcc/Dispatcher.c: fixed recently broken OS4 build due to latest
-	   MorphOS changes.
+      MorphOS changes.
 
 2005-04-06  Ilkka Lehtoranta <ilkleht@isoveli.org>
 
