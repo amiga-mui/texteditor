@@ -57,7 +57,7 @@ MakeStaticHook(URLHook, URLHookCode);
 
 Object *editorgad;
 
-HOOKPROTONHNP(PosHookCode, void, Object obj)
+HOOKPROTONHNP(PosHookCode, void, Object *obj)
 {
   ULONG x, y, sx, sy;
   struct Rectangle *crsr;
@@ -115,7 +115,7 @@ struct RexxSysIFace *IRexxSys = NULL;
 struct UtilityIFace *IUtility = NULL;
 #endif
 
-void main(void)
+int main(void)
 {
   void    *slider;
   long    argarray[6] = {0,0,0,0,0,0};
@@ -139,7 +139,7 @@ void main(void)
   if((UtilityBase = OpenLibrary("utility.library", 38)) &&
     GETINTERFACE(IUtility, UtilityBase))
   {
-    if(args = ReadArgs("Filename/A,MIME/S,MIMEQuoted/S,SkipHeader/S,Fixed/S,EMail/S", argarray, NULL))
+    if((args = ReadArgs("FILENAME,MIME/S,MIMEQUOTED/S,SKIPHEADER/S,FIXED/S,EMAIL/S", argarray, NULL)))
     {
       if((MUIMasterBase = OpenLibrary("muimaster.library", MUIMASTER_VMIN)) &&
         GETINTERFACE(IMUIMaster, MUIMasterBase))
@@ -148,10 +148,10 @@ void main(void)
                 *bold, *italic, *underline, *ischanged, *undo, *redo, *string,
                 *xslider, *yslider, *flow;
           STRPTR  flow_text[] = {"Left", "Center", "Right", NULL};
-          STRPTR  titles[] = {"Nothing", "Editor", NULL};
           STRPTR  classes[] = {"TextEditor.mcc", NULL};
 
         mcc = MUI_CreateCustomClass(NULL, "Area.mui", NULL, sizeof(struct InstData), (void *)_Dispatcher);
+        
         app = MUI_NewObject("Application.mui",
               MUIA_Application_Author,    "Allan Odgaard",
               MUIA_Application_Base,      "Editor-Demo",
@@ -349,37 +349,41 @@ void main(void)
           {
             set(editorgad, MUIA_TextEditor_FixedFont, TRUE);
           }
-          if(fh = Open((char *)argarray[0], MODE_OLDFILE))
-          {
-              char  *text = AllocVec(50*1024, 0L);
-              char  *buffer = text;
-              int size;
 
-            size = Read(fh, text, (50*1024)-2);
-            text[size] = '\0';
-            Close(fh);
-
-            if(argarray[3])
-            {
-              while(*buffer != '\n' && buffer < &text[size])
-              {
-                while(*buffer++ != '\n');
-              }
-            }
-
-            if(argarray[2])
-              set(editorgad, MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_MIMEQuoted);
-            else
-              if(argarray[1])
-                set(editorgad, MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_MIME);
-              else
-                if(argarray[5])
-                  set(editorgad, MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_EMail);
-
-            SetAttrs(editorgad, MUIA_TextEditor_Contents, buffer,
-                          TAG_DONE);
-            FreeVec(text);
-          }
+					if (argarray[0])
+					{
+	          if((fh = Open((char *)argarray[0], MODE_OLDFILE)))
+	          {
+	              char  *text = AllocVec(50*1024, 0L);
+	              char  *buffer = text;
+	              int size;
+	
+	            size = Read(fh, text, (50*1024)-2);
+	            text[size] = '\0';
+	            Close(fh);
+	
+	            if(argarray[3])
+	            {
+	              while(*buffer != '\n' && buffer < &text[size])
+	              {
+	                while(*buffer++ != '\n');
+	              }
+	            }
+	
+	            if(argarray[2])
+	              set(editorgad, MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_MIMEQuoted);
+	            else
+	              if(argarray[1])
+	                set(editorgad, MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_MIME);
+	              else
+	                if(argarray[5])
+	                  set(editorgad, MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_EMail);
+	
+	            SetAttrs(editorgad, MUIA_TextEditor_Contents, buffer,
+	                          TAG_DONE);
+	            FreeVec(text);
+	          }
+					}
 
           set(string, MUIA_CycleChain, TRUE);
 
@@ -536,4 +540,6 @@ void main(void)
     DROPINTERFACE(IDiskfont);
     CloseLibrary(DiskfontBase);
   }
+
+  return 0;
 }
