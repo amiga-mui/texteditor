@@ -54,7 +54,7 @@
 #define ClassInit
 #define ClassExit
 
-#include "Locale.h"
+#include "locale.h"
 
 #if defined(__amigaos4__) || defined(__MORPHOS__)
 struct Library *LocaleBase = NULL;
@@ -74,7 +74,8 @@ BOOL ClassInitFunc(UNUSED struct Library *base)
   if((LocaleBase = (APTR)OpenLibrary("locale.library", 38)) &&
      GETINTERFACE(ILocale, LocaleBase))
   {
-    OpenCat(NULL);
+    // open the TextEditor.mcp catalog
+    OpenCat();
 
     if((widthslider_mcc = MUI_CreateCustomClass(NULL, "Slider.mui", NULL, 0, (void *)WidthSlider_Dispatcher)))
     {

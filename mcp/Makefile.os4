@@ -27,10 +27,12 @@ RM    = rm -f
 RMDIR = rm -rf
 MKDIR = mkdir
 CP    = cp
+FC    = flexcat
 
 # Directories
 OBJDIR = .obj_os4
 BINDIR = bin_os4
+LOCALE = locale
 
 # Compiler/Linker flags
 CPU      = -mcpu=604e
@@ -60,26 +62,26 @@ PREFTARGET= $(BINDIR)/TextEditor-Prefs
 M68KSTUBS = $(OBJDIR)/mccclass_68k.o
 
 MCPOBJS = $(OBJDIR)/library.o \
+          $(OBJDIR)/locale.o \
           $(OBJDIR)/CreatePrefsGroup.o \
           $(OBJDIR)/Dispatcher.o \
           $(OBJDIR)/Keybindings.o \
           $(OBJDIR)/KeyStorage.o \
-          $(OBJDIR)/Locale.o \
           $(OBJDIR)/ObjectCreator.o \
           $(OBJDIR)/UserKeys.o
 
-PREFOBJS =$(OBJDIR)/CreatePrefsGroup.o \
+PREFOBJS= $(OBJDIR)/locale.o \
+          $(OBJDIR)/CreatePrefsGroup.o \
           $(OBJDIR)/Dispatcher.o \
           $(OBJDIR)/Keybindings.o \
           $(OBJDIR)/KeyStorage.o \
-          $(OBJDIR)/Locale.o \
           $(OBJDIR)/ObjectCreator.o \
           $(OBJDIR)/UserKeys.o \
           $(OBJDIR)/Preference.o
 
 #
 
-all: $(BINDIR) $(OBJDIR) $(MCPTARGET) $(PREFTARGET)
+all: $(BINDIR) $(OBJDIR) locale.c $(MCPTARGET) $(PREFTARGET)
 
 # make the object directories
 $(OBJDIR):
@@ -101,6 +103,10 @@ $(OBJDIR)/%.o: ../includes/%.S
 	@printf '\033[32mAssembling $<\033[0m\n'
 	@$(CC) $(CFLAGS) -I$(V)/src/kickstart/exec_sg/include -c $< -o $@ -Wa,-mregnames
 
+$(LOCALE)/%.catalog: $(LOCALE)/%.ct
+	@printf '\033[33mGenerating $@\033[0m\n'
+	@$(FC) $(LOCALE)/TextEditor_mcp.cd $< CATALOG $@
+
 #
 
 $(MCPTARGET): $(M68KSTUBS) $(MCPOBJS)
@@ -119,6 +125,11 @@ $(OBJDIR)/library.o: library.c ../includes/mccheader.c \
 $(OBJDIR)/library.o: library.c ../includes/mccheader.c TextEditor_mcp.h \
   private.h icon.bh rev.h
 
+locale.h: locale.c
+locale.c: locale/TextEditor_mcp.cd C_h.sd C_c.sd
+	@printf '\033[33mGenerating locale file $@...\033[0m\n'
+	@$(FC) locale/TextEditor_mcp.cd locale.h=C_h.sd locale.c=C_c.sd
+
 #
 
 .PHONY: clean
@@ -127,5 +138,6 @@ clean:
 
 .PHONY: distclean
 distclean: clean
+	-$(RM) locale.?
 	-$(RMDIR) $(OBJDIR)
 	-$(RMDIR) $(BINDIR)

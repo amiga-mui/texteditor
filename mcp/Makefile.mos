@@ -27,6 +27,7 @@ RM    = rm -f
 RMDIR = rm -rf
 MKDIR	= mkdir
 CP    = cp
+FC    = flexcat
 
 # Directories
 OBJDIR    = .obj_mos
@@ -57,26 +58,26 @@ MCPTARGET = $(BINDIR)/TextEditor.mcp
 PREFTARGET= $(BINDIR)/TextEditor-Prefs
 
 MCPOBJS = $(OBJDIR)/library.o \
+          $(OBJDIR)/locale.o \
           $(OBJDIR)/CreatePrefsGroup.o \
           $(OBJDIR)/Dispatcher.o \
           $(OBJDIR)/Keybindings.o \
           $(OBJDIR)/KeyStorage.o \
-          $(OBJDIR)/Locale.o \
           $(OBJDIR)/ObjectCreator.o \
           $(OBJDIR)/UserKeys.o
 
-PREFOBJS =$(OBJDIR)/CreatePrefsGroup.o \
+PREFOBJS =$(OBJDIR)/locale.o \
+          $(OBJDIR)/CreatePrefsGroup.o \
           $(OBJDIR)/Dispatcher.o \
           $(OBJDIR)/Keybindings.o \
           $(OBJDIR)/KeyStorage.o \
-          $(OBJDIR)/Locale.o \
           $(OBJDIR)/ObjectCreator.o \
           $(OBJDIR)/UserKeys.o \
           $(OBJDIR)/Preference.o
 
 #
 
-all: $(BINDIR) $(OBJDIR) $(MCPTARGET) $(PREFTARGET)
+all: $(BINDIR) $(OBJDIR) locale.c $(MCPTARGET) $(PREFTARGET)
 
 # make the object directories
 $(OBJDIR):
@@ -93,6 +94,10 @@ $(BINDIR):
 $(OBJDIR)/%.o: %.c
 	@printf '\033[32mCompiling $<\033[0m\n'
 	@$(CC) $(CFLAGS) $< -o $@ -DNO_PPCINLINE_STDARG
+
+$(LOCALE)/%.catalog: $(LOCALE)/%.ct
+	@printf '\033[33mGenerating $@\033[0m\n'
+	@$(FC) $(LOCALE)/TextEditor_mcp.cd $< CATALOG $@
 
 #
 
@@ -112,6 +117,11 @@ $(OBJDIR)/library.o: library.c ../includes/mccheader.c \
 $(OBJDIR)/library.o: library.c ../includes/mccheader.c TextEditor_mcp.h \
   private.h icon.bh rev.h
 
+locale.h: locale.c
+locale.c: locale/TextEditor_mcp.cd C_h.sd C_c.sd
+	@printf '\033[33mGenerating locale file $@...\033[0m\n'
+	@$(FC) locale/TextEditor_mcp.cd locale.h=C_h.sd locale.c=C_c.sd
+
 #
 
 .PHONY: clean
@@ -120,5 +130,6 @@ clean:
 
 .PHONY: distclean
 distclean: clean
+	-$(RM) locale.?
 	-$(RMDIR) $(OBJDIR)
 	-$(RMDIR) $(BINDIR)

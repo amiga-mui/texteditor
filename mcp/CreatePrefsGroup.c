@@ -33,7 +33,7 @@
 #include <proto/muimaster.h>
 
 #include "private.h"
-#include "Locale.h"
+#include "locale.h"
 #include "muiextra.h"
 #include "TextEditor_mcc.h"
 #include "rev.h"
@@ -66,9 +66,9 @@ HOOKPROTONH(ListDisplayFunc, void, char **array, struct te_key *entry)
   }
   else
   {
-    *array++ = CatString(MSG_LVLabel_Key, "\33c\0333Key:");
+    *array++ = GetStr(MSG_LVLabel_Key);
     *array++ = "";
-    *array = CatString(MSG_LVLabel_Action, "\33c\0333Action:");
+    *array = GetStr(MSG_LVLabel_Action);
   }
 }
 MakeStaticHook(ListDisplayHook, ListDisplayFunc);
@@ -248,34 +248,34 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 
   struct NewMenu editpopupdata[] =
   {
-    { NM_TITLE, CatString(MSG_MenuTitle_Edit, "Edit"),    0, 0, 0, (APTR)0 },
-    { NM_ITEM,  CatString(MSG_MenuItem_Cut, "Cut"),       NULL, NM_COMMANDSTRING, 0, (APTR)1 },
-    { NM_ITEM,  CatString(MSG_MenuItem_Copy, "Copy"),     NULL, NM_COMMANDSTRING, 0, (APTR)2 },
-    { NM_ITEM,  CatString(MSG_MenuItem_Paste, "Paste"),   NULL, NM_COMMANDSTRING, 0, (APTR)3 },
-    { NM_ITEM,  CatString(MSG_MenuItem_Delete, "Delete"), NULL, NM_COMMANDSTRING, 0, (APTR)4 },
+    { NM_TITLE, GetStr(MSG_MenuTitle_Edit),    0, 0, 0, (APTR)0 },
+    { NM_ITEM,  GetStr(MSG_MenuItem_Cut),       NULL, NM_COMMANDSTRING, 0, (APTR)1 },
+    { NM_ITEM,  GetStr(MSG_MenuItem_Copy),     NULL, NM_COMMANDSTRING, 0, (APTR)2 },
+    { NM_ITEM,  GetStr(MSG_MenuItem_Paste),   NULL, NM_COMMANDSTRING, 0, (APTR)3 },
+    { NM_ITEM,  GetStr(MSG_MenuItem_Delete), NULL, NM_COMMANDSTRING, 0, (APTR)4 },
     { NM_ITEM,  NM_BARLABEL, 0, 0, 0, (APTR)0 },
-    { NM_ITEM,  CatString(MSG_MenuItem_Undo, "Undo"), NULL, NM_COMMANDSTRING, 0, (APTR)5 },
-    { NM_ITEM,  CatString(MSG_MenuItem_Redo, "Redo"), NULL, NM_COMMANDSTRING, 0, (APTR)6 },
+    { NM_ITEM,  GetStr(MSG_MenuItem_Undo), NULL, NM_COMMANDSTRING, 0, (APTR)5 },
+    { NM_ITEM,  GetStr(MSG_MenuItem_Redo), NULL, NM_COMMANDSTRING, 0, (APTR)6 },
     { NM_ITEM,  NM_BARLABEL, 0, 0, 0, (APTR)0 },
-    { NM_ITEM,  CatString(MSG_MenuItem_Bold, "Bold"), NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)7 },
-    { NM_ITEM,  CatString(MSG_MenuItem_Italic, "Italic"), NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)8 },
-    { NM_ITEM,  CatString(MSG_MenuItem_Underline, "Underline"), NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)9 },
+    { NM_ITEM,  GetStr(MSG_MenuItem_Bold), NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)7 },
+    { NM_ITEM,  GetStr(MSG_MenuItem_Italic), NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)8 },
+    { NM_ITEM,  GetStr(MSG_MenuItem_Underline), NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)9 },
     { NM_ITEM,  NM_BARLABEL, 0, 0, 0, (APTR)0 },
-    { NM_ITEM,  CatString(MSG_MenuSubTitle_Alignment, "Alignment"), 0, 0, 0, (APTR)0 },
-    { NM_SUB,   CatString(MSG_MenuItem_Left, "Left"), NULL, NM_COMMANDSTRING | CHECKIT|CHECKED, ~1, (APTR)10 },
-    { NM_SUB,   CatString(MSG_MenuItem_Center, "Center"), NULL, NM_COMMANDSTRING | CHECKIT, ~2, (APTR)11 },
-    { NM_SUB,   CatString(MSG_MenuItem_Right, "Right"), NULL, NM_COMMANDSTRING | CHECKIT, ~4, (APTR)12 },
+    { NM_ITEM,  GetStr(MSG_MenuSubTitle_Alignment), 0, 0, 0, (APTR)0 },
+    { NM_SUB,   GetStr(MSG_MenuItem_Left), NULL, NM_COMMANDSTRING | CHECKIT|CHECKED, ~1, (APTR)10 },
+    { NM_SUB,   GetStr(MSG_MenuItem_Center), NULL, NM_COMMANDSTRING | CHECKIT, ~2, (APTR)11 },
+    { NM_SUB,   GetStr(MSG_MenuItem_Right), NULL, NM_COMMANDSTRING | CHECKIT, ~4, (APTR)12 },
 
-    { NM_ITEM,  CatString(MSG_MenuSubTitle_Color, "Color"), 0, 0, 0, (APTR)0 },
-    { NM_SUB,   CatString(MSG_MenuItem_Normal, "Normal"), NULL, NM_COMMANDSTRING | CHECKIT|CHECKED, ~1, (APTR)13 },
-    { NM_SUB,   CatString(MSG_MenuItem_Shine, "Shine"), NULL, NM_COMMANDSTRING | CHECKIT, ~2, (APTR)14 },
-    { NM_SUB,   CatString(MSG_MenuItem_Halfshine, "Halfshine"), NULL, NM_COMMANDSTRING | CHECKIT, ~4, (APTR)15 },
-    { NM_SUB,   CatString(MSG_MenuItem_Background, "Background"), NULL, NM_COMMANDSTRING | CHECKIT, ~8, (APTR)16 },
-    { NM_SUB,   CatString(MSG_MenuItem_Halfshadow, "Halfshadow"), NULL, NM_COMMANDSTRING | CHECKIT, ~16, (APTR)17 },
-    { NM_SUB,   CatString(MSG_MenuItem_Shadow, "Shadow"), NULL, NM_COMMANDSTRING | CHECKIT, ~32, (APTR)18 },
-    { NM_SUB,   CatString(MSG_MenuItem_Text, "Text"), NULL, NM_COMMANDSTRING | CHECKIT, ~64, (APTR)19 },
-    { NM_SUB,   CatString(MSG_MenuItem_Fill, "Fill"), NULL, NM_COMMANDSTRING | CHECKIT, ~128, (APTR)20 },
-    { NM_SUB,   CatString(MSG_MenuItem_Mark, "Mark"), NULL, NM_COMMANDSTRING | CHECKIT, ~256, (APTR)21 },
+    { NM_ITEM,  GetStr(MSG_MenuSubTitle_Color), 0, 0, 0, (APTR)0 },
+    { NM_SUB,   GetStr(MSG_MenuItem_Normal), NULL, NM_COMMANDSTRING | CHECKIT|CHECKED, ~1, (APTR)13 },
+    { NM_SUB,   GetStr(MSG_MenuItem_Shine), NULL, NM_COMMANDSTRING | CHECKIT, ~2, (APTR)14 },
+    { NM_SUB,   GetStr(MSG_MenuItem_Halfshine), NULL, NM_COMMANDSTRING | CHECKIT, ~4, (APTR)15 },
+    { NM_SUB,   GetStr(MSG_MenuItem_Background), NULL, NM_COMMANDSTRING | CHECKIT, ~8, (APTR)16 },
+    { NM_SUB,   GetStr(MSG_MenuItem_Halfshadow), NULL, NM_COMMANDSTRING | CHECKIT, ~16, (APTR)17 },
+    { NM_SUB,   GetStr(MSG_MenuItem_Shadow), NULL, NM_COMMANDSTRING | CHECKIT, ~32, (APTR)18 },
+    { NM_SUB,   GetStr(MSG_MenuItem_Text), NULL, NM_COMMANDSTRING | CHECKIT, ~64, (APTR)19 },
+    { NM_SUB,   GetStr(MSG_MenuItem_Fill), NULL, NM_COMMANDSTRING | CHECKIT, ~128, (APTR)20 },
+    { NM_SUB,   GetStr(MSG_MenuItem_Mark), NULL, NM_COMMANDSTRING | CHECKIT, ~256, (APTR)21 },
 
     { NM_END,   NULL, 0, 0, 0, (APTR)0 }
   };
@@ -292,26 +292,26 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
             MUIA_VertWeight, 0,
             MUIA_Background, MUII_GroupBack,
             MUIA_Frame, MUIV_Frame_Group,
-            MUIA_FrameTitle, CatString(MSG_GroupTitle_Control, "Control"),
+            MUIA_FrameTitle, GetStr(MSG_GroupTitle_Control),
             Child, RectangleObject,
             End,
             Child, ColGroup(2),
-              Child, TxtLabel(CatString(MSG_Label_UndoLevel, "\33rUndo levels:"), 0),
+              Child, TxtLabel(GetStr(MSG_Label_UndoLevel), 0),
               Child, data->undosize = SliderObject,
-                MUIA_ShortHelp, CatString(HelpBubble_UndoLevel, "Each undo eats 10 bytes of memory.\nCut and Copy takes a little more,\ndepends on the block size!"),
+                MUIA_ShortHelp, GetStr(HelpBubble_UndoLevel),
                 MUIA_Numeric_Min, 20,
                 MUIA_Numeric_Max, 2000,
                 MUIA_Numeric_Format, "%ld (± 5)",
               End,
-              Child, TxtLabel(CatString(MSG_Label_TabSize, "\33rTab size:"), 0),
+              Child, TxtLabel(GetStr(MSG_Label_TabSize), 0),
               Child, data->tabsize = SliderObject,
                 MUIA_Numeric_Min, 2,
                 MUIA_Numeric_Max, 12,
-                MUIA_Numeric_Format, CatString(MSG_SliderText_TabSize, "%ld spaces"),
+                MUIA_Numeric_Format, GetStr(MSG_SliderText_TabSize),
               End,
-              Child, TxtLabel(CatString(MSG_Label_Smooth, "\33rSmooth:"), 0),
+              Child, TxtLabel(GetStr(MSG_Label_Smooth), 0),
               Child, HGroup,
-                MUIA_ShortHelp, CatString(HelpBubble_Smooth, "This will enable pixel smooth scrolling."),
+                MUIA_ShortHelp, GetStr(HelpBubble_Smooth),
                 Child, data->smooth = MUI_MakeObject(MUIO_Checkmark, NULL),
                 Child, RectangleObject,
                 End,
@@ -326,24 +326,24 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
             MUIA_Group_SameHeight, FALSE,
             MUIA_Background, MUII_GroupBack,
             MUIA_Frame, MUIV_Frame_Group,
-            MUIA_FrameTitle, CatString(MSG_GroupTitle_Design, "Design:"),
+            MUIA_FrameTitle, GetStr(MSG_GroupTitle_Design),
 
-            Child, TxtLabel(CatString(MSG_Label_Frame, "\33rFrame:"), 0),
+            Child, TxtLabel(GetStr(MSG_Label_Frame), 0),
             Child, data->frame = MUI_NewObject("Popframe.mui",
-              MUIA_Window_Title, CatString(MSG_PopWinTitle_Frame, "Select frame"),
+              MUIA_Window_Title, GetStr(MSG_PopWinTitle_Frame),
             End,
-            Child, TxtLabel(CatString(MSG_Label_Background, "\33rBackground:"), 0),
+            Child, TxtLabel(GetStr(MSG_Label_Background), 0),
             Child, data->background = MUI_NewObject("Popimage.mui",
-              MUIA_Window_Title, CatString(MSG_PopWinTitle_Background, "Select background"),
+              MUIA_Window_Title, GetStr(MSG_PopWinTitle_Background),
               MUIA_Imageadjust_Type, 2,
             End,
-            Child, TxtLabel(CatString(MSG_Label_Text, "\33rText"), 0),
+            Child, TxtLabel(GetStr(MSG_Label_Text), 0),
             Child, data->textcolor = PoppenObject,
-              MUIA_Window_Title, CatString(MSG_PopWinTitle_Text, "Select text color"),
+              MUIA_Window_Title, GetStr(MSG_PopWinTitle_Text),
             End,
-            Child, TxtLabel(CatString(MSG_Label_Highlight, "\33rHighlight"), 0),
+            Child, TxtLabel(GetStr(MSG_Label_Highlight), 0),
             Child, data->highlightcolor = PoppenObject,
-              MUIA_Window_Title, CatString(MSG_PopWinTitle_Highlight, "Select highlight color"),
+              MUIA_Window_Title, GetStr(MSG_PopWinTitle_Highlight),
             End,
           End,
 
@@ -351,14 +351,14 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
             MUIA_VertWeight, 60,
             MUIA_Background, MUII_GroupBack,
             MUIA_Frame, MUIV_Frame_Group,
-            MUIA_FrameTitle, CatString(MSG_GroupTitle_Separator, "Separator"),
-            Child, TxtLabel(CatString(MSG_Label_SeparatorShine, "\33rShine:"), 0),
+            MUIA_FrameTitle, GetStr(MSG_GroupTitle_Separator),
+            Child, TxtLabel(GetStr(MSG_Label_SeparatorShine), 0),
             Child, data->separatorshine = PoppenObject,
-              MUIA_Window_Title, CatString(MSG_PopWinTitle_SeparatorShine, "Select separators shine color"),
+              MUIA_Window_Title, GetStr(MSG_PopWinTitle_SeparatorShine),
             End,
-            Child, TxtLabel(CatString(MSG_Label_SeparatorShadow, "\33rShadow"), 0),
+            Child, TxtLabel(GetStr(MSG_Label_SeparatorShadow), 0),
             Child, data->separatorshadow = PoppenObject,
-              MUIA_Window_Title, CatString(MSG_PopWinTitle_SeparatorShadow, "Select separators shadow color"),
+              MUIA_Window_Title, GetStr(MSG_PopWinTitle_SeparatorShadow),
             End,
           End,
         End,
@@ -368,17 +368,17 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 //            MUIA_VertWeight, 0,
             MUIA_Background, MUII_GroupBack,
             MUIA_Frame, MUIV_Frame_Group,
-            MUIA_FrameTitle, CatString(MSG_GroupTitle_Fonts, "Fonts"),
+            MUIA_FrameTitle, GetStr(MSG_GroupTitle_Fonts),
             Child, RectangleObject,
             End,
             Child, ColGroup(2),
-              Child, TxtLabel(CatString(MSG_Label_Normal, "\33rNormal"), 0),
+              Child, TxtLabel(GetStr(MSG_Label_Normal), 0),
               Child, PopaslObject,
                 MUIA_Popstring_String,  data->normalfont = BetterStringObject, StringFrame, End,
                 MUIA_Popstring_Button,  MUI_MakeObject(MUIO_PopButton, MUII_PopUp),
                 MUIA_Popasl_Type,     ASL_FontRequest,
               End,
-              Child, TxtLabel(CatString(MSG_Label_Fixed, "\33rFixed:"), 0),
+              Child, TxtLabel(GetStr(MSG_Label_Fixed), 0),
               Child, PopaslObject,
                 MUIA_Popstring_String,  data->fixedfont = BetterStringObject, StringFrame, End,
                 MUIA_Popstring_Button,  MUI_MakeObject(MUIO_PopButton, MUII_PopUp),
@@ -394,27 +394,27 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 //            MUIA_VertWeight, 0,
             MUIA_Background, MUII_GroupBack,
             MUIA_Frame, MUIV_Frame_Group,
-            MUIA_FrameTitle, CatString(MSG_GroupTitle_Cursor, "Cursor"),
+            MUIA_FrameTitle, GetStr(MSG_GroupTitle_Cursor),
             MUIA_Group_Columns, 2,
-            Child, TxtLabel(CatString(MSG_Label_Cursor, "\33rCursor:"), 0),
+            Child, TxtLabel(GetStr(MSG_Label_Cursor), 0),
             Child, data->cursorcolor = PoppenObject,
-              MUIA_Window_Title, CatString(MSG_PopWinTitle_Cursor, "Select cursor color"),
+              MUIA_Window_Title, GetStr(MSG_PopWinTitle_Cursor),
             End,
-            Child, TxtLabel(CatString(MSG_Label_Selected, "\33Marked:"), 0),
+            Child, TxtLabel(GetStr(MSG_Label_Selected), 0),
             Child, data->markedcolor = PoppenObject,
-              MUIA_Window_Title, CatString(MSG_PopWinTitle_Selected, "Select mark color"),
+              MUIA_Window_Title, GetStr(MSG_PopWinTitle_Selected),
             End,
-            Child, TxtLabel(CatString(MSG_Label_Width, "\33rWidth:"), 0),
+            Child, TxtLabel(GetStr(MSG_Label_Width), 0),
             Child, data->cursorwidth = NewObject(widthslider_mcc->mcc_Class, NULL,
               MUIA_Numeric_Min, 1,
               MUIA_Numeric_Max, 6,
-              MUIA_Numeric_Format, CatString(MSG_SliderText_StdWidth, "%ld pixels"),
+              MUIA_Numeric_Format, GetStr(MSG_SliderText_StdWidth),
             End,
-            Child, TxtLabel(CatString(MSG_Label_BlinkSpeed, "\33rBlinkspeed:"), 0),
+            Child, TxtLabel(GetStr(MSG_Label_BlinkSpeed), 0),
             Child, data->blinkspeed = NewObject(speedslider_mcc->mcc_Class, NULL,
               MUIA_Numeric_Min, 0,
               MUIA_Numeric_Max, 20,
-              MUIA_Numeric_Format, CatString(MSG_SliderText_StdSpeed, "\33r%ld ms"),
+              MUIA_Numeric_Format, GetStr(MSG_SliderText_StdSpeed),
             End,
           End,
 
@@ -424,8 +424,8 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 
       Child, VGroup,
         Child, HGroup,
-          Child, defaultkeys = SimpleButton(CatString(MSG_Button_DefaultKeys, "Default _keys")),
-          Child, TxtLabel(CatString(MSG_Label_BlkQual, "\33rBlock qualifier:"), 1000),
+          Child, defaultkeys = SimpleButton(GetStr(MSG_Button_DefaultKeys)),
+          Child, TxtLabel(GetStr(MSG_Label_BlkQual), 1000),
           Child, data->blockqual = MUI_MakeObject(MUIO_Cycle, NULL, data->cycleentries),
         End,
         Child, data->keybindings = ListviewObject,
@@ -457,7 +457,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
             Child, button = TextObject, ButtonFrame,
               MUIA_CycleChain, TRUE,
               MUIA_Background, MUII_ButtonBack,
-              MUIA_Text_Contents, CatString(MSG_Button_Snoop, "Snoop"),
+              MUIA_Text_Contents, GetStr(MSG_Button_Snoop),
               MUIA_Text_SetMax, TRUE,
               MUIA_InputMode, MUIV_InputMode_Toggle,
             End,
@@ -488,8 +488,8 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 
           End,
           Child, HGroup,
-            Child, data->insertkey = SimpleButton(CatString(MSG_Button_Insert, "_Insert")),
-            Child, data->deletekey = SimpleButton(CatString(MSG_Button_Delete, "_Delete")),
+            Child, data->insertkey = SimpleButton(GetStr(MSG_Button_Insert)),
+            Child, data->deletekey = SimpleButton(GetStr(MSG_Button_Delete)),
           End,
         End,
       End,
@@ -502,12 +502,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
             ReadListFrame,
             MUIA_CycleChain, TRUE,
             MUIA_TextEditor_ReadOnly, TRUE,
-            MUIA_TextEditor_Contents, CatString(MSG_HelpTxt_SpellChecker, " \33u Intro \33n\n\nThe TextEditor gadget offers you easy "
-            "integration of external spell checkers, this allows you to have both type'n'spell and also normal word-guessing.\n\n \33u"
-            " Lookup command \33n\n\nFor the type'n'spell you'll have to set the lookup command to a script that will lookup the word "
-            "and set the environment variable \"Found\" to either 0 (for not found) or 1 (for a match).\nI have chosen this behavior "
-            "because it is the default for AlphaSpell.\nYou write %s where you want the word.\nIf you use AlphaSpell, then you can "
-            "write:\n\33bARexx:\33n \"Options Results;Address ALPHASPELL Search For '%s' Path 'T:' Danish.ald\"\n\nYou \33bmust\33n remember the quotes, this will let ARexx execute it as a command instead of a script.\n\n \33u Suggest command \33n\n\nIf you press HELP over a word, then the editor will launch this command, again with %s substituted with the current word.\nYour script should produce a file in T: named \"Matches\". This file are then read by the gadget, and the contents are shown in a popup-listview, from where you can choose a word which will replace the misspelled one.\nAgain, AlphaSpell users can write:\n\33bARexx:\33n \"Address ALPHASPELL Match '%s' 'T:Matches' Path 'T:' Danish.ald\"\n\nIf you use the methods described above, then you must start AlphaSpell with the \"ARexx\" switch.\n\nIt is advised to keep your dictionary in RAM if you enable the type'n'spell feature."),
+            MUIA_TextEditor_Contents, GetStr(MSG_HelpTxt_SpellChecker),
           End,
           Child, slider2 = ScrollbarObject,
           End,
@@ -516,13 +511,13 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
         Child, BalanceObject, End,
 
         Child, ColGroup(3),
-          Child, TxtLabel(CatString(MSG_Label_LookupCmd, "\33rLookup command:"), 0),
+          Child, TxtLabel(GetStr(MSG_Label_LookupCmd), 0),
           Child, data->LookupExeType = CycleObject,
             MUIA_Cycle_Entries, data->execution,
             MUIA_Weight, 0,
           End,
           Child, data->lookupcmd = BetterStringObject, StringFrame, End,
-          Child, TxtLabel(CatString(MSG_Label_SuggestCmd, "\33rSuggest command:"), 0),
+          Child, TxtLabel(GetStr(MSG_Label_SuggestCmd), 0),
           Child, data->SuggestExeType = CycleObject,
             MUIA_Cycle_Entries, data->execution,
             MUIA_Weight, 0,
@@ -530,9 +525,9 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
           Child, data->suggestcmd = BetterStringObject, StringFrame, MUIA_String_AdvanceOnCR, TRUE, End,
         End,
         Child, ColGroup(2),
-          Child, TxtLabel(CatString(MSG_Label_SpellNType, "\33rSpell check as you type?"), 1000),
+          Child, TxtLabel(GetStr(MSG_Label_SpellNType), 1000),
           Child, data->typenspell = MUI_MakeObject(MUIO_Checkmark, NULL),
-          Child, TxtLabel(CatString(MSG_Label_LookupWords, "\33rLookup word before suggesting?"), 1000),
+          Child, TxtLabel(GetStr(MSG_Label_LookupWords), 1000),
           Child, data->CheckWord = MUI_MakeObject(MUIO_Checkmark, NULL),
           MUIA_Weight, 0,
         End,
@@ -587,9 +582,9 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
     set(readview, MUIA_TextEditor_Slider, slider2);
     set(editor, MUIA_TextEditor_Slider, slider);
 
-    set(data->blockqual, MUIA_ShortHelp, CatString(HelpBubble_BlockQual, "Move the cursor key and hold down the qualifer\nthat you set here to mark text."));
-    set(data->typenspell, MUIA_ShortHelp, CatString(HelpBubble_TypeNSpell, "Enable this to let the editor\nlookup the words while you type them."));
-    set(data->CheckWord, MUIA_ShortHelp, CatString(HelpBubble_CheckWord, "If enabled, then the editor will lookup the word,\nand only show suggestions if the word is misspelled."));
+    set(data->blockqual, MUIA_ShortHelp, GetStr(HelpBubble_BlockQual));
+    set(data->typenspell, MUIA_ShortHelp, GetStr(HelpBubble_TypeNSpell));
+    set(data->CheckWord, MUIA_ShortHelp, GetStr(HelpBubble_CheckWord));
 
     set(data->hotkey, MUIA_String_AttachedList, data->keybindings);
     set(popbutton, MUIA_CycleChain, TRUE);
