@@ -43,8 +43,8 @@ VOID RedrawArea(UWORD startx, struct line_node *startline, UWORD stopx, struct l
 
   OffsetToLines(startx, startline, &pos1, data);
 
-  if(stopx >= stopline->length)
-    stopx = stopline->length-1;
+  if(stopx >= stopline->line.Length)
+    stopx = stopline->line.Length-1;
   
   OffsetToLines(stopx, stopline, &pos2, data);
 
@@ -84,15 +84,15 @@ char *GetBlock (struct marking *block, struct InstData *data)
   if(startline != stopline)
   {
     /* Create a firstline look-a-like */
-    emsg.Contents = (STRPTR)MyAllocPooled(data->mypool, startline->length-startx);
-    if(startline->styles && *startline->styles != EOS)
+    emsg.Contents = (STRPTR)MyAllocPooled(data->mypool, startline->line.Length-startx);
+    if(startline->line.Styles && *startline->line.Styles != EOS)
     {
         ULONG startstyle = GetStyle(startx, startline);
 
-      if((emsg.Styles = (UWORD *)MyAllocPooled(data->mypool, *((ULONG *)startline->styles-1)+16)))
+      if((emsg.Styles = (UWORD *)MyAllocPooled(data->mypool, *((ULONG *)startline->line.Styles-1)+16)))
       {
           UWORD *styles = emsg.Styles,
-              *oldstyles = startline->styles;
+              *oldstyles = startline->line.Styles;
 
         if(startstyle & BOLD)
         {
@@ -123,11 +123,11 @@ char *GetBlock (struct marking *block, struct InstData *data)
     emsg.Colors = NULL;
     if(emsg.Contents)
     {
-      CopyMem(startline->contents+startx, emsg.Contents, startline->length-startx);
-      emsg.Length = startline->length-startx;
-      emsg.Flow = startline->flow;
-      emsg.Separator = startline->separator;
-      emsg.Highlight = startline->color;
+      CopyMem(startline->line.Contents + startx, emsg.Contents, startline->line.Length - startx);
+      emsg.Length = startline->line.Length - startx;
+      emsg.Flow = startline->line.Flow;
+      emsg.Separator = startline->line.Separator;
+      emsg.Highlight = startline->line.Color;
       emsg.UserData = (APTR)CallHookA(&ExPlainHook, &ExPlainHook, &emsg);
       MyFreePooled(data->mypool, emsg.Contents);
     }
@@ -139,27 +139,27 @@ char *GetBlock (struct marking *block, struct InstData *data)
     act = startline->next;
     while(act != stopline)
     {
-      emsg.Contents = act->contents;
-      emsg.Length   = act->length;
-      emsg.Styles   = act->styles;
-      emsg.Colors   = act->colors;
-      emsg.Flow   = act->flow;
-      emsg.Separator = act->separator;
-      emsg.Highlight = act->color;
+      emsg.Contents = act->line.Contents;
+      emsg.Length   = act->line.Length;
+      emsg.Styles   = act->line.Styles;
+      emsg.Colors   = act->line.Colors;
+      emsg.Flow   = act->line.Flow;
+      emsg.Separator = act->line.Separator;
+      emsg.Highlight = act->line.Color;
       emsg.UserData = (APTR)CallHookA(&ExPlainHook, &ExPlainHook, &emsg);
       act = act->next;
     }
 
     /* Create a Lastline look-a-like */
     emsg.Contents = (STRPTR)MyAllocPooled(data->mypool, stopx);
-    if(stopline->styles && *stopline->styles != EOS)
+    if(stopline->line.Styles && *stopline->line.Styles != EOS)
     {
         ULONG stopstyle = GetStyle(stopx, stopline);
 
-      if((emsg.Styles = (UWORD *)MyAllocPooled(data->mypool, *((ULONG *)stopline->styles-1)+16)))
+      if((emsg.Styles = (UWORD *)MyAllocPooled(data->mypool, *((ULONG *)stopline->line.Styles-1)+16)))
       {
           UWORD *styles = emsg.Styles,
-              *oldstyles = stopline->styles;
+              *oldstyles = stopline->line.Styles;
 
         while(*oldstyles <= stopx)
         {
@@ -187,11 +187,11 @@ char *GetBlock (struct marking *block, struct InstData *data)
     emsg.Colors = NULL;
     if(emsg.Contents)
     {
-      CopyMem(stopline->contents, emsg.Contents, stopx);
+      CopyMem(stopline->line.Contents, emsg.Contents, stopx);
       emsg.Length = stopx;
-      emsg.Flow = stopline->flow;
-      emsg.Separator = stopline->separator;
-      emsg.Highlight = stopline->color;
+      emsg.Flow = stopline->line.Flow;
+      emsg.Separator = stopline->line.Separator;
+      emsg.Highlight = stopline->line.Color;
       emsg.Last = TRUE;
       text = (STRPTR)CallHookA(&ExPlainHook, &ExPlainHook, &emsg);
       MyFreePooled(data->mypool, emsg.Contents);
@@ -204,15 +204,15 @@ char *GetBlock (struct marking *block, struct InstData *data)
   {
     /* Create a single line */
     emsg.Contents = (STRPTR)MyAllocPooled(data->mypool, stopx-startx);
-    if(startline->styles && *startline->styles != EOS)
+    if(startline->line.Styles && *startline->line.Styles != EOS)
     {
         ULONG startstyle = GetStyle(startx, startline);
         ULONG stopstyle = GetStyle(stopx, stopline);
 
-      if((emsg.Styles = (UWORD *)MyAllocPooled(data->mypool, *((ULONG *)startline->styles-1))))
+      if((emsg.Styles = (UWORD *)MyAllocPooled(data->mypool, *((ULONG *)startline->line.Styles-1))))
       {
           UWORD *styles = emsg.Styles,
-              *oldstyles = startline->styles;
+              *oldstyles = startline->line.Styles;
 
         if(startstyle & BOLD)
         {
@@ -257,11 +257,11 @@ char *GetBlock (struct marking *block, struct InstData *data)
     emsg.Colors = NULL;
     if(emsg.Contents)
     {
-      CopyMem(startline->contents+startx, emsg.Contents, stopx-startx);
+      CopyMem(startline->line.Contents+startx, emsg.Contents, stopx-startx);
       emsg.Length = stopx-startx;
-      emsg.Flow = startline->flow;
-      emsg.Separator = startline->separator;
-      emsg.Highlight = startline->color;
+      emsg.Flow = startline->line.Flow;
+      emsg.Separator = startline->line.Separator;
+      emsg.Highlight = startline->line.Color;
       emsg.Last = TRUE;
       text = (STRPTR)CallHookA(&ExPlainHook, &ExPlainHook, &emsg);
       MyFreePooled(data->mypool, emsg.Contents);
@@ -384,32 +384,32 @@ void ClipInfo (struct line_node *line, struct InstData *data)
     long  separatorheader[]  = { MAKE_ID('S','B','A','R'), 2};
     long  flowheader[]    = { MAKE_ID('F','L','O','W'), 2};
 
-  if(line->flow != MUIV_TextEditor_Flow_Left)
+  if(line->line.Flow != MUIV_TextEditor_Flow_Left)
   {
     data->clipboard->io_Data    = (STRPTR)flowheader;
     data->clipboard->io_Length    = sizeof(flowheader);
     DoIO(data->iorequest);
-    data->clipboard->io_Data    = (STRPTR)&line->flow;
+    data->clipboard->io_Data    = (STRPTR)&line->line.Flow;
     data->clipboard->io_Length    = flowheader[1];
     DoIO(data->iorequest);
   }
 
-  if(line->separator)
+  if(line->line.Separator)
   {
     data->clipboard->io_Data    = (STRPTR)separatorheader;
     data->clipboard->io_Length    = sizeof(separatorheader);
     DoIO(data->iorequest);
-    data->clipboard->io_Data    = (STRPTR)&line->separator;
+    data->clipboard->io_Data    = (STRPTR)&line->line.Separator;
     data->clipboard->io_Length    = separatorheader[1];
     DoIO(data->iorequest);
   }
 
-  if(line->color)
+  if(line->line.Color)
   {
     data->clipboard->io_Data    = (STRPTR)highlightheader;
     data->clipboard->io_Length    = sizeof(highlightheader);
     DoIO(data->iorequest);
-    data->clipboard->io_Data    = (STRPTR)&line->color;
+    data->clipboard->io_Data    = (STRPTR)&line->line.Color;
     data->clipboard->io_Length    = highlightheader[1];
     DoIO(data->iorequest);
   }
@@ -423,7 +423,7 @@ void ClipChars (LONG x, struct line_node *line, LONG length, struct InstData *da
     UWORD style[2] = {1, GetStyle(x-1, line)};
     UWORD color[2] = {1, 0};
     ULONG t_offset;
-    UWORD *colors = line->colors;
+    UWORD *colors = line->line.Colors;
 
   ClipInfo(line, data);
 
@@ -492,9 +492,9 @@ void ClipChars (LONG x, struct line_node *line, LONG length, struct InstData *da
     }
   }
 
-  if(line->styles)
+  if(line->line.Styles)
   {
-      unsigned short *styles = line->styles;
+      unsigned short *styles = line->line.Styles;
 
     while((*styles <= x) && (*styles != EOS))
       styles += 2;
@@ -543,7 +543,7 @@ void ClipChars (LONG x, struct line_node *line, LONG length, struct InstData *da
   data->clipboard->io_Data    = (STRPTR)textheader;
   data->clipboard->io_Length    = sizeof(textheader);
   DoIO(data->iorequest);
-  data->clipboard->io_Data    = line->contents+x;
+  data->clipboard->io_Data    = line->line.Contents+x;
   data->clipboard->io_Length    = length;
   DoIO(data->iorequest);
 
@@ -555,8 +555,8 @@ void ClipLine (struct line_node *line, struct InstData *data)
     long  colorheader[] = { MAKE_ID('C','O','L','S'), 0};
     long  styleheader[] = { MAKE_ID('S','T','Y','L'), 0};
     long  textheader[]  = { MAKE_ID('C','H','R','S'), 0};
-    UWORD *styles = line->styles;
-    UWORD *colors = line->colors;
+    UWORD *styles = line->line.Styles;
+    UWORD *colors = line->line.Colors;
 
   ClipInfo(line, data);
 
@@ -570,7 +570,7 @@ void ClipLine (struct line_node *line, struct InstData *data)
     data->clipboard->io_Data    = (STRPTR)colorheader;
     data->clipboard->io_Length    = sizeof(colorheader);
     DoIO(data->iorequest);
-    data->clipboard->io_Data    = (STRPTR)line->colors;
+    data->clipboard->io_Data    = (STRPTR)line->line.Colors;
     data->clipboard->io_Length    = colorheader[1];
     DoIO(data->iorequest);
   }
@@ -587,15 +587,15 @@ void ClipLine (struct line_node *line, struct InstData *data)
   data->clipboard->io_Data    = (STRPTR)styleheader;
   data->clipboard->io_Length    = sizeof(styleheader);
   DoIO(data->iorequest);
-  data->clipboard->io_Data    = (STRPTR)line->styles;
+  data->clipboard->io_Data    = (STRPTR)line->line.Styles;
   data->clipboard->io_Length    = styleheader[1];
   DoIO(data->iorequest);
 
-  textheader[1] = line->length;
+  textheader[1] = line->line.Length;
   data->clipboard->io_Data    = (STRPTR)textheader;
   data->clipboard->io_Length    = sizeof(textheader);
   DoIO(data->iorequest);
-  data->clipboard->io_Data    = (STRPTR)line->contents;
+  data->clipboard->io_Data    = (STRPTR)line->line.Contents;
   data->clipboard->io_Length    = textheader[1];
   DoIO(data->iorequest);
 
@@ -689,7 +689,7 @@ LONG CutBlock2 (struct InstData *data, long Clipboard, long NoCut, struct markin
         data->clipboard->io_Command = CMD_WRITE;
         data->clipboard->io_Offset    = 12;
 
-        ClipChars(startx, startline, startline->length-startx, data);
+        ClipChars(startx, startline, startline->line.Length-startx, data);
       }
       else
       {
@@ -708,9 +708,9 @@ LONG CutBlock2 (struct InstData *data, long Clipboard, long NoCut, struct markin
       {
           struct  line_node *cc_startline = c_startline;
 
-        MyFreePooled(data->mypool, c_startline->contents);
-        if(c_startline->styles)
-          MyFreePooled(data->mypool, c_startline->styles);
+        MyFreePooled(data->mypool, c_startline->line.Contents);
+        if(c_startline->line.Styles)
+          MyFreePooled(data->mypool, c_startline->line.Styles);
         data->totallines -= c_startline->visual;
         c_startline = c_startline->next;
         FreePooled(data->mypool, cc_startline, sizeof(struct line_node));
@@ -731,7 +731,7 @@ LONG CutBlock2 (struct InstData *data, long Clipboard, long NoCut, struct markin
       startline->next = stopline;
       stopline->previous = startline;
 
-      RemoveChars(startx, startline, startline->length-startx-1, data);
+      RemoveChars(startx, startline, startline->line.Length-startx-1, data);
       if(stopx)
       {
         RemoveChars(0, stopline, stopx, data);

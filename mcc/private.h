@@ -304,7 +304,7 @@ void  FreeConfig        (struct InstData *, struct MUI_RenderInfo *);
 
 ULONG HandleARexx (struct InstData *, STRPTR command);
 
-struct line_node *ImportText(char *, void *, struct Hook *, LONG, LONG);
+struct line_node *ImportText(char *, void *, struct Hook *, LONG);
 void *ExportText(struct line_node *, struct Hook *, LONG);
 
 struct  line_node *loadtext (void);
@@ -439,13 +439,9 @@ extern struct Hook ExportHook;
   {
     struct  line_node *next;        /* Pointer to next line */
     struct  line_node *previous;    /* Pointer to previous line */
-    STRPTR  contents;               /* Pointer to text */
-    LONG   length;                  /* Length of this line (incl. '\n') */
-    UWORD   *styles;
-    UWORD   *colors;
-    BOOL    color;
-    UWORD   flow;
-    UWORD   separator;
+
+		struct LineNode line;
+
     UWORD   visual;             /* How many lines are this line wrapped over */
 //  UWORD   flags;              /* Different flags... */
   };

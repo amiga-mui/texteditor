@@ -64,9 +64,9 @@ void  FreeTextMem (void *mypool, struct line_node *line)
   {
       struct  line_node *tline = line;
 
-    MyFreePooled(mypool, line->contents);
-    if(line->styles)
-      MyFreePooled(mypool, line->styles);
+    MyFreePooled(mypool, line->line.Contents);
+    if(line->line.Styles)
+      MyFreePooled(mypool, line->line.Styles);
     line = line->next;
     FreePooled(mypool, tline, sizeof(struct line_node));
   }
@@ -90,15 +90,15 @@ long  Init_LineNode (struct line_node *line, struct line_node *previous, char *t
 
     line->next     = NULL;
     line->previous   = previous;
-    line->contents   = ctext;
-    line->length   = textlength+1;
+    line->line.Contents   = ctext;
+    line->line.Length   = textlength+1;
     if(data->rport)
       line->visual = VisualHeight(line, data);
-    line->color    = FALSE;
-    line->styles   = NULL;
-    line->colors   = NULL;
-    line->flow     = MUIV_TextEditor_Flow_Left;
-    line->separator = 0;
+    line->line.Color    = FALSE;
+    line->line.Styles   = NULL;
+    line->line.Colors   = NULL;
+    line->line.Flow     = MUIV_TextEditor_Flow_Left;
+    line->line.Separator = 0;
 
     if (previous)
       previous->next  = line;
@@ -111,11 +111,11 @@ long  ExpandLine    (struct line_node *line, LONG length, struct InstData *data)
 {
     char  *newbuffer;
 
-  if((newbuffer = MyAllocPooled(data->mypool, line->length+40+length)))
+  if((newbuffer = MyAllocPooled(data->mypool, line->line.Length+40+length)))
   {
-    CopyMem(line->contents, newbuffer, line->length+1);
-    MyFreePooled(data->mypool, line->contents);
-    line->contents = newbuffer;
+    CopyMem(line->line.Contents, newbuffer, line->line.Length+1);
+    MyFreePooled(data->mypool, line->line.Contents);
+    line->line.Contents = newbuffer;
     return(TRUE);
   }
   else  return(FALSE);
@@ -125,12 +125,12 @@ long  CompressLine  (struct line_node *line, struct InstData *data)
 {
     char  *newbuffer;
 
-  if((newbuffer = MyAllocPooled(data->mypool, strlen(line->contents)+1)))
+  if((newbuffer = MyAllocPooled(data->mypool, strlen(line->line.Contents)+1)))
   {
-    CopyMem(line->contents, newbuffer, line->length+1);
-    MyFreePooled(data->mypool, line->contents);
-    line->contents = newbuffer;
-    line->length  = strlen(newbuffer);
+    CopyMem(line->line.Contents, newbuffer, line->line.Length+1);
+    MyFreePooled(data->mypool, line->line.Contents);
+    line->line.Contents = newbuffer;
+    line->line.Length  = strlen(newbuffer);
     return(TRUE);
   }
   else  return(FALSE);
@@ -174,10 +174,10 @@ short VisualHeight  (struct line_node *line, struct InstData *data)
   }
   else
   {
-    length = strlen(line->contents);
+    length = strlen(line->line.Contents);
     while (c < length)
     {
-      c = c + LineCharsWidth(line->contents+c, data);
+      c = c + LineCharsWidth(line->line.Contents+c, data);
       lines++;
     }
   }
@@ -229,7 +229,7 @@ void  OffsetToLines (LONG x, struct line_node *line, struct pos_info *pos, struc
     while(c <= x)
     {
       d = c;
-      c = c + LineCharsWidth(line->contents+c, data);
+      c = c + LineCharsWidth(line->line.Contents+c, data);
       lines++;
     }
     pos->lines  = lines;
@@ -242,7 +242,7 @@ void  OffsetToLines (LONG x, struct line_node *line, struct pos_info *pos, struc
     pos->lines  = 1;
     pos->x    = x;
     pos->bytes  = 0;
-    pos->extra  = line->length-1;
+    pos->extra  = line->line.Length-1;
   }
 }
 /*------------------*
@@ -283,16 +283,16 @@ void  SetCursor   (LONG x, struct line_node *line, long Set, struct InstData *da
           stop = c;
         styles[c+1] = convert(GetStyle(x+c, line));
         colors[c+1] = GetColor(x+c, line);
-        chars[c+1] = *(line->contents+x+c);
+        chars[c+1] = *(line->line.Contents+x+c);
       }
     }
 
-    cursor_width = (data->CursorWidth == 6) ? MyTextLength(data->font, (*(line->contents+x) == '\n') ? "n" : &chars[1], 1) : data->CursorWidth;
+    cursor_width = (data->CursorWidth == 6) ? MyTextLength(data->font, (*(line->line.Contents+x) == '\n') ? "n" : &chars[1], 1) : data->CursorWidth;
 
-    xplace  = data->xpos + MyTextLength(data->font, line->contents+(x-pos.x), pos.x+start);
-    xplace += FlowSpace(line->flow, line->contents+pos.bytes, data);
+    xplace  = data->xpos + MyTextLength(data->font, line->line.Contents+(x-pos.x), pos.x+start);
+    xplace += FlowSpace(line->line.Flow, line->line.Contents+pos.bytes, data);
     yplace  = data->ypos + (data->height * (line_nr + pos.lines - 1));
-    cursorxplace = xplace + MyTextLength(data->font, line->contents+(x+start), 0-start);
+    cursorxplace = xplace + MyTextLength(data->font, line->line.Contents+(x+start), 0-start);
 
     if(Set)
     {
@@ -317,35 +317,35 @@ void  SetCursor   (LONG x, struct line_node *line, long Set, struct InstData *da
 
     for(c = start; c <= stop; c++)
     {
-      SetAPen(data->rport, ConvertPen(colors[1+c], line->color, data));
+      SetAPen(data->rport, ConvertPen(colors[1+c], line->line.Color, data));
       SetSoftStyle(data->rport, styles[1+c], ~0);
       Text(data->rport, &chars[1+c], 1);
     }
 
     /* This is really bad code!!! */
-    if(line->separator)
+    if(line->line.Separator)
     {
         WORD  LeftX, LeftWidth,
             RightX, RightWidth,
             Y, Height;
-        UWORD flow = FlowSpace(line->flow, line->contents+pos.bytes, data);
+        UWORD flow = FlowSpace(line->line.Flow, line->line.Contents+pos.bytes, data);
 
       LeftX = data->xpos;
       LeftWidth = flow-3;
-      RightX = data->xpos + flow + MyTextLength(data->font, line->contents+pos.bytes, pos.extra-pos.bytes-1) + 3;
+      RightX = data->xpos + flow + MyTextLength(data->font, line->line.Contents+pos.bytes, pos.extra-pos.bytes-1) + 3;
       RightWidth = data->xpos+data->innerwidth - RightX;
       Y = yplace;
-      Height = (line->separator & LNSF_Thick) ? 2 : 1;
+      Height = (line->line.Separator & LNSF_Thick) ? 2 : 1;
 
-      if(line->separator & LNSF_Middle)
+      if(line->line.Separator & LNSF_Middle)
         Y += (data->height/2)-Height;
       else
       {
-        if(line->separator & LNSF_Bottom)
+        if(line->line.Separator & LNSF_Bottom)
           Y += data->height-(2*Height);
       }
 
-      if(line->separator & LNSF_StrikeThru || line->length == 1)
+      if(line->line.Separator & LNSF_StrikeThru || line->line.Length == 1)
       {
         LeftWidth = data->innerwidth;
       }
@@ -384,7 +384,7 @@ void  SetCursor   (LONG x, struct line_node *line, long Set, struct InstData *da
       return;
 
     SetDrMd(data->rport, JAM2);
-    xplace = data->xpos + MyTextLength(data->font, line->contents+(x-pos.x), pos.x);
+    xplace = data->xpos + MyTextLength(data->font, line->line.Contents+(x-pos.x), pos.x);
     yplace = data->ypos + (data->height * (line_nr + pos.lines - 1));
 
     if(data->CursorWidth == 6)
@@ -392,9 +392,9 @@ void  SetCursor   (LONG x, struct line_node *line, long Set, struct InstData *da
         long  style = convert(GetStyle(x, line));
         short space;
 
-      if(*(line->contents+x) == '\n')
+      if(*(line->line.Contents+x) == '\n')
           cursor_char = ' ';
-      else  cursor_char = *(line->contents+x);
+      else  cursor_char = *(line->line.Contents+x);
 
       SetFont(data->rport, data->font);
       Move(data->rport, xplace, yplace+data->rport->TxBaseline);
@@ -565,7 +565,7 @@ void  DumpText  (LONG visual_y, LONG line_nr, LONG lines, BOOL doublebuffer, str
 
     while((line != NULL) && (line_nr != lines))
     {
-      while((x < line->length) && (line_nr != lines))
+      while((x < line->line.Length) && (line_nr != lines))
         x = x + PrintLine(x, line, ++line_nr, doublebuffer, data);
 
       line = line->next;
@@ -757,13 +757,13 @@ void  GetLine     (LONG realline, struct pos_info *pos, struct InstData *data)
 
   if ((!line->next) && (realline > line->visual))
   {
-    x = line->length-1;
+    x = line->line.Length-1;
   }
   else
   {
     while (--realline)
     {
-      x += LineCharsWidth(line->contents+x, data);
+      x += LineCharsWidth(line->line.Contents+x, data);
     }
   }
 

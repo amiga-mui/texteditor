@@ -60,9 +60,9 @@ ULONG OM_MarkText (struct MUIP_TextEditor_MarkText *msg, struct InstData *data)
   }
 
   data->blockinfo.startline = LineNode(msg->start_crsr_y+1, data);
-  data->blockinfo.startx = (data->blockinfo.startline->length > (LONG)msg->start_crsr_x) ? msg->start_crsr_x : data->blockinfo.startline->length-1;
+  data->blockinfo.startx = (data->blockinfo.startline->line.Length > (LONG)msg->start_crsr_x) ? msg->start_crsr_x : data->blockinfo.startline->line.Length-1;
   data->blockinfo.stopline = LineNode(msg->stop_crsr_y+1, data);
-  data->blockinfo.stopx = (data->blockinfo.stopline->length > (LONG)msg->stop_crsr_x) ? msg->stop_crsr_x : data->blockinfo.stopline->length-1;
+  data->blockinfo.stopx = (data->blockinfo.stopline->line.Length > (LONG)msg->stop_crsr_x) ? msg->stop_crsr_x : data->blockinfo.stopline->line.Length-1;
   data->blockinfo.enabled = TRUE;
 
   data->actualline = data->blockinfo.stopline;
@@ -92,7 +92,7 @@ ULONG ClearText (struct InstData *data)
         {
           newblock.stopline = newblock.stopline->next;
         }
-        newblock.stopx = newblock.stopline->length-1;
+        newblock.stopx = newblock.stopline->line.Length-1;
 
         data->CPos_X = 0;
         data->actualline = data->firstline;
@@ -230,8 +230,8 @@ ULONG InputTrigger (struct IClass *cl, struct InstData *data)
         {
           if(data->selectmode == 1)
           {
-            while((data->CPos_X < data->actualline->length-1) && !CheckSep(*(data->actualline->contents+data->CPos_X), data))
-//            while((data->CPos_X < data->actualline->length-1) && (*(data->actualline->contents+data->CPos_X) != ' '))
+            while((data->CPos_X < data->actualline->line.Length-1) && !CheckSep(*(data->actualline->line.Contents+data->CPos_X), data))
+//            while((data->CPos_X < data->actualline->line.Length-1) && (*(data->actualline->line.Contents+data->CPos_X) != ' '))
               data->CPos_X++;
           }
           else
@@ -246,14 +246,14 @@ ULONG InputTrigger (struct IClass *cl, struct InstData *data)
         ULONG flow;
 
         OffsetToLines(data->CPos_X, data->actualline, &pos, data);
-        flow = FlowSpace(data->actualline->flow, data->actualline->contents+pos.bytes, data);
+        flow = FlowSpace(data->actualline->line.Flow, data->actualline->line.Contents+pos.bytes, data);
         
-        if((LONG)MouseX <= data->xpos+flow+MyTextLength(data->font, data->actualline->contents+pos.bytes, pos.extra-pos.bytes-1))
+        if((LONG)MouseX <= data->xpos+flow+MyTextLength(data->font, data->actualline->line.Contents+pos.bytes, pos.extra-pos.bytes-1))
         {
           if(data->selectmode == 1)
           {
-            while(data->CPos_X > 0 && !CheckSep(*(data->actualline->contents+data->CPos_X-1), data))
-//            while(data->CPos_X > 0 && *(data->actualline->contents+data->CPos_X-1) != ' ')
+            while(data->CPos_X > 0 && !CheckSep(*(data->actualline->line.Contents+data->CPos_X-1), data))
+//            while(data->CPos_X > 0 && *(data->actualline->line.Contents+data->CPos_X-1) != ' ')
               data->CPos_X--;
           }
           else
@@ -296,7 +296,7 @@ ULONG InsertText (struct InstData *data, STRPTR text, BOOL movecursor)
     struct line_node *line, *actline = data->actualline;
     UWORD   x = data->CPos_X, realx;
 
-  if((line = ImportText(text, data->mypool, data->ImportHook, sizeof(struct line_node), data->ImportWrap)))
+  if((line = ImportText(text, data->mypool, data->ImportHook, data->ImportWrap)))
   {
     long  oneline = FALSE;
     long  newline = FALSE;
@@ -310,7 +310,7 @@ ULONG InsertText (struct InstData *data, STRPTR text, BOOL movecursor)
       line->visual    = VisualHeight(line, data);
       data->totallines += line->visual;
     }
-    if(*(line->contents+line->length) == '\n')
+    if(*(line->line.Contents+line->line.Length) == '\n')
       newline = TRUE;
 
     data->update = FALSE;
@@ -319,10 +319,10 @@ ULONG InsertText (struct InstData *data, STRPTR text, BOOL movecursor)
     actline->next->previous = line;
     actline->next = startline;
     startline->previous = actline;
-    data->CPos_X = line->length-1;
+    data->CPos_X = line->line.Length-1;
     if(actline->next == line)
     {
-      data->CPos_X += actline->length-1;
+      data->CPos_X += actline->line.Length-1;
       oneline = TRUE;
     }
     if(!newline)

@@ -80,10 +80,10 @@ long Undo (struct InstData *data)
     switch(buffer->type)
     {
       case pastechar:
-        buffer->del.character = *(data->actualline->contents+data->CPos_X);
+        buffer->del.character = *(data->actualline->line.Contents+data->CPos_X);
         buffer->del.style = GetStyle(data->CPos_X, data->actualline);
-        buffer->del.flow = data->actualline->flow;
-        buffer->del.separator = data->actualline->separator;
+        buffer->del.flow = data->actualline->line.Flow;
+        buffer->del.separator = data->actualline->line.Separator;
         RemoveChars(data->CPos_X, data->actualline, 1, data);
         break;
       case backspacechar:
@@ -314,16 +314,16 @@ long AddToUndoBuffer (long eventtype, char *eventdata, struct InstData *data)
     {
       case backspacemerge:
       case mergelines:
-        buffer->del.style = data->actualline->next->color;
-        buffer->del.flow = data->actualline->next->flow;
-        buffer->del.separator = data->actualline->next->separator;
+        buffer->del.style = data->actualline->next->line.Color;
+        buffer->del.flow = data->actualline->next->line.Flow;
+        buffer->del.separator = data->actualline->next->line.Separator;
         break;
       case deletechar:
       case backspacechar:
         buffer->del.character = *eventdata;
         buffer->del.style = GetStyle(data->CPos_X, data->actualline);
-        buffer->del.flow = data->actualline->flow;
-        buffer->del.separator = data->actualline->separator;
+        buffer->del.flow = data->actualline->line.Flow;
+        buffer->del.separator = data->actualline->line.Separator;
         break;
       case pasteblock:
         {

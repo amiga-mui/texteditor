@@ -153,10 +153,10 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                   data->blockinfo.startx = data->CPos_X;
                   if(last_x == data->CPos_X && lastline == data->actualline && DoubleClick(data->StartSecs, data->StartMicros, msg->imsg->Seconds, msg->imsg->Micros))
                   {
-                    if((data->DoubleClickHook && !CallHook(data->DoubleClickHook, (Object *)data->object, data->actualline->contents, data->CPos_X)) || (!data->DoubleClickHook))
+                    if((data->DoubleClickHook && !CallHook(data->DoubleClickHook, (Object *)data->object, data->actualline->line.Contents, data->CPos_X)) || (!data->DoubleClickHook))
                     {
-                      if(!CheckSep(data->actualline->contents[data->CPos_X], data))
-//                      if(*(data->actualline->contents+data->CPos_X) != ' ' && *(data->actualline->contents+data->CPos_X) != '\n')
+                      if(!CheckSep(data->actualline->line.Contents[data->CPos_X], data))
+//                      if(*(data->actualline->line.Contents+data->CPos_X) != ' ' && *(data->actualline->line.Contents+data->CPos_X) != '\n')
                       {
                         if(data->selectmode)
                         {
@@ -174,8 +174,8 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                         {
                             int x = data->CPos_X;
 
-                          while(x > 0 && !CheckSep(*(data->actualline->contents+x-1), data))
-//                          while(x > 0 && *(data->actualline->contents+x-1) != ' ')
+                          while(x > 0 && !CheckSep(*(data->actualline->line.Contents+x-1), data))
+//                          while(x > 0 && *(data->actualline->line.Contents+x-1) != ' ')
                             x--;
 
                           data->blockinfo.startx = x;
@@ -303,7 +303,7 @@ void Key_DelLine (struct InstData *data)
     MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
   }
 
-  if(!data->actualline->next && *data->actualline->contents == '\n')
+  if(!data->actualline->next && *data->actualline->line.Contents == '\n')
     GoLeft(data);
 
   GoStartOfLine(data);
@@ -409,7 +409,7 @@ void Key_Backspace (struct InstData *data)
   {
     if(data->CPos_X > 0)
     {
-      AddToUndoBuffer(backspacechar, data->actualline->contents+--data->CPos_X, data);
+      AddToUndoBuffer(backspacechar, data->actualline->line.Contents+--data->CPos_X, data);
       RemoveChars(data->CPos_X, data->actualline, 1, data);
     }
     else
@@ -417,7 +417,7 @@ void Key_Backspace (struct InstData *data)
       if(data->actualline->previous)
       {
         data->actualline = data->actualline->previous;
-        data->CPos_X = data->actualline->length-1;
+        data->CPos_X = data->actualline->line.Length-1;
         AddToUndoBuffer(backspacemerge, NULL, data);
         MergeLines(data->actualline, data);
       }
@@ -433,9 +433,9 @@ void Key_Delete (struct InstData *data)
   }
   else
   {
-    if(data->actualline->length > (data->CPos_X+1))
+    if(data->actualline->line.Length > (data->CPos_X+1))
     {
-      AddToUndoBuffer(deletechar, data->actualline->contents+data->CPos_X, data);
+      AddToUndoBuffer(deletechar, data->actualline->line.Contents+data->CPos_X, data);
       RemoveChars(data->CPos_X, data->actualline, 1, data);
     }
     else
@@ -517,7 +517,7 @@ void Key_Normal (UBYTE key, struct InstData *data)
   {
       ULONG xpos = data->CPos_X;
 
-    while(--xpos && *(data->actualline->contents+xpos) != ' ');
+    while(--xpos && *(data->actualline->line.Contents+xpos) != ' ');
     if(xpos)
     {
         ULONG length = data->CPos_X-xpos;
@@ -525,7 +525,7 @@ void Key_Normal (UBYTE key, struct InstData *data)
       data->CPos_X = xpos;
       AddToUndoBuffer(splitline, NULL, data);
       SplitLine(data->CPos_X, data->actualline, TRUE, NULL, data);
-      AddToUndoBuffer(deletechar, data->actualline->contents+data->CPos_X, data);
+      AddToUndoBuffer(deletechar, data->actualline->line.Contents+data->CPos_X, data);
       data->CPos_X = length-1;
       RemoveChars(0, data->actualline, 1, data);
     }

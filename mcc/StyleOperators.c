@@ -147,9 +147,9 @@ LONG  GetStyle (LONG x, struct line_node *line)
 {
     LONG  style = 0;
 
-  if(line->styles)
+  if(line->line.Styles)
   {
-      unsigned short *styles = line->styles;
+      unsigned short *styles = line->line.Styles;
 
     while(*styles <= x+1)
     {
@@ -163,7 +163,7 @@ LONG  GetStyle (LONG x, struct line_node *line)
 
 void  AddStyleToLine  (LONG x, struct line_node *line, LONG length, unsigned short style, struct InstData *data)
 {
-    unsigned short *styles    = line->styles;
+    unsigned short *styles    = line->line.Styles;
     unsigned short *oldstyles = styles;
     unsigned short *newstyles;
     unsigned short cur_style = 0;
@@ -177,7 +177,7 @@ void  AddStyleToLine  (LONG x, struct line_node *line, LONG length, unsigned sho
 
   if(newstyles)
   {
-    line->styles = newstyles;
+    line->line.Styles = newstyles;
     if(styles)
     {
       while(*styles != EOS && *styles < x)
@@ -283,10 +283,10 @@ void  AddStyle (struct marking *realblock, unsigned short style, long Set, struc
   {
       struct  line_node *line = startline->next;
 
-    AddStyleToLine(startx, startline, startline->length-startx-1, style, data);
+    AddStyleToLine(startx, startline, startline->line.Length-startx-1, style, data);
     while(line != stopline)
     {
-      AddStyleToLine(0, line, line->length-1, style, data);
+      AddStyleToLine(0, line, line->line.Length-1, style, data);
       line = line->next;
     }
     AddStyleToLine(0, line, stopx, style, data);

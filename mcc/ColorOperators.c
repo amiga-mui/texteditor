@@ -25,7 +25,7 @@
 UWORD GetColor (UWORD x, struct line_node *line)
 {
     UWORD color = 0;
-    UWORD *colors = line->colors;
+    UWORD *colors = line->line.Colors;
 
   if(colors)
   {
@@ -40,7 +40,7 @@ UWORD GetColor (UWORD x, struct line_node *line)
 
 void  AddColorToLine (UWORD x, struct line_node *line, UWORD length, UWORD color, struct InstData *data)
 {
-    UWORD *colors   = line->colors;
+    UWORD *colors   = line->line.Colors;
     UWORD *oldcolors  = colors;
     UWORD *newcolors;
 
@@ -54,7 +54,7 @@ void  AddColorToLine (UWORD x, struct line_node *line, UWORD length, UWORD color
   {
       UWORD oldcol = 0;
 
-    line->colors = newcolors;
+    line->line.Colors = newcolors;
     if(colors)
     {
       while(*colors != 0xffff && *colors < x)
@@ -130,10 +130,10 @@ VOID AddColor (struct marking *realblock, UWORD color, struct InstData *data)
   {
       struct  line_node *line = startline->next;
 
-    AddColorToLine(startx, startline, startline->length-startx-1, color, data);
+    AddColorToLine(startx, startline, startline->line.Length-startx-1, color, data);
     while(line != stopline)
     {
-      AddColorToLine(0, line, line->length-1, color, data);
+      AddColorToLine(0, line, line->line.Length-1, color, data);
       line = line->next;
     }
     AddColorToLine(0, line, stopx, color, data);

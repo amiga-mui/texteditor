@@ -68,10 +68,10 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
       struct pos_info pos;
       OffsetToLines(x, line, &pos, data);
 
-      cursor_width = (data->CursorWidth == 6) ? MyTextLength(data->font, (line->contents[x] == '\n') ? (char *)"n" : (char *)&line->contents[x], 1) : data->CursorWidth;
+      cursor_width = (data->CursorWidth == 6) ? MyTextLength(data->font, (line->line.Contents[x] == '\n') ? (char *)"n" : (char *)&line->line.Contents[x], 1) : data->CursorWidth;
 
-      xplace  = data->xpos + MyTextLength(data->font, &line->contents[x-pos.x], pos.x);
-      xplace += FlowSpace(line->flow, line->contents+pos.bytes, data);
+      xplace  = data->xpos + MyTextLength(data->font, &line->line.Contents[x-pos.x], pos.x);
+      xplace += FlowSpace(line->line.Flow, line->line.Contents+pos.bytes, data);
       yplace  = data->ypos + (data->height * (line_nr + pos.lines - 1));
 
       data->CursorPosition.MinX = xplace;
@@ -633,7 +633,7 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
 
             do {
               lines += startline->visual;
-              startline->flow = ti_Data;
+              startline->line.Flow = ti_Data;
               startline = startline->next;
             } while(startline != newblock.stopline->next);
           }
@@ -641,7 +641,7 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
           {
             start = LineToVisual(data->actualline, data);
             lines = data->actualline->visual;
-            data->actualline->flow = ti_Data;
+            data->actualline->line.Flow = ti_Data;
             data->pixel_x = 0;
           }
           if(start < 1)
@@ -665,7 +665,7 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
   {
     struct line_node *newcontents;
 
-    if((newcontents = ImportText(contents, data->mypool, data->ImportHook, sizeof(struct line_node), data->ImportWrap)))
+    if((newcontents = ImportText(contents, data->mypool, data->ImportHook, data->ImportWrap)))
     {
       FreeTextMem(data->mypool, data->firstline);
       data->firstline = newcontents;
@@ -681,13 +681,13 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
     if(crsr_y != 0xffff)
     {
       data->actualline = LineNode(crsr_y+1, data);
-      if(data->actualline->length < data->CPos_X)
-        data->CPos_X = data->actualline->length-1;
+      if(data->actualline->line.Length < data->CPos_X)
+        data->CPos_X = data->actualline->line.Length-1;
     }
 
     if(crsr_x != 0xffff)
     {
-      data->CPos_X = (data->actualline->length > (LONG)crsr_x) ? (UWORD)crsr_x : (UWORD)data->actualline->length-1;
+      data->CPos_X = (data->actualline->line.Length > (LONG)crsr_x) ? (UWORD)crsr_x : (UWORD)data->actualline->line.Length-1;
     }
     ScrollIntoDisplay(data);
     if(data->flags & FLG_Active)
