@@ -840,12 +840,14 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
     x = line->line.Length;
 
     OffsetToLines(x-1, line, &pos, data);
-    if((line->visual + line->next->visual >= c) && (line->visual == lines))
+    if(((ULONG)(line->visual + line->next->visual) >= c) && (line->visual == lines))
     {
-      if(line->visual + line->next->visual > c)
+      if((ULONG)(line->visual + line->next->visual) > c)
         data->totallines += 1;
+
       PrintLine(pos.bytes, line, line_nr, TRUE, data);
-      if((line_nr+line->next->visual-1 < data->maxlines) && (line->visual + line->next->visual > c))
+
+      if((line_nr+line->next->visual-1 < data->maxlines) && ((ULONG)(line->visual + line->next->visual) > c))
       {
         ScrollDown(line_nr+line->next->visual-1, 1, data);
       }
@@ -853,7 +855,8 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
     else
     {
       PrintLine((x-1)-pos.x, line, line_nr, TRUE, data);
-      if((line_nr < data->maxlines) && (line->visual + line->next->visual < c))
+
+      if((line_nr < data->maxlines) && ((ULONG)(line->visual + line->next->visual) < c))
       {
         data->totallines -= 1;
         ScrollUp(line_nr, 1, data);

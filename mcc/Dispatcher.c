@@ -21,6 +21,7 @@
 ***************************************************************************/
 
 #include <string.h>
+#include <clib/alib_protos.h>
 #include <exec/memory.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
@@ -31,7 +32,6 @@
 #include <proto/utility.h>
 
 #ifdef __MORPHOS__
-#include <clib/alib_protos.h>
 #include <proto/alib.h>
 #endif
 
