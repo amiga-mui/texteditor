@@ -81,6 +81,7 @@ struct Library *LocaleBase = NULL;
 struct Library *MUIMasterBase = NULL;
 struct Library *RexxSysBase = NULL;
 struct Library *UtilityBase = NULL;
+struct Library *WorkbenchBase = NULL;
 #elif defined(__MORPHOS__)
 struct Library *DiskfontBase = NULL;
 struct Library *GfxBase = NULL;
@@ -91,6 +92,7 @@ struct Library *LocaleBase = NULL;
 struct Library *MUIMasterBase = NULL;
 struct Library *RexxSysBase = NULL;
 struct Library *UtilityBase = NULL;
+struct Library *WorkbenchBase = NULL;
 #else
 struct Library *DiskfontBase = NULL;
 struct Library *GfxBase = NULL;
@@ -101,6 +103,7 @@ struct Library *LocaleBase = NULL;
 struct Library *MUIMasterBase = NULL;
 struct Library *RexxSysBase = NULL;
 struct Library *UtilityBase = NULL;
+struct Library *WorkbenchBase = NULL;
 #endif
 
 #if defined(__amigaos4__)
@@ -113,6 +116,7 @@ struct LocaleIFace *ILocale = NULL;
 struct MUIMasterIFace *IMUIMaster = NULL;
 struct RexxSysIFace *IRexxSys = NULL;
 struct UtilityIFace *IUtility = NULL;
+struct WorkbenchIFace *IWorkbench = NULL;
 #endif
 
 int main(void)
@@ -139,6 +143,16 @@ int main(void)
   if((UtilityBase = OpenLibrary("utility.library", 38)) &&
     GETINTERFACE(IUtility, UtilityBase))
   {
+  	/* Open workbench.library (optional) */
+		if ((WorkbenchBase = OpenLibrary("workbench.library",0)))
+		{
+  		if (!(GETINTERFACE(IWorkbench, WorkbenchBase)))
+  		{
+  			CloseLibrary(WorkbenchBase);
+  			WorkbenchBase = NULL;
+  		}
+		}
+
     if((args = ReadArgs("FILENAME,MIME/S,MIMEQUOTED/S,SKIPHEADER/S,FIXED/S,EMAIL/S", argarray, NULL)))
     {
       if((MUIMasterBase = OpenLibrary("muimaster.library", MUIMASTER_VMIN)) &&
@@ -493,6 +507,11 @@ int main(void)
     }
   }
 
+	if(WorkbenchBase)
+	{
+		DROPINTERFACE(IWorkbench);
+		WorkbenchBase = NULL;
+	}
   if(UtilityBase)
   {
     DROPINTERFACE(IUtility);

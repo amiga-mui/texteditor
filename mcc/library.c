@@ -52,6 +52,7 @@ struct Library *KeymapBase = NULL;
 struct Library *LayersBase = NULL;
 struct Library *LocaleBase = NULL;
 struct Library *RexxSysBase = NULL;
+struct Library *WorkbenchBase = NULL;
 
 #if defined(__amigaos4__)
 struct DiskfontIFace *IDiskfont = NULL;
@@ -59,6 +60,7 @@ struct KeymapIFace *IKeymap = NULL;
 struct LayersIFace *ILayers = NULL;
 struct LocaleIFace *ILocale = NULL;
 struct RexxSysIFace *IRexxSys = NULL;
+struct Interface *IWorkbench = NULL;
 #endif
 
 BOOL ClassInitFunc(UNUSED struct Library *base)
@@ -78,6 +80,16 @@ BOOL ClassInitFunc(UNUSED struct Library *base)
           if((DiskfontBase = OpenLibrary("diskfont.library", 38)) &&
              GETINTERFACE(IDiskfont, DiskfontBase))
           {
+          	/* workbench.library is optional */
+          	if ((WorkbenchBase = OpenLibrary("workbench.library", 44)))
+          	{
+          		if (!(GETINTERFACE(IWorkbench, WorkbenchBase)))
+          		{
+          			CloseLibrary(WorkbenchBase);
+          			WorkbenchBase = NULL;
+          		}
+          	}
+
             return(TRUE);
           }
 
@@ -107,6 +119,13 @@ BOOL ClassInitFunc(UNUSED struct Library *base)
 
 VOID ClassExitFunc(UNUSED struct Library *base)
 {
+	if(WorkbenchBase)
+	{
+    DROPINTERFACE(IWorkbench);
+    CloseLibrary(WorkbenchBase);
+    WorkbenchBase = NULL;
+	}
+
   if(DiskfontBase)
   {
     DROPINTERFACE(IDiskfont);
