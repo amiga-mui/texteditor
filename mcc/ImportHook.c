@@ -29,6 +29,66 @@
 #include "TextEditor_mcc.h"
 #include "private.h"
 
+/*************************************************************************/
+
+struct grow
+{
+	UWORD *array;
+	
+	int current;
+	int max;
+
+	APTR pool;
+};
+
+/*************************************************************************/
+
+/************************************************************************
+ Reads out the next value at *src_ptr and advances src_ptr.
+ Returns TRUE if succedded else FALSE
+*************************************************************************/
+STATIC BOOL GetLong(char **src_ptr, LONG *val)
+{
+	LONG chars = StrToLong(*src_ptr,val);
+	if (chars != -1)
+	{
+		*src_ptr += chars;
+		return TRUE;
+	}
+	return FALSE;
+}
+
+/************************************************************************
+ Adds two new values to the given grow. This function guarantees
+ that there is at least space for 2 additional values.
+*************************************************************************/
+STATIC VOID AddToGrow(struct grow *grow, UWORD val1, UWORD val2)
+{
+	if (grow->current >= grow->max)
+	{
+		UWORD *new_array;
+
+		if ((new_array = MyAllocPooled(grow->pool, sizeof(grow->array[0])*2*(grow->max+9)))) /* we reserve one more for the ending */
+		{
+			/* Copy old contents into new array */
+			if (grow->array)
+			{
+				memcpy(new_array,grow->array,sizeof(grow->array[0])*2*grow->current);
+				MyFreePooled(grow->pool,grow->array);
+			}
+			grow->array = new_array;
+			grow->max += 8;
+		}
+	}
+
+	if (grow->current < grow->max)
+	{
+		grow->array[grow->current*2] = val1;
+		grow->array[grow->current*2+1] = val2;
+		grow->current++;
+	}
+}
+
 /************************************************************************
  The plain import hook. It supports following escape sequences:
 
@@ -86,13 +146,16 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 
 		int current_style = 0;
 		int new_style = 0;
-		int cur_styles = 0;
-		int max_styles = 0;
+		struct grow style_grow;
 
 		int current_color = 0;
 		int new_color = 0;
-		int cur_colors = 0;
-		int max_colors = 0;
+		struct grow color_grow;
+
+		memset(&color_grow,0,sizeof(color_grow));
+		memset(&style_grow,0,sizeof(style_grow));
+
+		color_grow.pool = style_grow.pool = msg->PoolHandle;
 
 		/* Copy loop */
 		while (src < eol)
@@ -114,13 +177,9 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 								if (*src == '[')
 								{
 									LONG pen;
-									LONG chars;
-
 									src++;
-									chars = StrToLong(src,&pen);
-									if (chars != -1)
+									if (GetLong(&src,&pen))
 									{
-										src += chars;
 										if (*src == ']')
 										{
 											new_color = pen;
@@ -135,18 +194,13 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 									if (*(++src) == ':')
 									{
 										LONG flags;
-										LONG chars;
-
 										src++;
-
-										chars = StrToLong(src,&flags) ;
-										if (chars != -1)
+										if (GetLong(&src,&flags))
 										{
-											src += chars;
 											if (*src == ']')
 											{
-												src++;
 												line->Separator = flags;
+												src++;
 											}
 										}
 									}
@@ -161,74 +215,38 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 			/* Handle color changes */
 			if (new_color != current_color)
 			{
-				if (cur_colors >= max_colors)
-				{
-					UWORD *new_colors;
-					if ((new_colors = MyAllocPooled(msg->PoolHandle, sizeof(line->Colors[0])*2*(max_colors+9)))) /* we reserve one more for the ending */
-					{
-						if (line->Colors)
-						{
-							memcpy(new_colors,line->Colors,sizeof(line->Colors[0])*2*max_colors);
-							MyFreePooled(msg->PoolHandle,line->Colors);
-						}
-						line->Colors = new_colors;
-						max_colors += 8;
-					}
-				}
-
-				if (cur_colors < max_colors)
-				{
-					line->Colors[cur_colors*2] = dest - (unsigned char*)line->Contents;
-					line->Colors[cur_colors*2+1] = new_color;
-					cur_colors++;
-			  }
+				AddToGrow(&color_grow, dest - (unsigned char*)line->Contents, new_color);
 				current_color = new_color;
 			}
 
 			/* Handle style changes */
 			if (new_style != current_style)
 			{
-				if (cur_styles >= max_styles)
-				{
-					UWORD *new_styles;
-					if ((new_styles = MyAllocPooled(msg->PoolHandle, sizeof(line->Styles[0])*2*(max_styles+9)))) /* we reserve one more for the ending */
-					{
-						if (line->Styles)
-						{
-							memcpy(new_styles,line->Styles,sizeof(line->Styles[0])*2*max_styles);
-							MyFreePooled(msg->PoolHandle,line->Styles);
-						}
-						line->Styles = new_styles;
-						max_styles += 8;
-					}
-				}
-
-				if (cur_styles < max_styles)
-				{
-					line->Styles[cur_styles*2] = dest - (unsigned char*)line->Contents;
-					line->Styles[cur_styles*2+1] = new_style;
-					cur_styles++;
-				}
+				AddToGrow(&style_grow, dest - (unsigned char*)line->Contents, new_style);
 				current_style = new_style;
 			}
 		}
 
-		/* Mark the end of the color array */
+		line->Colors = color_grow.array;
+		line->Styles = style_grow.array;
+
+		/* Mark the end of the color array (space is ensured) */
 		if (line->Colors)
 		{
-			line->Colors[cur_colors*2] = ~0;
-			line->Colors[cur_colors*2+1] = 0;
+			line->Colors[color_grow.current*2] = ~0;
+			line->Colors[color_grow.current*2+1] = 0;
 		}
 
-		/* Mark the end of the style array */
+		/* Mark the end of the style array (space is ensured) */
 		if (line->Styles)
 		{
-			line->Styles[cur_styles*2] = ~0;
-			line->Styles[cur_styles*2+1] = 0;
+			line->Styles[style_grow.current*2] = ~0;
+			line->Styles[style_grow.current*2+1] = 0;
 		}
 
 		*dest++ = '\n';
 		*dest = 0;
+
 		line->Length = dest - line->Contents; /* excluding \n */
 	}
   return ret;
