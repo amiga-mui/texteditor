@@ -113,7 +113,7 @@ long SendCLI(char *word, char *command, struct InstData *data)
 
   #warning "CloneWB/FreeWB necessary?"
   //path = CloneWBPath(NULL, DOSBase);
-  if(SystemTags(buffer, NP_Path, path, TAG_DONE) == -1)
+  if(SystemTags(buffer, /*NP_Path, path,*/ TAG_DONE) == -1)
   {
     result = FALSE;
     //FreeWBPath(path, DOSBase);
