@@ -317,7 +317,10 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 	line->Flow = 0;
 
 	len = eol - src;
-	if ((line->Contents = MyAllocPooled(msg->PoolHandle,len+2)))
+
+ /* allocate some more memory for the possible quote mark '>', note that if
+  * a '=' is detected at the end of a line this memory is not sufficient! */
+	if ((line->Contents = MyAllocPooled(msg->PoolHandle,len+4)))
 	{
 		unsigned char *dest_start = (unsigned char*)line->Contents;
 		unsigned char *dest = dest_start;
@@ -350,6 +353,12 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 				line->Separator = 18;
 				line->Flow = 1;
 			}
+		}
+
+		if (type == 2)
+		{
+			*dest++ = '>';
+			line->Color = TRUE;
 		}
 
 		/* Copy loop */
