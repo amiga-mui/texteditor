@@ -28,7 +28,7 @@
 #include <proto/intuition.h>
 #include <proto/utility.h>
 
-#include "Locale.h"
+#include "locale.h"
 #include "private.h"
 
 #include "SDI_compiler.h"
@@ -73,10 +73,10 @@ DISPATCHERPROTO(WidthSlider_Dispatcher)
     struct MUIP_Numeric_Stringify *smsg = (struct MUIP_Numeric_Stringify *)msg;
 
     if(smsg->value == 1)
-      return((ULONG)CatString(MSG_SliderText_MinWidth, "1 pixel"));
+      return (ULONG)GetStr(MSG_SliderText_MinWidth);
 
     if(smsg->value == 6)
-      return((ULONG)CatString(MSG_SliderText_MaxWidth, "Same as char"));
+      return (ULONG)GetStr(MSG_SliderText_MaxWidth);
   }
 
   return(DoSuperMethodA(cl, obj, msg));
@@ -89,7 +89,7 @@ DISPATCHERPROTO(SpeedSlider_Dispatcher)
     struct MUIP_Numeric_Stringify *smsg = (struct MUIP_Numeric_Stringify *)msg;
 
     if(smsg->value == 0)
-      return((ULONG)CatString(MSG_SliderText_MinSpeed, "Off"));
+      return (ULONG)GetStr(MSG_SliderText_MinSpeed);
     else
     {
       static char buf[20];

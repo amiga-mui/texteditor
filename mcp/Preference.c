@@ -31,7 +31,7 @@
 #include <proto/muimaster.h>
 #include <proto/intuition.h>
 
-#include "Locale.h"
+#include "locale.h"
 #include "private.h"
 
 #include "SDI_hook.h"
@@ -76,7 +76,7 @@ int main(void)
       if((LocaleBase = OpenLibrary("locale.library", 38)) &&
         GETINTERFACE(ILocale, LocaleBase))
       {
-        OpenCat(NULL);
+        OpenCat();
 
         if((MUIMasterBase = OpenLibrary("muimaster.library", MUIMASTER_VMIN)) &&
            GETINTERFACE(IMUIMaster, MUIMasterBase))

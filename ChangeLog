@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-03-31  Jens Langner <Jens.Langner@light-speed.de>
+
+    * mcp: modified preferences sources to use flexcat to generate
+      the locale.c,h files out of the new TextEditor_mcp.cd and C_?.sd
+      files instead of having a static locale interface.
 
 2005-03-31  David Rey <tactica@users.sourceforge.net>
 
