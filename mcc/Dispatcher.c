@@ -22,8 +22,6 @@
 
 #include <string.h>
 #include <exec/memory.h>
-#include <clib/alib_protos.h>
-#include <proto/alib.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/intuition.h>
@@ -31,6 +29,11 @@
 #include <proto/layers.h>
 #include <proto/locale.h>
 #include <proto/utility.h>
+
+#ifdef __MORPHOS__
+#include <clib/alib_protos.h>
+#include <proto/alib.h>
+#endif
 
 #ifndef ClassAct
 #include <proto/muimaster.h>
