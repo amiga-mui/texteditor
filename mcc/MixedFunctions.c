@@ -283,16 +283,20 @@ void  SetCursor   (LONG x, struct line_node *line, long Set, struct InstData *da
           stop = c;
         styles[c+1] = convert(GetStyle(x+c, line));
         colors[c+1] = GetColor(x+c, line);
-        chars[c+1] = *(line->line.Contents+x+c);
+        chars[c+1] = line->line.Contents[x+c];
       }
     }
 
-    cursor_width = (data->CursorWidth == 6) ? MyTextLength(data->font, (*(line->line.Contents+x) == '\n') ? "n" : &chars[1], 1) : data->CursorWidth;
+    cursor_width = (data->CursorWidth == 6) ? MyTextLength(data->font, (line->line.Contents[x] == '\n') ? "n" : &chars[1], 1) : data->CursorWidth;
 
     xplace  = data->xpos + MyTextLength(data->font, line->line.Contents+(x-pos.x), pos.x+start);
     xplace += FlowSpace(line->line.Flow, line->line.Contents+pos.bytes, data);
     yplace  = data->ypos + (data->height * (line_nr + pos.lines - 1));
     cursorxplace = xplace + MyTextLength(data->font, line->line.Contents+(x+start), 0-start);
+
+    /* if font is anti aliased, clear area near the cursor first */
+    if (data->font->tf_Style & FSF_ANTIALIASED)
+      DoMethod(data->object, MUIM_DrawBackground, xplace, yplace, MyTextLength(data->font,chars,stop-start+1), data->height, cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0), ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2));
 
     if(Set)
     {
@@ -302,7 +306,9 @@ void  SetCursor   (LONG x, struct line_node *line, long Set, struct InstData *da
     }
     else
     {
-      DoMethod(data->object, MUIM_DrawBackground, cursorxplace, yplace, cursor_width, data->height, cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0), ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2));
+      /* Clear the place of the cursor, if not already done, because font is anti aliased */
+    	if (!(data->font->tf_Style & FSF_ANTIALIASED))
+        DoMethod(data->object, MUIM_DrawBackground, cursorxplace, yplace, cursor_width, data->height, cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0), ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2));
     }
 
     SetDrMd(data->rport, JAM1);
