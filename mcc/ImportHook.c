@@ -178,25 +178,12 @@ STATIC VOID AddToGrow(struct grow *grow, UWORD val1, UWORD val2)
 HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 {
 	char *eol;
-	char *ret;
 	char *src = msg->Data;
 	int len;
 	struct LineNode *line = msg->linenode;
 
-	/* Find the end of the line */
-	eol = strchr(src,'\n');
-	if (!eol)
-	{
-		int len = strlen(src);
-		if (!len) return NULL;
-		eol = src + len;
-		ret = NULL;
-	} else
-	{
-		ret = eol + 1;
-		if (eol != (char*)msg->Data && eol[-1] == '\r')
-			eol--;
-	}
+	if (!(eol = FindEOL(src)))
+		return NULL;
 
 	len = eol - src;
 	if ((line->Contents = MyAllocPooled(msg->PoolHandle,len+2)))
@@ -308,7 +295,7 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 
 		line->Length = dest - line->Contents; /* this excludes \n */
 	}
-  return ret;
+  return eol+1;
 }
 MakeHook(ImPlainHook, PlainImportHookFunc);
 
