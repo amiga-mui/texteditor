@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-04-06  Sebastian Bauer <mail@sebastianbauer.info>
+
+    * mcc/ImportHook.c: Changed behaviour of FindEOL() not to return NULL
+      if the text only consits of a 0 byte. This fixed bug #1177619. 
+
 2005-04-05  Sebastian Bauer <mail@sebastianbauer.info>
 
     * mcc: Clipboard handling for copy/paste was totaly broken (don't
