@@ -8,8 +8,9 @@ $Source$
 2005-04-05  Sebastian Bauer <mail@sebastianbauer.info>
 
     * mcc: Finished complete reimplementation of the import hooks. Because
-      the nature of a reimplementation, the behaviour of the new function
-      might be different and even buggy.
+      the nature of a reimplementation, the behaviour of the new functions
+      might be different and even buggy. Exporting also works in the
+      meantime.
 
 2005-04-04  Jens Langner <Jens.Langner@light-speed.de>
 
