@@ -25,11 +25,68 @@
 #include <exec/types.h>
 #include <clib/dos_protos.h>
 #include <proto/exec.h>
+#include <proto/utility.h>
 
 #include "TextEditor_mcc.h"
 #include "private.h"
 
+/***********************************************************************
+ Import the given 0 terminated text by invoking the gicen import Hook
+ for every line
+***********************************************************************/
 struct line_node *ImportText(char *contents, void *mempool, struct Hook *importHook, LONG wraplength)
 {
-	return NULL;
+	struct line_node *first_line, *line;
+	struct ImportMessage im;
+
+	im.Data = contents;
+	im.ImportWrap = wraplength;
+	im.PoolHandle = mempool;
+
+	line = AllocPooled(mempool,sizeof(struct line_node));
+	if (!line) return NULL;
+
+	memset(line,0,sizeof(*line));
+	first_line = line;
+
+	while (1)
+	{
+		struct line_node *new_line;
+
+		im.linenode = &line->line;
+
+		/* invoke the hook, it will return NULL in case it is finished or
+		 * an error occured */
+		im.Data = (char*)CallHookPkt(importHook, NULL, &im);
+
+		if (!im.Data)
+		{
+			if (!line->line.Contents)
+			{
+				/* Free the line node if it didn't contain any contents */
+				if (line->previous)
+				{
+					line->previous->next = NULL;
+				}
+				else
+				{
+					/* if the line has nor predecessor it was obviously the first line */
+					first_line = NULL;
+				}
+				FreePooled(mempool,line,sizeof(struct line_node));
+			}
+			break;
+		}
+
+		if (!(new_line = AllocPooled(mempool,sizeof(struct line_node))))
+			break;
+		memset(new_line,0,sizeof(*new_line));
+		/* Inherit the flow from the previous line */
+		new_line->line.Flow = line->line.Flow;
+		new_line->previous = line;
+		line->next = new_line;
+		line = new_line;
+	}
+
+	return first_line;
 }
