@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+
+2005-03-31  David Rey <tactica@users.sourceforge.net>
+
+    * mcp/locale/TextEditor_mcp.cd: added
+
 2005-03-28  Jens Langner <Jens.Langner@light-speed.de>
 
     * initial LGPL release published at sf.net
