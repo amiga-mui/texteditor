@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-04-05  Sebastian Bauer <mail@sebastianbauer.info>
+
+    * mcc: Finished complete reimplementation of the import hooks. Because
+      the nature of a reimplementation, the behaviour of the new function
+      might be different and even buggy.
+
 2005-04-04  Jens Langner <Jens.Langner@light-speed.de>
 
     * mcc/ImportText.c: fixed bug where an empty MUIA_TextEditor_Contents
@@ -17,6 +23,8 @@ $Source$
     * mcc: Now clears the area before the text near the cursor is
       redrawn. Fixes bug #1172355 aka "anti alias bug". This is no
       april fool ;)
+    * mcc: Started to reimplement all of the import and export hooks
+      which were 68k asm before
 
 2005-03-31  Sebastian Bauer <mail@sebastianbauer.info>
 
