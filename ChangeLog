@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-04-01  Sebastian Bauer <mail@sebastianbauer.info>
+
+    * mcc: Now clears the area before the text near the cursor is
+      redrawn. Fixes bug #1172355 aka "anti alias bug". This is no
+      april fool ;)
+
 2005-03-31  Sebastian Bauer <mail@sebastianbauer.info>
 
     * mcc: Fixed buffer overflow which happened if the font name was 
