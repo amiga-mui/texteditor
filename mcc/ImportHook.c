@@ -56,7 +56,8 @@ STATIC LONG GetHex(char *src)
 }
 
 /************************************************************************
- 
+ Convert a =XX string to it's value (into *val). Returns TRUE if
+ conversion was successfull in that case *src_ptr will advanved as well.
 *************************************************************************/
 STATIC BOOL GetQP(char **src_ptr, unsigned char *val)
 {
@@ -322,11 +323,11 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
   * a '=' is detected at the end of a line this memory is not sufficient! */
 	if ((line->Contents = MyAllocPooled(msg->PoolHandle,len+4)))
 	{
-		unsigned char *dest_start = (unsigned char*)line->Contents;
+		unsigned char *dest_start = line->Contents;
 		unsigned char *dest = dest_start;
-		unsigned char *src_word_start = src;
 		unsigned char *dest_word_start = dest_start;
-
+		unsigned char *src_word_start = src;
+		
 		/* Style and color state */
 		int state = 0;
 
@@ -392,6 +393,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 			} else
 			if (c == '=' && type > 0)
 			{
+				/* This is a concatenated line */
 				if (!GetQP(&src,&c))
 				{
 					int i;
@@ -401,10 +403,26 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 
 					if (src[i] == '\n')
 					{
+						unsigned char *new_dest_start;
+
 						src += i + 1;
 
 						if (!(eol = FindEOL(src)))
 							break;
+
+						/* The size of the dest buffer has to be increased now */
+						len += eol - src;
+						
+						if (!(new_dest_start = (unsigned char*)MyAllocPooled(msg->PoolHandle, len + 4)))
+							break;
+
+						memcpy(new_dest_start, dest_start, dest - dest_start);
+						MyFreePooled(msg->PoolHandle,dest_start);
+
+						/* Update all dest variables */
+						dest_word_start = new_dest_start + (dest_word_start - dest_start);
+						dest = new_dest_start + (dest - dest_start);
+						dest_start = line->Contents = new_dest_start;
 						continue;
 					}
 				}
