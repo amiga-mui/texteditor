@@ -67,13 +67,24 @@ struct line_node *ImportText(char *contents, void *mempool, struct Hook *importH
 				if (line->previous)
 				{
 					line->previous->next = NULL;
+
+  				FreePooled(mempool,line,sizeof(struct line_node));
 				}
 				else
 				{
-					/* if the line has nor predecessor it was obviously the first line */
-					first_line = NULL;
+          char *ctext;
+
+					// if the line has nor predecessor it was obviously the first line
+          // so we prepare a "fake" line_node to let the textEditor clear our
+          // text
+          if((ctext = MyAllocPooled(mempool, 2)))
+          {
+            ctext[0] = '\n';
+            ctext[1] = '\0';
+            line->line.Contents = ctext;
+            line->line.Length   = 1;
+          }
 				}
-				FreePooled(mempool,line,sizeof(struct line_node));
 			}
 			break;
 		}
