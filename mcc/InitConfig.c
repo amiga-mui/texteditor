@@ -41,39 +41,37 @@ extern struct keybindings keys[];
 
 struct TextFont *GetFont(struct InstData *data, void *obj, long attr)
 {
-  long setting;
+  char *setting;
+  char *fontname;
+ 	char *size_ptr;
+  struct TextFont *f;
+  struct TextAttr myfont;
 
-  if(DoMethod(obj, MUIM_GetConfigItem, attr, &setting))
-  {
-    long c = 0;
-    char *src = (char *)setting;
-    char fontname[40];
-    struct TextAttr myfont =
-    {
-      fontname,
-      8,
-      FS_NORMAL,
-      0
-    };
+  if (!DoMethod(obj, MUIM_GetConfigItem, attr, &setting)) return NULL;
+	if (!setting) return NULL;
+  if (!(fontname = AllocVec(strlen(setting)+6,0))) return NULL;
 
-    while(src[c] != '/' && src[c] != '\0' && c < 32)
-    {
-      if(c > 0)
-        fontname[c-1] = src[c];
+	f = NULL;
 
-      c++;
-    }
+  myfont.ta_Name = fontname;
+  myfont.ta_YSize = 8;
+  myfont.ta_Style = FS_NORMAL;
+  myfont.ta_Flags = 0;
 
-    strncpy(&fontname[c], ".font", 6);
-    StrToLong(&src[c+1], &c);
-    myfont.ta_YSize = c;
+	strcpy(fontname,setting);
+	size_ptr = strchr(fontname,'/');
+	if (size_ptr)
+	{
+		long size;
 
-    return(OpenDiskFont(&myfont));
-  }
-  else
-  {
-    return(NULL);
-  }
+   	StrToLong(size_ptr + 1, &size);
+   	strncpy(size_ptr, ".font", 6);
+   	myfont.ta_YSize = size;
+	}
+
+  f = OpenDiskFont(&myfont);
+  FreeVec(fontname);
+	return f;
 }
 
 void SetCol (struct InstData *data, void *obj, long item, ULONG *storage, long bit)
