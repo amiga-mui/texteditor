@@ -37,8 +37,8 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 	int len;
 	struct LineNode *line = msg->linenode;
 
+	/* Find the end of the line */
 	eol = strchr(src,'\n');
-
 	if (!eol)
 	{
 		int len = strlen(src);
@@ -55,10 +55,103 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 	len = eol - src;
 	if ((line->Contents = MyAllocPooled(msg->PoolHandle,len+2)))
 	{
-		memcpy(line->Contents, src, len);
-		line->Contents[len] = '\n';
-		line->Contents[len+1] = 0;
-		line->Length = len+1;
+		unsigned char *dest = (unsigned char*)line->Contents;
+		int current_style = 0;
+		int new_style = 0;
+		int cur_styles = 0;
+		int max_styles = 0;
+
+		/* Copy loop */
+		while (src < eol)
+		{
+			unsigned char c = *src++;
+			if (c == '\033')
+			{
+				switch (*src++)
+				{
+					case	'b': new_style |= BOLD; break;
+					case	'i': new_style |= ITALIC; break;
+					case	'u': new_style |= UNDERLINE; break;
+					case	'h': new_style |= COLOURED; break;
+					case	'n': new_style = ~new_style; break;
+					case	'p':
+								if (*src == '[')
+								{
+									LONG pen;
+									LONG chars;
+
+									src++;
+									chars = StrToLong(src,&pen) ;
+									if (chars != -1)
+									{
+										src += chars;
+										if (*src == ']') src++;
+									}
+								}
+								break;
+					case	'[':
+								if (*src == 's')
+								{
+									if (*(++src) == ':')
+									{
+										LONG flags;
+										LONG chars;
+
+										src++;
+
+										chars = StrToLong(src,&flags) ;
+										if (chars != -1)
+										{
+											src += chars;
+											if (*src == ']') src++;
+										}
+									}
+								}
+								break;
+				}
+				continue;
+			}
+
+			*dest++ = c;
+
+			if (new_style != current_style)
+			{
+				if (cur_styles >= max_styles)
+				{
+					UWORD *new_styles;
+					if ((new_styles = MyAllocPooled(msg->PoolHandle, sizeof(line->Styles[0])*2*(max_styles+9)))) /* we reserve one for the ending */
+					{
+						if (line->Styles)
+						{
+							memcpy(new_styles,line->Styles,sizeof(line->Styles[0])*2*max_styles);
+							MyFreePooled(msg->PoolHandle,line->Styles);
+						}
+						line->Styles = new_styles;
+						max_styles += 8;
+					}
+				}
+
+				if (line->Styles)
+				{
+					line->Styles[cur_styles*2] = dest - (unsigned char*)line->Contents;
+					line->Styles[cur_styles*2+1] = new_style;
+					cur_styles++;
+				}
+
+				current_style = new_style;
+			}
+		}
+
+		/* Mark the end of the style array */
+		if (line->Styles)
+		{
+			line->Styles[cur_styles*2] = ~0;
+			line->Styles[cur_styles*2+1] = 0;
+		}
+
+		*dest++ = '\n';
+		*dest = 0;
+		line->Length = dest - line->Contents; /* excluding \n */
 	}
   return ret;
 }
