@@ -225,7 +225,7 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 				AddToGrow(&style_grow, dest - (unsigned char*)line->Contents, new_style);
 				current_style = new_style;
 			}
-		}
+		} /* while (src < eol) */
 
 		line->Colors = color_grow.array;
 		line->Styles = style_grow.array;
@@ -247,7 +247,7 @@ HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 		*dest++ = '\n';
 		*dest = 0;
 
-		line->Length = dest - line->Contents; /* excluding \n */
+		line->Length = dest - line->Contents; /* this excludes \n */
 	}
   return ret;
 }
@@ -255,8 +255,118 @@ MakeHook(ImPlainHook, PlainImportHookFunc);
 
 HOOKPROTONO(EMailImportHookFunc, STRPTR , struct ImportMessage *msg)
 {
-  #warning "ImportHook not finished yet!!";
-  return PlainImportHookFunc(hook, NULL, msg);
+	char *eol;
+	char *ret;
+	char *src = msg->Data;
+	int len;
+	struct LineNode *line = msg->linenode;
+
+	/* Find the end of the line */
+	eol = strchr(src,'\n');
+	if (!eol)
+	{
+		int len = strlen(src);
+		if (!len) return NULL;
+		eol = src + len;
+		ret = NULL;
+	} else
+	{
+		ret = eol + 1;
+		if (eol != (char*)msg->Data && eol[-1] == '\r')
+			eol--;
+	}
+
+	/* Clear the flow */
+	line->Flow = 0;
+
+	len = eol - src;
+	if ((line->Contents = MyAllocPooled(msg->PoolHandle,len+2)))
+	{
+		unsigned char *dest = (unsigned char*)line->Contents;
+
+		int state = 0;
+
+		struct grow style_grow;
+		struct grow color_grow;
+
+		memset(&color_grow,0,sizeof(color_grow));
+		memset(&style_grow,0,sizeof(style_grow));
+
+		color_grow.pool = style_grow.pool = msg->PoolHandle;
+
+		if (src[0] == '>') line->Color = TRUE;
+		else if (src[0] == '<')
+		{
+			if (src[1] == 's' && src[2] == 'b' && src[3] == '>')
+			{
+				line->Separator = 2;	
+				src+= 4;
+				line->Flow = 1;
+			}
+			else if (src[1] == 't' && src[2] == 's' && src[3] == 'b' && src[4] == '>')
+			{
+				src += 5;
+				line->Separator = 18;
+				line->Flow = 1;
+			}
+		}
+
+		/* Copy loop */
+		while (src < eol)
+		{
+			unsigned char c = *src++;
+
+			if (c == '/')
+			{
+				AddToGrow(&style_grow, dest - line->Contents + 1, (state & ITALIC)?~ITALIC:ITALIC);
+				state ^= ITALIC;
+				continue;
+			} else
+			if (c == '*')
+			{
+				AddToGrow(&style_grow, dest - line->Contents + 1, (state & BOLD)?~BOLD:BOLD);
+				state ^= BOLD;
+				continue;
+			} else
+			if (c == '_')
+			{
+				AddToGrow(&style_grow, dest - line->Contents + 1, (state & UNDERLINE)?~UNDERLINE:UNDERLINE);
+				state ^= UNDERLINE;
+				continue;
+			} else
+			if (c == '#')
+			{
+				AddToGrow(&color_grow, dest - line->Contents + 1, (state & COLOURED)?0:7);
+				state ^= COLOURED;
+				continue;
+			}
+
+			*dest++ = c;
+		} /* while (src < eol) */
+
+		line->Colors = color_grow.array;
+		line->Styles = style_grow.array;
+
+		/* Mark the end of the color array (space is ensured) */
+		if (line->Colors)
+		{
+			line->Colors[color_grow.current*2] = ~0;
+			line->Colors[color_grow.current*2+1] = 0;
+		}
+
+		/* Mark the end of the style array (space is ensured) */
+		if (line->Styles)
+		{
+			line->Styles[style_grow.current*2] = ~0;
+			line->Styles[style_grow.current*2+1] = 0;
+		}
+
+		*dest++ = '\n';
+		*dest = 0;
+
+		line->Length = dest - line->Contents; /* this excludes \n */
+	}
+  return ret;
 }
 MakeHook(ImEMailHook, EMailImportHookFunc);
 
