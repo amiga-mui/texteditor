@@ -433,7 +433,7 @@ void Key_Delete (struct InstData *data)
   }
   else
   {
-    if(data->actualline->line.Length > (data->CPos_X+1))
+    if(data->actualline->line.Length > (ULONG)(data->CPos_X+1))
     {
       AddToUndoBuffer(deletechar, data->actualline->line.Contents+data->CPos_X, data);
       RemoveChars(data->CPos_X, data->actualline, 1, data);
@@ -813,14 +813,14 @@ long FindKey (unsigned char key, unsigned long qualifier, struct InstData *data)
   return(2);
 }
 
-long ReactOnRawKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
+long ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
 {
   BOOL result = TRUE;
   long dummy;
   struct line_node *oldactualline = data->actualline;
   UWORD oldCPos_X = data->CPos_X;
 
-  if(key >= IECODE_KEY_CODE_FIRST && key <= IECODE_KEY_CODE_LAST)
+  if(key <= IECODE_KEY_CODE_LAST)
   {
     dummy = FindKey(key, qualifier, data);
     if(dummy == TRUE)
@@ -869,8 +869,7 @@ long ReactOnRawKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct
       }
       else
       {
-//        if(dummy != 4 && (qualifier & IEQUALIFIER_RCOMMAND) || (!(data->flags & FLG_ReadOnly) && !ConvertKey(key, qualifier, imsg, data)))
-        if((dummy != 4 && (data->flags & FLG_ReadOnly || qualifier & IEQUALIFIER_RCOMMAND) || !ConvertKey(key, qualifier, imsg, data)))
+        if(((dummy != 4 && ((data->flags & FLG_ReadOnly) || (qualifier & IEQUALIFIER_RCOMMAND))) || !ConvertKey(key, qualifier, imsg, data)))
         {
           result = FALSE;
         }

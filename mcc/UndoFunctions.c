@@ -337,10 +337,10 @@ long AddToUndoBuffer (long eventtype, char *eventdata, struct InstData *data)
         }
       case deleteblock:
         {
-            char *text;
-            struct marking *block = (struct marking *)eventdata;
+          char *text;
+          struct marking *block = (struct marking *)eventdata;
 
-          if(text = GetBlock((struct marking *)eventdata, data))
+          if((text = GetBlock((struct marking *)eventdata, data)))
           {
             buffer->x = block->startx;
             buffer->y = LineNr(block->startline, data);

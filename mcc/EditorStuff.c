@@ -392,7 +392,7 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
 {
   struct line_node *next;
   char  *newbuffer;
-  LONG  visual, oldvisual, line_nr, c;
+  LONG  visual, oldvisual, line_nr;
   LONG  emptyline = FALSE;
   LONG  color = line->line.Color;
   UWORD flow = line->line.Flow;
@@ -562,8 +562,7 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
     {
       LONG t_oldvisual = oldvisual;
       LONG t_line_nr   = line_nr;
-      
-      c = 0;
+      ULONG c = 0;
       
       while((--t_oldvisual) && (t_line_nr++ <= data->maxlines))
         c = c + LineCharsWidth(line->line.Contents+c, data);
@@ -623,14 +622,15 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
 /*---------------------*
  * Split line into two *
  *---------------------*/
-long  SplitLine   (LONG x, struct line_node *line, BOOL move_crsr, struct UserAction *buffer, struct InstData *data)
+long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction *buffer, struct InstData *data)
 {
-  struct line_node  *newline;
-  struct line_node  *next;
+  struct line_node *newline;
+  struct line_node *next;
   struct pos_info pos;
-  LONG c, line_nr, lines;
-  UWORD   crsr_x = data->CPos_X;
-  struct  line_node *crsr_l = data->actualline;
+  LONG line_nr, lines;
+  ULONG c;
+  UWORD crsr_x = data->CPos_X;
+  struct line_node *crsr_l = data->actualline;
 
   OffsetToLines(x, line, &pos, data);
   lines = pos.lines;
@@ -638,10 +638,10 @@ long  SplitLine   (LONG x, struct line_node *line, BOOL move_crsr, struct UserAc
   next = line->next;
   if((newline = AllocPooled(data->mypool, sizeof(struct line_node))))
   {
-      UWORD *styles = line->line.Styles;
-      UWORD *newstyles = NULL;
-      UWORD *colors = line->line.Colors;
-      UWORD *newcolors = NULL;
+    UWORD *styles = line->line.Styles;
+    UWORD *newstyles = NULL;
+    UWORD *colors = line->line.Colors;
+    UWORD *newcolors = NULL;
 
     data->HasChanged = TRUE;
     Init_LineNode(newline, line, line->line.Contents+x, data);
@@ -657,9 +657,9 @@ long  SplitLine   (LONG x, struct line_node *line, BOOL move_crsr, struct UserAc
 
     if(styles)
     {
-        LONG  style = 0;
-        LONG  length = 0;
-        UWORD *ostyles;
+      LONG  style = 0;
+      LONG  length = 0;
+      UWORD *ostyles;
 
       while(*styles++ <= x+1)
       {
@@ -721,7 +721,7 @@ long  SplitLine   (LONG x, struct line_node *line, BOOL move_crsr, struct UserAc
 
       if((newcolors = MyAllocPooled(data->mypool, length)))
       {
-          UWORD *ncolors = newcolors;
+        UWORD *ncolors = newcolors;
 
         if(color && *colors-x != 1)
         {
@@ -815,7 +815,7 @@ long  SplitLine   (LONG x, struct line_node *line, BOOL move_crsr, struct UserAc
       return(TRUE);
     }
 
-    if(x == line->line.Length + newline->line.Length - 2)
+    if(x == (LONG)(line->line.Length + newline->line.Length - 2))
     {
       data->totallines += 1;
       if(!buffer)
@@ -900,9 +900,9 @@ void  strcpyback    (char *dest, char *src)
  * ------------------------------------ */
 void  OptimizedPrint  (LONG x, struct line_node *line, LONG line_nr, LONG width, struct InstData *data)
 {
-    LONG twidth = PrintLine(x, line, line_nr++, TRUE, data);
+  LONG twidth = PrintLine(x, line, line_nr++, TRUE, data);
 
-  if((twidth != width) && (x+twidth < line->line.Length) && (line_nr <= data->maxlines))
+  if((twidth != width) && (x+twidth < (LONG)line->line.Length) && (line_nr <= data->maxlines))
   {
     OptimizedPrint(x+twidth, line, line_nr, LineCharsWidth(line->line.Contents+x+width, data) + (width - twidth), data);
   }
@@ -985,12 +985,12 @@ void  UpdateChange(LONG x, struct line_node *line, LONG length, char *characters
   {
     if(lineabove_width != LineCharsWidth(line->line.Contents+skip-lineabove_width, data))
     {
-        LONG  newwidth;
+      LONG newwidth;
 
       newwidth = PrintLine(skip-lineabove_width, line, line_nr-1, TRUE, data) - lineabove_width;
       skip  += newwidth;
       width -= newwidth;
-      if(skip >= line->line.Length)
+      if(skip >= (LONG)line->line.Length)
         return;
     }
   }
@@ -1007,7 +1007,7 @@ long  PasteChars    (LONG x, struct line_node *line, LONG length, char *characte
   {
     if(*line->line.Styles != EOS)
     {
-        ULONG c = 0;
+      ULONG c = 0;
 
       while(*(line->line.Styles+c) <= x+1)
         c += 2;
@@ -1036,7 +1036,7 @@ long  PasteChars    (LONG x, struct line_node *line, LONG length, char *characte
   }
 
 
-  if((*((long *)line->line.Contents-1))-4 < line->line.Length + length + 1)
+  if((*((long *)line->line.Contents-1))-4 < (LONG)(line->line.Length + length + 1))
   {
     if(!ExpandLine(line, length, data))
       return(FALSE);

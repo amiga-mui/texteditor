@@ -687,7 +687,7 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
 
     if(crsr_x != 0xffff)
     {
-      data->CPos_X = (data->actualline->line.Length > (LONG)crsr_x) ? (UWORD)crsr_x : (UWORD)data->actualline->line.Length-1;
+      data->CPos_X = (data->actualline->line.Length > (ULONG)crsr_x) ? (UWORD)crsr_x : (UWORD)data->actualline->line.Length-1;
     }
     ScrollIntoDisplay(data);
     if(data->flags & FLG_Active)

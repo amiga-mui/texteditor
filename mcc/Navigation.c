@@ -297,7 +297,7 @@ void  GoEndOfLine (struct InstData *data)
 
 void  GoNextWord  (struct InstData *data)
 {
-  BOOL EOL = (data->CPos_X == data->actualline->line.Length);
+  //BOOL EOL = (data->CPos_X == data->actualline->line.Length);
 
   if(!CheckSep(*(data->actualline->line.Contents+data->CPos_X), data) && (data->CPos_X < data->actualline->line.Length))
   {
@@ -342,7 +342,7 @@ void  GoNextSentence (struct InstData *data)
 
 void  GoRight  (struct InstData *data)
 {
-  if(data->actualline->line.Length > (data->CPos_X+1))
+  if((LONG)data->actualline->line.Length > (data->CPos_X+1))
       data->CPos_X++;
   else  NextLine(data);
 }
@@ -361,8 +361,8 @@ void  GoStartOfLine  (struct InstData *data)
 
 void  GoPreviousWord (struct InstData *data)
 {
-    BOOL SOL = (!data->CPos_X);
-    BOOL moved = FALSE;
+  //BOOL SOL = (!data->CPos_X);
+  BOOL moved = FALSE;
 
 FindWord:
 
@@ -447,7 +447,7 @@ long  CheckSep (unsigned char character, struct InstData *data)
 /*-----------------------------------------*
  * Check if given char is a sentence ender *
  *-----------------------------------------*/
-long  CheckSent (unsigned char character, struct InstData *data)
+long CheckSent(unsigned char character, UNUSED struct InstData *data)
 {
   if((character == '.') || (character == '!') || (character == '?'))
       return(TRUE);

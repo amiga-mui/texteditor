@@ -80,7 +80,7 @@ long SendRexx (char *word, char *command, struct InstData *data)
     rxmsg = CreateRexxMsg(data->clipport, NULL, NULL);
     rxmsg->rm_Action = RXCOMM;
     sprintf(buffer, command, word);
-    rxmsg->rm_Args[0] = CreateArgstring(buffer, strlen(buffer));
+    rxmsg->rm_Args[0] = (UBYTE *)CreateArgstring(buffer, strlen(buffer));
 
     PutMsg(rexxport, (struct Message *)rxmsg);
     if(Wait((1 << data->clipport->mp_SigBit) | SIGBREAKF_CTRL_C) != SIGBREAKF_CTRL_C)
@@ -90,10 +90,10 @@ long SendRexx (char *word, char *command, struct InstData *data)
       if(rxmsg->rm_Result1 == 0)
       {
         result = TRUE;
-        DeleteArgstring((char *)rxmsg->rm_Result2);
+        DeleteArgstring((APTR)rxmsg->rm_Result2);
       }
     }
-    DeleteArgstring(rxmsg->rm_Args[0]);
+    DeleteArgstring((APTR)rxmsg->rm_Args[0]);
     DeleteRexxMsg(rxmsg);
     DeleteMsgPort(data->clipport);
   }
@@ -103,11 +103,11 @@ long SendRexx (char *word, char *command, struct InstData *data)
 //void *CloneWBPath(struct WBStartup *, struct  Library *);
 //void FreeWBPath(void *, struct  Library *);
 
-long SendCLI(char *word, char *command, struct InstData *data)
+long SendCLI(char *word, char *command, UNUSED struct InstData *data)
 {
-  char  buffer[512];
-  long  result = TRUE;
-  void  *path;
+  char buffer[512];
+  long result = TRUE;
+  BPTR path;
 
   sprintf(buffer, command, word);
 
@@ -208,10 +208,11 @@ void SuggestWord (struct InstData *data)
     }
 */  
 
-    while(data->CPos_X && (IsAlpha(data->mylocale, *(line->line.Contents+data->CPos_X-1)) || *(line->line.Contents+data->CPos_X-1) == '-') || (*(line->line.Contents+data->CPos_X-1) == '\''))
+    while(data->CPos_X && (IsAlpha(data->mylocale, *(line->line.Contents+data->CPos_X-1)) || *(line->line.Contents+data->CPos_X-1) == '-' || (*(line->line.Contents+data->CPos_X-1) == '\'')))
     {
       GoPreviousWord(data);
     }
+
     line = data->actualline;
     data->blockinfo.startx = data->CPos_X;
     data->blockinfo.startline = line;
@@ -251,9 +252,9 @@ void SuggestWord (struct InstData *data)
 
       if((data->flags & FLG_CheckWords) && LookupWord(word, data))
       {
-          Object  *group;
+        Object *group;
 
-        get(data->SuggestWindow, MUIA_Window_RootObject, &group);
+        get(data->SuggestWindow, MUIA_Window_RootObject, (APTR)&group);
         set(group, MUIA_Group_ActivePage, MUIV_Group_ActivePage_First);
         SetAttrs(data->SuggestWindow,
               MUIA_Window_Activate, TRUE,
@@ -283,7 +284,7 @@ void SuggestWord (struct InstData *data)
             }
             Close(fh);
 
-            get(data->SuggestWindow, MUIA_Window_RootObject, &group);
+            get(data->SuggestWindow, MUIA_Window_RootObject, (APTR)&group);
             set(group, MUIA_Group_ActivePage, MUIV_Group_ActivePage_Last);
             SetAttrs(data->SuggestWindow,
                   MUIA_Window_Activate, TRUE,

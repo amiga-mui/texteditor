@@ -48,7 +48,7 @@ ULONG ConvertPen (UWORD color, BOOL highlight, struct InstData *data)
 #ifdef ClassAct
   return(color ? (data->colormap ? data->colormap[color-1] : color) : (highlight ? data->highlightcolor : data->textcolor));
 #else
-  return(color ? (data->colormap ? data->colormap[color-1] : ((color <= 8) ? _pens(data->object)[color-1] : color-9)) : (highlight ? data->highlightcolor : data->textcolor));
+  return(color ? (ULONG)(data->colormap ? (ULONG)data->colormap[color-1] : (ULONG)((color <= 8) ? _pens(data->object)[color-1] : color-9)) : (ULONG)(highlight ? (ULONG)data->highlightcolor : (ULONG)data->textcolor));
 #endif
 }
 
@@ -107,7 +107,6 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
   if((line_nr > 0) && (data->update) && !(data->flags & FLG_Quiet))
   {
       LONG  c_length = length-1;
-      LONG  old_x   = x;
       LONG  startx = 0, stopx = 0;
       LONG  starty = 0, xoffset = ((data->height-rp->TxBaseline+1)>>1)+1;
       LONG  flow = 0;
@@ -192,7 +191,7 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
         {
           cursor = TRUE;
           blockstart = MyTextLength(data->font, text+x, data->CPos_X-x);
-          blockwidth = (data->CursorWidth == 6) ? MyTextLength(data->font, (*(text+data->CPos_X) == '\n') ? "n" : text+data->CPos_X, 1) : data->CursorWidth;
+          blockwidth = (data->CursorWidth == 6) ? MyTextLength(data->font, (*(text+data->CPos_X) == '\n') ? (char *)"n" : (char *)(text+data->CPos_X), 1) : data->CursorWidth;
         }
       }
 

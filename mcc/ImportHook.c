@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <exec/types.h>
-#include <clib/dos_protos.h>
+#include <proto/dos.h>
 #include <proto/exec.h>
 
 #include "TextEditor_mcc.h"
@@ -175,7 +175,7 @@ STATIC VOID AddToGrow(struct grow *grow, UWORD val1, UWORD val2)
                      16 = Thick        - Make separator extra thick.
 
 *************************************************************************/
-HOOKPROTONO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
+HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 {
 	char *eol;
 	char *src = msg->Data;
@@ -425,19 +425,19 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
   return eol?eol + 1:NULL;
 }
 
-HOOKPROTONO(EMailImportHookFunc, STRPTR , struct ImportMessage *msg)
+HOOKPROTONHNO(EMailImportHookFunc, STRPTR , struct ImportMessage *msg)
 {
 	return MimeImport(msg,0);
 }
 MakeHook(ImEMailHook, EMailImportHookFunc);
 
-HOOKPROTONO(MIMEImportHookFunc, STRPTR, struct ImportMessage *msg)
+HOOKPROTONHNO(MIMEImportHookFunc, STRPTR, struct ImportMessage *msg)
 {
 	return MimeImport(msg,1);
 }
 MakeHook(ImMIMEHook, MIMEImportHookFunc);
 
-HOOKPROTONO(MIMEQuoteImportHookFunc, STRPTR, struct ImportMessage *msg)
+HOOKPROTONHNO(MIMEQuoteImportHookFunc, STRPTR, struct ImportMessage *msg)
 {
 	return MimeImport(msg,2);
 }
