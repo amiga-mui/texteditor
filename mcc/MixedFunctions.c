@@ -34,6 +34,14 @@
 #include <proto/muimaster.h>
 #endif
 
+/*************************************************************************/
+
+#ifndef FSF_ANTIALIASED
+#define FSF_ANTIALIASED 0x10
+#endif
+
+/*************************************************************************/
+
 #include "TextEditor_mcc.h"
 #include "private.h"
 
