@@ -333,16 +333,17 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 	char *eol;
 	char *src = msg->Data;
 	int len;
+	int tabs;
 	struct LineNode *line = msg->linenode;
 	ULONG wrap = msg->ImportWrap;
 
-	if (!(eol = FindEOL(src,NULL)))
+	if (!(eol = FindEOL(src,&tabs)))
 		return NULL;
 
 	/* Clear the flow */
 	line->Flow = 0;
 
-	len = eol - src;
+	len = eol - src + 4 * tabs;
 
  /* allocate some more memory for the possible quote mark '>', note that if
   * a '=' is detected at the end of a line this memory is not sufficient! */
@@ -392,6 +393,13 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 		{
 			unsigned char c = *src++;
 
+			if (c == '\t')
+			{
+				int i;
+				for (i=(dest - dest_start)% 4; i < 4; i++)
+					*dest++ = ' ';
+				continue;				
+			} else
 			if (c == '/')
 			{
 				AddToGrow(&style_grow, dest - dest_start + 1, (state & ITALIC)?~ITALIC:ITALIC);
@@ -432,11 +440,11 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 
 						src += i + 1;
 
-						if (!(eol = FindEOL(src,NULL)))
+						if (!(eol = FindEOL(src,&tabs)))
 							break;
 
 						/* The size of the dest buffer has to be increased now */
-						len += eol - src;
+						len += eol - src + 4 * tabs;
 						
 						if (!(new_dest_start = (unsigned char*)MyAllocPooled(msg->PoolHandle, len + 4)))
 							break;
