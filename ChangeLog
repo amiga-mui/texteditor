@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-04-06  Ilkka Lehtoranta <ilkleht@isoveli.org>
+
+    * mcc: Removed compiler warnings for MorphOS build.
+
 2005-04-06  Sebastian Bauer <mail@sebastianbauer.info>
 
     * mcc/ImportHook.c: Changed behaviour of FindEOL() not to return NULL

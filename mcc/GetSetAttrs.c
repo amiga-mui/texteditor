@@ -21,6 +21,7 @@
 ***************************************************************************/
 
 #include <utility/tagitem.h>
+#include <clib/alib_protos.h>
 #include <proto/exec.h>
 #include <proto/diskfont.h>
 #include <proto/graphics.h>
