@@ -230,7 +230,9 @@ void  ClearLine   (char *text, int printed, int line_nr, struct InstData *data)
  *-----------------------------------------*/
 void  OffsetToLines (LONG x, struct line_node *line, struct pos_info *pos, struct InstData *data)
 {
-    LONG  c = 0, d, lines = 0;
+  LONG c=0;
+  LONG d=0;
+  LONG lines = 0;
 
   if(data->shown)
   {
@@ -258,17 +260,17 @@ void  OffsetToLines (LONG x, struct line_node *line, struct pos_info *pos, struc
  *------------------*/
 void  SetCursor   (LONG x, struct line_node *line, long Set, struct InstData *data)
 {
-    LONG    line_nr;
-    struct  pos_info pos;
-    ULONG   xplace, yplace, cursorxplace;
-    UWORD   cursor_width;
-    BOOL    clipping = FALSE;
+  LONG    line_nr;
+  struct  pos_info pos;
+  ULONG   xplace, yplace, cursorxplace;
+  UWORD   cursor_width;
+  BOOL    clipping = FALSE;
 
-    UWORD   styles[3] = {0, 0, 0};
-    UWORD   colors[3] = {0, 0, 0};
-    UBYTE   chars[3]  = {' ', ' ', ' '};
-    WORD    start = 0, stop = 0;
-    LONG    c;
+  UWORD   styles[3] = {0, 0, 0};
+  UWORD   colors[3] = {0, 0, 0};
+  UBYTE   chars[3]  = {' ', ' ', ' '};
+  WORD    start = 0, stop = 0;
+  LONG    c;
 
   if(Enabled(data) || !data->update || (data->scrollaction && Set) || (data->ypos != data->realypos) || (!data->shown) || (data->flags & (FLG_ReadOnly | FLG_Quiet | FLG_Ghosted)))
   {
@@ -295,7 +297,7 @@ void  SetCursor   (LONG x, struct line_node *line, long Set, struct InstData *da
       }
     }
 
-    cursor_width = (data->CursorWidth == 6) ? MyTextLength(data->font, (line->line.Contents[x] == '\n') ? "n" : &chars[1], 1) : data->CursorWidth;
+    cursor_width = (data->CursorWidth == 6) ? MyTextLength(data->font, (line->line.Contents[x] == '\n') ? (char *)"n" : (char *)&chars[1], 1) : data->CursorWidth;
 
     xplace  = data->xpos + MyTextLength(data->font, line->line.Contents+(x-pos.x), pos.x+start);
     xplace += FlowSpace(line->line.Flow, line->line.Contents+pos.bytes, data);
@@ -323,7 +325,7 @@ void  SetCursor   (LONG x, struct line_node *line, long Set, struct InstData *da
     SetFont(data->rport, data->font);
     Move(data->rport, xplace, yplace+data->rport->TxBaseline);
 
-    if((data->font->tf_Flags & FPF_PROPORTIONAL) && (xplace + *((short *)data->font->tf_CharKern-data->font->tf_LoChar+chars[1+start]) < data->xpos))
+    if((data->font->tf_Flags & FPF_PROPORTIONAL) && ((LONG)(xplace + *((short *)data->font->tf_CharKern-data->font->tf_LoChar+chars[1+start])) < data->xpos))
     {
       clipping = TRUE;
       AddClipping(data);

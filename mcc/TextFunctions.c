@@ -25,6 +25,8 @@
 #include <graphics/text.h>
 #include <graphics/rastport.h>
 
+#include "SDI_compiler.h"
+
 long MyTextLength(struct TextFont *font, char *text, long length)
 {
   register UWORD    stringlength = 0;
@@ -49,7 +51,7 @@ long MyTextLength(struct TextFont *font, char *text, long length)
   else  return (length * font->tf_XSize);
 }
 
-long MyTextFit(struct TextFont *font, char *text, long length, long width, long direction)
+long MyTextFit(struct TextFont *font, char *text, long length, long width, UNUSED long direction)
 {
   register int    stringlength = 0;
   register UWORD    charsthatfit = length;

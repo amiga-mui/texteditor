@@ -226,7 +226,7 @@ void  RejectInput   (struct InstData *);
 long  MyTextLength  (struct TextFont *, char *, long);
 long  MyTextFit   (struct TextFont *, char *, long, long, long);
 
-long  ReactOnRawKey (unsigned char, unsigned long qualifier, struct IntuiMessage *, struct InstData *);
+long  ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessage *, struct InstData *);
 void  ScrollIntoDisplay (struct InstData *);
 long  CheckSep    (unsigned char, struct InstData *);
 long  CheckSent   (unsigned char, struct InstData *);
@@ -251,7 +251,7 @@ void  GetLine     (LONG, struct pos_info *, struct InstData *);
 LONG  LineToVisual  (struct line_node *, struct InstData *);
 
 LONG  PasteClip   (LONG x, struct line_node *line, struct InstData *);
-long  SplitLine   (LONG, struct line_node *, BOOL, struct UserAction *, struct InstData *);
+long  SplitLine   (LONG x, struct line_node *, BOOL, struct UserAction *, struct InstData *);
 long  MergeLines    (struct line_node *, struct InstData *);
 long  RemoveChars   (LONG, struct line_node *, LONG, struct InstData *);
 long  PasteChars    (LONG, struct line_node *, LONG, char *, struct UserAction *, struct InstData *);

@@ -60,9 +60,9 @@ ULONG OM_MarkText (struct MUIP_TextEditor_MarkText *msg, struct InstData *data)
   }
 
   data->blockinfo.startline = LineNode(msg->start_crsr_y+1, data);
-  data->blockinfo.startx = (data->blockinfo.startline->line.Length > (LONG)msg->start_crsr_x) ? msg->start_crsr_x : data->blockinfo.startline->line.Length-1;
+  data->blockinfo.startx = (data->blockinfo.startline->line.Length > msg->start_crsr_x) ? msg->start_crsr_x : data->blockinfo.startline->line.Length-1;
   data->blockinfo.stopline = LineNode(msg->stop_crsr_y+1, data);
-  data->blockinfo.stopx = (data->blockinfo.stopline->line.Length > (LONG)msg->stop_crsr_x) ? msg->stop_crsr_x : data->blockinfo.stopline->line.Length-1;
+  data->blockinfo.stopx = (data->blockinfo.stopline->line.Length > msg->stop_crsr_x) ? msg->stop_crsr_x : data->blockinfo.stopline->line.Length-1;
   data->blockinfo.enabled = TRUE;
 
   data->actualline = data->blockinfo.stopline;
@@ -129,7 +129,7 @@ ULONG ToggleCursor (struct InstData *data)
   return(TRUE);
 }
 
-ULONG InputTrigger (struct IClass *cl, struct InstData *data)
+ULONG InputTrigger(UNUSED struct IClass *cl, struct InstData *data)
 {
   if(data->smooth_wait == 1 && data->scrollaction)
   {
@@ -248,7 +248,7 @@ ULONG InputTrigger (struct IClass *cl, struct InstData *data)
         OffsetToLines(data->CPos_X, data->actualline, &pos, data);
         flow = FlowSpace(data->actualline->line.Flow, data->actualline->line.Contents+pos.bytes, data);
         
-        if((LONG)MouseX <= data->xpos+flow+MyTextLength(data->font, data->actualline->line.Contents+pos.bytes, pos.extra-pos.bytes-1))
+        if(MouseX <= (LONG)(data->xpos+flow+MyTextLength(data->font, data->actualline->line.Contents+pos.bytes, pos.extra-pos.bytes-1)))
         {
           if(data->selectmode == 1)
           {
@@ -293,8 +293,9 @@ ULONG InputTrigger (struct IClass *cl, struct InstData *data)
 
 ULONG InsertText (struct InstData *data, STRPTR text, BOOL movecursor)
 {
-    struct line_node *line, *actline = data->actualline;
-    UWORD   x = data->CPos_X, realx;
+  struct line_node *line, *actline = data->actualline;
+  UWORD x = data->CPos_X;
+  UWORD realx = 0;
 
   if((line = ImportText(text, data->mypool, data->ImportHook, data->ImportWrap)))
   {

@@ -39,7 +39,7 @@
 
 extern struct keybindings keys[];
 
-struct TextFont *GetFont(struct InstData *data, void *obj, long attr)
+struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
 {
   char *setting;
   char *fontname;

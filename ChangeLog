@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-04-04  Jens Langner <Jens.Langner@light-speed.de>
+
+    * mcc: removed the last bunch of compiler warnings and made the
+      custom class compile with -DDEBUG disabled.
+
 2005-04-01  Sebastian Bauer <mail@sebastianbauer.info>
 
     * mcc: Now clears the area before the text near the cursor is

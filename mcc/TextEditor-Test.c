@@ -57,7 +57,7 @@ MakeStaticHook(URLHook, URLHookCode);
 
 Object *editorgad;
 
-HOOKPROTONHNP(PosHookCode, void, Object *obj)
+HOOKPROTONHNONP(PosHookCode, void)
 {
   ULONG x, y, sx, sy;
   struct Rectangle *crsr;
@@ -66,8 +66,8 @@ HOOKPROTONHNP(PosHookCode, void, Object *obj)
     printf("%ld, %ld, %ld, %ld\n", x, y, sx, sy);
   }
 
-  if(GetAttr(MUIA_TextEditor_CursorPosition, editorgad, (ULONG *)&crsr))
-    printf("Cursor: (%ld, %ld) - (%ld, %ld)\n", crsr->MinX, crsr->MinY, crsr->MaxX, crsr->MaxY);
+  if(get(editorgad, MUIA_TextEditor_CursorPosition, (APTR)&crsr))
+    printf("Cursor: (%d, %d) - (%d, %d)\n", crsr->MinX, crsr->MinY, crsr->MaxX, crsr->MaxY);
 }
 MakeStaticHook(PosHook, PosHookCode);
 
@@ -441,7 +441,7 @@ int main(void)
           do  {
               long  changed;
 
-            while(DoMethod(app, MUIM_Application_NewInput, &sigs) != MUIV_Application_ReturnID_Quit)
+            while((LONG)DoMethod(app, MUIM_Application_NewInput, &sigs) != MUIV_Application_ReturnID_Quit)
             {
               if(sigs)
               {
@@ -460,7 +460,7 @@ int main(void)
           {
               void  *text = (void *)DoMethod(editorgad, MUIM_TextEditor_ExportText);
 
-            if(fh = Open((char *)argarray[0], MODE_NEWFILE))
+            if((fh = Open((char *)argarray[0], MODE_NEWFILE)))
             {
               Write(fh, text, strlen(text));
               Close(fh);
