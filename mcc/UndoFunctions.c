@@ -253,8 +253,6 @@ void ResetUndoBuffer(struct InstData *data)
         MyFreePooled(data->mypool, buffer->clip);
       }
       
-      #warning "is this replacement correct?"
-      //(char *)buffer += sizeof(UserAction);
       buffer++;
     }
     
@@ -265,8 +263,6 @@ void ResetUndoBuffer(struct InstData *data)
         MyFreePooled(data->mypool, buffer->clip);
       }
       
-      #warning "is this replacement correct?"
-      //(char *)buffer += sizeof(UserAction);
       buffer++;
     }
     
