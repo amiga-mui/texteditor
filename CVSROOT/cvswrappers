@@ -25,6 +25,7 @@
 *.jpeg -k 'b'
 *.png -k 'b'
 *.iff -k 'b'
+*.ilbm -l 'b'
 *.exe -k 'b'
 *.o -k 'b'
 *.lib -k 'b'
