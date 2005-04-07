@@ -22,6 +22,7 @@
                   reduce compiler warnings.
  1.7   04.07.04 : removed static from all DISPATCHERPROTO definitions as there
                   may dispatcher that are of course non static.
+ 1.8   07.04.05 : added MakeHookWithData (Sebastian Bauer)
 */
 
 /*
@@ -156,6 +157,11 @@
       {SDI_TRAP_LIB, 0, (void(*)()) funcname};                               \
       struct Hook hookname = {{NULL, NULL}, (HOOKFUNC)&Gate_##funcname,      \
       NULL, NULL}
+    #define MakeHookWithData(hookname, funcname, data)                       \
+      } static const struct SDI_EmulLibEntry Gate_##funcname =               \
+      {SDI_TRAP_LIB, 0, (void(*)()) funcname};                               \
+      struct Hook hookname = {{NULL, NULL}, (HOOKFUNC)&Gate_##funcname,      \
+      NULL, (APTR)data}
     #define MakeStaticHook(hookname, funcname)                               \
       } static const struct SDI_EmulLibEntry Gate_##funcname =               \
       {SDI_TRAP_LIB, 0, (void(*)()) funcname};                               \
@@ -175,6 +181,11 @@
       0, (APTR) funcname};                                                   \
       struct Hook hookname = {{NULL, NULL},                                  \
       (HOOKFUNC)&Gate_##funcname, NULL, NULL}
+    #define MakeHookWithData(hookname, funcname, data)                       \
+      static const struct SDI_EmulLibEntry Gate_##funcname = {SDI_TRAP_LIB,  \
+      0, (APTR) funcname};                                                   \
+      struct Hook hookname = {{NULL, NULL},                                  \
+      (HOOKFUNC)&Gate_##funcname, NULL, (APTR)data}
     #define MakeStaticHook(hookname, funcname)                               \
       static const struct SDI_EmulLibEntry Gate_##funcname = {SDI_TRAP_LIB,  \
       0, (APTR) funcname};                                                   \
@@ -197,6 +208,8 @@
   #define ENTRY(func) (APTR)func
   #define MakeHook(hookname, funcname) struct Hook hookname = {{NULL, NULL}, \
     (HOOKFUNC)funcname, NULL, NULL}
+  #define MakeHookWithData(hookname, funcname, data) struct Hook hookname = {{NULL, NULL}, \
+    (HOOKFUNC)funcname, NULL, (APTR)data}
   #define MakeStaticHook(hookname, funcname) static struct Hook hookname =   \
     {{NULL, NULL}, (HOOKFUNC)funcname, NULL, NULL}
 #endif
