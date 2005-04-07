@@ -7,6 +7,13 @@ $Source$
 
 2005-04-07  Sebastian Bauer <mail@sebastianbauer.info>
 
+    * mcc/SpellChecker.c: Reimplemented the search path feature also
+      for systems not having a recent workbench.library. Code is mainly
+      untested but the core is taken from YAM with permission from
+      Jens Langner. So TextEditor-mcc is still LGPL ;)
+      Note that this code is not included within the OS4 compile so
+      this feature requires at least version 44 of workbench.library
+      here. But this is a tautology.
     * mcc: No longer uses static hook declarations within functions,
       because same code of a mcc can be executed by several tasks!
     * doc/MCC_TextEditor.doc: Warn about unpredictable results of
