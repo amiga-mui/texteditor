@@ -165,7 +165,7 @@ int main(void)
           STRPTR  flow_text[] = {"Left", "Center", "Right", NULL};
           STRPTR  classes[] = {"TextEditor.mcc", NULL};
 
-        mcc = MUI_CreateCustomClass(NULL, "Area.mui", NULL, sizeof(struct InstData), (void *)_Dispatcher);
+        mcc = MUI_CreateCustomClass(NULL, "Area.mui", NULL, sizeof(struct InstData), ENTRY(_Dispatcher));
         
         app = MUI_NewObject("Application.mui",
               MUIA_Application_Author,    "Allan Odgaard",

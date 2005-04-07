@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-04-08  Jens Langner <Jens.Langner@light-speed.de>
+
+    * mcp: added missing ENTRY() calls to the Dispatchers which are required
+      by the MorphOS build. However, this required to put the Create/Delete
+      of our subclasses into Dispatcher.c, but now the mcp should hopefully
+      work on MorphOS as well.
+
 2005-04-07  David Rey <tactica@users.sourceforge.net>
 
     * doc/MCC_TextEditor.doc: fixed typos, corrected grammar, reformatted

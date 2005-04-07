@@ -468,7 +468,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 //            Child, MUI_MakeObject(MUIO_Cycle, NULL, data->functions),
             Child, data->keyfunctions = PopobjectObject,
               MUIA_Weight, 400,
-              MUIA_Popstring_String,    functionname = NewObject(data->text_class->mcc_Class, NULL, TextFrame, MUIA_Background, MUII_TextBack, End,
+              MUIA_Popstring_String,    functionname = NewObject(text_mcc->mcc_Class, NULL, TextFrame, MUIA_Background, MUII_TextBack, End,
               MUIA_Popstring_Button,    popbutton = MUI_MakeObject(MUIO_PopButton, MUII_PopUp),
               MUIA_Popobject_StrObjHook,  &Popstring_OpenHook,
               MUIA_Popobject_ObjStrHook,  &Popstring_CloseHook,

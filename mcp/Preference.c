@@ -60,9 +60,6 @@ struct LocaleIFace *ILocale = NULL;
 struct UtilityIFace *IUtility = NULL;
 #endif
 
-struct MUI_CustomClass *widthslider_mcc;
-struct MUI_CustomClass *speedslider_mcc;
-
 extern DISPATCHERPROTO(_DispatcherP);
 
 int main(void)
@@ -85,11 +82,8 @@ int main(void)
           Object *window;
           struct MUI_CustomClass *mcc = NULL;
 
-          widthslider_mcc = MUI_CreateCustomClass(NULL, "Slider.mui", NULL, 0, (void *)WidthSlider_Dispatcher);
-          speedslider_mcc = MUI_CreateCustomClass(NULL, "Slider.mui", NULL, 0, (void *)SpeedSlider_Dispatcher);
-      
-          if(widthslider_mcc && speedslider_mcc)
-            mcc = MUI_CreateCustomClass(NULL, "Group.mui", NULL, sizeof(struct InstData_MCP), (void *)_DispatcherP);
+          if(CreateSubClasses())
+            mcc = MUI_CreateCustomClass(NULL, "Group.mui", NULL, sizeof(struct InstData_MCP), ENTRY(_DispatcherP));
       
           if(mcc)
           {
@@ -141,11 +135,8 @@ int main(void)
 
             if(mcc)
               MUI_DeleteCustomClass(mcc);
-            if(widthslider_mcc)
-              MUI_DeleteCustomClass(widthslider_mcc);
-            if(speedslider_mcc)
-              MUI_DeleteCustomClass(speedslider_mcc);
 
+            DeleteSubClasses();
           }
 
           DROPINTERFACE(IMUIMaster);

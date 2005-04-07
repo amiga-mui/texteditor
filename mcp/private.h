@@ -61,8 +61,6 @@ enum
 
 struct InstData_MCP
 {
-  struct MUI_CustomClass *text_class;
-
   Object *editpopup;
   Object *obj;
   Object *hotkey;
@@ -122,13 +120,10 @@ struct te_key
 
 #include "default-align.h"
 
-// extern dispatcher protos of other internal MUI classes
-extern SAVEDS ASM ULONG Text_Dispatcher(REG(a0, struct IClass * cl), REG(a2, Object * obj), REG(a1, Msg msg));
-extern SAVEDS ASM ULONG WidthSlider_Dispatcher(REG(a0, struct IClass * cl), REG(a2, Object * obj), REG(a1, Msg msg));
-extern SAVEDS ASM ULONG SpeedSlider_Dispatcher(REG(a0, struct IClass * cl), REG(a2, Object * obj), REG(a1, Msg msg));
-
 extern struct MUI_CustomClass *widthslider_mcc;
 extern struct MUI_CustomClass *speedslider_mcc;
+extern struct MUI_CustomClass *text_mcc;
+
 extern const struct te_key *keybindings[];
 
 Object *CreatePrefsGroup(struct InstData_MCP *data);
@@ -138,6 +133,8 @@ void AddKeyBinding (STRPTR keystring, UWORD action, struct KeyAction *storage);
 void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage);
 void KeyToString(STRPTR buffer, struct KeyAction *ka);
 STRPTR FunctionName(UWORD func);
+BOOL CreateSubClasses(void);
+void DeleteSubClasses(void);
 
 // main class methods
 ULONG New(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct opSet *msg));

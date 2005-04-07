@@ -27,6 +27,7 @@
 #include <libraries/mui.h>
 #include <proto/intuition.h>
 #include <proto/utility.h>
+#include <proto/muimaster.h>
 
 #include "locale.h"
 #include "private.h"
@@ -102,3 +103,45 @@ DISPATCHERPROTO(SpeedSlider_Dispatcher)
 
   return(DoSuperMethodA(cl, obj, msg));
 }
+
+struct MUI_CustomClass *widthslider_mcc = NULL;
+struct MUI_CustomClass *speedslider_mcc = NULL;
+struct MUI_CustomClass *text_mcc = NULL;
+
+BOOL CreateSubClasses(void)
+{
+  if((widthslider_mcc = MUI_CreateCustomClass(NULL, "Slider.mui", NULL, 0, ENTRY(WidthSlider_Dispatcher))))
+  {
+    if((speedslider_mcc = MUI_CreateCustomClass(NULL, "Slider.mui", NULL, 0, ENTRY(SpeedSlider_Dispatcher))))
+    {
+      if((text_mcc = MUI_CreateCustomClass(NULL, "Text.mui", NULL, 0, ENTRY(Text_Dispatcher))))
+      {
+        return TRUE;
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+void DeleteSubClasses(void)
+{
+  if(text_mcc)
+  {
+    MUI_DeleteCustomClass(text_mcc);
+    text_mcc = NULL;
+  }
+
+  if(speedslider_mcc)
+  {
+    MUI_DeleteCustomClass(speedslider_mcc);
+    speedslider_mcc = NULL;
+  }
+
+  if(widthslider_mcc)
+  {
+    MUI_DeleteCustomClass(widthslider_mcc);
+    widthslider_mcc = NULL;
+  }
+}
+
