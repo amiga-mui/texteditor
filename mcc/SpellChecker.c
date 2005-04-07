@@ -109,29 +109,104 @@ BOOL WorkbenchControl(STRPTR name, ...)
 }
 #endif
 
+/***********************************************************************
+ This returns a duplicated search path (preferable the workbench
+ searchpath) usable for NP_Path of SystemTagList().
+************************************************************************/
+static BPTR CloneSearchPath(void)
+{
+	BPTR path = 0;
+
+	if (WorkbenchBase && WorkbenchBase->lib_Version >= 44)
+	{
+    WorkbenchControl(NULL, WBCTRLA_DuplicateSearchPath, &path, TAG_DONE);
+	} else
+	{
+		/* We don't like this evil code in OS4 compile, as we should have
+		 * a recent enough workbench available */
+#ifndef __amigaos4__
+		struct Process *pr;
+
+		pr = (struct Process*)FindTask(NULL);
+
+		if (pr->pr_Task.tc_Node.ln_Type == NT_PROCESS)
+		{
+			struct CommandLineInterface *cli = BADDR(pr->pr_CLI);
+
+      if (cli)
+      {
+        BPTR *p = &path;
+        BPTR dir = cli->cli_CommandDir;
+
+        while (dir)
+        {
+          BPTR dir2;
+          struct FileLock *lock = BADDR(dir);
+          struct PathNode *node;
+
+          dir = lock->fl_Link;
+          dir2 = DupLock(lock->fl_Key);
+          if (!dir2) break;
+
+          /* TODO: Check out if AllocVec() is correct, because this memory is
+           * freed by the system later */
+          node = AllocVec(sizeof(struct PathNode), MEMF_PUBLIC);
+          if (!node)
+          {
+            UnLock(dir2);
+            break;
+          }
+          node->pn_Next = 0;
+          node->pn_Lock = dir2;
+          *p = MKBADDR(node);
+          p = &node->pn_Next;
+        }
+		  }
+		}
+#endif
+	}
+	return path;
+}
+
+/***********************************************************************
+ Free the memory returned by CloneSearchPath
+************************************************************************/
+static VOID FreeSearchPath(BPTR path)
+{
+	if (path == 0) return;
+
+	if (WorkbenchBase && WorkbenchBase->lib_Version >= 44)
+	{
+		WorkbenchControl(NULL, WBCTRLA_FreeSearchPath, path, TAG_DONE);
+	} else
+	{
+#ifndef __amigaos4__
+  	 while (path)
+  	 {
+  	    struct PathNode *node = BADDR(path);
+  	    path = node->pn_Next;
+  	    UnLock(node->pn_Lock);
+  	    FreeVec(node);
+  	 }
+#endif
+	}
+}
+
 long SendCLI(char *word, char *command, UNUSED struct InstData *data)
 {
   char buffer[512];
   long result = TRUE;
-  BPTR path = ((BPTR)NULL);
+  BPTR path;
 
   sprintf(buffer, command, word);
 
-	/* Find out workbench path */
-	if (WorkbenchBase && WorkbenchBase->lib_Version >= 44)
-	{
-		WorkbenchControl(NULL, WBCTRLA_DuplicateSearchPath, &path, TAG_DONE);
-	}
+	/* path maybe 0, which is allowed */
+	path = CloneSearchPath();
 
-  if (SystemTags(buffer, path?NP_Path:TAG_IGNORE, path, TAG_DONE) == -1)
+  if (SystemTags(buffer, NP_Path, path, TAG_DONE) == -1)
   {
     result = FALSE;
-    
-    /* Free the path */
-		if (path)
-		{
-			WorkbenchControl(NULL, WBCTRLA_FreeSearchPath, path, TAG_DONE);
-		}
+		FreeSearchPath(path);
   }
   return result;
 }
