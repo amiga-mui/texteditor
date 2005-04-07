@@ -131,11 +131,8 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
 {
   if((obj = (Object *)DoSuperMethodA(cl, obj, (Msg)msg)))
   {
-    static struct Hook ExPlainHook;
     struct InstData *data = INST_DATA(cl, obj);
     data->object = obj;
-
-    InitHook(&ExPlainHook, ExportHook, FALSE);
 
     if((data->mypool = CreatePool(MEMF_ANY, 3*1024, 512)))
     {
@@ -163,7 +160,7 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
 */            data->ImportHook = &ImPlainHook;
             data->ImportWrap = 1023;
 
-            data->ExportHook = &ExPlainHook;
+            data->ExportHook = &ExportHookPlain;
 /*            data->ExportWrap = 0;
 
             data->slider = NULL;
