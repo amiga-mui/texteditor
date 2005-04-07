@@ -590,21 +590,13 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
         {
           case MUIV_TextEditor_ExportHook_Plain:
           {
-            static struct Hook ExPlainHook;
-
-            InitHook(&ExPlainHook, ExportHook, FALSE);
-
-            data->ExportHook = &ExPlainHook;
+            data->ExportHook = &ExportHookPlain;
           }
           break;
           
           case MUIV_TextEditor_ExportHook_EMail:
           {
-            static struct Hook ExEMailHook;
-
-            InitHook(&ExEMailHook, ExportHook, TRUE);
-
-            data->ExportHook = &ExEMailHook;
+            data->ExportHook = &ExportHookEMail;
           }
           break;
 

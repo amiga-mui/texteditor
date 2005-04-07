@@ -363,7 +363,8 @@ extern struct Hook ImEMailHook;
 extern struct Hook ImMIMEHook;
 extern struct Hook ImMIMEQuoteHook;
 
-extern struct Hook ExportHook;
+extern struct Hook ExportHookPlain;
+extern struct Hook ExportHookEMail;
 
   enum
   {

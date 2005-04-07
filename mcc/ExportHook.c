@@ -295,4 +295,5 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
   }
   return(result);
 }
-MakeHook(ExportHook, ExportHookFunc);
+MakeHookWithData(ExportHookPlain, ExportHookFunc, FALSE);
+MakeHookWithData(ExportHookEMail, ExportHookFunc, TRUE);
