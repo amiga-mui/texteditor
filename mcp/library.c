@@ -61,9 +61,6 @@ struct LocaleBase *LocaleBase = NULL;
 struct LocaleIFace *ILocale = NULL;
 #endif
 
-struct MUI_CustomClass *widthslider_mcc;
-struct MUI_CustomClass *speedslider_mcc;
-
 BOOL ClassInitFunc(UNUSED struct Library *base)
 {
   if((LocaleBase = (APTR)OpenLibrary("locale.library", 38)) &&
@@ -72,30 +69,22 @@ BOOL ClassInitFunc(UNUSED struct Library *base)
     // open the TextEditor.mcp catalog
     OpenCat();
 
-    if((widthslider_mcc = MUI_CreateCustomClass(NULL, "Slider.mui", NULL, 0, (void *)WidthSlider_Dispatcher)))
-    {
-      if((speedslider_mcc = MUI_CreateCustomClass(NULL, "Slider.mui", NULL, 0, (void *)SpeedSlider_Dispatcher)))
-      {
-        return(TRUE);
-      }
-    }
+    // Initialize the subclasses
+    if(CreateSubClasses())
+      return TRUE;
 
     DROPINTERFACE(ILocale);
     CloseLibrary((APTR)LocaleBase);
     LocaleBase  = NULL;
   }
 
-  return(FALSE);
+  return FALSE ;
 }
 
 
 VOID ClassExitFunc(UNUSED struct Library *base)
 {
-  if(speedslider_mcc)
-    MUI_DeleteCustomClass(speedslider_mcc);
-
-  if(widthslider_mcc)
-    MUI_DeleteCustomClass(widthslider_mcc);
+  DeleteSubClasses();
 
   CloseCat();
 
