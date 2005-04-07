@@ -7,6 +7,8 @@ $Source$
 
 2005-04-07  Sebastian Bauer <mail@sebastianbauer.info>
 
+    * mcc: No longer uses static hook declarations within functions,
+      because same code of a mcc can be executed by several tasks!
     * doc/MCC_TextEditor.doc: Warn about unpredictable results of
       forbidden placement of some escape sequences for the plain import
       hook.
