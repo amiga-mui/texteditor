@@ -548,7 +548,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
             "\n\33cTextEditor.mcp " LIB_REV_STRING CPU " (" LIB_DATE ")\n"
             "Copyright (C) 1997-2000 Allan Odgaard\n"
             LIB_COPYRIGHT
-            "\033l\n\033[s:9]\n"
+            "\n\033[s:9]\n"
             "For the latest version, try: \33u\33p[7]http://www.sf.net/projects/texteditor-mcc/\33p[0]\33n\n"
             "\n"
             "\33hThis gadget is \33ifree software\33n. You can redistribute it and/or modify it under the terms of "
