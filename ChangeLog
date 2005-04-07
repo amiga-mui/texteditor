@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-04-07  David Rey <tactica@users.sourceforge.net>
+
+    * doc/MCC_TextEditor.doc: fixed typos, corrected grammar, reformatted
+      to make it a bit more readable and adapted to the new state of
+      affairs (LGPL)
+
 2005-04-07  Sebastian Bauer <mail@sebastianbauer.info>
 
     * mcc/SpellChecker.c: Reimplemented the search path feature also
