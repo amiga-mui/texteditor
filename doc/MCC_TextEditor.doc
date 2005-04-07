@@ -387,7 +387,8 @@ For feedback write to: Allan Odgaard
         Since this gadget allows different text styles, you can supply an
         importhook to parse the text correctly.
 
-        The default importhook understands the following escape sequences:
+        The default importhook understands the following escape sequences. They
+        may appear at any position within the line:
 
          <ESC> + u      Set the soft style to underline.
          <ESC> + b      Set the soft style to bold.
@@ -397,7 +398,9 @@ For feedback write to: Allan Odgaard
          <ESC> + p[x]   Change to color x, where x is taken from the colormap.
                         0 means normal. The color is reset for each new line.
 
-             The following sequences are only valid at the beginning of a line.
+        The following sequences are only valid at the beginning of a line. If
+        they aren't placed at the beginning of a line, the result is undefined
+        (they might be ignored or not).
 
          <ESC> + l      Left justify current and following lines.
          <ESC> + r      Right justify current and following lines.
