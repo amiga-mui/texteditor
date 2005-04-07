@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-04-07  Sebastian Bauer <mail@sebastianbauer.info>
+
+    * doc/MCC_TextEditor.doc: Warn about unpredictable results of
+      forbidden placement of some escape sequences for the plain import
+      hook.
+
 2005-04-06  Jens Langner <Jens.Langner@light-speed.de>
  
     * mcc: fixed OS3 build as well and removed all remaining compiler
