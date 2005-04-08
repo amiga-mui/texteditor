@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-04-08  Ilkka Lehtoranta <ilkleht@isoveli.org>
+
+    * mcc/SpellChecker.c: Now compiles without OS4 headers too.
+
 2005-04-08  Sebastian Bauer <mail@sebastianbauer.info>
 
     * TODO: Added two more entries (italic letter problem, tabs)

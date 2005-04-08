@@ -40,6 +40,14 @@
 
 #include "SDI_hook.h"
 
+#if !defined(__amigaos4__) || (INCLUDE_VERSION < 50)
+struct PathNode
+{
+  BPTR pn_Next;
+  BPTR pn_Lock;
+};
+#endif
+
 HOOKPROTONH(SelectCode, void, void *lvobj, long **parms)
 {
     struct InstData *data = (struct InstData *)*parms;
