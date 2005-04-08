@@ -120,6 +120,10 @@ struct UtilityIFace *IUtility = NULL;
 struct WorkbenchIFace *IWorkbench = NULL;
 #endif
 
+#ifdef __MORPHOS__
+DISPATCHERPROTO(_Dispatcher);
+#endif
+
 int main(void)
 {
   void    *slider;
