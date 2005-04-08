@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-04-08  Sebastian Bauer <mail@sebastianbauer.info>
+
+    * TODO: Added two more entries (italic letter problem, tabs)
+
 2005-04-08  Jens Langner <Jens.Langner@light-speed.de>
 
     * mcp/CreatePrefsGroup.c: fixed incorrectly formatted about text.
