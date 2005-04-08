@@ -8,6 +8,8 @@ $Source$
 2005-04-08  Ilkka Lehtoranta <ilkleht@isoveli.org>
 
     * mcc/SpellChecker.c: Now compiles without OS4 headers too.
+    * mcc/TextEditor-Test.c: Fixed MorphOS build.
+    * includes/SDI_hook.h: Changed MorphOS hooks to use HookEntry stub.
 
 2005-04-08  Sebastian Bauer <mail@sebastianbauer.info>
 
