@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-04-09  Jens Langner <Jens.Langner@light-speed.de>
+
+    * all: last preparations for the 15.10 release. bumped version date and
+      such.
+
 2005-04-08  Ilkka Lehtoranta <ilkleht@isoveli.org>
 
     * mcc/SpellChecker.c: Now compiles without OS4 headers too.
