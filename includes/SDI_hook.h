@@ -4,7 +4,7 @@
 /* Includeheader
 
         Name:           SDI_hook.h
-        Versionstring:  $VER: SDI_hook.h 1.9 (04.08.2005)
+        Versionstring:  $VER: SDI_hook.h 1.9 (08.04.2005)
         Author:         SDI & Jens Langner
         Distribution:   PD
         Description:    defines to hide compiler specific hook stuff
@@ -124,7 +124,7 @@
   #endif
 #endif
 
-#ifdef __MORPHOS__
+#if defined(__MORPHOS__)
   #include <proto/alib.h>
 
   #define SDI_TRAP_LIB 0xFF00 /* SDI prefix to reduce conflicts */
@@ -138,30 +138,30 @@
 
   #define MakeHook(hookname, funcname) struct Hook hookname = {{NULL, NULL}, \
     (HOOKFUNC)HookEntry, (HOOKFUNC)funcname, NULL}
-  #define MakeHookWithData(hookname, funcname, data) struct Hook hookname = {{NULL, NULL}, \
-    (HOOKFUNC)HookEntry, (HOOKFUNC)funcname, (APTR)data}
+  #define MakeHookWithData(hookname, funcname, data) struct Hook hookname =  \
+    {{NULL, NULL}, (HOOKFUNC)HookEntry, (HOOKFUNC)funcname, (APTR)data}
   #define MakeStaticHook(hookname, funcname) static struct Hook hookname =   \
     {{NULL, NULL}, (HOOKFUNC)HookEntry, (HOOKFUNC)funcname, NULL}
 
-  #ifdef __GNUC__
-    #define HOOKPROTO(name, ret, obj, param) static SAVEDS ASM ret             \
+  #if defined(__GNUC__)
+    #define HOOKPROTO(name, ret, obj, param) static SAVEDS ASM ret           \
       name(REG(a0, struct Hook *hook), REG(a2, obj), REG(a1, param))
-    #define HOOKPROTONO(name, ret, param) static SAVEDS ASM ret                \
-      name(REG(a0, struct Hook *hook), REG(a2, UNUSED APTR obj),               \
+    #define HOOKPROTONO(name, ret, param) static SAVEDS ASM ret              \
+      name(REG(a0, struct Hook *hook), REG(a2, UNUSED APTR obj),             \
       REG(a1, param))
-    #define HOOKPROTONP(name, ret, obj) static SAVEDS ASM ret                  \
-      name(REG(a0, struct Hook *hook), REG(a2, obj),                           \
+    #define HOOKPROTONP(name, ret, obj) static SAVEDS ASM ret                \
+      name(REG(a0, struct Hook *hook), REG(a2, obj),                         \
       REG(a1, UNUSED APTR param))
-    #define HOOKPROTONONP(name, ret) static SAVEDS ASM ret                     \
-      name(REG(a0, struct Hook *hook), REG(a2, UNUSED APTR obj),               \
+    #define HOOKPROTONONP(name, ret) static SAVEDS ASM ret                   \
+      name(REG(a0, struct Hook *hook), REG(a2, UNUSED APTR obj),             \
       REG(a1, UNUSED APTR param))
-    #define HOOKPROTONH(name, ret, obj, param) static SAVEDS ASM ret           \
+    #define HOOKPROTONH(name, ret, obj, param) static SAVEDS ASM ret         \
       name(REG(a0, UNUSED struct Hook *hook), REG(a2, obj), REG(a1, param))
-    #define HOOKPROTONHNO(name, ret, param) static SAVEDS ASM ret              \
-      name(REG(a0, UNUSED struct Hook *hook), REG(a2, UNUSED APTR obj),        \
+    #define HOOKPROTONHNO(name, ret, param) static SAVEDS ASM ret            \
+      name(REG(a0, UNUSED struct Hook *hook), REG(a2, UNUSED APTR obj),      \
       REG(a1, param))
-    #define HOOKPROTONHNP(name, ret, obj) static SAVEDS ASM ret                \
-      name(REG(a0, UNUSED struct Hook *hook), REG(a2, obj),                    \
+    #define HOOKPROTONHNP(name, ret, obj) static SAVEDS ASM ret              \
+      name(REG(a0, UNUSED struct Hook *hook), REG(a2, obj),                  \
       REG(a1, UNUSED APTR param))
     #define HOOKPROTONHNONP(name, ret) static SAVEDS ret name(void)
     #define DISPATCHERPROTO(name)                                            \
@@ -190,8 +190,8 @@
   #define ENTRY(func) (APTR)func
   #define MakeHook(hookname, funcname) struct Hook hookname = {{NULL, NULL}, \
     (HOOKFUNC)funcname, NULL, NULL}
-  #define MakeHookWithData(hookname, funcname, data) struct Hook hookname = {{NULL, NULL}, \
-    (HOOKFUNC)funcname, NULL, (APTR)data}
+  #define MakeHookWithData(hookname, funcname, data) struct Hook hookname =  \
+    {{NULL, NULL}, (HOOKFUNC)funcname, NULL, (APTR)data}
   #define MakeStaticHook(hookname, funcname) static struct Hook hookname =   \
     {{NULL, NULL}, (HOOKFUNC)funcname, NULL, NULL}
 #endif
