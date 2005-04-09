@@ -1,9 +1,9 @@
 @DataBase TextEditor.Guide
-@Author Allan Odgaard <Duff@DIKU.DK>
+@Author TextEditor.mcc Open Source Team
 @Font Helvetica.font 13
 
-@$VER: TextEditor.Guide V15.9 (21-May-00)
-@Macro Ver "V15.9"
+@$VER: TextEditor.guide V15.10 (09.04.2005)
+@Macro Ver "V15.10"
 @Macro _Contents "..............................@{FG Highlight}$1@{FG Text}@{Par}"
 @Macro _Section "@{JLeft}@{LIndent 0}@{u}@{b} $1 @{ub}@{uu}@{LIndent 2}@{Par}@{Line}
 
@@ -18,7 +18,7 @@
 
 
 Welcome to @{b}TextEditor @{Ver}@{ub} AmigaGuide,@{Par}
-© 2000 by Allan Odgaard.@{Par}
+(c) 1997-2005 TextEditor.mcc Open Source Team.@{Par}
 @{FG Highlight}___________________________________________________@{FG Text}@{Par}
 @{Line}@{JCenter}
 
@@ -116,7 +116,7 @@ advised of the possibility of such damages.
 
 
 @{JCenter}
-Contact @{" Allan Odgaard " Link Author}, author.
+Contact @{" TextEditor.mcc Open Source Team " Link Author}, author.
 @{JLeft}
 
 @EndNode
@@ -131,11 +131,11 @@ Contact @{" Allan Odgaard " Link Author}, author.
 
 @{LIndent 5}
 
-@{LIndent 8}· Freeware authors can use this gadget for free, aslong as it isn't distributed together with a commercial product.
+@{LIndent 8}· The binaries and source code is licensed under the GNU Lesser Public Open Source License.
 @{LIndent 5}
 
 
-@{LIndent 8}· All others (incl. shareware and commercial) will need to obtain a license from the @{" author. " Link Author}
+@{LIndent 8}· Please consult the included "COPYING" file for more information on that license.
 @{LIndent 5}
 
 
@@ -153,15 +153,11 @@ Contact @{" Allan Odgaard " Link Author}, author.
 
 @{LIndent 5}
 
-Allan Odgaard
+the TextEditor.mcc Open Source Team.
 
-Dagmarsgade 36
+If you have suggestions or bugreports please consult:
 
-DK-2200 Copenhagen
-
-Duff@DIKU.DK
-
-http://www.DIKU.dk/students/duff/
+http://www.sourceforge.net/projects/texteditor_mcc/
 
 @EndNode
 
@@ -204,8 +200,9 @@ Double-click on the install icon. Follow the prompts.
 
 @{LIndent 5}
 
-Copy Libs/MUI/TextEditor020.mcc and Libs/MUI/TextEditor020.mcp to your MUI:
-directory, under the name TextEditor.mcc and TextEditor.mcp.
+Copy Libs/MUI/<OS>/TextEditor.mcc and Libs/MUI/<OS>/TextEditor.mcp to your MUI:Libs/mui/
+directory, under the name TextEditor.mcc and TextEditor.mcp. Here <OS> is the type of
+operating system your are running/want to install TextEditor.mcc for.
 
 If you haven't already gotten BetterString.mcc and HotkeyString.mcc, then you
 will also need to copy in these two classes, in order to make the preference
@@ -378,6 +375,16 @@ Please read the Amiga styleguide, for a detailed explanation of the commands.
 
 
 @{_Section "History"}
+@{LIndent 2}
+
+@{FG Highlight}V15.10+@{FG Text}
+@{LIndent 5}
+
+
+Please consulte the included "ChangeLog" file for detailed information on the changes done since
+a particular version. Since version 15.10 TextEditor.mcc is released under the LGPL license and as
+such contains a "COPYING" and "ChangeLog"file for further information.
+
 @{LIndent 2}
 
 @{FG Highlight}V15.9 (21-May-00)@{FG Text}
