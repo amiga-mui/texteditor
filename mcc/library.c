@@ -74,7 +74,7 @@ BOOL ClassInitFunc(UNUSED struct Library *base)
       if((KeymapBase = OpenLibrary("keymap.library", 38)) &&
          GETINTERFACE(IKeymap, KeymapBase))
       {
-        if((RexxSysBase = OpenLibrary("rexxsyslib.library", 38)) &&
+        if((RexxSysBase = OpenLibrary("rexxsyslib.library", 36)) &&
            GETINTERFACE(IRexxSys, RexxSysBase))
         {
           if((DiskfontBase = OpenLibrary("diskfont.library", 38)) &&
