@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-04-10  Jens Langner <Jens.Langner@light-speed.de>
+
+    * includes/mccclass_68k: replaced the assembler based OS4/68k stub by a easier
+      manageable C-based variant.
+	 
 2005-04-10  Ilkka Lehtoranta <ilkleht@isoveli.org>
 
     * mcc/library.c: Request rexxsyslib.library V36 (KS 3.1) instead of V38.
