@@ -99,9 +99,9 @@ $(OBJDIR)/%.o: %.c
 	@printf '\033[32mCompiling $<\033[0m\n'
 	@$(CC) $(CFLAGS) $< -o $@ -DNO_PPCINLINE_STDARG
 
-$(OBJDIR)/%.o: ../includes/%.S
-	@printf '\033[32mAssembling $<\033[0m\n'
-	@$(CC) $(CFLAGS) -I$(V)/src/kickstart/exec_sg/include -c $< -o $@ -Wa,-mregnames
+$(OBJDIR)/mccclass_68k.o: ../includes/mccclass_68k.c
+	@printf '\033[32mCompiling $<\033[0m\n'
+	@$(CC) $(CFLAGS) $< -o $@
 
 $(LOCALE)/%.catalog: $(LOCALE)/%.ct
 	@printf '\033[33mGenerating $@\033[0m\n'
