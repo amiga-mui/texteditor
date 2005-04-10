@@ -295,11 +295,7 @@ ULONG                    LIBFUNC MCC_Query (REG(d0, LONG which));
 /* Dummy entry point and LibNull() function all in one                        */
 /******************************************************************************/
 
-#if defined(__amigaos4__)
 int _start(void)
-#else
-int Main(void)
-#endif
 {
   return RETURN_FAIL;
 }
