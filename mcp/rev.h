@@ -44,4 +44,4 @@
   #define CPU ""
 #endif
 
-#define LIB_COPYRIGHT  "Copyright (c) 1997-2005 TextEditor.mcc Open Source Team"
+#define LIB_COPYRIGHT  "Copyright (C) 2005 TextEditor.mcc Open Source Team"

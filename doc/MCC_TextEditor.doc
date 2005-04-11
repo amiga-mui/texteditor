@@ -54,9 +54,9 @@ TextEditor.mcc/MUIM_TextEditor_Search
 TextEditor.mcc is a multiline string gadget which holds most of the functions
 of a normal text editor.
 
-The gadget was originally written in 1997, and is Copyright (c) 1997-2000
+The gadget was originally written in 1997, and is Copyright (C) 1997-2000
 by Allan Odgaard.  As of version 15.10, released in April 2005, the gadget
-is maintained and Copyright (c) by the TextEditor.mcc Open Source team.
+is maintained and Copyright (C) 2005 by the TextEditor.mcc Open Source team.
 
 TextEditor.mcc/MUIA_TextEditor_AreaMarked
 
