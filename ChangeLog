@@ -5,6 +5,26 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-04-11  David Rey <tactica@users.sourceforge.net>
+
+    * doc/MCC_TextEditor.guide: general rework - fixed typos and grammar;
+      dropped the fancy V40+ formatting to make maintenance easier
+      (sorry Allan :o); put the old (<15.10) changes in a separate page;
+      documented the historic HD recovery... TODO: installation, arexx,
+      credits and more
+    * mcp/CreatePrefsGroup.c: no longer highlights the LGPL tidbit (it
+      would be unreadable against a white background otherwise, which
+      would be quite common for a text editor :); fixed typos and grammar;
+      reformatted to be more readable; made the usage and arexx parts
+      match what the guide says; added the missing KILLLINE, TOUPPER &
+      TOLOWER ARexx commands; no longer refers the user to the AUI
+      Style Guide for documentation that belongs to local docs; fixed
+      wrong copyright attribution (copyright for the open source code
+      begins in 2005, not in 1997)
+    * mcc/rev.h, mcp/rev.h: changed copyright mark "(c)" to "(C)" for
+      being generally better accepted though still not legally binding
+    * doc/MCC_TextEditor.doc: likewise
+
 2005-04-10  Jens Langner <Jens.Langner@light-speed.de>
 
     * includes/mccheader.c: updated common MCC include file to reflect the
