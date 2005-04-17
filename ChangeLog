@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-04-17  Sebastian Bauer <mail@sebastianbauer.info>
+
+    * mcc/Dispatcher.c: Don't add MBQ_MUI_MAXMAX when requesting maximal
+      dimension in MUIM_AskMinMax but assign MUI_MAXMAX instead.
+
 2005-04-11  David Rey <tactica@users.sourceforge.net>
 
     * doc/MCC_TextEditor.guide: general rework - fixed typos and grammar;
