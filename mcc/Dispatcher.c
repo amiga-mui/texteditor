@@ -316,7 +316,7 @@ ULONG AskMinMax (struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
   {
     msg->MinMaxInfo->MinWidth += 40;
     msg->MinMaxInfo->DefWidth += 300;
-    msg->MinMaxInfo->MaxWidth += MBQ_MUI_MAXMAX;
+    msg->MinMaxInfo->MaxWidth = MUI_MAXMAX;
   }
 
   fontheight = font->tf_YSize;
@@ -331,7 +331,7 @@ ULONG AskMinMax (struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
   {
     msg->MinMaxInfo->MinHeight +=  1 * fontheight;
     msg->MinMaxInfo->DefHeight += 15 * fontheight;
-    msg->MinMaxInfo->MaxHeight += MBQ_MUI_MAXMAX;
+    msg->MinMaxInfo->MaxHeight = MUI_MAXMAX;
   }
   return(0);
 }
