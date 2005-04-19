@@ -75,7 +75,7 @@ int main(void)
       {
         OpenCat();
 
-        if((MUIMasterBase = OpenLibrary("muimaster.library", MUIMASTER_VMIN)) &&
+        if((MUIMasterBase = OpenLibrary(MUIMASTER_NAME, MUIMASTER_VMIN)) &&
            GETINTERFACE(IMUIMaster, MUIMasterBase))
         {
           Object *app = NULL;
