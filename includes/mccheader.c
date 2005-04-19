@@ -746,7 +746,7 @@ BOOL UserLibOpen(struct Library *base)
   #define MASTERVERSION MUIMASTER_VMIN
   #endif
 
-  if((MUIMasterBase = OpenLibrary("muimaster.library", MASTERVERSION)) &&
+  if((MUIMasterBase = OpenLibrary(MUIMASTER_NAME, MASTERVERSION)) &&
      GETINTERFACE(IMUIMaster, MUIMasterBase))
   {
   	    #ifdef PreClassInit
