@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-04-20  Sebastian Bauer <mail@sebastianbauer.info>
+
+    * mcc/Keybinings.c: The default keybindings array have to be
+      terminated with a -1. Problem found by Georg Steger.
+
 2005-04-17  Sebastian Bauer <mail@sebastianbauer.info>
 
     * mcc/Dispatcher.c: Don't add MBQ_MUI_MAXMAX when requesting maximal
