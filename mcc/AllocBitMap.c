@@ -27,6 +27,7 @@
 #include <graphics/gfxbase.h>
 
 #include "SDI_compiler.h"
+#include "Debug.h"
 
 #if defined(__amigaos4__)
 extern struct Library *GfxBase;
@@ -36,6 +37,8 @@ extern struct GfxBase *GfxBase;
 
 struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG width), REG(d1, LONG height), REG(d2, LONG depth), REG(d3, LONG flags), REG(a0, struct BitMap *friend))
 {
+  ENTER();
+
   if(((struct Library *)GfxBase)->lib_Version >= 39)
   {
     BOOL CyberGFX = FindSemaphore("cybergraphics.library") ? TRUE : FALSE;
@@ -49,6 +52,7 @@ struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG width), REG(d1, LONG he
     if(friend)
       flags |= BMF_MINPLANES;
 
+    LEAVE();
     return AllocBitMap(width,height,depth,flags,friend);
   }
   else
@@ -70,6 +74,7 @@ struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG width), REG(d1, LONG he
       }
     }
 
+    RETURN(NULL);
     return NULL;
   }
 }
@@ -77,6 +82,8 @@ struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG width), REG(d1, LONG he
 
 VOID SAVEDS ASM MUIG_FreeBitMap(REG(a0, struct BitMap *bm))
 {
+  ENTER();
+
   WaitBlit();
 
   if(((struct Library *)GfxBase)->lib_Version >= 39)
@@ -88,4 +95,6 @@ VOID SAVEDS ASM MUIG_FreeBitMap(REG(a0, struct BitMap *bm))
     FreeVec(bm->Planes[0]);
     FreeMem(bm,sizeof(struct BitMap));
   }
+
+  LEAVE();
 }

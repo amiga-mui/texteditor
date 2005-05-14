@@ -33,6 +33,9 @@ ULONG FlowSpace(UWORD, STRPTR, struct InstData *);
 ULONG OM_BlockInfo(struct MUIP_TextEditor_BlockInfo *msg, struct InstData *data)
 {
   ULONG result = FALSE;
+
+  ENTER();
+
   if(Enabled(data))
   {
     struct marking newblock;
@@ -44,11 +47,15 @@ ULONG OM_BlockInfo(struct MUIP_TextEditor_BlockInfo *msg, struct InstData *data)
 
     result = TRUE;
   }
+
+  RETURN(result);
   return(result);
 }
 
 ULONG OM_MarkText (struct MUIP_TextEditor_MarkText *msg, struct InstData *data)
 {
+  ENTER();
+
   if(Enabled(data))
   {
     data->blockinfo.enabled = FALSE;
@@ -70,12 +77,15 @@ ULONG OM_MarkText (struct MUIP_TextEditor_MarkText *msg, struct InstData *data)
   ScrollIntoDisplay(data);
   MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
 
+  RETURN(TRUE);
   return(TRUE);
 }
 
 ULONG ClearText (struct InstData *data)
 {
   struct line_node *newcontents;
+
+  ENTER();
   
   if((newcontents = AllocPooled(data->mypool, sizeof(struct line_node))))
   {
@@ -83,7 +93,7 @@ ULONG ClearText (struct InstData *data)
     {
       if(data->undosize)
       {
-          struct  marking newblock;
+        struct  marking newblock;
 
         newblock.startx = 0;
         newblock.startline = data->firstline;
@@ -107,12 +117,16 @@ ULONG ClearText (struct InstData *data)
       FreePooled(data->mypool, newcontents, sizeof(struct line_node));
     }
   }
+
+  RETURN(TRUE);
   return(TRUE);
 }
 
 
 ULONG ToggleCursor (struct InstData *data)
 {
+  ENTER();
+
   if(data->flags & FLG_Active)
   {
     if(data->cursor_shown)
@@ -126,11 +140,15 @@ ULONG ToggleCursor (struct InstData *data)
       data->cursor_shown = TRUE;
     }
   }
+
+  RETURN(TRUE);
   return(TRUE);
 }
 
 ULONG InputTrigger(UNUSED struct IClass *cl, struct InstData *data)
 {
+  ENTER();
+
   if(data->smooth_wait == 1 && data->scrollaction)
   {
     if(data->ypos != data->realypos)
@@ -173,6 +191,8 @@ ULONG InputTrigger(UNUSED struct IClass *cl, struct InstData *data)
     {
       data->mousemove = FALSE;
       RejectInput(data);
+
+      RETURN(TRUE);
       return(TRUE);
     }
 
@@ -287,6 +307,7 @@ ULONG InputTrigger(UNUSED struct IClass *cl, struct InstData *data)
   }
 #endif
 
+  RETURN(TRUE);
   return(TRUE);
 }
 
@@ -296,6 +317,8 @@ ULONG InsertText (struct InstData *data, STRPTR text, BOOL movecursor)
   struct line_node *line, *actline = data->actualline;
   UWORD x = data->CPos_X;
   UWORD realx = 0;
+
+  ENTER();
 
   if((line = ImportText(text, data->mypool, data->ImportHook, data->ImportWrap)))
   {
@@ -378,5 +401,7 @@ ULONG InsertText (struct InstData *data, STRPTR text, BOOL movecursor)
       data->actualline = line;
     }
   }
+
+  RETURN(TRUE);
   return(TRUE);
 }

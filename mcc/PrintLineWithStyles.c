@@ -54,6 +54,8 @@ ULONG ConvertPen (UWORD color, BOOL highlight, struct InstData *data)
 
 VOID DrawSeparator (struct RastPort *rp, WORD X, WORD Y, WORD Width, WORD Height, struct InstData *data)
 {
+  ENTER();
+
   if(Width > 3*Height)
   {
 /*    SetAPen(rp, data->separatorshadow);
@@ -77,13 +79,17 @@ VOID DrawSeparator (struct RastPort *rp, WORD X, WORD Y, WORD Width, WORD Height
       RectFill(rp, X+1, Y+1, X+Width-2, Y+(2*Height)-2);
     }
 */  }
+
+  LEAVE();
 }
 
 LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, struct InstData *data)
 {
-    STRPTR  text    = line->line.Contents;
-    LONG    length  = LineCharsWidth(text+x, data);
-    struct RastPort *rp = &data->doublerp;
+  STRPTR  text    = line->line.Contents;
+  LONG    length  = LineCharsWidth(text+x, data);
+  struct RastPort *rp = &data->doublerp;
+
+  ENTER();
 
 /*  switch(text[x+length-1])
   {
@@ -412,5 +418,6 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
   if(data->flags & FLG_HScroll)
     length = line->line.Length;
 
+  RETURN(length);
   return(length);
 }

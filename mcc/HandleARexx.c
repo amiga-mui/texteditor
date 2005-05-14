@@ -83,20 +83,26 @@ enum
 
 STRPTR StringCompare (STRPTR str1, STRPTR str2)
 {
+  ENTER();
+
   while(*str1 && *str2)
   {
     if(ToUpper(*str1++) != *str2++)
       return(FALSE);
   }
+
+  LEAVE();
   return((*str2 == '\0') ? str1 : FALSE);
 }
 
 ULONG CallFunction (UWORD function, LONG *args, STRPTR txtargs, struct InstData *data)
 {
-    struct line_node *oldactualline = data->actualline;
-    UWORD oldCPos_X = data->CPos_X;
-    ULONG result = TRUE;
-    LONG new_y = data->visual_y-1;
+  struct line_node *oldactualline = data->actualline;
+  UWORD oldCPos_X = data->CPos_X;
+  ULONG result = TRUE;
+  LONG new_y = data->visual_y-1;
+
+  ENTER();
 
   if(data->flags & FLG_ReadOnly)
   {
@@ -371,6 +377,8 @@ ULONG CallFunction (UWORD function, LONG *args, STRPTR txtargs, struct InstData 
         SetCursor(data->CPos_X, data->actualline, TRUE, data);
     }
   }
+
+  RETURN(result);
   return(result);
 }
 
@@ -382,6 +390,8 @@ ULONG HandleARexx (struct InstData *data, STRPTR command)
   STRPTR txtargs = "";
   UWORD  function;
   ULONG  result = FALSE;
+
+  ENTER();
 
   if(data->shown)
   {
@@ -431,6 +441,8 @@ ULONG HandleARexx (struct InstData *data, STRPTR command)
       }
     }
   }
+
+  RETURN(result);
   return result;
 }
 

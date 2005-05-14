@@ -5,6 +5,22 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-05-14  Jens Langner <Jens.Langner@light-speed.de>
+
+    * mcc/TextFunctions.c: with help of the new debugging scheme I was
+      finally able to find and fix the reason why under certain circumstances
+      a texteditor.mcc gadget could end up in an endless loop if used in write
+      mode. This should fix bug #1180094, #1181948.
+    * misc: after having finally found a reproduceable case for bug #1180094
+      and similar reports, I tight together a complete runtime debugging
+      system similar to the one in YAM. It should help in finding this and
+      other bugs more easily in future. This new debugging system will search
+      for an "texteditor.mcc.debug" ENV variable and does accept similar
+      variable content identifies like in YAM. E.g. to pull out all possible
+      debug information, compile with -DDEBUG (is the default) and set
+      the env variable to "@all all". However, please review the YAM
+      ChangeLog for a more detailed description on the debugging scheme.
+
 2005-04-20  Sebastian Bauer <mail@sebastianbauer.info>
 
     * mcc/Keybinings.c: The default keybindings array has to be
@@ -45,6 +61,8 @@ $Source$
 2005-04-10  Ilkka Lehtoranta <ilkleht@isoveli.org>
 
     * mcc/library.c: Request rexxsyslib.library V36 (KS 3.1) instead of V38.
+
+#### v15.10 RELEASE ############################################################
 
 2005-04-09  Jens Langner <Jens.Langner@light-speed.de>
 

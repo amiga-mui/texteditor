@@ -65,6 +65,8 @@ struct Interface *IWorkbench = NULL;
 
 BOOL ClassInitFunc(UNUSED struct Library *base)
 {
+  ENTER();
+
   if((LocaleBase = OpenLibrary("locale.library", 38)) &&
      GETINTERFACE(ILocale, LocaleBase))
   {
@@ -90,6 +92,7 @@ BOOL ClassInitFunc(UNUSED struct Library *base)
           		}
           	}
 
+            RETURN(TRUE);
             return(TRUE);
           }
 
@@ -113,12 +116,15 @@ BOOL ClassInitFunc(UNUSED struct Library *base)
     LocaleBase  = NULL;
   }
 
+  RETURN(FALSE);
   return(FALSE);
 }
 
 
 VOID ClassExitFunc(UNUSED struct Library *base)
 {
+  ENTER();
+
 	if(WorkbenchBase)
 	{
     DROPINTERFACE(IWorkbench);
@@ -160,6 +166,8 @@ VOID ClassExitFunc(UNUSED struct Library *base)
     CloseLibrary(LocaleBase);
     LocaleBase = NULL;
   }
+
+  LEAVE();
 }
 
 /******************************************************************************/

@@ -39,12 +39,18 @@ struct line_node *ImportText(char *contents, void *mempool, struct Hook *importH
 	struct line_node *first_line, *line;
 	struct ImportMessage im;
 
+  ENTER();
+
 	im.Data = contents;
 	im.ImportWrap = wraplength;
 	im.PoolHandle = mempool;
 
 	line = AllocPooled(mempool,sizeof(struct line_node));
-	if (!line) return NULL;
+	if(!line)
+  {
+    RETURN(NULL);
+    return NULL;
+  }
 
 	memset(line,0,sizeof(*line));
 	first_line = line;
@@ -103,5 +109,6 @@ struct line_node *ImportText(char *contents, void *mempool, struct Hook *importH
 		line = new_line;
 	}
 
+  RETURN(first_line);
 	return first_line;
 }

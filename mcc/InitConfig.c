@@ -47,9 +47,25 @@ struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
   struct TextFont *f;
   struct TextAttr myfont;
 
-  if (!DoMethod(obj, MUIM_GetConfigItem, attr, &setting)) return NULL;
-	if (!setting) return NULL;
-  if (!(fontname = AllocVec(strlen(setting)+6,0))) return NULL;
+  ENTER();
+
+  if(!DoMethod(obj, MUIM_GetConfigItem, attr, &setting))
+  {
+    RETURN(NULL);
+    return NULL;
+  }
+
+	if(!setting)
+  {
+    RETURN(NULL);
+    return NULL;
+  }
+
+  if(!(fontname = AllocVec(strlen(setting)+6,0)))
+  {
+    RETURN(NULL);
+    return NULL;
+  }
 
 	f = NULL;
 
@@ -71,26 +87,34 @@ struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
 
   f = OpenDiskFont(&myfont);
   FreeVec(fontname);
+
+  RETURN(f);
 	return f;
 }
 
 void SetCol (struct InstData *data, void *obj, long item, ULONG *storage, long bit)
 {
-    struct MUI_PenSpec *spec;
+  struct MUI_PenSpec *spec;
+
+  ENTER();
 
   if(DoMethod(obj, MUIM_GetConfigItem, item, &spec))
   {
     *storage = MUI_ObtainPen(muiRenderInfo(obj), spec, 0L);
     data->allocatedpens |= 1<<bit;
   }
+
+  LEAVE();
 }
 
 BOOL iswarned = FALSE;
 
 void InitConfig (void *obj, struct InstData *data)
 {
-    long  setting;
-    UWORD *muipens = _pens(obj);
+  long  setting;
+  UWORD *muipens = _pens(obj);
+
+  ENTER();
 
   data->allocatedpens = 0;
   data->textcolor         = *(muipens+MPEN_TEXT);
@@ -354,10 +378,14 @@ void InitConfig (void *obj, struct InstData *data)
       }
     }
   }
+
+  LEAVE();
 }
 
 void  FreeConfig  (struct InstData *data, struct MUI_RenderInfo *mri)
 {
+  ENTER();
+
   if(data->RawkeyBindings)
     MyFreePooled(data->mypool, data->RawkeyBindings);
 
@@ -388,5 +416,7 @@ void  FreeConfig  (struct InstData *data, struct MUI_RenderInfo *mri)
     DoMethod(_app(data->object), MUIM_Application_RemInputHandler, &data->blinkhandler);
     data->BlinkSpeed = 1;
   }
+
+  LEAVE();
 }
 

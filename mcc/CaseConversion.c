@@ -30,6 +30,8 @@ VOID MangleCharacters(UBYTE (*change)(UBYTE c), struct InstData *data)
   LONG startx, stopx, _startx;
   struct line_node *startline, *stopline, *_startline;
 
+  ENTER();
+
   if(Enabled(data))
   {
     struct marking newblock;
@@ -67,6 +69,8 @@ VOID MangleCharacters(UBYTE (*change)(UBYTE c), struct InstData *data)
 
   data->HasChanged = TRUE;
   RedrawArea(_startx, _startline, stopx, stopline, data);
+
+  LEAVE();
 }
 
 UBYTE ChangeToUpper(UBYTE c)
