@@ -55,6 +55,8 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
   struct InstData *data = INST_DATA(cl, obj);
   ULONG ti_Data;
 
+  ENTER();
+
   switch(msg->opg_AttrID)
   {
     case MUIA_TextEditor_CursorPosition:
@@ -186,20 +188,26 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
     case MUIA_TextEditor_WrapBorder:
       ti_Data = data->WrapBorder;
       break;
+
     default:
+      LEAVE();
       return(DoSuperMethodA(cl, obj, (Msg)msg));
   }
   *msg->opg_Storage = ti_Data;
+
+  RETURN(TRUE);
   return(TRUE);
 }
 
 ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
 {
-    struct InstData *data = INST_DATA(cl, obj);
-    struct TagItem *tags, *tag;
-    char  *contents = NULL;
-    ULONG result = FALSE;
-    ULONG crsr_x = 0xffff, crsr_y = 0xffff;
+  struct InstData *data = INST_DATA(cl, obj);
+  struct TagItem *tags, *tag;
+  char  *contents = NULL;
+  ULONG result = FALSE;
+  ULONG crsr_x = 0xffff, crsr_y = 0xffff;
+
+  ENTER();
 
 #ifndef ClassAct
   if(data->shown && !(data->flags & FLG_Draw))
@@ -212,6 +220,8 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
     }
     data->UpdateInfo = msg;
     MUI_Redraw(obj, MADF_DRAWUPDATE);
+
+    RETURN((ULONG)data->UpdateInfo);
     return((ULONG)data->UpdateInfo);
   }
 
@@ -689,5 +699,6 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
     result = TRUE;
   }
 
+  RETURN(result);
   return result;
 }

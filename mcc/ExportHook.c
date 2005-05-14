@@ -49,6 +49,8 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
   struct      InstData *data = emsg->data;
   LONG        expand;
 
+  ENTER();
+
   if(!buf)
   {
     if(data)
@@ -293,6 +295,8 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
   {
     result = (STRPTR)buf;
   }
+
+  RETURN(result);
   return(result);
 }
 MakeHookWithData(ExportHookPlain, ExportHookFunc, FALSE);

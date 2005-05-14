@@ -60,6 +60,9 @@ VOID PasteClipProcess (REG(a0) STRPTR arguments);
 LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
 {
   struct PasteArgs args = { x, actline, data, FindTask(NULL), AllocSignal(-1) };
+
+  ENTER();
+
   if(args.sigbit != -1)
   {
     UBYTE str_args[10];
@@ -73,12 +76,15 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
     ObtainSemaphore(&data->semaphore);
     data->rport = ObtainGIRPort(data->GInfo);
   }
+
+  RETURN(args.res);
   return args.res;
 }
 
 VOID PasteClipProcess (REG(a0) STRPTR arguments)
 {
   struct PasteArgs *args;
+
   if(sscanf(arguments, "%x", &args))
   {
     LONG x = args->x;
@@ -98,6 +104,8 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
     STRPTR  textline;
     BOOL    newline = TRUE;
     LONG    res = FALSE;
+
+  ENTER();
 
 #ifdef ClassAct
   ObtainSemaphore(&data->semaphore);
@@ -383,6 +391,8 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
     Signal(args->task, 1 << args->sigbit);
   }
 #else
+
+  RETURN(res);
   return res;
 #endif
 }
@@ -398,6 +408,8 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
   LONG  color = line->line.Color;
   UWORD flow = line->line.Flow;
   UWORD separator = line->line.Separator;
+
+  ENTER();
 
   data->HasChanged = TRUE;
   if(line->line.Length == 1)
@@ -613,10 +625,13 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
           ScrollDown(line_nr + line->visual - 2, 1, data);
       }
     }
+
+    RETURN(TRUE);
     return(TRUE);
   }
   else
   {
+    RETURN(FALSE);
     return(FALSE);
   }
 }
@@ -632,6 +647,8 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
   ULONG c;
   UWORD crsr_x = data->CPos_X;
   struct line_node *crsr_l = data->actualline;
+
+  ENTER();
 
   OffsetToLines(x, line, &pos, data);
   lines = pos.lines;
@@ -813,6 +830,8 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
           }
         }
       }
+
+      RETURN(TRUE);
       return(TRUE);
     }
 
@@ -835,6 +854,8 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
         }
         else  DumpText(data->visual_y+line_nr, line_nr, data->maxlines, TRUE, data);
       }
+
+      RETURN(TRUE);
       return(TRUE);
     }
     x = line->line.Length;
@@ -870,10 +891,12 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
       c = c + PrintLine(c, line, line_nr++, TRUE, data);
   /* Her printes !HELE! den nye linie, burde optimeres! */
 
+    RETURN(TRUE);
     return (TRUE);
   }
   else
   {
+    RETURN(FALSE);
     return (FALSE);
   }
 }
@@ -885,7 +908,9 @@ void  strcpyback    (char *dest, char *src)
 //  ULONG length = strlen(src)+1;
 //  memmove(dest, src, length);
 
-    LONG  length;
+  LONG  length;
+
+  ENTER();
 
   length = strlen(src)+1;
   dest = dest + length;
@@ -897,6 +922,8 @@ void  strcpyback    (char *dest, char *src)
     *--dest = *--src;
 //    printf("%d, %d\n", *src, *dest);
   }
+
+  LEAVE();
 }
 
 /* ------------------------------------ *
@@ -906,10 +933,14 @@ void  OptimizedPrint  (LONG x, struct line_node *line, LONG line_nr, LONG width,
 {
   LONG twidth = PrintLine(x, line, line_nr++, TRUE, data);
 
+  ENTER();
+
   if((twidth != width) && (x+twidth < (LONG)line->line.Length) && (line_nr <= data->maxlines))
   {
     OptimizedPrint(x+twidth, line, line_nr, LineCharsWidth(line->line.Contents+x+width, data) + (width - twidth), data);
   }
+
+  LEAVE();
 }
 
 void  UpdateChange(LONG x, struct line_node *line, LONG length, char *characters, struct UserAction *buffer, struct InstData *data)
@@ -920,6 +951,8 @@ void  UpdateChange(LONG x, struct line_node *line, LONG length, char *characters
   LONG orgline_nr;
   LONG width;
   LONG lineabove_width=0;
+
+  ENTER();
 
   line_nr   = LineToVisual(line, data);
   orgline_nr  = line_nr;
@@ -1000,6 +1033,8 @@ void  UpdateChange(LONG x, struct line_node *line, LONG length, char *characters
   }
   OptimizedPrint(skip, line, line_nr, width, data);
   data->HasChanged = TRUE;
+
+  LEAVE();
 }
 
 /*------------------------------*
@@ -1007,6 +1042,8 @@ void  UpdateChange(LONG x, struct line_node *line, LONG length, char *characters
  *------------------------------*/
 long  PasteChars    (LONG x, struct line_node *line, LONG length, char *characters, struct UserAction *buffer, struct InstData *data)
 {
+  ENTER();
+
   if(line->line.Styles)
   {
     if(*line->line.Styles != EOS)
@@ -1043,10 +1080,15 @@ long  PasteChars    (LONG x, struct line_node *line, LONG length, char *characte
   if((*((long *)line->line.Contents-1))-4 < (LONG)(line->line.Length + length + 1))
   {
     if(!ExpandLine(line, length, data))
+    {
+      RETURN(FALSE);
       return(FALSE);
+    }
   }
 
   UpdateChange(x, line, length, characters, buffer, data);
+
+  RETURN(TRUE);
   return(TRUE);
 }
 /*----------------------------*
@@ -1054,6 +1096,8 @@ long  PasteChars    (LONG x, struct line_node *line, LONG length, char *characte
  *----------------------------*/
 long  RemoveChars   (LONG x, struct line_node *line, LONG length, struct InstData *data)
 {
+  ENTER();
+
   if(line->line.Styles)
   {
     if(*line->line.Styles != EOS)
@@ -1127,8 +1171,8 @@ long  RemoveChars   (LONG x, struct line_node *line, LONG length, struct InstDat
     }
   }
 
-
-
   UpdateChange(x, line, length, NULL, NULL, data);
+
+  RETURN(TRUE);
   return(TRUE);
 }

@@ -51,24 +51,34 @@ ULONG ConvertPen(UWORD, BOOL, struct InstData *);
 
 void  AddClipping (struct InstData *data)
 {
+  ENTER();
+
 #ifndef ClassAct
   if(data->clipcount++ == 0)
   {
     data->cliphandle = MUI_AddClipping(muiRenderInfo(data->object), data->xpos, data->realypos, data->innerwidth, muiAreaData(data->object)->mad_Box.Height - muiAreaData(data->object)->mad_subheight);
   }
 #endif
+
+  LEAVE();
 }
 
 void  RemoveClipping (struct InstData *data)
 {
+  ENTER();
+
 #ifndef ClassAct
   if(--data->clipcount == 0)
     MUI_RemoveClipping(muiRenderInfo(data->object), data->cliphandle);
 #endif
+
+  LEAVE();
 }
 
 void  FreeTextMem (void *mypool, struct line_node *line)
 {
+  ENTER();
+
   while(line)
   {
       struct  line_node *tline = line;
@@ -79,6 +89,8 @@ void  FreeTextMem (void *mypool, struct line_node *line)
     line = line->next;
     FreePooled(mypool, tline, sizeof(struct line_node));
   }
+
+  LEAVE();
 }
 
 /*-----------------------------------*
@@ -88,6 +100,8 @@ long  Init_LineNode (struct line_node *line, struct line_node *previous, char *t
 {
   LONG  textlength = 0;
   char  *ctext;
+
+  ENTER();
 
   while((text[textlength] != '\n') && (text[textlength] != 0))
     textlength++;
@@ -111,28 +125,40 @@ long  Init_LineNode (struct line_node *line, struct line_node *previous, char *t
 
     if (previous)
       previous->next  = line;
+
+    RETURN(TRUE);
     return(TRUE);
   }
-  else  return(FALSE);
+
+  RETURN(FALSE);
+  return(FALSE);
 }
 
 long  ExpandLine    (struct line_node *line, LONG length, struct InstData *data)
 {
-    char  *newbuffer;
+  char  *newbuffer;
+
+  ENTER();
 
   if((newbuffer = MyAllocPooled(data->mypool, line->line.Length+40+length)))
   {
     CopyMem(line->line.Contents, newbuffer, line->line.Length+1);
     MyFreePooled(data->mypool, line->line.Contents);
     line->line.Contents = newbuffer;
+
+    RETURN(TRUE);
     return(TRUE);
   }
-  else  return(FALSE);
+
+  RETURN(FALSE);
+  return(FALSE);
 }
 
 long  CompressLine  (struct line_node *line, struct InstData *data)
 {
-    char  *newbuffer;
+  char  *newbuffer;
+
+  ENTER();
 
   if((newbuffer = MyAllocPooled(data->mypool, strlen(line->line.Contents)+1)))
   {
@@ -140,17 +166,23 @@ long  CompressLine  (struct line_node *line, struct InstData *data)
     MyFreePooled(data->mypool, line->line.Contents);
     line->line.Contents = newbuffer;
     line->line.Length  = strlen(newbuffer);
+
+    RETURN(TRUE);
     return(TRUE);
   }
-  else  return(FALSE);
+
+  RETURN(FALSE);
+  return(FALSE);
 }
 /*-----------------------------------------------------*
  * Returns the number of chars that will fit on a line *
  *-----------------------------------------------------*/
-LONG  LineCharsWidth  (char *text, struct InstData *data)
+LONG LineCharsWidth(char *text, struct InstData *data)
 {
-    LONG    c;
-    LONG    w = data->innerwidth;
+  LONG c;
+  LONG w = data->innerwidth;
+
+  ENTER();
 
   w -= (data->CursorWidth == 6) ? MyTextLength(data->font, "n", 1) : data->CursorWidth;
   c = MyTextFit(data->font, text, strlen(text)-1, w, 1);
@@ -162,12 +194,15 @@ LONG  LineCharsWidth  (char *text, struct InstData *data)
   else
   {
     LONG tc = c;
+
     while(text[tc] != ' ' && tc)
       tc--;
 
     if(tc)
       c = tc+1;
   }
+
+  RETURN(c);
   return c;
 }
 /*-------------------------------------------------------*
@@ -175,7 +210,9 @@ LONG  LineCharsWidth  (char *text, struct InstData *data)
  *-------------------------------------------------------*/
 short VisualHeight  (struct line_node *line, struct InstData *data)
 {
-    LONG c = 0, lines = 0, length;
+  LONG c = 0, lines = 0, length;
+
+  ENTER();
 
   if(data->flags & FLG_HScroll)
   {
@@ -190,6 +227,8 @@ short VisualHeight  (struct line_node *line, struct InstData *data)
       lines++;
     }
   }
+
+  RETURN(lines);
   return(lines);
 }
 /*---------------------------------*
@@ -235,6 +274,8 @@ void  OffsetToLines (LONG x, struct line_node *line, struct pos_info *pos, struc
   LONG d=0;
   LONG lines = 0;
 
+  ENTER();
+
   if(data->shown)
   {
     while(c <= x)
@@ -255,6 +296,8 @@ void  OffsetToLines (LONG x, struct line_node *line, struct pos_info *pos, struc
     pos->bytes  = 0;
     pos->extra  = line->line.Length-1;
   }
+
+  LEAVE();
 }
 /*------------------*
  * Place the cursor *
@@ -273,9 +316,13 @@ void  SetCursor   (LONG x, struct line_node *line, long Set, struct InstData *da
   WORD    start = 0, stop = 0;
   LONG    c;
 
+  ENTER();
+
   if(Enabled(data) || !data->update || (data->scrollaction && Set) || (data->ypos != data->realypos) || (!data->shown) || (data->flags & (FLG_ReadOnly | FLG_Quiet | FLG_Ghosted)))
   {
     data->cursor_shown = 0;
+
+    LEAVE();
     return;
   }
 
@@ -549,6 +596,8 @@ void  SetCursor   (LONG x, struct line_node *line, long Set, struct InstData *da
       data->cursor_width = 0;
     }
   }*/
+
+  LEAVE();
 }
 /*-----------------------------------------*
  * Dump text from buffer and out to screen *
@@ -559,6 +608,8 @@ void  DumpText  (LONG visual_y, LONG line_nr, LONG lines, BOOL doublebuffer, str
   struct  line_node *line;
   ULONG    x;
   BOOL    drawbottom = (visual_y + (lines-line_nr) - 1) > data->totallines;
+
+  ENTER();
 
 #ifdef ClassAct
   if((visual_y <= data->totallines) && data->update && (data->shown == TRUE) && !(data->flags & FLG_Quiet))
@@ -634,16 +685,23 @@ void  DumpText  (LONG visual_y, LONG line_nr, LONG lines, BOOL doublebuffer, str
     }
 
   }
+
+  LEAVE();
 }
 /*-----------------------*
  * Scroll up the display *
  *-----------------------*/
 void  ScrollUp      (LONG line_nr, LONG lines, struct InstData *data)
 {
-    struct pos_info pos;
+  struct pos_info pos;
+
+  ENTER();
 
   if((!data->update) || data->flags & FLG_Quiet)
+  {
+    LEAVE();
     return;
+  }
 
   if(!data->fastbackground && line_nr > 0)
   {
@@ -704,14 +762,21 @@ void  ScrollUp      (LONG line_nr, LONG lines, struct InstData *data)
       DumpText(data->visual_y, 0, data->maxlines, FALSE, data);
     }
   }
+
+  LEAVE();
 }
 /*-------------------------*
  * Scroll down the display *
  *-------------------------*/
 void  ScrollDown    (LONG line_nr, LONG lines, struct InstData *data)
 {
+  ENTER();
+
   if((!data->update) || data->flags & FLG_Quiet)
+  {
+    LEAVE();
     return;
+  }
 
   if(!data->fastbackground && line_nr > 0)
   {
@@ -754,14 +819,18 @@ void  ScrollDown    (LONG line_nr, LONG lines, struct InstData *data)
       DumpText(data->visual_y, 0, data->maxlines, FALSE, data);
     }
   }
+
+  LEAVE();
 }
 /*----------------------------------------------*
  * Find a line and fillout a pos_info structure *
  *----------------------------------------------*/
 void  GetLine     (LONG realline, struct pos_info *pos, struct InstData *data)
 {
-    struct line_node *line = data->firstline;
-    LONG x = 0;
+  struct line_node *line = data->firstline;
+  LONG x = 0;
+
+  ENTER();
 
   while ((realline > line->visual) && (line->next))
   {
@@ -785,19 +854,25 @@ void  GetLine     (LONG realline, struct pos_info *pos, struct InstData *data)
   }
 
   pos->x = x;
+
+  LEAVE();
 }
 /*----------------------------*
  * Find visual line on screen *
  *----------------------------*/
 LONG  LineToVisual  (struct line_node *line, struct InstData *data)
 {
-    LONG  line_nr = 2 - data->visual_y;   // Top line!
-    struct line_node *tline = data->firstline;
+  LONG  line_nr = 2 - data->visual_y;   // Top line!
+  struct line_node *tline = data->firstline;
+
+  ENTER();
 
   while(tline != line && tline)
   {
     line_nr = line_nr + tline->visual;
     tline = tline->next;
   }
+
+  RETURN(line_nr);
   return(line_nr);
 }

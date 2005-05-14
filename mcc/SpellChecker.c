@@ -50,11 +50,14 @@ struct PathNode
 
 HOOKPROTONH(SelectCode, void, void *lvobj, long **parms)
 {
-    struct InstData *data = (struct InstData *)*parms;
-    struct marking block;
-    char *entry;
+  struct InstData *data = (struct InstData *)*parms;
+  struct marking block;
+  char *entry;
+
+  ENTER();
 
   DoMethod(lvobj, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &entry);
+
   if(entry)
   {
       int length = strlen(entry);
@@ -75,15 +78,19 @@ HOOKPROTONH(SelectCode, void, void *lvobj, long **parms)
   set(data->SuggestWindow, MUIA_Window_Open, FALSE);
   DoMethod(lvobj, MUIM_List_Clear);
   set(data->object, MUIA_TextEditor_AreaMarked, FALSE);
+
+  LEAVE();
 }
 MakeStaticHook(SelectHook, SelectCode);
 
 long SendRexx (char *word, char *command, struct InstData *data)
 {
-    struct MsgPort *rexxport;
-    struct RexxMsg *rxmsg;
-    char    buffer[512];
-    LONG    result = FALSE;
+  struct MsgPort *rexxport;
+  struct RexxMsg *rxmsg;
+  char    buffer[512];
+  LONG    result = FALSE;
+
+  ENTER();
 
   if((rexxport = FindPort("REXX")) && (data->clipport = CreateMsgPort()))
   {
@@ -107,6 +114,8 @@ long SendRexx (char *word, char *command, struct InstData *data)
     DeleteRexxMsg(rxmsg);
     DeleteMsgPort(data->clipport);
   }
+
+  RETURN(result);
   return result;
 }
 

@@ -158,6 +158,10 @@ int main(void)
   		}
 		}
 
+    #if defined(DEBUG)
+    SetupDebug();
+    #endif
+
     if((args = ReadArgs("FILENAME,MIME/S,MIMEQUOTED/S,SKIPHEADER/S,FIXED/S,EMAIL/S", argarray, NULL)))
     {
       if((MUIMasterBase = OpenLibrary("muimaster.library", MUIMASTER_VMIN)) &&

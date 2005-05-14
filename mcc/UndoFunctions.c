@@ -29,30 +29,40 @@
 
 unsigned short LineNr (struct line_node *line, struct InstData *data)
 {
-    unsigned short result = 1;
-    struct line_node *actual = data->firstline;
+  unsigned short result = 1;
+  struct line_node *actual = data->firstline;
+
+  ENTER();
 
   while(line != actual)
   {
     result++;
     actual = actual->next;
   }
+
+  RETURN(result);
   return(result);
 }
 
 struct line_node *LineNode (unsigned short linenr, struct InstData *data)
 {
-    struct line_node *actual = data->firstline;
+  struct line_node *actual = data->firstline;
+
+  ENTER();
 
   while(--linenr && actual->next)
   {
     actual = actual->next;
   }
+
+  RETURN(actual);
   return(actual);
 }
 
 long Undo (struct InstData *data)
 {
+  ENTER();
+
   if(data->undosize && data->undobuffer != data->undopointer)
   {
     struct UserAction *buffer;
@@ -148,17 +158,23 @@ long Undo (struct InstData *data)
       if(!(data->flags & FLG_UndoLost))
         data->HasChanged = FALSE;
     }
+
+    RETURN(TRUE);
     return(TRUE);
   }
   else
   {
     DoMethod(data->object, MUIM_TextEditor_HandleError, Error_NothingToUndo);
+
+    RETURN(FALSE);
     return(FALSE);
   }
 }
 
 long Redo (struct InstData *data)
 {
+  ENTER();
+
   if(data->undosize && *(short *)data->undopointer != 0xff)
   {
       struct UserAction *buffer = (struct UserAction *)data->undopointer;
@@ -231,17 +247,23 @@ long Redo (struct InstData *data)
       SetCursor(data->CPos_X, data->actualline, TRUE, data);
     if(*(short *)data->undopointer == 0xff)
       set(data->object, MUIA_TextEditor_RedoAvailable, FALSE);
+
+    RETURN(TRUE);
     return(TRUE);
   }
   else
   {
     DoMethod(data->object, MUIM_TextEditor_HandleError, Error_NothingToRedo);
+
+    RETURN(FALSE);
     return(FALSE);
   }
 }
 
 void ResetUndoBuffer(struct InstData *data)
 {
+  ENTER();
+
   if(data->undosize)
   {
     struct UserAction *buffer = (struct UserAction *)data->undobuffer;
@@ -269,10 +291,14 @@ void ResetUndoBuffer(struct InstData *data)
     data->undopointer = data->undobuffer;
     *(short *)data->undopointer = 0xff;
   }
+
+  LEAVE();
 }
 
 long AddToUndoBuffer (long eventtype, char *eventdata, struct InstData *data)
 {
+  ENTER();
+
   if(data->undosize)
   {
     struct UserAction *buffer;
@@ -359,5 +385,7 @@ long AddToUndoBuffer (long eventtype, char *eventdata, struct InstData *data)
         break;
     }
   }
+
+  RETURN(TRUE);
   return(TRUE);
 }

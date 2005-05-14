@@ -36,8 +36,10 @@ extern struct keybindings keys[];
 
 ULONG RAWToANSI (struct IntuiMessage *imsg)
 {
-    struct  InputEvent  event;
-    UBYTE   code = 0;
+  struct  InputEvent  event;
+  UBYTE   code = 0;
+
+  ENTER();
 
   event.ie_NextEvent      = NULL;
   event.ie_Class          = IECLASS_RAWKEY;
@@ -47,22 +49,28 @@ ULONG RAWToANSI (struct IntuiMessage *imsg)
   event.ie_EventAddress   = (APTR *) *((ULONG *)imsg->IAddress);
 
   MapRawKey(&event, &code, 1, NULL);
+
+  RETURN(code);
   return(code);
 }
 
 ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 {
-    struct InstData *data = INST_DATA(cl, obj);
-    long  tresult;
+  struct InstData *data = INST_DATA(cl, obj);
+  long  tresult;
+
+  ENTER();
 
   if((msg->muikey == MUIKEY_UP) && data->KeyUpFocus && _win(obj) && (data->firstline == data->actualline))
   {
     set(_win(obj), MUIA_Window_ActiveObject, data->KeyUpFocus);
+
+    RETURN(MUI_EventHandlerRC_Eat);
     return MUI_EventHandlerRC_Eat;
   }
   else if(!(data->flags & FLG_Ghosted) && data->shown && msg->imsg && (msg->muikey != MUIKEY_GADGET_PREV) && (msg->muikey != MUIKEY_GADGET_NEXT))
   {
-      ULONG activeobj, defaultobj;
+    ULONG activeobj, defaultobj;
 
     get(_win(obj), MUIA_Window_ActiveObject, &activeobj);
     get(_win(obj), MUIA_Window_DefaultObject, &defaultobj);
@@ -70,6 +78,8 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
     if(data->CtrlChar && activeobj != (ULONG)obj && defaultobj != (ULONG)obj && RAWToANSI(msg->imsg) == data->CtrlChar)
     {
       set(_win(obj), MUIA_Window_ActiveObject, obj);
+
+      RETURN(MUI_EventHandlerRC_Eat);
       return(MUI_EventHandlerRC_Eat);
     }
 
@@ -79,6 +89,8 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
       {
         data->UpdateInfo = msg;
         MUI_Redraw(obj, MADF_DRAWUPDATE);
+
+        RETURN((ULONG)data->UpdateInfo);
         return((ULONG)data->UpdateInfo);
       }
 
@@ -88,8 +100,13 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
           if(data->ypos != data->realypos)
             return(MUI_EventHandlerRC_Eat);
           tresult = ReactOnRawKey(msg->imsg->Code, msg->imsg->Qualifier, msg->imsg, data);
+
           if(tresult == 0)
+          {
+            RETURN(0);
             return(0);
+          }
+
           break;
 
 /*        case IDCMP_INACTIVEWINDOW:
@@ -109,6 +126,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 */        case IDCMP_MOUSEBUTTONS:
           if(data->ypos != data->realypos)
           {
+            RETURN(0);
             return(0);
           }
           if((msg->imsg->Code == (IECODE_LBUTTON | IECODE_UP_PREFIX)) && data->mousemove)
@@ -213,33 +231,53 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
               }
               else
               {
+                RETURN(0);
                 return(0);
               }
             }
             else
             {
+              RETURN(0);
               return(0);
             }
           }
           break;
+
         default:
+          RETURN(0);
           return(0);
       }
+
+      RETURN(MUI_EventHandlerRC_Eat);
       return(MUI_EventHandlerRC_Eat);
     }
-    else  return(0);
+    else
+    {
+      RETURN(0);
+      return(0);
+    }
   }
-  else  return(0);
+  else
+  {
+    RETURN(0);
+    return(0);
+  }
 }
 
 VOID DoBlock (BOOL clipboard, BOOL erase, struct InstData *data)
 {
+  ENTER();
+
   data->blockinfo.enabled = FALSE;
   CutBlock(data, clipboard, !erase, TRUE);
+
+  LEAVE();
 }
 
 VOID EraseBlock (BOOL clipboard, struct InstData *data)
 {
+  ENTER();
+
   if(Enabled(data))
   {
     DoBlock(clipboard, TRUE, data);
@@ -249,17 +287,25 @@ VOID EraseBlock (BOOL clipboard, struct InstData *data)
   {
     DoMethod(data->object, MUIM_TextEditor_HandleError, Error_NoAreaMarked);
   }
+
+  LEAVE();
 }
 
 void Key_Clear (struct InstData *data)
 {
+  ENTER();
+
   EraseBlock(FALSE, data);
+
+  LEAVE();
 }
 
 enum {Del_BOL = 0, Del_EOL, Del_BOW, Del_EOW};
 
 void Key_DelSomething (ULONG what, struct InstData *data)
 {
+  ENTER();
+
   if(data->blockinfo.enabled)
   {
     data->blockinfo.enabled = FALSE;
@@ -293,10 +339,14 @@ void Key_DelSomething (ULONG what, struct InstData *data)
       Key_Clear(data);
   else  data->blockinfo.enabled = FALSE;
   data->flags &= ~FLG_FreezeCrsr;
+
+  LEAVE();
 }
 
 void Key_DelLine (struct InstData *data)
 {
+  ENTER();
+
   if(data->blockinfo.enabled)
   {
     data->blockinfo.enabled = FALSE;
@@ -321,16 +371,24 @@ void Key_DelLine (struct InstData *data)
       Key_Clear(data);
   else  data->blockinfo.enabled = FALSE;
 //  data->flags &= ~FLG_FreezeCrsr;
+
+  LEAVE();
 }
 
 
 void Key_Cut (struct InstData *data)
 {
+  ENTER();
+
   EraseBlock(TRUE, data);
+
+  LEAVE();
 }
 
 void Key_Copy (struct InstData *data)
 {
+  ENTER();
+
   if(Enabled(data))
   {
     DoBlock(TRUE, FALSE, data);
@@ -339,12 +397,16 @@ void Key_Copy (struct InstData *data)
   {
     DoMethod(data->object, MUIM_TextEditor_HandleError, Error_NoAreaMarked);
   }
+
+  LEAVE();
 }
 
 void Key_Paste (struct InstData *data)
 {
-    BOOL  update;
-    struct marking block;
+  BOOL  update;
+  struct marking block;
+
+  ENTER();
 
   if(Enabled(data))
     Key_Clear(data);
@@ -361,10 +423,14 @@ void Key_Paste (struct InstData *data)
     AddToUndoBuffer(pasteblock, (char *)&block, data);
     data->pixel_x = 0;
   }
+
+  LEAVE();
 }
 
 void Key_Tab (struct InstData *data)
 {
+  ENTER();
+
   if(Enabled(data))
     Key_Clear(data);
 
@@ -385,10 +451,14 @@ void Key_Tab (struct InstData *data)
     data->CPos_X += data->TabSize;
     PasteChars(data->CPos_X-data->TabSize, data->actualline, data->TabSize, "            ", NULL, data);
   }
+
+  LEAVE();
 }
 
 void Key_Return (struct InstData *data)
 {
+  ENTER();
+
   if(Enabled(data))
     Key_Clear(data);
 
@@ -397,10 +467,14 @@ void Key_Return (struct InstData *data)
 #endif
   AddToUndoBuffer(splitline, NULL, data);
   SplitLine(data->CPos_X, data->actualline, TRUE, NULL, data);
+
+  LEAVE();
 }
 
 void Key_Backspace (struct InstData *data)
 {
+  ENTER();
+
   if(Enabled(data))
   {
     Key_Clear(data);
@@ -423,10 +497,14 @@ void Key_Backspace (struct InstData *data)
       }
     }
   }
+
+  LEAVE();
 }
 
 void Key_Delete (struct InstData *data)
 {
+  ENTER();
+
   if(Enabled(data))
   {
     Key_Clear(data);
@@ -447,6 +525,8 @@ void Key_Delete (struct InstData *data)
       }
     }
   }
+
+  LEAVE();
 }
 /*
 void cutcopypasteerase (UBYTE key, ULONG qualifier, struct InstData *data)
@@ -501,6 +581,8 @@ void cutcopypasteerase (UBYTE key, ULONG qualifier, struct InstData *data)
 
 void Key_Normal (UBYTE key, struct InstData *data)
 {
+  ENTER();
+
   if(Enabled(data))
   {
     Key_Clear(data);
@@ -515,7 +597,7 @@ void Key_Normal (UBYTE key, struct InstData *data)
   PasteChars(data->CPos_X++, data->actualline, 1, &key, NULL, data);
   if(data->WrapBorder && (data->CPos_X > data->WrapBorder) && (key != ' '))
   {
-      ULONG xpos = data->CPos_X;
+    ULONG xpos = data->CPos_X;
 
     while(--xpos && *(data->actualline->line.Contents+xpos) != ' ');
     if(xpos)
@@ -530,6 +612,8 @@ void Key_Normal (UBYTE key, struct InstData *data)
       RemoveChars(0, data->actualline, 1, data);
     }
   }
+
+  LEAVE();
 }
 
 /*----------------*
@@ -537,10 +621,12 @@ void Key_Normal (UBYTE key, struct InstData *data)
  *----------------*/
 long  ConvertKey (UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
 {
-    long    result = TRUE;
-    unsigned char        code;
+  long    result = TRUE;
+  unsigned char        code;
 #ifndef ClassAct
-    struct   InputEvent  event;
+  struct   InputEvent  event;
+
+  ENTER();
 
   event.ie_NextEvent      = NULL;
   event.ie_Class          = IECLASS_RAWKEY;
@@ -551,6 +637,8 @@ long  ConvertKey (UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct 
 
   if(MapRawKey(&event, &code, 1, NULL) > 0)
 #else
+  ENTER();
+
   if(MapRawKey((struct InputEvent *)imsg, &code, 1, NULL) > 0)
 #endif
   {
@@ -570,6 +658,7 @@ long  ConvertKey (UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct 
   }
   else  result = FALSE;
 
+  RETURN(result);
   return(result);
 }
 
@@ -580,6 +669,8 @@ long  ConvertKey (UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct 
 
 BOOL MatchQual (ULONG input, ULONG match, UWORD action, struct InstData *data)
 {
+  ENTER();
+
   if((match & IEQUALIFIER_SHIFT) && (input & (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT)))
   {
     match &= ~IEQUALIFIER_SHIFT;
@@ -595,6 +686,8 @@ BOOL MatchQual (ULONG input, ULONG match, UWORD action, struct InstData *data)
     match &= ~IEQUALIFIER_COMMAND;
     input &= ~(IEQUALIFIER_LCOMMAND | IEQUALIFIER_RCOMMAND);
   }
+
+  LEAVE();
   return(input == match || (((input & ~data->blockqual) == match) && action < kSuggestWord));
 }
 
@@ -606,6 +699,8 @@ long FindKey (unsigned char key, unsigned long qualifier, struct InstData *data)
 {
   struct   keybindings *t_keys = data->RawkeyBindings;
   BOOL    speed = FALSE;
+
+  ENTER();
 
   if(t_keys == 0)
     t_keys = keys;
@@ -671,6 +766,8 @@ long FindKey (unsigned char key, unsigned long qualifier, struct InstData *data)
           if(new_y < 0)
             new_y = 0;
           set(data->object, MUIA_TextEditor_Prop_First, new_y*data->height);
+
+          RETURN(4);
           return(4);
         }
       }
@@ -680,59 +777,75 @@ long FindKey (unsigned char key, unsigned long qualifier, struct InstData *data)
         {
           case mTop:
             GoTop(data);
+            RETURN(TRUE);
             return(TRUE);
           case mPreviousLine:
             GoPreviousLine(data);
+            RETURN(TRUE);
             return(TRUE);
           case mPreviousPage:
             GoPreviousPage(data);
+            RETURN(FALSE);
             return(FALSE);
           case mUp:
             GoUp(data);
             if(speed)
               GoUp(data);
+            RETURN(FALSE);
             return(FALSE);
           case mBottom:
             GoBottom(data);
+            RETURN(TRUE);
             return(TRUE);
           case mNextLine:
             GoNextLine(data);
+            RETURN(TRUE);
             return(TRUE);
           case mNextPage:
             GoNextPage(data);
+            RETURN(FALSE);
             return(FALSE);
           case mDown:
             GoDown(data);
             if(speed)
               GoDown(data);
+            RETURN(FALSE);
             return(FALSE);
           case mNextWord:
             GoNextWord(data);
+            RETURN(TRUE);
             return(TRUE);
           case mNextSentence:
             GoNextSentence(data);
+            RETURN(TRUE);
             return(TRUE);
           case mEndOfLine:
             GoEndOfLine(data);
+            RETURN(TRUE);
             return(TRUE);
           case mRight:
             GoRight(data);
             if(speed)
               GoRight(data);
+            RETURN(TRUE);
             return(TRUE);
           case mPreviousWord:
             GoPreviousWord(data);
+            RETURN(TRUE);
             return(TRUE);
           case mPreviousSentence:
             GoPreviousSentence(data);
+            RETURN(TRUE);
             return(TRUE);
           case mStartOfLine:
             GoStartOfLine(data);
+            RETURN(TRUE);
             return(TRUE);
           case mLeft:
             GoLeft(data);
             if(speed)
               GoLeft(data);
+            RETURN(TRUE);
             return(TRUE);
           case kSuggestWord:
 #ifndef ClassAct
@@ -788,12 +901,15 @@ long FindKey (unsigned char key, unsigned long qualifier, struct InstData *data)
             break;
           case kGotoBookmark1:
             GotoBookmark(0, data);
+            RETURN(TRUE);
             return(TRUE);
           case kGotoBookmark2:
             GotoBookmark(1, data);
+            RETURN(TRUE);
             return(TRUE);
           case kGotoBookmark3:
             GotoBookmark(2, data);
+            RETURN(TRUE);
             return(TRUE);
           case kSetBookmark1:
             SetBookmark(0, data);
@@ -805,11 +921,15 @@ long FindKey (unsigned char key, unsigned long qualifier, struct InstData *data)
             SetBookmark(2, data);
             break;
         }
+
+        RETURN(3);
         return(3);
       }
     }
     t_keys++;
   }
+
+  RETURN(2);
   return(2);
 }
 
@@ -819,6 +939,8 @@ long ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessage *imsg
   long dummy;
   struct line_node *oldactualline = data->actualline;
   UWORD oldCPos_X = data->CPos_X;
+
+  ENTER();
 
   if(key <= IECODE_KEY_CODE_LAST)
   {
@@ -894,6 +1016,7 @@ long ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessage *imsg
   if(result)
     ScrollIntoDisplay(data);
 
+  RETURN(result);
   return(result);
 }
 /*------------------------------------------------------*
@@ -901,8 +1024,10 @@ long ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessage *imsg
  *------------------------------------------------------*/
 void  ScrollIntoDisplay (struct InstData *data)
 {
-    struct   pos_info pos;
-    LONG      diff;
+  struct   pos_info pos;
+  LONG      diff;
+
+  ENTER();
 
   if(data->shown)
   {
@@ -919,15 +1044,19 @@ void  ScrollIntoDisplay (struct InstData *data)
       ScrollDown(0, (-diff)+1, data);
     }
   }
+
+  LEAVE();
 }
 /*------------------------*
  * Update the marked area *
  *------------------------*/
 void  MarkText    (LONG x1, struct line_node *line1, LONG x2, struct line_node *line2, struct InstData *data)
 {
-    struct   marking  newblock, fakeblock;
-      LONG   startx, stopx;
-    struct   line_node   *startline, *stopline;
+  struct   marking  newblock, fakeblock;
+  LONG   startx, stopx;
+  struct   line_node   *startline, *stopline;
+
+  ENTER();
 
   fakeblock.startx = x1;
   fakeblock.startline = line1;
@@ -941,9 +1070,9 @@ void  MarkText    (LONG x1, struct line_node *line1, LONG x2, struct line_node *
   stopline  = newblock.stopline;
 
   {
-      struct pos_info pos1, pos2;
-      LONG   line_nr1 = LineToVisual(startline, data) - 1,
-          line_nr2 = LineToVisual(stopline, data) - 1;
+    struct pos_info pos1, pos2;
+    LONG   line_nr1 = LineToVisual(startline, data) - 1,
+           line_nr2 = LineToVisual(stopline, data) - 1;
 
     OffsetToLines(startx, startline, &pos1, data);
     OffsetToLines(stopx, stopline, &pos2, data);
@@ -960,4 +1089,6 @@ void  MarkText    (LONG x1, struct line_node *line1, LONG x2, struct line_node *
       DumpText(data->visual_y+line_nr1, line_nr1, line_nr2+1, FALSE, data);
     }
   }
+
+  LEAVE();
 }

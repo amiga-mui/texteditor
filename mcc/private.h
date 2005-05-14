@@ -39,9 +39,9 @@
 #endif
 
 #include <mcc_common.h>
-#include <mcc_debug.h>
 
 #include "TextEditor_mcc.h"
+#include "Debug.h"
 
 #define EOS        (unsigned short)-1
 

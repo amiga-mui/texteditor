@@ -32,6 +32,8 @@
 
 VOID SimpleMarkText (UWORD startx, struct line_node *startline, UWORD stopx, struct line_node *stopline, struct InstData *data)
 {
+  ENTER();
+
   if(Enabled(data))
   {
     data->blockinfo.enabled = FALSE;
@@ -50,6 +52,8 @@ VOID SimpleMarkText (UWORD startx, struct line_node *startline, UWORD stopx, str
 
   ScrollIntoDisplay(data);
   MarkText(startx, startline, stopx, stopline, data);
+
+  LEAVE();
 }
 
 LONG Native_strncmp (STRPTR str1, STRPTR str2, LONG len) { return strncmp(str1, str2, len); }
@@ -59,6 +63,8 @@ ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
 {
   STRPTR str = msg->SearchString;
   LONG len = strlen(str), step = 0;
+
+  ENTER();
 
   if(len && len <= 120)
   {
@@ -110,6 +116,8 @@ ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
           {
             UWORD startx = contents - line->line.Contents;
             SimpleMarkText(startx, line, startx+len, line, data);
+
+            RETURN(TRUE);
             return TRUE;
           }
           contents += len;
@@ -120,12 +128,17 @@ ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
       line = line->next;
     }
   }
+
+  RETURN(FALSE);
   return FALSE;
 }
 
 ULONG OM_Replace (Object *obj, struct MUIP_TextEditor_Replace *msg, struct InstData *data)
 {
   ULONG res = FALSE;
+
+  ENTER();
+
   if(Enabled(data))
   {
     Key_Clear(data);
@@ -136,5 +149,7 @@ ULONG OM_Replace (Object *obj, struct MUIP_TextEditor_Replace *msg, struct InstD
 #endif
     res = TRUE;
   }
+
+  RETURN(res);
   return res;
 }

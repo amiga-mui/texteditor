@@ -50,8 +50,10 @@
 
 void ResetDisplay(struct InstData *data)
 {
-    struct  line_node *line = data->firstline;
-    LONG    lines = 0;
+  struct  line_node *line = data->firstline;
+  LONG    lines = 0;
+
+  ENTER();
 
   data->blockinfo.enabled = FALSE;
   data->visual_y = 1;
@@ -108,27 +110,39 @@ void ResetDisplay(struct InstData *data)
       SetCursor(data->CPos_X, data->actualline, TRUE, data);
     }
 */  }
+
+  LEAVE();
 }
 
 void  RequestInput(struct InstData *data)
 {
+  ENTER();
+
 #ifndef ClassAct
   if(!(data->scrollaction || (data->mousemove)))
     DoMethod(_app(data->object), MUIM_Application_AddInputHandler, &data->ihnode);
 #endif
+
+  LEAVE();
 }
 
 void  RejectInput(struct InstData *data)
 {
+  ENTER();
+
 #ifndef ClassAct
   if(!(data->scrollaction || (data->mousemove)))
     DoMethod(_app(data->object), MUIM_Application_RemInputHandler, &data->ihnode);
 #endif
+
+  LEAVE();
 }
 
 
 ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
 {
+  ENTER();
+
   if((obj = (Object *)DoSuperMethodA(cl, obj, (Msg)msg)))
   {
     struct InstData *data = INST_DATA(cl, obj);
@@ -209,6 +223,7 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
               data->BevelVert  = (UWORD)temp;
             }
 #endif
+            RETURN((long)obj);
             return((long)obj);
           }
         }
@@ -216,12 +231,16 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
     }
     CoerceMethod(cl, obj, OM_DISPOSE);
   }
+
+  RETURN(FALSE);
   return(FALSE);
 }
 
 ULONG Dispose(struct IClass *cl, Object *obj, Msg msg)
 {
-    struct InstData *data = INST_DATA(cl, obj);
+  struct InstData *data = INST_DATA(cl, obj);
+
+  ENTER();
 
   if(data->undosize)
   {
@@ -234,15 +253,19 @@ ULONG Dispose(struct IClass *cl, Object *obj, Msg msg)
   if(data->mypool)
     DeletePool(data->mypool);
 
+  LEAVE();
   return(DoSuperMethodA(cl, obj, msg));
 }
 
 #ifndef ClassAct
 ULONG Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
 {
-    struct InstData *data = INST_DATA(cl, obj);
+  struct InstData *data = INST_DATA(cl, obj);
+
+  ENTER();
 
   InitConfig(obj, data);
+
   if(DoSuperMethodA(cl, obj, (Msg)rinfo))
   {
     if(!(data->flags & FLG_ReadOnly))
@@ -268,17 +291,23 @@ ULONG Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
       data->smooth_wait = 0;
       data->scrollaction      = FALSE;
 
+      RETURN(TRUE);
       return(TRUE);
     }
   }
+
+  RETURN(FALSE);
   return(FALSE);
 }
 
 ULONG Cleanup(struct IClass *cl, Object *obj, Msg msg)
 {
-    struct InstData *data = INST_DATA(cl, obj);
+  struct InstData *data = INST_DATA(cl, obj);
+
+  ENTER();
 
   DoMethod(_win(obj), MUIM_Window_RemEventHandler, &data->ehnode);
+
   if(DoMethod(_app(obj), OM_REMMEMBER, data->SuggestWindow))
   {
     MUI_DisposeObject(data->SuggestWindow);
@@ -293,14 +322,18 @@ ULONG Cleanup(struct IClass *cl, Object *obj, Msg msg)
   }
 
   FreeConfig(data, muiRenderInfo(obj));
+
+  LEAVE();
   return(DoSuperMethodA(cl, obj, msg));
 }
 
 ULONG AskMinMax (struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
 {
-    struct InstData *data = INST_DATA(cl, obj);
-    UWORD fontheight;
-    struct TextFont *font;
+  struct InstData *data = INST_DATA(cl, obj);
+  UWORD fontheight;
+  struct TextFont *font;
+
+  ENTER();
 
   DoSuperMethodA(cl,obj,(Msg)msg);
 
@@ -333,15 +366,19 @@ ULONG AskMinMax (struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
     msg->MinMaxInfo->DefHeight += 15 * fontheight;
     msg->MinMaxInfo->MaxHeight = MUI_MAXMAX;
   }
+
+  RETURN(0);
   return(0);
 }
 
 ULONG Show(struct IClass *cl, Object *obj, Msg msg)
 {
-    struct InstData *data = INST_DATA(cl, obj);
-    struct line_node  *line;
-    struct MUI_AreaData *ad = muiAreaData(obj);
-    LONG  lines = 0;
+  struct InstData *data = INST_DATA(cl, obj);
+  struct line_node  *line;
+  struct MUI_AreaData *ad = muiAreaData(obj);
+  LONG  lines = 0;
+
+  ENTER();
 
   DoSuperMethodA(cl, obj, msg);
 
@@ -398,12 +435,16 @@ ULONG Show(struct IClass *cl, Object *obj, Msg msg)
 //#endif
 
   data->shown   = TRUE;
+
+  RETURN(TRUE);
   return(TRUE);
 }
 
 ULONG Hide(struct IClass *cl, Object *obj, Msg msg)
 {
-    struct InstData *data = INST_DATA(cl, obj);
+  struct InstData *data = INST_DATA(cl, obj);
+
+  ENTER();
 
   data->shown   = FALSE;
 
@@ -412,12 +453,16 @@ ULONG Hide(struct IClass *cl, Object *obj, Msg msg)
   set(_win(obj), MUIA_Window_DisableKeys, 0L);
   MUIG_FreeBitMap(data->doublebuffer);
   data->rport   = NULL;
+
+  LEAVE();
   return(DoSuperMethodA(cl, obj, msg));
 }
 
 ULONG mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 {
-    struct InstData *data = INST_DATA(cl, obj);
+  struct InstData *data = INST_DATA(cl, obj);
+
+  ENTER();
 
   DoSuperMethodA(cl, obj, (Msg)msg);
 
@@ -473,6 +518,8 @@ ULONG mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
     }
     DumpText(data->visual_y, 0, data->maxlines, FALSE, data);
   }
+
+  RETURN(0);
   return(0);
 }
 

@@ -26,7 +26,8 @@
 #include "TextEditor_mcp.h"
 
 #include <mcc_common.h>
-#include <mcc_debug.h>
+
+#include "Debug.h"
 
 #define PREFSIMAGEOBJECT \
   BitmapObject,\
