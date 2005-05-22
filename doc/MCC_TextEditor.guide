@@ -1,5 +1,5 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.11 (11.4.2005)
+@$VER: TextEditor.Guide 15.11 (22.05.2005)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
@@ -338,11 +338,17 @@ History
 (Please check the @{" ChangeLog " link ChangeLog/main} for a more detailed and complete
 list of changes since 15.9)
 
+Quick summary:
 
-15.11 (xx.xx.2005)
+15.11 (22.05.2005)
 
+- fixed crash/hang bug where it could have happened that the gadgets caused a total
+  system hang [damato]
+- fixed problems with keybindings of texteditor.mcc [sba]
+- fixed problems in using TextEditor.mcc on systems with a rexxsyslib.library
+  V36 on OS3.1 systems [ilkka]
 
-15.10 (9.4.2005)
+15.10 (09.04.2005)
 
 - First update from the TextEditor.mcc Open Source team under the LGPL.
   Read @{" this " Link Background} to know how it all was made possible!
