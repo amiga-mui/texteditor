@@ -105,4 +105,5 @@ VOID ClassExitFunc(UNUSED struct Library *base)
 
 #include "icon.bh"
 
+#define USE_UTILITYBASE
 #include "mccheader.c"

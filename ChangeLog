@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-05-25  Jens Langner <Jens.Langner@light-speed.de>
+
+    * library.c: added missing USE_UTILITYBASE define which in fact was the reason
+      why the last two previous releases crashed on OS3 machines. bug #1180094
+
 #### v15.11 RELEASE ############################################################
 
 2005-05-14  Jens Langner <Jens.Langner@light-speed.de>
