@@ -21,6 +21,8 @@
 ***************************************************************************/
 
 #include <proto/exec.h>
+#include <proto/utility.h>
+#include <proto/dos.h>
 
 /******************************************************************************/
 /*                                                                            */
@@ -176,4 +178,5 @@ VOID ClassExitFunc(UNUSED struct Library *base)
 /*                                                                            */
 /******************************************************************************/
 
+#define USE_UTILITYBASE
 #include "mccheader.c"
