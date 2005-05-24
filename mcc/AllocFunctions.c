@@ -22,19 +22,27 @@
 
 #include <proto/exec.h>
 
+#include "private.h"
+
 void *MyAllocPooled(void *pool, unsigned long length)
 {
   long *mem;
+
+  ENTER();
 
   if((mem = AllocPooled(pool, length+4)))
   {
     *mem = length+4;
     mem += 1;
-    
+
+    RETURN(mem);
     return(mem);
   }
   else
+  {
+    RETURN(NULL);
     return(NULL);
+  }
 }
 
 void MyFreePooled(void *pool, void *mem)
@@ -42,8 +50,12 @@ void MyFreePooled(void *pool, void *mem)
   long *memptr = (long *)mem;
   long length;
 
+  ENTER();
+
   memptr -= 1;
   length = *(memptr);
 
   FreePooled(pool, memptr, length);
+
+  LEAVE();
 }
