@@ -61,7 +61,7 @@ struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
     return NULL;
   }
 
-  if(!(fontname = AllocVec(strlen(setting)+6,0)))
+  if(!(fontname = AllocVec(strlen(setting)+6, MEMF_ANY|MEMF_CLEAR)))
   {
     RETURN(NULL);
     return NULL;
