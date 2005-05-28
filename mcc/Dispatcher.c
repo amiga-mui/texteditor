@@ -279,7 +279,7 @@ ULONG Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
       data->ehnode.ehn_Flags    = MUI_EHF_GUIMODE;
       data->ehnode.ehn_Object   = obj;
       data->ehnode.ehn_Class    = cl;
-      data->ehnode.ehn_Events   = /*IDCMP_INACTIVEWINDOW |*/ IDCMP_MOUSEBUTTONS | IDCMP_RAWKEY /* (data->flags & FLG_ReadOnly ? IDCMP_RAWKEY : 0) */ ;
+      data->ehnode.ehn_Events   = IDCMP_ACTIVEWINDOW | IDCMP_MOUSEBUTTONS | IDCMP_RAWKEY /* (data->flags & FLG_ReadOnly ? IDCMP_RAWKEY : 0) */ ;
 
       data->ihnode.ihn_Object   = obj;
       data->ihnode.ihn_Millis   = 20;
@@ -599,52 +599,41 @@ DISPATCHERPROTO(_Dispatcher)
     }
     break;
 
-//#ifndef ClassAct
     case MUIM_GoActive:
-      data->flags |= FLG_Active;
+    {
+      // set the gadgets flags to active and also "activated" so that
+      // other functions know that the gadget was activated recently.
+      data->flags |= (FLG_Active | FLG_Activated);
 
-/*      DoMethod(_win(obj), MUIM_Window_RemEventHandler, &data->ehnode);
-      data->ehnode.ehn_Events |= IDCMP_RAWKEY;
-      DoMethod(_win(obj), MUIM_Window_AddEventHandler, &data->ehnode);
-*/      if(data->shown)
+      if(data->shown)
       {
         SetCursor(data->CPos_X, data->actualline, TRUE, data);
         if(!(data->flags & FLG_ReadOnly))
           set(_win(obj), MUIA_Window_DisableKeys, MUIKEYF_GADGET_NEXT);
       }
-/*      else
-      {
-        data->ehnode.ehn_Events   |= IDCMP_RAWKEY;// | IDCMP_MOUSEMOVE;
-      }
-*/
+
       if(data->BlinkSpeed == 1)
       {
         DoMethod(_app(obj), MUIM_Application_AddInputHandler, &data->blinkhandler);
         data->BlinkSpeed = 2;
       }
 
-//      if(data->flags & FLG_ReadOnly)
-        DoSuperMethodA(cl, obj, msg);
+      DoSuperMethodA(cl, obj, msg);
       return(TRUE);
+    }
+    break;
 
     case MUIM_GoInactive:
+    {
+      // clear the active and activated flag so that others know about it
       data->flags &= ~FLG_Active;
+      data->flags &= ~FLG_Activated;
 
-//      if(~data->flags & FLG_ReadOnly)
-/*      {
-        DoMethod(_win(obj), MUIM_Window_RemEventHandler, &data->ehnode);
-        data->ehnode.ehn_Events &= ~IDCMP_RAWKEY;
-        DoMethod(_win(obj), MUIM_Window_AddEventHandler, &data->ehnode);
-      }
-*/      if(data->shown)
+      if(data->shown)
       {
         set(_win(obj), MUIA_Window_DisableKeys, 0L);
       }
-/*      else
-      {
-        data->ehnode.ehn_Events   &= ~(IDCMP_RAWKEY | IDCMP_VANILLAKEY);
-      }
-*/
+
       if(data->mousemove)
       {
         data->mousemove = FALSE;
@@ -661,10 +650,10 @@ DISPATCHERPROTO(_Dispatcher)
       }
       SetCursor(data->CPos_X, data->actualline, FALSE, data);
 
-//      if(data->flags & FLG_ReadOnly)
-        DoSuperMethodA(cl, obj, msg);
+      DoSuperMethodA(cl, obj, msg);
       return(TRUE);
-//#endif
+    }
+    break;
 
     case MUIM_Hide:
       return(Hide(cl, obj, msg));
