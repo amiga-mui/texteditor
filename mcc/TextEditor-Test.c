@@ -288,6 +288,7 @@ int main(void)
 //                              MUIA_Frame, "602211",
 //                              InputListFrame,
 //                              MUIA_Background, MUII_GroupBack,
+//                              MUIA_TextEditor_FixedFont, TRUE,
                               MUIA_TextEditor_AutoClip, FALSE,
 //                              MUIA_TextEditor_ReadOnly, TRUE,
                               MUIA_TextEditor_DoubleClickHook, &URLHook,

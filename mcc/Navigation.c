@@ -39,7 +39,7 @@ ULONG FlowSpace (UWORD flow, STRPTR text, struct InstData *data)
   if(flow != MUIV_TextEditor_Flow_Left)
   {
     flowspace  = (data->innerwidth-MyTextLength(data->font, text, LineCharsWidth(text, data)-1));
-    flowspace -= (data->CursorWidth == 6) ? MyTextLength(data->font, "n", 1) : data->CursorWidth;
+    flowspace -= (data->CursorWidth == 6) ? MyTextLength(data->font, " ", 1) : data->CursorWidth;
     if(flow == MUIV_TextEditor_Flow_Center)
     {
       flowspace /= 2;
