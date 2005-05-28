@@ -94,7 +94,10 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
     }
 
     if((imsg->Class == IDCMP_MOUSEBUTTONS) || (activeobj == obj) ||
-       (data->flags & FLG_ReadOnly && defaultobj == obj && !activeobj))
+       (data->flags & FLG_ReadOnly && defaultobj == obj && !activeobj) ||
+       (imsg->Class == IDCMP_RAWKEY &&
+        (imsg->Code == NM_WHEEL_UP || imsg->Code == NM_WHEEL_DOWN ||
+         imsg->Code == NM_WHEEL_LEFT || imsg->Code == NM_WHEEL_RIGHT)))
     {
       if(!(data->flags & FLG_Draw))
       {
