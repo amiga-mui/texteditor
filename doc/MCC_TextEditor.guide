@@ -1,5 +1,5 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.11 (22.05.2005)
+@$VER: TextEditor.Guide 15.12 (28.05.2005)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
@@ -339,6 +339,12 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.12 (28.05.2005)
+
+- fixed some graphics bugs where the cursor was not completely erased
+- implemented general wheel-mouse support (newmouse)
+- fixed some important bugs like general crashes on OS3 while deleting some text.
 
 15.11 (22.05.2005)
 
