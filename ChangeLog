@@ -5,6 +5,8 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+#### v15.12 RELEASE ############################################################
+
 2005-05-28  Jens Langner <Jens.Langner@light-speed.de>
 
     * mcp/CreatePrefsGroup.c: fixed a crash bug where the InsertHook() was
