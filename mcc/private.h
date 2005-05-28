@@ -50,6 +50,11 @@
 #define ITALIC    0x04
 #define COLOURED  0x08
 
+// some own usefull MUI-style macros to check mouse positions in objects
+#define _between(a,x,b) 					((x)>=(a) && (x)<=(b))
+#define _isinobject(o,x,y) 				(_between(_mleft(o),(x),_mright (o)) && _between(_mtop(o) ,(y),_mbottom(o)))
+#define _isinwholeobject(o,x,y) 	(_between(_left(o),(x),_right (o)) && _between(_top(o) ,(y),_bottom(o)))
+
 struct bookmark
 {
   struct  line_node *line;
@@ -225,7 +230,6 @@ void  RejectInput   (struct InstData *);
 long  MyTextLength  (struct TextFont *, char *, long);
 long  MyTextFit   (struct TextFont *, char *, long, long, long);
 
-long  ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessage *, struct InstData *);
 void  ScrollIntoDisplay (struct InstData *);
 long  CheckSep    (unsigned char, struct InstData *);
 long  CheckSent   (unsigned char, struct InstData *);

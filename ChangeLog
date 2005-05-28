@@ -5,6 +5,14 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-05-28  Jens Langner <Jens.Langner@light-speed.de>
+
+    * mcc/HandleInput.c: implemented wheel-mouse event recognition via the rawkey
+      based NEWMOUSE standard. Now, each TextEditor.mcc object should allow to
+      use an existing wheel-mouse to scroll text up/down. Previously each
+      application had to implement that on its own. However, for those apps
+      already having implemented it, nothing will change.
+
 2005-05-25  Jens Langner <Jens.Langner@light-speed.de>
 
     * library.c: added missing USE_UTILITYBASE define which in fact was the reason

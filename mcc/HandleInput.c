@@ -31,10 +31,12 @@
 
 #include "TextEditor_mcc.h"
 #include "private.h"
+#include "newmouse.h"
 
 extern struct keybindings keys[];
+static long ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data);
 
-ULONG RAWToANSI (struct IntuiMessage *imsg)
+static ULONG RAWToANSI(struct IntuiMessage *imsg)
 {
   struct  InputEvent  event;
   UBYTE   code = 0;
@@ -57,7 +59,6 @@ ULONG RAWToANSI (struct IntuiMessage *imsg)
 ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
-  long  tresult;
 
   ENTER();
 
@@ -68,14 +69,17 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
     RETURN(MUI_EventHandlerRC_Eat);
     return MUI_EventHandlerRC_Eat;
   }
-  else if(!(data->flags & FLG_Ghosted) && data->shown && msg->imsg && (msg->muikey != MUIKEY_GADGET_PREV) && (msg->muikey != MUIKEY_GADGET_NEXT))
+  else if(!(data->flags & FLG_Ghosted) && data->shown && msg->imsg &&
+          (msg->muikey != MUIKEY_GADGET_PREV) && (msg->muikey != MUIKEY_GADGET_NEXT) && // if the user moves to another obj with TAB
+          (msg->muikey != MUIKEY_GADGET_OFF)) // user deselected gadget with CTRL+TAB
   {
     ULONG activeobj, defaultobj;
+  	struct IntuiMessage *imsg = msg->imsg;
 
     get(_win(obj), MUIA_Window_ActiveObject, &activeobj);
     get(_win(obj), MUIA_Window_DefaultObject, &defaultobj);
 
-    if(data->CtrlChar && activeobj != (ULONG)obj && defaultobj != (ULONG)obj && RAWToANSI(msg->imsg) == data->CtrlChar)
+    if(data->CtrlChar && activeobj != (ULONG)obj && defaultobj != (ULONG)obj && RAWToANSI(imsg) == data->CtrlChar)
     {
       set(_win(obj), MUIA_Window_ActiveObject, obj);
 
@@ -83,7 +87,8 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
       return(MUI_EventHandlerRC_Eat);
     }
 
-    if((msg->imsg->Class == IDCMP_MOUSEBUTTONS) || (activeobj == (ULONG)obj) || (data->flags & FLG_ReadOnly && defaultobj == (ULONG)obj && !activeobj))
+    if((imsg->Class == IDCMP_MOUSEBUTTONS) || (activeobj == (ULONG)obj) ||
+       (data->flags & FLG_ReadOnly && defaultobj == (ULONG)obj && !activeobj))
     {
       if(!(data->flags & FLG_Draw))
       {
@@ -94,20 +99,57 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
         return((ULONG)data->UpdateInfo);
       }
 
-      switch(msg->imsg->Class)
+      switch(imsg->Class)
       {
         case IDCMP_RAWKEY:
+        {
           if(data->ypos != data->realypos)
+          {
+            RETURN(MUI_EventHandlerRC_Eat);
             return(MUI_EventHandlerRC_Eat);
-          tresult = ReactOnRawKey(msg->imsg->Code, msg->imsg->Qualifier, msg->imsg, data);
+          }
 
-          if(tresult == 0)
+    			// we check wheter the mouse is currently within our object borders
+          // and if so we check wheter the newmouse wheel stuff is used or not
+          if(_isinwholeobject(obj, imsg->MouseX, imsg->MouseY))
+    			{
+		    		// MouseWheel events are only possible if the mouse is above the
+				    // object
+    				if(imsg->Code == NM_WHEEL_UP   || imsg->Code == NM_WHEEL_LEFT ||
+		    			 imsg->Code == NM_WHEEL_DOWN || imsg->Code == NM_WHEEL_RIGHT)
+				    {
+    					LONG visible;
+
+              get(obj, MUIA_TextEditor_Prop_Visible, &visible);
+		    			if(visible > 0)
+				    	{
+						    // we scroll 1/6 of the displayed text by default
+    						LONG delta = ((((double)visible)/6.0)+0.5); // round the value
+
+		    				// make sure that we scroll at least 1 line
+				    		if(delta < 1) delta = 1;
+
+						    if(imsg->Code == NM_WHEEL_UP || imsg->Code == NM_WHEEL_LEFT)
+    						{
+		    					DoMethod(data->slider, MUIM_Prop_Decrease, delta);
+				    		}
+						    else
+                  DoMethod(data->slider, MUIM_Prop_Increase, delta);
+  					  }
+
+              RETURN(MUI_EventHandlerRC_Eat);
+					    return MUI_EventHandlerRC_Eat;
+    				}
+		    	}
+
+          // if not we check wheter we have to react on that particular RAWKEY event
+          if(ReactOnRawKey(imsg->Code, imsg->Qualifier, imsg, data) == 0)
           {
             RETURN(0);
             return(0);
           }
-
-          break;
+        }
+        break;
 
 /*        case IDCMP_INACTIVEWINDOW:
         {
@@ -123,42 +165,46 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
           if(data->mousemove && !data->smooth_wait)
             InputTrigger(cl, data);
           break;
-*/        case IDCMP_MOUSEBUTTONS:
+*/
+        case IDCMP_MOUSEBUTTONS:
+        {
           if(data->ypos != data->realypos)
           {
             RETURN(0);
             return(0);
           }
-          if((msg->imsg->Code == (IECODE_LBUTTON | IECODE_UP_PREFIX)) && data->mousemove)
+
+          if((imsg->Code == (IECODE_LBUTTON | IECODE_UP_PREFIX)) && data->mousemove)
           {
             data->mousemove = FALSE;
             RejectInput(data);
+
             if((data->flags & FLG_ReadOnly) && (data->flags & FLG_AutoClip) && Enabled(data))
               Key_Copy(data);
           }
           else
           {
-            if(msg->imsg->Code == IECODE_LBUTTON)
+            if(imsg->Code == IECODE_LBUTTON)
             {
                 struct MUI_AreaData *ad = muiAreaData(obj);
 
-              if(((msg->imsg->MouseX >= ad->mad_Box.Left) &&
-                 (msg->imsg->MouseX <  ad->mad_Box.Left + ad->mad_Box.Width) &&
-                 (msg->imsg->MouseY >= data->ypos) &&
-                 (msg->imsg->MouseY <  data->ypos+(data->maxlines * data->height))))
+              if(((imsg->MouseX >= ad->mad_Box.Left) &&
+                 (imsg->MouseX <  ad->mad_Box.Left + ad->mad_Box.Width) &&
+                 (imsg->MouseY >= data->ypos) &&
+                 (imsg->MouseY <  data->ypos+(data->maxlines * data->height))))
               {
                 UWORD last_x = data->CPos_X; struct line_node *lastline = data->actualline;
                 RequestInput(data);
                 data->mousemove = TRUE;
                 SetCursor(data->CPos_X, data->actualline, FALSE, data);
-                PosFromCursor(msg->imsg->MouseX, msg->imsg->MouseY, data);
+                PosFromCursor(imsg->MouseX, imsg->MouseY, data);
 
-                if(msg->imsg->Qualifier & (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT))
+                if(imsg->Qualifier & (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT))
                 {
                   data->selectmode  = 0;
                 }
 
-                if(!((data->blockinfo.enabled) && (msg->imsg->Qualifier & (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT))))
+                if(!((data->blockinfo.enabled) && (imsg->Qualifier & (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT))))
                 {
                   if(Enabled(data))
                   {
@@ -169,7 +215,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                   data->blockinfo.enabled = TRUE;
                   data->blockinfo.startline = data->actualline;
                   data->blockinfo.startx = data->CPos_X;
-                  if(last_x == data->CPos_X && lastline == data->actualline && DoubleClick(data->StartSecs, data->StartMicros, msg->imsg->Seconds, msg->imsg->Micros))
+                  if(last_x == data->CPos_X && lastline == data->actualline && DoubleClick(data->StartSecs, data->StartMicros, imsg->Seconds, imsg->Micros))
                   {
                     if((data->DoubleClickHook && !CallHook(data->DoubleClickHook, (Object *)data->object, data->actualline->line.Contents, data->CPos_X)) || (!data->DoubleClickHook))
                     {
@@ -198,23 +244,23 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 
                           data->blockinfo.startx = x;
                           data->selectmode  = 1;
-                          data->StartSecs = msg->imsg->Seconds;
-                          data->StartMicros = msg->imsg->Micros;
+                          data->StartSecs = imsg->Seconds;
+                          data->StartMicros = imsg->Micros;
                         }
                       }
                       else
                       {
                         data->selectmode  = 0;
-                        data->StartSecs = msg->imsg->Seconds;
-                        data->StartMicros = msg->imsg->Micros;
+                        data->StartSecs = imsg->Seconds;
+                        data->StartMicros = imsg->Micros;
                       }
                     }
                   }
                   else
                   {
                     data->selectmode  = 0;
-                    data->StartSecs = msg->imsg->Seconds;
-                    data->StartMicros = msg->imsg->Micros;
+                    data->StartSecs = imsg->Seconds;
+                    data->StartMicros = imsg->Micros;
                   }
                 }
                 else
@@ -241,11 +287,14 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
               return(0);
             }
           }
-          break;
+        }
+        break;
 
         default:
+        {
           RETURN(0);
           return(0);
+        }
       }
 
       RETURN(MUI_EventHandlerRC_Eat);
@@ -264,7 +313,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
   }
 }
 
-VOID DoBlock (BOOL clipboard, BOOL erase, struct InstData *data)
+static VOID DoBlock(BOOL clipboard, BOOL erase, struct InstData *data)
 {
   ENTER();
 
@@ -274,7 +323,7 @@ VOID DoBlock (BOOL clipboard, BOOL erase, struct InstData *data)
   LEAVE();
 }
 
-VOID EraseBlock (BOOL clipboard, struct InstData *data)
+static VOID EraseBlock(BOOL clipboard, struct InstData *data)
 {
   ENTER();
 
@@ -291,7 +340,7 @@ VOID EraseBlock (BOOL clipboard, struct InstData *data)
   LEAVE();
 }
 
-void Key_Clear (struct InstData *data)
+void Key_Clear(struct InstData *data)
 {
   ENTER();
 
@@ -302,7 +351,7 @@ void Key_Clear (struct InstData *data)
 
 enum {Del_BOL = 0, Del_EOL, Del_BOW, Del_EOW};
 
-void Key_DelSomething (ULONG what, struct InstData *data)
+void Key_DelSomething(ULONG what, struct InstData *data)
 {
   ENTER();
 
@@ -343,7 +392,7 @@ void Key_DelSomething (ULONG what, struct InstData *data)
   LEAVE();
 }
 
-void Key_DelLine (struct InstData *data)
+void Key_DelLine(struct InstData *data)
 {
   ENTER();
 
@@ -376,7 +425,7 @@ void Key_DelLine (struct InstData *data)
 }
 
 
-void Key_Cut (struct InstData *data)
+void Key_Cut(struct InstData *data)
 {
   ENTER();
 
@@ -619,7 +668,7 @@ void Key_Normal (UBYTE key, struct InstData *data)
 /*----------------*
  * Convert Rawkey *
  *----------------*/
-long  ConvertKey (UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
+static long ConvertKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
 {
   long    result = TRUE;
   unsigned char        code;
@@ -667,7 +716,7 @@ long  ConvertKey (UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct 
 
 */
 
-BOOL MatchQual (ULONG input, ULONG match, UWORD action, struct InstData *data)
+static BOOL MatchQual(ULONG input, ULONG match, UWORD action, struct InstData *data)
 {
   ENTER();
 
@@ -695,7 +744,7 @@ BOOL MatchQual (ULONG input, ULONG match, UWORD action, struct InstData *data)
 /*---------------------------------*
  * Function to handle a cursormove *
  *---------------------------------*/
-long FindKey (unsigned char key, unsigned long qualifier, struct InstData *data)
+static long FindKey (unsigned char key, unsigned long qualifier, struct InstData *data)
 {
   struct   keybindings *t_keys = data->RawkeyBindings;
   BOOL    speed = FALSE;
@@ -933,7 +982,7 @@ long FindKey (unsigned char key, unsigned long qualifier, struct InstData *data)
   return(2);
 }
 
-long ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
+static long ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
 {
   BOOL result = TRUE;
   long dummy;
@@ -945,11 +994,12 @@ long ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessage *imsg
   if(key <= IECODE_KEY_CODE_LAST)
   {
     dummy = FindKey(key, qualifier, data);
-    if(dummy == TRUE)
+    if(dummy == 1)
     {
       data->pixel_x = 0;
     }
-    if(dummy == TRUE || dummy == FALSE)
+
+    if(dummy == 1 || dummy == 0)
     {
       if((data->CPos_X != oldCPos_X || oldactualline != data->actualline) || (!(qualifier & data->blockqual) && data->blockinfo.enabled))
       {
@@ -1022,7 +1072,7 @@ long ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessage *imsg
 /*------------------------------------------------------*
  * Make sure that the cursor is inside the visible area *
  *------------------------------------------------------*/
-void  ScrollIntoDisplay (struct InstData *data)
+void ScrollIntoDisplay(struct InstData *data)
 {
   struct   pos_info pos;
   LONG      diff;
@@ -1050,7 +1100,7 @@ void  ScrollIntoDisplay (struct InstData *data)
 /*------------------------*
  * Update the marked area *
  *------------------------*/
-void  MarkText    (LONG x1, struct line_node *line1, LONG x2, struct line_node *line2, struct InstData *data)
+void  MarkText(LONG x1, struct line_node *line1, LONG x2, struct line_node *line2, struct InstData *data)
 {
   struct   marking  newblock, fakeblock;
   LONG   startx, stopx;
