@@ -75,6 +75,10 @@ int main(void)
       {
         OpenCat();
 
+        #if defined(DEBUG)
+        SetupDebug();
+        #endif
+
         if((MUIMasterBase = OpenLibrary(MUIMASTER_NAME, MUIMASTER_VMIN)) &&
            GETINTERFACE(IMUIMaster, MUIMasterBase))
         {

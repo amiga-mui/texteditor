@@ -45,6 +45,8 @@ HOOKPROTONH(ListDisplayFunc, void, char **array, struct te_key *entry)
   static char buffer[118];
   struct KeyAction ka;
 
+  ENTER();
+
   if(entry)
   {
     ka.key = entry->code;
@@ -70,41 +72,52 @@ HOOKPROTONH(ListDisplayFunc, void, char **array, struct te_key *entry)
     *array++ = "";
     *array = GetStr(MSG_LVLabel_Action);
   }
+
+  LEAVE();
 }
 MakeStaticHook(ListDisplayHook, ListDisplayFunc);
 
 HOOKPROTONH(ListConstructFunc, APTR, APTR pool, struct te_key *entry)
 {
-  struct te_key *newplace = AllocPooled(pool, sizeof(struct te_key));
+  struct te_key *newplace;
+  ENTER();
 
+  newplace = AllocPooled(pool, sizeof(struct te_key));
   if(newplace)
   {
     CopyMem(entry, newplace, sizeof(struct te_key));
   }
 
+  RETURN(newplace);
   return(newplace);
 }
 MakeStaticHook(ListConstructHook, ListConstructFunc);
 
 HOOKPROTONH(ListDestructFunc, void, APTR pool, struct te_key *entry)
 {
+  ENTER();
   FreePooled(pool, entry, sizeof(struct te_key));
+  LEAVE();
 }
 MakeStaticHook(ListDestructHook, ListDestructFunc);
 
 HOOKPROTONH(Popstring_WindowCode, void, Object *pop, Object *win)
 {
+  ENTER();
   set(win, MUIA_Window_DefaultObject, pop);
+  LEAVE();
 }
 MakeStaticHook(Popstring_WindowHook, Popstring_WindowCode);
 
 HOOKPROTONH(Popstring_OpenCode, BOOL, Object *pop, Object *text)
 {
   LONG active;
+  ENTER();
 
   get(text, MUIA_UserData, &active);
   set(pop, MUIA_List_Active, active);
   
+  RETURN(TRUE);
   return(TRUE);
 }
 MakeStaticHook(Popstring_OpenHook, Popstring_OpenCode);
@@ -112,9 +125,12 @@ MakeStaticHook(Popstring_OpenHook, Popstring_OpenCode);
 HOOKPROTONH(Popstring_CloseCode, void, Object *pop, Object *text)
 {
   LONG active;
+  ENTER();
 
   get(pop, MUIA_List_Active, &active);
   set(text, MUIA_UserData, active);
+
+  LEAVE();
 }
 MakeStaticHook(Popstring_CloseHook, Popstring_CloseCode);
 
@@ -123,6 +139,8 @@ HOOKPROTONHNO(InsertCode, void, APTR **array)
   static const struct te_key constentry = {76, 0, 0};
   Object *keylist = (Object *)*array++;
   ULONG entry;
+
+  ENTER();
 
   get(keylist, MUIA_List_Active, &entry);
 
@@ -133,6 +151,8 @@ HOOKPROTONHNO(InsertCode, void, APTR **array)
 
   DoMethod(keylist, MUIM_List_InsertSingle, &constentry, entry);
   set(keylist, MUIA_List_Active, entry);
+
+  LEAVE();
 }
 MakeStaticHook(InsertHook, InsertCode);
 
@@ -141,6 +161,8 @@ HOOKPROTONHNO(SelectCode, void, APTR **array)
   struct InstData_MCP *data = (struct InstData_MCP *)*array++;
   Object *keylist = (Object *)*array++;
   struct te_key *entry;
+
+  ENTER();
 
   DoMethod(keylist, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &entry);
   
@@ -167,6 +189,8 @@ HOOKPROTONHNO(SelectCode, void, APTR **array)
     KeyToString(buffer, &ka);
     nnset(data->hotkey, MUIA_String_Contents, buffer);
   }
+
+  LEAVE();
 }
 MakeStaticHook(SelectHook, SelectCode);
 
@@ -177,6 +201,8 @@ HOOKPROTONHNO(UpdateCode, void, APTR **array)
   struct te_key entry;
   ULONG result;
   ULONG active;
+
+  ENTER();
 
   get(keylist, MUIA_List_Active, &active);
   
@@ -214,6 +240,8 @@ HOOKPROTONHNO(UpdateCode, void, APTR **array)
                 MUIA_NoNotify,    TRUE,
                 TAG_DONE);
   }
+
+  LEAVE();
 }
 MakeStaticHook(UpdateHook, UpdateCode);
 
@@ -279,6 +307,8 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 
     { NM_END,   NULL, 0, 0, 0, (APTR)0 }
   };
+
+  ENTER();
 
   data->editpopup = MUI_MakeObject(MUIO_MenustripNM, editpopupdata, NULL);
 
@@ -610,7 +640,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 
     DoMethod(data->insertkey, MUIM_Notify,
         MUIA_Pressed, FALSE,
-        MUIV_Notify_Self, 4, MUIM_CallHook, &InsertHook, data, keylist);
+        MUIV_Notify_Self, 3, MUIM_CallHook, &InsertHook, keylist);
 
     DoMethod(keylist, MUIM_Notify,
         MUIA_List_Active, MUIV_EveryTime,
@@ -727,5 +757,6 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
     DoMethod(editor, MUIM_Notify, MUIA_TextEditor_RedoAvailable, MUIV_EveryTime, (Object *)DoMethod(data->editpopup,MUIM_FindUData, 6), 3, MUIM_Set, MUIA_Menuitem_Enabled, MUIV_TriggerValue);
   }
 
+  RETURN(group);
   return(group);
 }

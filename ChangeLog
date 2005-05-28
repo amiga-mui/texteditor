@@ -7,6 +7,8 @@ $Source$
 
 2005-05-28  Jens Langner <Jens.Langner@light-speed.de>
 
+    * mcp/CreatePrefsGroup.c: fixed a crash bug where the InsertHook() was
+      using the passed function parameters incorrectly.
     * mcc: fixed bug #1187007 where upon using anti-aliased proportional fonts
       caused the texteditor to not correctly clear the whole cursor areas and
       therefore left some cursor "signs" back in the editor.
