@@ -7,6 +7,9 @@ $Source$
 
 2005-05-28  Jens Langner <Jens.Langner@light-speed.de>
 
+    * mcc: fixed bug #1187007 where upon using anti-aliased proportional fonts
+      caused the texteditor to not correctly clear the whole cursor areas and
+      therefore left some cursor "signs" back in the editor.
     * mcc/Dispatcher.c, mcc/HandleInput.c: fixed bug #1178168 where upon switching
       from another gadget to a texteditor object via the TAB key automatically
       caused that a TAB key is inserted into the text.

@@ -71,7 +71,12 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
       struct pos_info pos;
       OffsetToLines(x, line, &pos, data);
 
-      cursor_width = (data->CursorWidth == 6) ? MyTextLength(data->font, (line->line.Contents[x] == '\n') ? (char *)"n" : (char *)&line->line.Contents[x], 1) : data->CursorWidth;
+      // calculate the cursor width
+      // if it is set to 6 then we should find out how the width of the current char is
+      if(data->CursorWidth == 6)
+        cursor_width = MyTextLength(data->font, line->line.Contents[x] < ' ' ? (char *)" " : (char *)&line->line.Contents[x], 1);
+      else
+        cursor_width = data->CursorWidth;
 
       xplace  = data->xpos + MyTextLength(data->font, &line->line.Contents[x-pos.x], pos.x);
       xplace += FlowSpace(line->line.Flow, line->line.Contents+pos.bytes, data);

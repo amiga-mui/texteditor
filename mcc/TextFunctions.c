@@ -30,9 +30,6 @@
 
 long MyTextLength(struct TextFont *font, char *text, long length)
 {
-  register UWORD    stringlength = 0;
-  register short    *spacing;
-  register short    *kerning;
   long res = 0;
 
   ENTER();
@@ -41,16 +38,17 @@ long MyTextLength(struct TextFont *font, char *text, long length)
   {
     if(font->tf_Flags & FPF_PROPORTIONAL)
     {
-      register unsigned char  current;
+      long stringlength = 0;
+      short *spacing = ((short *)font->tf_CharSpace) - font->tf_LoChar;
+      short *kerning = ((short *)font->tf_CharKern) - font->tf_LoChar;
+      unsigned char current;
 
-      spacing = (short *)font->tf_CharSpace - font->tf_LoChar;
-      kerning = (short *)font->tf_CharKern - font->tf_LoChar;
-      length++;
-
-      while(--length > 0)
+      while(--length >= 0)
       {
-        current = *text++;
-        stringlength += *(spacing+current) + *(kerning+current);
+        current = *text;
+        stringlength += spacing[current] + kerning[current];
+
+        text++;
       }
 
       res = stringlength;
@@ -65,10 +63,6 @@ long MyTextLength(struct TextFont *font, char *text, long length)
 
 long MyTextFit(struct TextFont *font, char *text, long length, long width, UNUSED long direction)
 {
-  register int  stringlength = 0;
-  register UWORD charsthatfit = length;
-  register short *spacing;
-  register short *kerning;
   long res = 0;
 
   ENTER();
@@ -77,16 +71,20 @@ long MyTextFit(struct TextFont *font, char *text, long length, long width, UNUSE
   {
     if(font->tf_Flags & FPF_PROPORTIONAL)
     {
-      register unsigned char current;
+      int  stringlength = 0;
+      long charsthatfit = length;
+      short *spacing = ((short *)font->tf_CharSpace) - font->tf_LoChar;
+      short *kerning = ((short *)font->tf_CharKern) - font->tf_LoChar;
+      unsigned char current;
 
-      spacing = (short *)font->tf_CharSpace - font->tf_LoChar;
-      kerning = (short *)font->tf_CharKern - font->tf_LoChar;
       length++;
 
       while((stringlength < width) && (--length) > 0)
       {
-        current = *text++;
-        stringlength += *(spacing+current) + *(kerning+current);
+        current = *text;
+        stringlength += spacing[current] + kerning[current];
+
+        text++;
       }
 
       res = charsthatfit-length;

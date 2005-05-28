@@ -197,7 +197,13 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
         {
           cursor = TRUE;
           blockstart = MyTextLength(data->font, text+x, data->CPos_X-x);
-          blockwidth = (data->CursorWidth == 6) ? MyTextLength(data->font, (*(text+data->CPos_X) == '\n') ? (char *)"n" : (char *)(text+data->CPos_X), 1) : data->CursorWidth;
+
+          // calculate the cursor width
+          // if it is set to 6 then we should find out how the width of the current char is
+          if(data->CursorWidth == 6)
+            blockwidth = MyTextLength(data->font, (*(text+data->CPos_X) < ' ') ? (char *)" " : (char *)(text+data->CPos_X), 1);
+          else
+            blockwidth = data->CursorWidth;
         }
       }
 

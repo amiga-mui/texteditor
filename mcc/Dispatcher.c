@@ -533,6 +533,8 @@ DISPATCHERPROTO(_Dispatcher)
   BOOL  areamarked  = Enabled(data);
   ULONG result;
 
+  ENTER();
+
 //  kprintf("Method: 0x%lx\n", msg->MethodID);
 //  kprintf("Stack usage: %ld\n", (ULONG)FindTask(NULL)->tc_SPUpper - (ULONG)FindTask(NULL)->tc_SPReg);
   if(data->shown && !(data->flags & FLG_Draw))
@@ -554,27 +556,21 @@ DISPATCHERPROTO(_Dispatcher)
         MUI_Redraw(obj, MADF_DRAWUPDATE);
         result = (ULONG)data->UpdateInfo;
         data->UpdateInfo = NULL;
+
+        RETURN(result);
         return(result);
     }
   }
 
   switch(msg->MethodID)
   {
-    case OM_NEW:
-      return(New(cl, obj, (struct opSet *)msg));
-    case MUIM_Setup:
-      return(Setup(cl, obj, (struct MUI_RenderInfo *)msg));
-    case MUIM_Show:
-      return(Show(cl, obj, msg));
-    case MUIM_AskMinMax:
-      return(AskMinMax(cl, obj, (struct MUIP_AskMinMax *)msg));
-    case MUIM_Draw:
-      return(mDraw(cl, obj, (struct MUIP_Draw *)msg));
-    case OM_GET:
-      return(Get(cl, obj, (struct opGet *)msg));
-    case OM_SET:
-      result = Set(cl, obj, (struct opSet *)msg);
-      break;
+    case OM_NEW:          result = New(cl, obj, (struct opSet *)msg); RETURN(result); return(result); break;
+    case MUIM_Setup:      result = Setup(cl, obj, (struct MUI_RenderInfo *)msg); RETURN(result); return(result); break;
+    case MUIM_Show:       result = Show(cl, obj, msg); RETURN(result); return(result); break;
+    case MUIM_AskMinMax:  result = AskMinMax(cl, obj, (struct MUIP_AskMinMax *)msg); RETURN(result); return(result); break;
+    case MUIM_Draw:       result = mDraw(cl, obj, (struct MUIP_Draw *)msg); RETURN(result); return(result); break;
+    case OM_GET:          result = Get(cl, obj, (struct opGet *)msg); RETURN(result); return(result); break;
+    case OM_SET:          result = Set(cl, obj, (struct opSet *)msg); break;
     case MUIM_HandleEvent:
     {
       ULONG oldx = data->CPos_X;
@@ -583,7 +579,10 @@ DISPATCHERPROTO(_Dispatcher)
 
       result = HandleInput(cl, obj, (struct MUIP_HandleEvent *)msg);
       if(result == 0)
+      {
+        RETURN(0);
         return(0);
+      }
 
       data->NoNotify = TRUE;
       
@@ -619,6 +618,8 @@ DISPATCHERPROTO(_Dispatcher)
       }
 
       DoSuperMethodA(cl, obj, msg);
+
+      RETURN(TRUE);
       return(TRUE);
     }
     break;
@@ -651,53 +652,37 @@ DISPATCHERPROTO(_Dispatcher)
       SetCursor(data->CPos_X, data->actualline, FALSE, data);
 
       DoSuperMethodA(cl, obj, msg);
+
+      RETURN(TRUE);
       return(TRUE);
     }
     break;
 
-    case MUIM_Hide:
-      return(Hide(cl, obj, msg));
-    case MUIM_Cleanup:
-      return(Cleanup(cl, obj, msg));
-    case OM_DISPOSE:
-      return(Dispose(cl, obj, msg));
-    case MUIM_TextEditor_ClearText:
-      result = ClearText(data);
-      break;
-    case MUIM_TextEditor_ToggleCursor:
-      return(ToggleCursor(data));
-    case MUIM_TextEditor_InputTrigger:
-      result = InputTrigger(cl, data);
-      break;
+    case MUIM_Hide:                     result = Hide(cl, obj, msg); RETURN(result); return(result); break;
+    case MUIM_Cleanup:                  result = Cleanup(cl, obj, msg); RETURN(result); return(result); break;
+    case OM_DISPOSE:                    result = Dispose(cl, obj, msg); RETURN(result); return(result); break;
+    case MUIM_TextEditor_ClearText:     result = ClearText(data); break;
+    case MUIM_TextEditor_ToggleCursor:  result = ToggleCursor(data); RETURN(result); return(result); break;
+    case MUIM_TextEditor_InputTrigger:  result = InputTrigger(cl, data);  break;
     case MUIM_TextEditor_InsertText:
-      {
-          struct marking block;
+    {
+      struct marking block;
 
-        block.startx = data->CPos_X,
-        block.startline = data->actualline,
-        result = InsertText(data, (STRPTR)*((long *)msg+1), TRUE);
-        block.stopx = data->CPos_X,
-        block.stopline = data->actualline,
-        AddToUndoBuffer(pasteblock, (char *)&block, data);
-        break;
-      }
-    case MUIM_TextEditor_ExportText:
-      return((ULONG)ExportText(data->firstline, data->ExportHook, data->ExportWrap));
-    case MUIM_TextEditor_ARexxCmd:
-      result = HandleARexx(data, (char *)*((long *)msg+1));
-      break;
-    case MUIM_TextEditor_MarkText:
-      result = OM_MarkText((struct MUIP_TextEditor_MarkText *)msg, data);
-      break;
-    case MUIM_TextEditor_BlockInfo:
-      result = OM_BlockInfo((struct MUIP_TextEditor_BlockInfo *)msg, data);
-      break;
-    case MUIM_TextEditor_Search:
-      result = OM_Search((struct MUIP_TextEditor_Search *)msg, data);
-      break;
-    case MUIM_TextEditor_Replace:
-      result = OM_Replace(obj, (struct MUIP_TextEditor_Replace *)msg, data);
-      break;
+      block.startx = data->CPos_X,
+      block.startline = data->actualline,
+      result = InsertText(data, (STRPTR)*((long *)msg+1), TRUE);
+      block.stopx = data->CPos_X,
+      block.stopline = data->actualline,
+      AddToUndoBuffer(pasteblock, (char *)&block, data);
+    }
+    break;
+
+    case MUIM_TextEditor_ExportText:  result = (ULONG)ExportText(data->firstline, data->ExportHook, data->ExportWrap); RETURN(result); return(result); break;
+    case MUIM_TextEditor_ARexxCmd:    result = HandleARexx(data, (char *)*((long *)msg+1)); break;
+    case MUIM_TextEditor_MarkText:    result = OM_MarkText((struct MUIP_TextEditor_MarkText *)msg, data); break;
+    case MUIM_TextEditor_BlockInfo:   result = OM_BlockInfo((struct MUIP_TextEditor_BlockInfo *)msg, data); break;
+    case MUIM_TextEditor_Search:      result = OM_Search((struct MUIP_TextEditor_Search *)msg, data); break;
+    case MUIM_TextEditor_Replace:     result = OM_Replace(obj, (struct MUIP_TextEditor_Replace *)msg, data); break;
 
     case MUIM_Export:
     {
@@ -733,7 +718,12 @@ DISPATCHERPROTO(_Dispatcher)
     break;
 
     default:
-      return(DoSuperMethodA(cl, obj, msg));
+    {
+      result = DoSuperMethodA(cl, obj, msg);
+
+      RETURN(result);
+      return(result);
+    }
   }
 
   if(t_haschanged != data->HasChanged)
@@ -743,11 +733,15 @@ DISPATCHERPROTO(_Dispatcher)
 
   if(msg->MethodID == OM_SET)
   {
-      ULONG newresult = DoSuperMethodA(cl, obj, msg);
+    ULONG newresult = DoSuperMethodA(cl, obj, msg);
 
     if(result)
-        result = newresult;
-    else  return(newresult);
+      result = newresult;
+    else
+    {
+      RETURN(newresult);
+      return(newresult);
+    }
   }
 
   if((data->visual_y != t_visual_y) || (data->totallines != t_totallines))
@@ -766,7 +760,7 @@ DISPATCHERPROTO(_Dispatcher)
   data->NoNotify = TRUE;
   if(Enabled(data))
   {
-      struct marking newblock;
+    struct marking newblock;
 
     NiceBlock(&data->blockinfo, &newblock);
     data->Pen = GetColor(data->blockinfo.stopx - ((data->blockinfo.stopx && newblock.startx == data->blockinfo.startx && newblock.startline == data->blockinfo.startline) ? 1 : 0), data->blockinfo.stopline);
@@ -798,7 +792,7 @@ DISPATCHERPROTO(_Dispatcher)
   data->NoNotify = FALSE;
   UpdateStyles(data);
 
-//  kprintf("               result 0x%lx\n", result);
+  RETURN(result);
   return(result);
 }
 

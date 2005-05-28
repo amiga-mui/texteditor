@@ -184,7 +184,7 @@ LONG LineCharsWidth(char *text, struct InstData *data)
 
   ENTER();
 
-  w -= (data->CursorWidth == 6) ? MyTextLength(data->font, "n", 1) : data->CursorWidth;
+  w -= (data->CursorWidth == 6) ? MyTextLength(data->font, " ", 1) : data->CursorWidth;
   c = MyTextFit(data->font, text, strlen(text)-1, w, 1);
 
   if(c == 0 || text[c] == '\n' || (data->flags & FLG_HScroll))
@@ -302,19 +302,19 @@ void  OffsetToLines (LONG x, struct line_node *line, struct pos_info *pos, struc
 /*------------------*
  * Place the cursor *
  *------------------*/
-void  SetCursor   (LONG x, struct line_node *line, long Set, struct InstData *data)
+void SetCursor(LONG x, struct line_node *line, long Set, struct InstData *data)
 {
-  LONG    line_nr;
-  struct  pos_info pos;
-  ULONG   xplace, yplace, cursorxplace;
-  UWORD   cursor_width;
-  BOOL    clipping = FALSE;
+  unsigned char chars[4] = "   \0";
+  LONG   line_nr;
+  struct pos_info pos;
+  ULONG  xplace, yplace, cursorxplace;
+  UWORD  cursor_width;
+  BOOL   clipping = FALSE;
 
-  UWORD   styles[3] = {0, 0, 0};
-  UWORD   colors[3] = {0, 0, 0};
-  UBYTE   chars[3]  = {' ', ' ', ' '};
-  WORD    start = 0, stop = 0;
-  LONG    c;
+  UWORD styles[3] = {0, 0, 0};
+  UWORD colors[3] = {0, 0, 0};
+  WORD  start = 0, stop = 0;
+  LONG  c;
 
   ENTER();
 
@@ -335,17 +335,21 @@ void  SetCursor   (LONG x, struct line_node *line, long Set, struct InstData *da
     {
       if(x+c >= pos.bytes && x+c < pos.extra-1)
       {
-        if(c < start)
-          start = c;
-        if(c > stop)
-          stop = c;
+        if(c < start) start = c;
+        if(c > stop)  stop = c;
+
         styles[c+1] = convert(GetStyle(x+c, line));
         colors[c+1] = GetColor(x+c, line);
         chars[c+1] = line->line.Contents[x+c];
       }
     }
 
-    cursor_width = (data->CursorWidth == 6) ? MyTextLength(data->font, (line->line.Contents[x] == '\n') ? (char *)"n" : (char *)&chars[1], 1) : data->CursorWidth;
+    // calculate the cursor width
+    // if it is set to 6 then we should find out how the width of the current char is
+    if(data->CursorWidth == 6)
+      cursor_width = MyTextLength(data->font, chars[1] < ' ' ? (char *)" " : (char *)&chars[1], 1);
+    else
+      cursor_width = data->CursorWidth;
 
     xplace  = data->xpos + MyTextLength(data->font, line->line.Contents+(x-pos.x), pos.x+start);
     xplace += FlowSpace(line->line.Flow, line->line.Contents+pos.bytes, data);
@@ -353,8 +357,12 @@ void  SetCursor   (LONG x, struct line_node *line, long Set, struct InstData *da
     cursorxplace = xplace + MyTextLength(data->font, line->line.Contents+(x+start), 0-start);
 
     /* if font is anti aliased, clear area near the cursor first */
-    if (data->font->tf_Style & FSF_ANTIALIASED)
-      DoMethod(data->object, MUIM_DrawBackground, xplace, yplace, MyTextLength(data->font,chars,stop-start+1), data->height, cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0), ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2));
+    if(data->font->tf_Style & FSF_ANTIALIASED)
+      DoMethod(data->object, MUIM_DrawBackground, xplace, yplace,
+                                                  MyTextLength(data->font, start == 0 ? chars+1 : chars, stop-start+1), data->height,
+                                                  cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0),
+                                                  ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2),
+                                                  0);
 
     if(Set)
     {
@@ -365,15 +373,20 @@ void  SetCursor   (LONG x, struct line_node *line, long Set, struct InstData *da
     else
     {
       /* Clear the place of the cursor, if not already done, because font is anti aliased */
-    	if (!(data->font->tf_Style & FSF_ANTIALIASED))
-        DoMethod(data->object, MUIM_DrawBackground, cursorxplace, yplace, cursor_width, data->height, cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0), ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2));
+    	if(!(data->font->tf_Style & FSF_ANTIALIASED))
+        DoMethod(data->object, MUIM_DrawBackground, cursorxplace, yplace,
+                                                    cursor_width, data->height,
+                                                    cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0),
+                                                    ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2),
+                                                    0);
     }
 
     SetDrMd(data->rport, JAM1);
     SetFont(data->rport, data->font);
     Move(data->rport, xplace, yplace+data->rport->TxBaseline);
 
-    if((data->font->tf_Flags & FPF_PROPORTIONAL) && ((LONG)(xplace + *((short *)data->font->tf_CharKern-data->font->tf_LoChar+chars[1+start])) < data->xpos))
+    if((data->font->tf_Flags & FPF_PROPORTIONAL) &&
+       ((LONG)(xplace + *((short *)data->font->tf_CharKern-data->font->tf_LoChar+chars[1+start])) < data->xpos))
     {
       clipping = TRUE;
       AddClipping(data);
@@ -389,10 +402,10 @@ void  SetCursor   (LONG x, struct line_node *line, long Set, struct InstData *da
     /* This is really bad code!!! */
     if(line->line.Separator)
     {
-        WORD  LeftX, LeftWidth,
-            RightX, RightWidth,
-            Y, Height;
-        UWORD flow = FlowSpace(line->line.Flow, line->line.Contents+pos.bytes, data);
+      WORD LeftX, LeftWidth;
+      WORD RightX, RightWidth;
+      WORD Y, Height;
+      UWORD flow = FlowSpace(line->line.Flow, line->line.Contents+pos.bytes, data);
 
       LeftX = data->xpos;
       LeftWidth = flow-3;
