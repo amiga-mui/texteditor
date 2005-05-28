@@ -42,7 +42,7 @@ OPTFLAGS = -O3 -finline-functions -fomit-frame-pointer -funroll-loops
 DEBUG    = -DDEBUG -g -O0
 CFLAGS   = -noixemul -I. -I../mcc -I../includes $(CPU) $(CPUFLAGS) $(WARN) $(OPTFLAGS)\
            $(DEBUG) -c
-LDFLAGS  = -noixemul -nostartfiles
+LDFLAGS  = -noixemul -nostartfiles $(CPU)
 LDLIBS   = -ldebug
 
 # CPU and DEBUG can be defined outside, defaults to above
