@@ -7,6 +7,9 @@ $Source$
 
 2005-05-28  Jens Langner <Jens.Langner@light-speed.de>
 
+    * mcc/Dispatcher.c, mcc/HandleInput.c: fixed bug #1178168 where upon switching
+      from another gadget to a texteditor object via the TAB key automatically
+      caused that a TAB key is inserted into the text.
     * mcc/HandleInput.c: implemented wheel-mouse event recognition via the rawkey
       based NEWMOUSE standard. Now, each TextEditor.mcc object should allow to
       use an existing wheel-mouse to scroll text up/down. Previously each

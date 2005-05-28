@@ -59,8 +59,13 @@ static ULONG RAWToANSI(struct IntuiMessage *imsg)
 ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
+  BOOL wasActivated;
 
   ENTER();
+
+  // check if the gadget was activate recently (via TAB key?)
+  wasActivated = (data->flags & FLG_Activated) == FLG_Activated;
+  data->flags &= ~FLG_Activated; // clear the activated flag immediately
 
   if((msg->muikey == MUIKEY_UP) && data->KeyUpFocus && _win(obj) && (data->firstline == data->actualline))
   {
@@ -73,13 +78,14 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
           (msg->muikey != MUIKEY_GADGET_PREV) && (msg->muikey != MUIKEY_GADGET_NEXT) && // if the user moves to another obj with TAB
           (msg->muikey != MUIKEY_GADGET_OFF)) // user deselected gadget with CTRL+TAB
   {
-    ULONG activeobj, defaultobj;
+    Object *activeobj;
+    Object *defaultobj;
   	struct IntuiMessage *imsg = msg->imsg;
 
     get(_win(obj), MUIA_Window_ActiveObject, &activeobj);
     get(_win(obj), MUIA_Window_DefaultObject, &defaultobj);
 
-    if(data->CtrlChar && activeobj != (ULONG)obj && defaultobj != (ULONG)obj && RAWToANSI(imsg) == data->CtrlChar)
+    if(data->CtrlChar && activeobj != obj && defaultobj != obj && RAWToANSI(imsg) == data->CtrlChar)
     {
       set(_win(obj), MUIA_Window_ActiveObject, obj);
 
@@ -87,8 +93,8 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
       return(MUI_EventHandlerRC_Eat);
     }
 
-    if((imsg->Class == IDCMP_MOUSEBUTTONS) || (activeobj == (ULONG)obj) ||
-       (data->flags & FLG_ReadOnly && defaultobj == (ULONG)obj && !activeobj))
+    if((imsg->Class == IDCMP_MOUSEBUTTONS) || (activeobj == obj) ||
+       (data->flags & FLG_ReadOnly && defaultobj == obj && !activeobj))
     {
       if(!(data->flags & FLG_Draw))
       {
@@ -103,7 +109,8 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
       {
         case IDCMP_RAWKEY:
         {
-          if(data->ypos != data->realypos)
+          if(data->ypos != data->realypos ||
+             (wasActivated && imsg->Code == 66)) // ignore TAB key if the gadget was activated recently
           {
             RETURN(MUI_EventHandlerRC_Eat);
             return(MUI_EventHandlerRC_Eat);
