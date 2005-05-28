@@ -121,7 +121,8 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 
     			// we check wheter the mouse is currently within our object borders
           // and if so we check wheter the newmouse wheel stuff is used or not
-          if(_isinwholeobject(obj, imsg->MouseX, imsg->MouseY))
+          if(data->slider &&
+             _isinwholeobject(obj, imsg->MouseX, imsg->MouseY))
     			{
 		    		// MouseWheel events are only possible if the mouse is above the
 				    // object
