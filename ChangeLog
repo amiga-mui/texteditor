@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-06-01  Jens Langner <Jens.Langner@light-speed.de>
+
+    * mcc/GetSetAttrs.c: if MUIA_Disabled is used on a TextEditor object, an
+      existing slider was not automatically disabled as well. bug #1212811
+
 #### v15.12 RELEASE ############################################################
 
 2005-05-28  Jens Langner <Jens.Langner@light-speed.de>
