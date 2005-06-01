@@ -255,8 +255,14 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
       case MUIA_Disabled:
 #endif
         if(ti_Data)
-            data->flags |= FLG_Ghosted;
-        else  data->flags &= ~FLG_Ghosted;
+          data->flags |= FLG_Ghosted;
+        else
+          data->flags &= ~FLG_Ghosted;
+
+        // make sure an eventually existing slider is disabled as well
+        if(data->slider)
+          set(data->slider, MUIA_Disabled, ti_Data);
+
 #ifndef ClassAct
 
         MUI_Redraw(obj, MADF_DRAWOBJECT);
