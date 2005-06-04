@@ -68,8 +68,7 @@ MCPOBJS = $(OBJDIR)/library.o \
           $(OBJDIR)/Dispatcher.o \
           $(OBJDIR)/Keybindings.o \
           $(OBJDIR)/KeyStorage.o \
-          $(OBJDIR)/ObjectCreator.o \
-          $(OBJDIR)/UserKeys.o
+          $(OBJDIR)/ObjectCreator.o
 
 PREFOBJS= $(OBJDIR)/locale.o \
           $(OBJDIR)/CreatePrefsGroup.o \
@@ -78,7 +77,6 @@ PREFOBJS= $(OBJDIR)/locale.o \
           $(OBJDIR)/Keybindings.o \
           $(OBJDIR)/KeyStorage.o \
           $(OBJDIR)/ObjectCreator.o \
-          $(OBJDIR)/UserKeys.o \
           $(OBJDIR)/Preference.o
 
 #

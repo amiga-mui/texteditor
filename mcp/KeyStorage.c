@@ -39,33 +39,36 @@
 
 #include "private.h"
 
+#define KEYS_COUNT (52)
+
 void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage)
 {
-    static const STRPTR ratemplate =
-          "LSHIFT/S,RSHIFT/S,CAPSLOCK/S,CONTROL=CTRL/S,LALT/S,RALT/S,LAMIGA=LCOMMAND/S,RAMIGA=RCOMMAND/S,NUMPAD=NUMERICPAD/S,SHIFT/S,ALT/S,AMIGA=COMMAND/S,"
-          "f1/S,f2/S,f3/S,f4/S,f5/S,f6/S,f7/S,f8/S,f9/S,f10/S,"
-          "help/S,"
-          "up/S,down/S,right/S,left/S,"
-          "escape=esc/S,tab/S,return=enter/S,space/S,backspace=bs/S,delete=del/S,key/F";
-    LONG    args[43];
-    struct RDArgs *ra_result;
-    struct RDArgs *myrdargs;
-    ULONG count = 0;
+  LONG args[KEYS_COUNT];
+  struct RDArgs *ra_result;
+  struct RDArgs *myrdargs;
+  ULONG count = 0;
+
+  static const STRPTR ratemplate =
+    "LSHIFT/S,RSHIFT/S,CAPSLOCK/S,CONTROL=CTRL/S,LALT/S,RALT/S,LAMIGA=LCOMMAND/S,RAMIGA=RCOMMAND/S,NUMPAD=NUMERICPAD/S,SHIFT/S,ALT/S,AMIGA=COMMAND/S,"
+    "f1/S,f2/S,f3/S,f4/S,f5/S,f6/S,f7/S,f8/S,f9/S,f10/S,f11/S,f12/S"
+    "help/S,"
+    "up/S,down/S,right/S,left/S,"
+    "home/S,end/S,page_up=pageup/S,page_down=pagedown/S,insert/S,scrolllock=scrlock/S,printscreen=prtscr/S,break=pause/S,"
+    "escape=esc/S,tab/S,return=enter/S,space/S,backspace=bs/S,delete=del/S,key/F";
 
   storage->vanilla = FALSE;
   storage->key = 0;
   storage->qualifier = 0;
   storage->action = action;
 
-  while(count < 43)
-  {
+  // clear all args
+  while(count < KEYS_COUNT)
     args[count++] = 0L;
-  }
 
   if((myrdargs = AllocDosObject(DOS_RDARGS, NULL)))
   {
-      ULONG length = strlen(keystring);
-      STRPTR buffer;
+    ULONG length = strlen(keystring);
+    unsigned char *buffer;
 
     if((buffer = AllocMem(length+2, MEMF_ANY)))
     {
@@ -79,9 +82,9 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
 
       if((ra_result = ReadArgs(ratemplate, args, myrdargs)))
       {
-          ULONG qual = 1;
+        ULONG qual = 1;
 
-        /* Scan for qualifier */
+        // Scan for 12 qualifier keys
         for(count = 0;count < 12;count++)
         {
           if(args[count])
@@ -91,22 +94,47 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
           qual = qual << 1;
         }
 
-        /* Scan for F-keys */
+        // Scan for the 10 standard F-keys (f1-f10)
         for(;count < 22;count++)
         {
           if(args[count])
-            storage->key = count+68;
+            storage->key = count+0x44;
         }
 
+        // Scan for the 2 extended f-keys (f11,f12)
         if(args[count++])
-          storage->key = 95;    /* Help */
+          storage->key = RAWKEY_F11;
+        if(args[count++])
+          storage->key = RAWKEY_F12;
 
-        /* Scan for cursor-keys */
+        // Help
+        if(args[count++])
+          storage->key = RAWKEY_HELP;
+
+        // Scan for cursor-keys
         for(;count < 27;count++)
         {
           if(args[count])
-            storage->key = count+53;
+            storage->key = count+0x35;
         }
+
+        // scan for the other extended (non-standard) keys
+        if(args[count++])
+          storage->key = RAWKEY_HOME;
+        if(args[count++])
+          storage->key = RAWKEY_END;
+        if(args[count++])
+          storage->key = RAWKEY_PAGEUP;
+        if(args[count++])
+          storage->key = RAWKEY_PAGEDOWN;
+        if(args[count++])
+          storage->key = RAWKEY_INSERT;
+        if(args[count++])
+          storage->key = RAWKEY_SCRLOCK;
+        if(args[count++])
+          storage->key = RAWKEY_PRINTSCR;
+        if(args[count++])
+          storage->key = RAWKEY_BREAK;
 
         if(!storage->key)
         {
@@ -140,6 +168,8 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
 void KeyToString (STRPTR buffer, struct KeyAction *ka)
 {
   buffer[0] = '\0';
+
+  // lets first put the qualifiers in our buffer string
   if(ka->qualifier & IEQUALIFIER_LSHIFT)
     strcat(buffer, "lshift ");
   if(ka->qualifier & IEQUALIFIER_RSHIFT)
@@ -158,7 +188,6 @@ void KeyToString (STRPTR buffer, struct KeyAction *ka)
     strcat(buffer, "rcommand ");
   if(ka->qualifier & IEQUALIFIER_NUMERICPAD)
     strcat(buffer, "numpad ");
-
   if(ka->qualifier & IEQUALIFIER_SHIFT)
     strcat(buffer, "shift ");
   if(ka->qualifier & IEQUALIFIER_ALT)
@@ -166,83 +195,58 @@ void KeyToString (STRPTR buffer, struct KeyAction *ka)
   if(ka->qualifier & IEQUALIFIER_COMMAND)
     strcat(buffer, "command ");
 
+  // then we check wheter this are vanilla key codes or RAWKEY codes
   if(ka->vanilla)
   {
-      UBYTE key = ka->key;
-
-    switch(key)
+    switch(ka->key)
     {
-      case 8:
-        strcat(buffer, "backspace");
-        break;
-      case 9:
-        strcat(buffer, "tab");
-        break;
-      case 13:
-        strcat(buffer, ((ka->qualifier & IEQUALIFIER_NUMERICPAD) ? "enter" : "return"));
-        break;
-      case 27:
-        strcat(buffer, "esc");
-        break;
-      case 32:
-        strcat(buffer, "space");
-        break;
-      case 0x7f:
-        strcat(buffer, "del");
-        break;
+      case 8:   strcat(buffer, "backspace"); break;
+      case 9:   strcat(buffer, "tab"); break;
+      case 13:  strcat(buffer, ((ka->qualifier & IEQUALIFIER_NUMERICPAD) ? "enter" : "return")); break;
+      case 27:  strcat(buffer, "esc"); break;
+      case 32:  strcat(buffer, "space"); break;
+      case 0x7f:strcat(buffer, "del"); break;
+
       default:
-        strncat(buffer, &key, 1);
+      {
+        char *p = &buffer[strlen(buffer)];
+
+        *p = ka->key;
+        p++;
+        *p = '\0';
+      }
     }
   }
   else
   {
     switch(ka->key)
     {
-      case 76:
-        strcat(buffer, "up");
-        break;
-      case 77:
-        strcat(buffer, "down");
-        break;
-      case 78:
-        strcat(buffer, "right");
-        break;
-      case 79:
-        strcat(buffer, "left");
-        break;
-      case 80:
-        strcat(buffer, "f1");
-        break;
-      case 81:
-        strcat(buffer, "f2");
-        break;
-      case 82:
-        strcat(buffer, "f3");
-        break;
-      case 83:
-        strcat(buffer, "f4");
-        break;
-      case 84:
-        strcat(buffer, "f5");
-        break;
-      case 85:
-        strcat(buffer, "f6");
-        break;
-      case 86:
-        strcat(buffer, "f7");
-        break;
-      case 87:
-        strcat(buffer, "f8");
-        break;
-      case 88:
-        strcat(buffer, "f9");
-        break;
-      case 89:
-        strcat(buffer, "f10");
-        break;
-      case 95:
-        strcat(buffer, "help");
-        break;
+      case RAWKEY_CRSRUP:     strcat(buffer, "up"); break;
+      case RAWKEY_CRSRDOWN:   strcat(buffer, "down"); break;
+      case RAWKEY_CRSRRIGHT:  strcat(buffer, "right"); break;
+      case RAWKEY_CRSRLEFT:   strcat(buffer, "left"); break;
+      case RAWKEY_F1:         strcat(buffer, "f1"); break;
+      case RAWKEY_F2:         strcat(buffer, "f2"); break;
+      case RAWKEY_F3:         strcat(buffer, "f3"); break;
+      case RAWKEY_F4:         strcat(buffer, "f4"); break;
+      case RAWKEY_F5:         strcat(buffer, "f5"); break;
+      case RAWKEY_F6:         strcat(buffer, "f6"); break;
+      case RAWKEY_F7:         strcat(buffer, "f7"); break;
+      case RAWKEY_F8:         strcat(buffer, "f8"); break;
+      case RAWKEY_F9:         strcat(buffer, "f9"); break;
+      case RAWKEY_F10:        strcat(buffer, "f10"); break;
+      case RAWKEY_F11:        strcat(buffer, "f11"); break;
+      case RAWKEY_F12:        strcat(buffer, "f12"); break;
+      case RAWKEY_HELP:       strcat(buffer, "help"); break;
+      case RAWKEY_HOME:       strcat(buffer, "home"); break;
+      case RAWKEY_END:        strcat(buffer, "end"); break;
+      case RAWKEY_PAGEUP:     strcat(buffer, "page_up"); break;
+      case RAWKEY_PAGEDOWN:   strcat(buffer, "page_down"); break;
+      case RAWKEY_INSERT:     strcat(buffer, "insert"); break;
+      case RAWKEY_SCRLOCK:    strcat(buffer, "scrolllock"); break;
+      case RAWKEY_PRINTSCR:   strcat(buffer, "printscreen"); break;
+      case RAWKEY_BREAK:      strcat(buffer, "break"); break;
+
       default:
         strcat(buffer, "???");
     }

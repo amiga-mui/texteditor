@@ -168,7 +168,7 @@ HOOKPROTONHNO(SelectCode, void, APTR **array)
   
   if(entry)
   {
-    UBYTE buffer[100];
+    char buffer[100];
     struct KeyAction ka;
     ULONG result;
 

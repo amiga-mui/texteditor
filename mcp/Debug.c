@@ -28,6 +28,7 @@
 
 #include <proto/intuition.h>
 #include <proto/utility.h>
+#include <proto/dos.h>
 
 #include "SDI_compiler.h"
 #include "Debug.h"
@@ -53,14 +54,15 @@ static ULONG debug_classes = DBC_ERROR | DBC_DEBUG | DBC_WARNING | DBC_ASSERT | 
 
 void SetupDebug(void)
 {
-  char *debug;
+  char var[256];
 
   kprintf("** TextEditor.mcc v" LIB_REV_STRING " startup ***********************\n");
   kprintf("Initializing runtime debugging:\n");
 
-	if((debug = getenv("texteditor.mcp.debug")))
+	if(GetVar("texteditor.mcp.debug", var, sizeof(var), 0) > 0)
 	{
 		char *tok;
+    char *debug = var;
 
     // static list of our debugging classes tokens.
     // in the yamdebug variable these classes always start with a @
