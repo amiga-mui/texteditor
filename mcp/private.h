@@ -47,6 +47,28 @@
 #define IEQUALIFIER_ALT     0x0400
 #define IEQUALIFIER_COMMAND 0x0800
 
+// proper RAWKEY_ defines were first introduced in OS4 and MorphOS
+// and unfortunately they are also a bit different, so lets
+// prepare an alternate table for it
+#if defined(__amigaos4__)
+#include <proto/keymap.h>
+
+#define RAWKEY_SCRLOCK    RAWKEY_MENU
+
+#elif defined(__MORPHOS__)
+#include <devices/rawkeycodes.h>
+
+#define RAWKEY_CRSRUP     RAWKEY_UP
+#define RAWKEY_CRSRDOWN   RAWKEY_DOWN
+#define RAWKEY_CRSRRIGHT  RAWKEY_RIGHT
+#define RAWKEY_CRSRLEFT   RAWKEY_LEFT
+#define RAWKEY_PRINTSCR   RAWKEY_PRTSCREEN
+#define RAWKEY_BREAK      RAWKEY_PAUSE
+
+#else
+
+#endif
+
 enum
 {
   mUp, mDown, mLeft, mRight, mPreviousPage, mNextPage,
@@ -104,8 +126,8 @@ struct InstData_MCP
 
 struct KeyAction
 {
-  BOOL  vanilla;
-  UWORD key;
+  BOOL vanilla;
+  unsigned int key;
   ULONG qualifier;
   UWORD action;
 };
