@@ -7,6 +7,12 @@ $Source$
 
 2005-06-04  Jens Langner <Jens.Langner@light-speed.de>
 
+    * mcc/ImportHook.c: reworked the MIME/Email based ImportHook to properly
+      recognize the ESC sequences like the plain import hook does. This in fact
+      seems to be the same behaviour than the old 68k ASM based ImportHooks had.
+      Also improved the termination/recognition of the /,*,#,_ chars to make it
+      possible to set soft styles on a particular text. This should also fix
+      bug #1210745.
     * mcp: added keycodes for the extended keys available in AmigaOS4/MorphOS for
       example. Now keys like PAGE_UP/PAGE_DOWN are properly recognized by the
       preference pane and more intuitively configurable.

@@ -99,11 +99,16 @@ struct line_node *ImportText(char *contents, void *mempool, struct Hook *importH
 			break;
 		}
 
-		if (!(new_line = AllocPooled(mempool,sizeof(struct line_node))))
+		if(!(new_line = AllocPooled(mempool,sizeof(struct line_node))))
 			break;
+
 		memset(new_line,0,sizeof(*new_line));
-		/* Inherit the flow from the previous line */
-		new_line->line.Flow = line->line.Flow;
+
+		// Inherit the flow from the previous line, but only if
+    // the clearFlow variable is not set
+    if(line->line.clearFlow == FALSE)
+  		new_line->line.Flow = line->line.Flow;
+
 		new_line->previous = line;
 		line->next = new_line;
 		line = new_line;
