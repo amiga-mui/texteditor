@@ -211,7 +211,8 @@ struct LineNode
   UWORD    *Colors;       /* The colors to use (allocated via the poolhandle) the format is: pos,color,pos,color,...,-1,-0 */
   BOOL     Color;         /* Set this to TRUE if you want the line to be highlighted */
   UWORD    Flow;          /* Use the MUIV_TextEditor_Flow_xxx values... */
-  UWORD    Separator;     /* See definitions bellow */
+  UWORD    Separator;     /* See definitions below */
+  BOOL     clearFlow;     /* if the flow definition should be cleared on the next line */
 };
 
 /* Definitions for Separator type */
