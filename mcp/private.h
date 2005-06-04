@@ -67,6 +67,32 @@
 
 #else
 
+#define RAWKEY_INSERT    0x47 /* Not on classic keyboards */
+#define RAWKEY_PAGEUP    0x48 /* Not on classic keyboards */
+#define RAWKEY_PAGEDOWN  0x49 /* Not on classic keyboards */
+#define RAWKEY_F11       0x4B /* Not on classic keyboards */
+#define RAWKEY_CRSRUP    0x4C
+#define RAWKEY_CRSRDOWN  0x4D
+#define RAWKEY_CRSRRIGHT 0x4E
+#define RAWKEY_CRSRLEFT  0x4F
+#define RAWKEY_F1        0x50
+#define RAWKEY_F2        0x51
+#define RAWKEY_F3        0x52
+#define RAWKEY_F4        0x53
+#define RAWKEY_F5        0x54
+#define RAWKEY_F6        0x55
+#define RAWKEY_F7        0x56
+#define RAWKEY_F8        0x57
+#define RAWKEY_F9        0x58
+#define RAWKEY_F10       0x59
+#define RAWKEY_HELP      0x5F
+#define RAWKEY_SCRLOCK   0x6B /* Not on classic keyboards */
+#define RAWKEY_PRINTSCR  0x6D /* Not on classic keyboards */
+#define RAWKEY_BREAK     0x6E /* Not on classic keyboards */
+#define RAWKEY_F12       0x6F /* Not on classic keyboards */
+#define RAWKEY_HOME      0x70 /* Not on classic keyboards */
+#define RAWKEY_END       0x71 /* Not on classic keyboards */
+
 #endif
 
 enum
