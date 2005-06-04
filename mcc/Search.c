@@ -68,7 +68,7 @@ ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
 
   if(len && len <= 120)
   {
-    BYTE map[256];
+    char map[256];
 //    int (*StrCmp) (const char *, const char *, size_t);
     LONG (*StrCmp) (STRPTR, STRPTR, LONG);
 
@@ -89,8 +89,9 @@ ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
     if(msg->Flags & MUIF_TextEditor_Search_CaseSensitive)
     {
       StrCmp = Native_strncmp;
+
       while(*str)
-        map[*str++] = step--;
+        map[(int)(*str++)] = step--;
     }
     else
     {
@@ -108,7 +109,7 @@ ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
       STRPTR contents = line->line.Contents + cursor + len-1, upper = line->line.Contents + line->line.Length;
       while(contents < upper)
       {
-        skip = map[*contents];
+        skip = map[(int)(*contents)];
         contents += skip;
         if(skip <= 0)
         {

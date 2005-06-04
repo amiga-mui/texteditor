@@ -97,10 +97,10 @@ long Undo (struct InstData *data)
         RemoveChars(data->CPos_X, data->actualline, 1, data);
         break;
       case backspacechar:
-        PasteChars(data->CPos_X++, data->actualline, 1, &buffer->del.character, buffer, data);
+        PasteChars(data->CPos_X++, data->actualline, 1, (char *)&buffer->del.character, buffer, data);
         break;
       case deletechar:
-        PasteChars(data->CPos_X, data->actualline, 1, &buffer->del.character, buffer, data);
+        PasteChars(data->CPos_X, data->actualline, 1, (char *)&buffer->del.character, buffer, data);
         break;
       case splitline:
         MergeLines(data->actualline, data);
@@ -124,7 +124,7 @@ long Undo (struct InstData *data)
             char  *clip = GetBlock(&block, data);
 
           CutBlock2(data, FALSE, FALSE, &block, TRUE);
-          buffer->clip = clip;
+          buffer->clip = (unsigned char *)clip;
         }
         break;
       case deleteblock_nomove:
@@ -132,7 +132,7 @@ long Undo (struct InstData *data)
       case deleteblock:
       {
           struct Hook *oldhook = data->ImportHook;
-          char *clip = buffer->clip;
+          char *clip = (char *)buffer->clip;
 
           data->ImportHook = &ImPlainHook;
           InsertText(data, clip, crsr_move);
@@ -198,7 +198,7 @@ long Redo (struct InstData *data)
     switch(buffer->type)
     {
       case pastechar:
-        PasteChars(data->CPos_X++, data->actualline, 1, &buffer->del.character, buffer, data);
+        PasteChars(data->CPos_X++, data->actualline, 1, (char *)&buffer->del.character, buffer, data);
         break;
       case backspacechar:
       case deletechar:
@@ -216,7 +216,7 @@ long Redo (struct InstData *data)
             struct Hook *oldhook = data->ImportHook;
 
           data->ImportHook = &ImPlainHook;
-          InsertText(data, buffer->clip, TRUE);
+          InsertText(data, (char *)buffer->clip, TRUE);
           data->ImportHook = oldhook;
           MyFreePooled(data->mypool, buffer->clip);
 
@@ -238,7 +238,7 @@ long Redo (struct InstData *data)
             char  *clip = GetBlock(&block, data);
 
           CutBlock2(data, FALSE, FALSE, &block, TRUE);
-          buffer->clip = clip;
+          buffer->clip = (unsigned char *)clip;
         }
         break;
     }
@@ -370,7 +370,7 @@ long AddToUndoBuffer (long eventtype, char *eventdata, struct InstData *data)
           {
             buffer->x = block->startx;
             buffer->y = LineNr(block->startline, data);
-            buffer->clip = text;
+            buffer->clip = (unsigned char *)text;
             if(data->flags & FLG_FreezeCrsr)
             {
               buffer->type = deleteblock_nomove;

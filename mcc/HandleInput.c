@@ -39,7 +39,7 @@ static long ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessag
 static ULONG RAWToANSI(struct IntuiMessage *imsg)
 {
   struct  InputEvent  event;
-  UBYTE   code = 0;
+  char code = 0;
 
   ENTER();
 
@@ -639,7 +639,7 @@ void cutcopypasteerase (UBYTE key, ULONG qualifier, struct InstData *data)
 }
 */
 
-void Key_Normal (UBYTE key, struct InstData *data)
+void Key_Normal(UBYTE key, struct InstData *data)
 {
   ENTER();
 
@@ -654,7 +654,7 @@ void Key_Normal (UBYTE key, struct InstData *data)
 #endif
 
   AddToUndoBuffer(pastechar, NULL, data);
-  PasteChars(data->CPos_X++, data->actualline, 1, &key, NULL, data);
+  PasteChars(data->CPos_X++, data->actualline, 1, (char *)&key, NULL, data);
   if(data->WrapBorder && (data->CPos_X > data->WrapBorder) && (key != ' '))
   {
     ULONG xpos = data->CPos_X;
@@ -681,8 +681,8 @@ void Key_Normal (UBYTE key, struct InstData *data)
  *----------------*/
 static long ConvertKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
 {
-  long    result = TRUE;
-  unsigned char        code;
+  long result = TRUE;
+  char code;
 #ifndef ClassAct
   struct   InputEvent  event;
 

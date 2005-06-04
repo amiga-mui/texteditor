@@ -97,7 +97,7 @@ long SendRexx (char *word, char *command, struct InstData *data)
     rxmsg = CreateRexxMsg(data->clipport, NULL, NULL);
     rxmsg->rm_Action = RXCOMM;
     sprintf(buffer, command, word);
-    rxmsg->rm_Args[0] = (UBYTE *)CreateArgstring(buffer, strlen(buffer));
+    rxmsg->rm_Args[0] = (APTR)CreateArgstring(buffer, strlen(buffer));
 
     PutMsg(rexxport, (struct Message *)rxmsg);
     if(Wait((1 << data->clipport->mp_SigBit) | SIGBREAKF_CTRL_C) != SIGBREAKF_CTRL_C)
