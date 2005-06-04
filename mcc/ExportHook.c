@@ -144,7 +144,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
   if(styles || colors)
   {
     UWORD pos;
-    UWORD style;
+    WORD style;
     BOOL coloured = FALSE;
     UWORD colour_state = 7;
 

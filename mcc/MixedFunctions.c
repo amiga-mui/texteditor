@@ -304,7 +304,7 @@ void  OffsetToLines (LONG x, struct line_node *line, struct pos_info *pos, struc
  *------------------*/
 void SetCursor(LONG x, struct line_node *line, long Set, struct InstData *data)
 {
-  unsigned char chars[4] = "   \0";
+  char chars[4] = "   \0";
   LONG   line_nr;
   struct pos_info pos;
   ULONG  xplace, yplace, cursorxplace;

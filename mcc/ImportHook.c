@@ -317,7 +317,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 		*dest++ = '\n';
 		*dest = 0;
 
-		line->Length = dest - line->Contents; /* this excludes \n */
+		line->Length = dest - (unsigned char *)line->Contents; /* this excludes \n */
 	}
 	if (eol[0] == 0) return NULL;
 	return eol + 1;
@@ -348,10 +348,10 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
   * a '=' is detected at the end of a line this memory is not sufficient! */
 	if ((line->Contents = MyAllocPooled(msg->PoolHandle,len+4)))
 	{
-		unsigned char *dest_start = line->Contents;
+		unsigned char *dest_start = (unsigned char *)line->Contents;
 		unsigned char *dest = dest_start;
 		unsigned char *dest_word_start = dest_start;
-		unsigned char *src_word_start = src;
+		unsigned char *src_word_start = (unsigned char *)src;
 		
 		/* Style and color state */
 		int state = 0;
@@ -454,7 +454,8 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 						/* Update all dest variables */
 						dest_word_start = new_dest_start + (dest_word_start - dest_start);
 						dest = new_dest_start + (dest - dest_start);
-						dest_start = line->Contents = new_dest_start;
+            line->Contents = (char *)new_dest_start;
+						dest_start = (unsigned char *)line->Contents;
 						continue;
 					}
 				}
@@ -463,7 +464,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 			if (c == ' ')
 			{
 				/* src is already advanced */
-				src_word_start = src;
+				src_word_start = (unsigned char *)src;
 				dest_word_start = dest;
 			}
 
@@ -474,7 +475,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 				if (dest_word_start != dest_start)
 				{
 					/* src points to the real word start, but we add one when we return eol */
-					eol = src_word_start - 1;
+					eol = (char *)(src_word_start - 1);
 					dest = dest_word_start;
 					break;
 				}

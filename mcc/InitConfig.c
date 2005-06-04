@@ -357,8 +357,8 @@ void InitConfig (void *obj, struct InstData *data)
       {
         if((mykeys+count)->keydata.code >= 500)
         {
-            UBYTE  RAW[4];
-            UBYTE  code = (mykeys+count)->keydata.code-500;
+          char RAW[4];
+          char code = (mykeys+count)->keydata.code-500;
 
           MapANSI(&code, 1, RAW, 1, NULL);
 
