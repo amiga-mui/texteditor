@@ -36,11 +36,6 @@
 #include "TextEditor_mcc.h"
 #include "private.h"
 
-#ifdef __MORPHOS__
-// doesnt belong here -itix
-#define DebugPrintF(x) NewRawDoFmt(x, (APTR)1, NULL, NULL)
-#endif
-
 VOID RedrawArea(UWORD startx, struct line_node *startline, UWORD stopx, struct line_node *stopline, struct InstData *data)
 {
   struct pos_info pos1, pos2;
