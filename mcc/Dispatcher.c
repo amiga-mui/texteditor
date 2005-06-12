@@ -338,9 +338,11 @@ ULONG AskMinMax (struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
   DoSuperMethodA(cl,obj,(Msg)msg);
 
   font = data->font ? data->font : muiAreaData(obj)->mad_Font;
+  SetFont(data->rport, font);
+
   if(data->Columns)
   {
-    ULONG width = (data->Columns+1) * MyTextLength(font, "n", 1);
+    ULONG width = (data->Columns+1) * TextLength(data->rport, "n", 1);
     msg->MinMaxInfo->MinWidth += width;
     msg->MinMaxInfo->DefWidth += width;
     msg->MinMaxInfo->MaxWidth += width;
@@ -475,7 +477,7 @@ ULONG mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 
   if(msg->flags & MADF_DRAWOBJECT)
   {
-      struct MUI_AreaData *ad = muiAreaData(obj);
+    struct MUI_AreaData *ad = muiAreaData(obj);
 
     SetFont(data->rport, data->font);
 
@@ -504,9 +506,9 @@ ULONG mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 
     if(data->flags & FLG_Ghosted)
     {
-        UWORD *oldPattern = data->rport->AreaPtrn;
-        UBYTE oldSize = data->rport->AreaPtSz;
-        UWORD newPattern[] = {0x1111, 0x4444};
+      UWORD *oldPattern = data->rport->AreaPtrn;
+      UBYTE oldSize = data->rport->AreaPtSz;
+      UWORD newPattern[] = {0x1111, 0x4444};
 
       SetDrMd(data->rport, JAM1);
       SetAPen(data->rport, *(_pens(obj)+MPEN_SHADOW));
@@ -516,6 +518,7 @@ ULONG mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
       data->rport->AreaPtrn = oldPattern;
       data->rport->AreaPtSz = oldSize;
     }
+
     DumpText(data->visual_y, 0, data->maxlines, FALSE, data);
   }
 

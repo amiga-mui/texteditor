@@ -21,7 +21,7 @@
 ***************************************************************************/
 
 #include <clib/alib_protos.h>
-#include <clib/graphics_protos.h>
+#include <proto/graphics.h>
 #include <proto/intuition.h>
 #include <proto/locale.h>
 
@@ -38,8 +38,9 @@ ULONG FlowSpace (UWORD flow, STRPTR text, struct InstData *data)
 
   if(flow != MUIV_TextEditor_Flow_Left)
   {
-    flowspace  = (data->innerwidth-MyTextLength(data->font, text, LineCharsWidth(text, data)-1));
-    flowspace -= (data->CursorWidth == 6) ? MyTextLength(data->font, " ", 1) : data->CursorWidth;
+    SetFont(data->rport, data->font);
+    flowspace  = (data->innerwidth-TextLength(data->rport, text, LineCharsWidth(text, data)-1));
+    flowspace -= (data->CursorWidth == 6) ? TextLength(data->rport, " ", 1) : data->CursorWidth;
     if(flow == MUIV_TextEditor_Flow_Center)
     {
       flowspace /= 2;
@@ -50,22 +51,50 @@ ULONG FlowSpace (UWORD flow, STRPTR text, struct InstData *data)
   return(flowspace);
 }
 
-ULONG CursorOffset (struct InstData *data)
+static ULONG CursorOffset(struct InstData *data)
 {
   struct line_node *line = data->actualline;
   STRPTR text = line->line.Contents+data->CPos_X;
-  LONG  offset = data->pixel_x-FlowSpace(line->line.Flow, text, data);
   ULONG res;
+  LONG offset = data->pixel_x-FlowSpace(line->line.Flow, text, data);
+  struct TextExtent tExtend;
 
   ENTER();
 
   if(offset < 1)
     offset = 1;
 
-  res = MyTextFit(data->font, text, LineCharsWidth(text, data)-1, offset, 1);
+  // make sure the correct font is set
+  SetFont(data->rport, data->font);
+
+  // call TextFit() to find out how many chars would fit.
+  res = TextFit(data->rport, text, LineCharsWidth(text, data)-1, &tExtend, NULL, 1, offset, data->font->tf_YSize);
 
   RETURN(res);
   return res;
+}
+
+/*---------------------------------------*
+ * Return the number of pixels to cursor *
+ *---------------------------------------*/
+static LONG GetPosInPixels(LONG bytes, LONG x, struct InstData *data)
+{
+  LONG pos;
+
+  ENTER();
+
+  SetFont(data->rport, data->font);
+  pos = TextLength(data->rport, data->actualline->line.Contents+bytes, x);
+
+  if(*(data->actualline->line.Contents+data->CPos_X) == '\n')
+    pos += TextLength(data->rport, " ", 1)/2;
+  else
+    pos += TextLength(data->rport, data->actualline->line.Contents+data->CPos_X, 1)/2;
+
+  pos += FlowSpace(data->actualline->line.Flow, data->actualline->line.Contents+bytes, data);
+
+  RETURN(pos);
+  return(pos);
 }
 
 VOID SetBookmark (UWORD nr, struct InstData *data)
@@ -556,28 +585,11 @@ void  NextLine (struct InstData *data)
 
   LEAVE();
 }
-/*---------------------------------------*
- * Return the number of pixels to cursor *
- *---------------------------------------*/
-LONG   GetPosInPixels (LONG bytes, LONG x, struct InstData *data)
-{
-  LONG  pos = MyTextLength(data->font, data->actualline->line.Contents+bytes, x);
-
-  ENTER();
-
-  if(*(data->actualline->line.Contents+data->CPos_X) == '\n')
-      pos += MyTextLength(data->font, " ", 1)/2;
-  else  pos += MyTextLength(data->font, data->actualline->line.Contents+data->CPos_X, 1)/2;
-  pos += FlowSpace(data->actualline->line.Flow, data->actualline->line.Contents+bytes, data);
-
-  RETURN(pos);
-  return(pos);
-}
 
 /*-----------------------------------------*
  * Place the cursor, based on an X Y coord *
  *-----------------------------------------*/
-void  PosFromCursor(WORD MouseX, WORD MouseY, struct InstData *data)
+void PosFromCursor(WORD MouseX, WORD MouseY, struct InstData *data)
 {
   struct pos_info pos;
 #ifdef ClassAct
@@ -594,19 +606,24 @@ void  PosFromCursor(WORD MouseX, WORD MouseY, struct InstData *data)
 
   if(MouseY >= limit)
     MouseY = limit-1;
+
 #ifndef ClassAct
   GetLine(((MouseY - data->ypos)/data->height) + data->visual_y, &pos, data);
 #else
   GetLine((MouseY/data->height) + data->visual_y, &pos, data);
 #endif
+
   data->actualline = pos.line;
+
 #ifdef ClassAct
   data->pixel_x = MouseX-data->BevelHoriz-2;
 #else
   data->pixel_x = MouseX-data->xpos+1;
 #endif
+
   if(data->pixel_x < 1)
     data->pixel_x = 1;
+
   data->CPos_X  = pos.x;
   data->CPos_X += CursorOffset(data);
   data->pixel_x = 0;

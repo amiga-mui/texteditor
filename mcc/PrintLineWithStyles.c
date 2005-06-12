@@ -83,27 +83,16 @@ VOID DrawSeparator (struct RastPort *rp, WORD X, WORD Y, WORD Width, WORD Height
   LEAVE();
 }
 
-LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, struct InstData *data)
+LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, struct InstData *data)
 {
-  STRPTR  text    = line->line.Contents;
-  LONG    length  = LineCharsWidth(text+x, data);
+  STRPTR text = line->line.Contents;
+  LONG length;
   struct RastPort *rp = &data->doublerp;
 
   ENTER();
 
-/*  switch(text[x+length-1])
-  {
-    case ' ':
-    case '\n':
-    case '\0':
-    break;
+  length  = LineCharsWidth(text+x, data);
 
-    default:
-      kprintf("%2d\n", text[x+length-1]);
-      length--;
-    break;
-  }
-*/
   if(!doublebuffer)
   {
     doublebuffer = FALSE;
@@ -112,14 +101,14 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
 
   if((line_nr > 0) && (data->update) && !(data->flags & FLG_Quiet))
   {
-      LONG  c_length = length-1;
-      LONG  startx = 0, stopx = 0;
-      LONG  starty = 0, xoffset = ((data->height-rp->TxBaseline+1)>>1)+1;
-      LONG  flow = 0;
-      UWORD *styles = line->line.Styles;
-      UWORD *colors = line->line.Colors;
-      struct marking block;
-      BOOL  cursor = FALSE;
+    LONG c_length = length;
+    LONG startx = 0, stopx = 0;
+    LONG starty = 0, xoffset = ((data->height-rp->TxBaseline+1)>>1)+1;
+    LONG flow = 0;
+    UWORD *styles = line->line.Styles;
+    UWORD *colors = line->line.Colors;
+    struct marking block;
+    BOOL cursor = FALSE;
 
     if(line->line.Color && x == 0 && line->line.Length == 1)
       line->line.Color = FALSE;
@@ -135,7 +124,7 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
 
     if(Enabled(data))
     {
-        struct line_node *blkline;
+      struct line_node *blkline;
 
       NiceBlock(&data->blockinfo, &block);
       blkline = block.startline->next;
@@ -176,32 +165,38 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
     }
 
     {
-        UWORD blockstart = 0, blockwidth = 0;
+      UWORD blockstart = 0, blockwidth = 0;
 #ifndef ClassAct
-        struct RastPort *old = muiRenderInfo(data->object)->mri_RastPort;
+      struct RastPort *old = muiRenderInfo(data->object)->mri_RastPort;
 #else
-        struct RastPort *old = data->rport;
+      struct RastPort *old = data->rport;
 #endif
+
+      SetFont(data->rport, data->font);
 
       if(startx <= x+c_length && stopx > x)
       {
         if(startx > x)
-            blockstart = MyTextLength(data->font, text+x, startx-x);
-        else  startx = x;
+          blockstart = TextLength(data->rport, text+x, startx-x);
+        else
+          startx = x;
 
-        blockwidth = ((stopx > c_length+x) ? data->innerwidth-(blockstart+flow) : MyTextLength(data->font, text+startx, stopx-startx));
+        blockwidth = ((stopx >= c_length+x) ? data->innerwidth-(blockstart+flow) : TextLength(data->rport, text+startx, stopx-startx));
       }
       else
       {
-        if(!(data->flags & (FLG_ReadOnly | FLG_Ghosted)) && line == data->actualline && data->CPos_X >= x && data->CPos_X <= x+c_length && !Enabled(data) && !data->scrollaction && (data->flags & FLG_Active))
+        if(!(data->flags & (FLG_ReadOnly | FLG_Ghosted)) &&
+           line == data->actualline && data->CPos_X >= x &&
+           data->CPos_X <= x+c_length && !Enabled(data) &&
+           !data->scrollaction && (data->flags & FLG_Active))
         {
           cursor = TRUE;
-          blockstart = MyTextLength(data->font, text+x, data->CPos_X-x);
+          blockstart = TextLength(data->rport, text+x, data->CPos_X-x);
 
           // calculate the cursor width
           // if it is set to 6 then we should find out how the width of the current char is
           if(data->CursorWidth == 6)
-            blockwidth = MyTextLength(data->font, (*(text+data->CPos_X) < ' ') ? (char *)" " : (char *)(text+data->CPos_X), 1);
+            blockwidth = TextLength(data->rport, (*(text+data->CPos_X) < ' ') ? (char *)" " : (char *)(text+data->CPos_X), 1);
           else
             blockwidth = data->CursorWidth;
         }
@@ -261,9 +256,10 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
     }
 
     SetAPen(rp, (line->line.Color ? data->highlightcolor : data->textcolor));
+
     while(c_length)
     {
-        LONG p_length = c_length;
+      LONG p_length = c_length;
 
       SetSoftStyle(rp, convert(GetStyle(x, line)), ~0);
       if(styles)
@@ -309,7 +305,10 @@ LONG  PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer,
             SetAPen(rp, (line->color ? data->highlightcolor : data->textcolor));
         }
       }
-*/      Text(rp, text+x, p_length);
+*/
+
+      Text(rp, text+x, p_length);
+
       x += p_length;
       c_length -= p_length;
     }
