@@ -84,7 +84,6 @@ MCCOBJS = $(OBJDIR)/library.o \
           $(OBJDIR)/Search.o \
           $(OBJDIR)/SpellChecker.o \
           $(OBJDIR)/StyleOperators.o \
-          $(OBJDIR)/TextFunctions.o \
           $(OBJDIR)/UndoFunctions.o
 
 TESTOBJS= $(OBJDIR)/TextEditor-Test.o \
@@ -112,7 +111,6 @@ TESTOBJS= $(OBJDIR)/TextEditor-Test.o \
           $(OBJDIR)/Search.o \
           $(OBJDIR)/SpellChecker.o \
           $(OBJDIR)/StyleOperators.o \
-          $(OBJDIR)/TextFunctions.o \
           $(OBJDIR)/UndoFunctions.o
 
 #
