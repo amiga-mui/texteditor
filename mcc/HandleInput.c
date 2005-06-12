@@ -197,14 +197,16 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
           {
             if(imsg->Code == IECODE_LBUTTON)
             {
-                struct MUI_AreaData *ad = muiAreaData(obj);
+              struct MUI_AreaData *ad = muiAreaData(obj);
 
               if(((imsg->MouseX >= ad->mad_Box.Left) &&
                  (imsg->MouseX <  ad->mad_Box.Left + ad->mad_Box.Width) &&
                  (imsg->MouseY >= data->ypos) &&
                  (imsg->MouseY <  data->ypos+(data->maxlines * data->height))))
               {
-                UWORD last_x = data->CPos_X; struct line_node *lastline = data->actualline;
+                UWORD last_x = data->CPos_X;
+                struct line_node *lastline = data->actualline;
+
                 RequestInput(data);
                 data->mousemove = TRUE;
                 SetCursor(data->CPos_X, data->actualline, FALSE, data);
@@ -279,6 +281,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                   if(data->blockinfo.stopline != data->actualline || data->blockinfo.stopx != data->CPos_X)
                     MarkText(data->blockinfo.stopx, data->blockinfo.stopline, data->CPos_X, data->actualline, data);
                 }
+
                 data->blockinfo.stopline = data->actualline;
                 data->blockinfo.stopx = data->CPos_X;
 
@@ -1111,11 +1114,11 @@ void ScrollIntoDisplay(struct InstData *data)
 /*------------------------*
  * Update the marked area *
  *------------------------*/
-void  MarkText(LONG x1, struct line_node *line1, LONG x2, struct line_node *line2, struct InstData *data)
+void MarkText(LONG x1, struct line_node *line1, LONG x2, struct line_node *line2, struct InstData *data)
 {
-  struct   marking  newblock, fakeblock;
-  LONG   startx, stopx;
-  struct   line_node   *startline, *stopline;
+  struct marking  newblock, fakeblock;
+  LONG startx, stopx;
+  struct line_node   *startline, *stopline;
 
   ENTER();
 
@@ -1143,8 +1146,10 @@ void  MarkText(LONG x1, struct line_node *line1, LONG x2, struct line_node *line
 
     if((line_nr1 += pos1.lines-1) < 0)
       line_nr1 = 0;
+
     if((line_nr2 += pos2.lines-1) >= data->maxlines)
       line_nr2 = data->maxlines-1;
+
     if(line_nr1 <= line_nr2)
     {
       DumpText(data->visual_y+line_nr1, line_nr1, line_nr2+1, FALSE, data);
