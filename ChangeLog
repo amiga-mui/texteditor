@@ -5,6 +5,20 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-06-12  Jens Langner <Jens.Langner@light-speed.de>
+
+    * mcc/MixedFunctions.c: fixed bug #1215342 where on hard wrapped lines a
+      single character was missing at the end of the wrapped line.
+    * mcc/HandleInput.c: applied a patch from Gunther Nikl which removes the
+      forbidden floating point math in the wheelmouse scrolling code to due
+      our shared library nature.
+    * mcc/ImportHook.c: fixed the Plain ImportHook to also call AddGrow for
+      every style/color item found instead of combining them. This in fact fixes
+      problems with being unable to set text bold on text that was imported.
+    * mcc/TextFunctions.c: replaced own anyway slightly buggy TextLength/TextFit
+      functions with the OS's own TextLength/TextFit functions and adapted sources
+      accordingly.
+
 2005-06-04  Jens Langner <Jens.Langner@light-speed.de>
 
     * mcc/ImportHook.c: reworked the MIME/Email based ImportHook to properly
