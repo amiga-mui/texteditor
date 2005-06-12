@@ -40,7 +40,7 @@ WARN     = -W -Wall
 OPTFLAGS = -O3 -finline-functions -fomit-frame-pointer -funroll-loops
 DEBUG    = -DDEBUG -g -O0
 CFLAGS   = -noixemul -I. -I../mcp -I../includes $(CPU) $(CPUFLAGS) $(WARN) $(OPTFLAGS)\
-           $(DEBUG) -c -DZERO=0
+           $(DEBUG) -c
 LDFLAGS  = -noixemul -nostartfiles $(CPU)
 LDLIBS   = -ldebug
 
