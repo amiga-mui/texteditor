@@ -227,14 +227,10 @@ VOID SAVEDS ASM MUIG_FreeBitMap(REG(a0, struct BitMap *));
 void  RequestInput  (struct InstData *);
 void  RejectInput   (struct InstData *);
 
-long  MyTextLength  (struct TextFont *, char *, long);
-long  MyTextFit   (struct TextFont *, char *, long, long, long);
-
 void  ScrollIntoDisplay (struct InstData *);
 long  CheckSep    (unsigned char, struct InstData *);
 long  CheckSent   (unsigned char, struct InstData *);
 void  NextLine    (struct InstData *);
-LONG  GetPosInPixels (LONG, LONG, struct InstData *);
 
 unsigned long convert (unsigned long);
 LONG  PrintLine   (LONG, struct line_node *, LONG, BOOL, struct InstData *);

@@ -28,6 +28,7 @@
 #include <clib/alib_protos.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
+#include <proto/graphics.h>
 #include <proto/intuition.h>
 #include <proto/locale.h>
 #include <proto/muimaster.h>
@@ -328,7 +329,8 @@ void SuggestWord (struct InstData *data)
     OffsetToLines(data->CPos_X, line, &pos, data);
     get(_win(data->object), MUIA_Window_LeftEdge, &left);
     get(_win(data->object), MUIA_Window_TopEdge, &top);
-    left  += data->xpos + FlowSpace(line->line.Flow, line->line.Contents+(data->CPos_X-pos.x), data) + MyTextLength(data->font, line->line.Contents+(data->CPos_X-pos.x), pos.x);
+    SetFont(data->rport, data->font);
+    left  += data->xpos + FlowSpace(line->line.Flow, line->line.Contents+(data->CPos_X-pos.x), data) + TextLength(data->rport, line->line.Contents+(data->CPos_X-pos.x), pos.x);
     top += data->ypos + (data->height * (line_nr + pos.lines));
 
     while(data->CPos_X < line->line.Length && (IsAlpha(data->mylocale, *(line->line.Contents+data->CPos_X)) || *(line->line.Contents+data->CPos_X) == '-' || *(line->line.Contents+data->CPos_X) == '\''))

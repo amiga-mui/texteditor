@@ -22,7 +22,7 @@
 
 #include <intuition/intuition.h>
 #include <proto/exec.h>
-#include <clib/graphics_protos.h>
+#include <proto/graphics.h>
 #include <proto/intuition.h>
 
 #include "TextEditor_mcc.h"
@@ -237,11 +237,13 @@ ULONG InputTrigger(UNUSED struct IClass *cl, struct InstData *data)
     }
 
     if(data->blockinfo.enabled && Scroll && data->blockinfo.stopline == data->actualline && data->blockinfo.stopx == data->CPos_X)
+    {
       PosFromCursor(MouseX, MouseY, data);
+    }
 
     if(data->selectmode != 0)
     {
-        struct marking tmpblock;
+      struct marking tmpblock;
 
       NiceBlock(&data->blockinfo, &tmpblock);
       if(data->blockinfo.startx == tmpblock.startx && data->blockinfo.startline == tmpblock.startline)
@@ -268,7 +270,10 @@ ULONG InputTrigger(UNUSED struct IClass *cl, struct InstData *data)
         OffsetToLines(data->CPos_X, data->actualline, &pos, data);
         flow = FlowSpace(data->actualline->line.Flow, data->actualline->line.Contents+pos.bytes, data);
         
-        if(MouseX <= (LONG)(data->xpos+flow+MyTextLength(data->font, data->actualline->line.Contents+pos.bytes, pos.extra-pos.bytes-1)))
+        // make sure the correct font is set
+        SetFont(data->rport, data->font);
+
+        if(MouseX <= (LONG)(data->xpos+flow+TextLength(data->rport, data->actualline->line.Contents+pos.bytes, pos.extra-pos.bytes-1)))
         {
           if(data->selectmode == 1)
           {
