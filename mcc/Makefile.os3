@@ -40,7 +40,7 @@ OPTFLAGS = -O3 -fomit-frame-pointer -funroll-loops
 DEBUG    = -DDEBUG -g -O0
 CFLAGS   = -noixemul -I. -I../mcp -I../includes -c $(CPU) $(WARN) $(OPTFLAGS) $(DEBUG)
 LDFLAGS  = -noixemul -nostartfiles $(CPU)
-LDLIBS   = -lmui -ldebug -lm
+LDLIBS   = -lmui -ldebug
 
 # CPU and DEBUG can be defined outside, defaults to above
 # using e.g. "make DEBUG= CPU=-m68060" produces optimized non-debug 68060 version
