@@ -53,7 +53,7 @@
 #if defined(__amigaos4__)
 #include <proto/keymap.h>
 
-#define RAWKEY_SCRLOCK    RAWKEY_MENU
+#define RAWKEY_NUMLOCK    0x79
 
 #elif defined(__MORPHOS__)
 #include <devices/rawkeycodes.h>
@@ -64,6 +64,13 @@
 #define RAWKEY_CRSRLEFT   RAWKEY_LEFT
 #define RAWKEY_PRINTSCR   RAWKEY_PRTSCREEN
 #define RAWKEY_BREAK      RAWKEY_PAUSE
+
+#define RAWKEY_AUD_STOP       RAWKEY_CDTV_STOP
+#define RAWKEY_AUD_PLAY_PAUSE RAWKEY_CDTV_PLAY
+#define RAWKEY_AUD_PREV_TRACK RAWKEY_CDTV_PREV
+#define RAWKEY_AUD_NEXT_TRACK RAWKEY_CDTV_NEXT
+#define RAWKEY_AUD_SHUFFLE    RAWKEY_CDTV_REW
+#define RAWKEY_AUD_REPEAT     RAWKEY_CDTV_FF
 
 #else
 
@@ -92,6 +99,15 @@
 #define RAWKEY_F12       0x6F /* Not on classic keyboards */
 #define RAWKEY_HOME      0x70 /* Not on classic keyboards */
 #define RAWKEY_END       0x71 /* Not on classic keyboards */
+
+#define RAWKEY_AUD_STOP       0x72
+#define RAWKEY_AUD_PLAY_PAUSE 0x73
+#define RAWKEY_AUD_PREV_TRACK 0x74
+#define RAWKEY_AUD_NEXT_TRACK 0x75
+#define RAWKEY_AUD_SHUFFLE    0x76
+#define RAWKEY_AUD_REPEAT     0x77
+
+#define RAWKEY_NUMLOCK   0x79
 
 #endif
 
