@@ -38,8 +38,9 @@
 #include <proto/muimaster.h>
 
 #include "private.h"
+#include "newmouse.h"
 
-#define KEYS_COUNT (52)
+#define KEYS_COUNT (64)
 
 void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage)
 {
@@ -53,7 +54,14 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
     "f1/S,f2/S,f3/S,f4/S,f5/S,f6/S,f7/S,f8/S,f9/S,f10/S,f11/S,f12/S"
     "help/S,"
     "up/S,down/S,right/S,left/S,"
-    "home/S,end/S,page_up=pageup/S,page_down=pagedown/S,insert/S,scrolllock=scrlock/S,printscreen=prtscr/S,break=pause/S,"
+    "home/S,end/S,page_up=pageup/S,page_down=pagedown/S,insert/S,printscreen=prtscr/S,pause=break/S,numlock/S,"
+    #if defined(__amigaos4__)
+    "menu/S"
+    #elif defined(__MORPHOS__)
+    "scrolllock=scrlock/S"
+    #endif
+    "media_stop/S,media_play/S,media_prev/S,media_next/S,media_rewind/S,media_forward/S,"
+    "wheel_up/S,wheel_down/S,wheel_left/S,wheel_right/S,wheel_button/S"
     "escape=esc/S,tab/S,return=enter/S,space/S,backspace=bs/S,delete=del/S,key/F";
 
   storage->vanilla = FALSE;
@@ -130,11 +138,46 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
         if(args[count++])
           storage->key = RAWKEY_INSERT;
         if(args[count++])
-          storage->key = RAWKEY_SCRLOCK;
-        if(args[count++])
           storage->key = RAWKEY_PRINTSCR;
         if(args[count++])
           storage->key = RAWKEY_BREAK;
+        if(args[count++])
+          storage->key = RAWKEY_NUMLOCK;
+
+        // some keys are mutual excluse on some platforms
+        #if defined(__amigso4__)
+        if(args[count++])
+          storage->key = RAWKEY_MENU;
+        #elif defined(__MORPHOS__)
+        if(args[count++])
+          storage->key = RAWKEY_SCRLOCK;
+        #endif
+
+        // lets address the media/CDTV keys as well
+        if(args[count++])
+          storage->key = RAWKEY_AUD_STOP;
+        if(args[count++])
+          storage->key = RAWKEY_AUD_PLAY_PAUSE;
+        if(args[count++])
+          storage->key = RAWKEY_AUD_PREV_TRACK;
+        if(args[count++])
+          storage->key = RAWKEY_AUD_NEXT_TRACK;
+        if(args[count++])
+          storage->key = RAWKEY_AUD_SHUFFLE;
+        if(args[count++])
+          storage->key = RAWKEY_AUD_REPEAT;
+
+        // take respect of the NEWMOUSE RAWKEY based wheel events as well
+        if(args[count++])
+          storage->key = NM_WHEEL_UP;
+        if(args[count++])
+          storage->key = NM_WHEEL_DOWN;
+        if(args[count++])
+          storage->key = NM_WHEEL_LEFT;
+        if(args[count++])
+          storage->key = NM_WHEEL_RIGHT;
+        if(args[count++])
+          storage->key = NM_BUTTON_FOURTH;
 
         if(!storage->key)
         {
@@ -243,9 +286,28 @@ void KeyToString (STRPTR buffer, struct KeyAction *ka)
       case RAWKEY_PAGEUP:     strcat(buffer, "page_up"); break;
       case RAWKEY_PAGEDOWN:   strcat(buffer, "page_down"); break;
       case RAWKEY_INSERT:     strcat(buffer, "insert"); break;
-      case RAWKEY_SCRLOCK:    strcat(buffer, "scrolllock"); break;
       case RAWKEY_PRINTSCR:   strcat(buffer, "printscreen"); break;
-      case RAWKEY_BREAK:      strcat(buffer, "break"); break;
+      case RAWKEY_BREAK:      strcat(buffer, "pause"); break;
+      case RAWKEY_NUMLOCK:    strcat(buffer, "numlock"); break;
+
+      #if defined(__amigaos4__)
+      case RAWKEY_MENU:       strcat(buffer, "menu"); break;
+      #elif defined(__MORPHOS__)
+      case RAWKEY_SCRLOCK:    strcat(buffer, "scrolllock"); break;
+      #endif
+
+			case RAWKEY_AUD_STOP:       strcat(buffer, "media_stop"); break;
+			case RAWKEY_AUD_PLAY_PAUSE: strcat(buffer, "media_play"); break;
+			case RAWKEY_AUD_PREV_TRACK: strcat(buffer, "media_prev"); break;
+			case RAWKEY_AUD_NEXT_TRACK: strcat(buffer, "media_next"); break;
+			case RAWKEY_AUD_SHUFFLE:    strcat(buffer, "media_rewind"); break;
+			case RAWKEY_AUD_REPEAT:     strcat(buffer, "media_forward"); break;
+
+			case NM_WHEEL_UP:           strcat(buffer, "wheel_up"); break;
+			case NM_WHEEL_DOWN:         strcat(buffer, "wheel_down"); break;
+			case NM_WHEEL_LEFT:         strcat(buffer, "wheel_left"); break;
+  		case NM_WHEEL_RIGHT:        strcat(buffer, "wheel_right"); break;
+			case NM_BUTTON_FOURTH:      strcat(buffer, "wheel_button"); break;
 
       default:
         strcat(buffer, "???");

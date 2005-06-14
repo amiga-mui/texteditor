@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-06-14  Jens Langner <Jens.Langner@light-speed.de>
+
+    * mcp/KeyStorage.c: improved the extended keycode recognition to also
+      recognize NUMLOCK and the newmouse wheel events as well as the
+      media keys. So now a user might more intuitively connect commands
+      to these extended keycodes as well.
+
 2005-06-12  Jens Langner <Jens.Langner@light-speed.de>
 
     * mcc/MixedFunctions.c: fixed bug #1215342 where on hard wrapped lines a
