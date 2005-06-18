@@ -249,7 +249,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                         }
                         else
                         {
-                            int x = data->CPos_X;
+                          int x = data->CPos_X;
 
                           while(x > 0 && !CheckSep(*(data->actualline->line.Contents+x-1), data))
 //                          while(x > 0 && *(data->actualline->line.Contents+x-1) != ' ')
@@ -1116,9 +1116,16 @@ void ScrollIntoDisplay(struct InstData *data)
  *------------------------*/
 void MarkText(LONG x1, struct line_node *line1, LONG x2, struct line_node *line2, struct InstData *data)
 {
-  struct marking  newblock, fakeblock;
-  LONG startx, stopx;
-  struct line_node   *startline, *stopline;
+  struct marking newblock;
+  struct marking fakeblock;
+  struct line_node *startline;
+  struct line_node *stopline;
+  struct pos_info pos1;
+  struct pos_info pos2;
+  LONG startx;
+  LONG stopx;
+  LONG line_nr1;
+  LONG line_nr2;
 
   ENTER();
 
@@ -1133,28 +1140,23 @@ void MarkText(LONG x1, struct line_node *line1, LONG x2, struct line_node *line2
   startline = newblock.startline;
   stopline  = newblock.stopline;
 
-  {
-    struct pos_info pos1, pos2;
-    LONG   line_nr1 = LineToVisual(startline, data) - 1,
-           line_nr2 = LineToVisual(stopline, data) - 1;
+  line_nr1 = LineToVisual(startline, data) - 1;
+  line_nr2 = LineToVisual(stopline, data) - 1;
 
-    OffsetToLines(startx, startline, &pos1, data);
-    OffsetToLines(stopx, stopline, &pos2, data);
+  OffsetToLines(startx, startline, &pos1, data);
+  OffsetToLines(stopx, stopline, &pos2, data);
 
-    data->blockinfo.stopx = x2;
-    data->blockinfo.stopline = line2;
+  data->blockinfo.stopx = x2;
+  data->blockinfo.stopline = line2;
 
-    if((line_nr1 += pos1.lines-1) < 0)
-      line_nr1 = 0;
+  if((line_nr1 += pos1.lines-1) < 0)
+    line_nr1 = 0;
 
-    if((line_nr2 += pos2.lines-1) >= data->maxlines)
-      line_nr2 = data->maxlines-1;
+  if((line_nr2 += pos2.lines-1) >= data->maxlines)
+    line_nr2 = data->maxlines-1;
 
-    if(line_nr1 <= line_nr2)
-    {
-      DumpText(data->visual_y+line_nr1, line_nr1, line_nr2+1, FALSE, data);
-    }
-  }
+  if(line_nr1 <= line_nr2)
+    DumpText(data->visual_y+line_nr1, line_nr1, line_nr2+1, FALSE, data);
 
   LEAVE();
 }
