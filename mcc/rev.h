@@ -24,7 +24,7 @@
 #define LIB_REVISION   13
 
 #define LIB_REV_STRING "15.13"
-#define LIB_DATE       "01.06.2005"
+#define LIB_DATE       "18.06.2005"
 
 #if defined(__PPC__)
   #if defined(__MORPHOS__)
