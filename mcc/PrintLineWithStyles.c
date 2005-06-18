@@ -127,7 +127,9 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       struct line_node *blkline;
 
       NiceBlock(&data->blockinfo, &block);
+
       blkline = block.startline->next;
+
       if(block.startline == block.stopline)
       {
         if(block.startline == line)
