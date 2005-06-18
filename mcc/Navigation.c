@@ -58,6 +58,7 @@ static ULONG CursorOffset(struct InstData *data)
   ULONG res;
   LONG offset = data->pixel_x-FlowSpace(line->line.Flow, text, data);
   struct TextExtent tExtend;
+  ULONG lineCharsWidth;
 
   ENTER();
 
@@ -68,7 +69,20 @@ static ULONG CursorOffset(struct InstData *data)
   SetFont(data->rport, data->font);
 
   // call TextFit() to find out how many chars would fit.
-  res = TextFit(data->rport, text, LineCharsWidth(text, data)-1, &tExtend, NULL, 1, offset, data->font->tf_YSize);
+  lineCharsWidth = LineCharsWidth(text, data);
+  res = TextFit(data->rport, text, lineCharsWidth, &tExtend, NULL, 1, offset, data->font->tf_YSize);
+
+  // in case of a hard-wrapped line we have to deal with
+  // the possibility that the user tries to
+  // select the last char in a line which should normally by a white space
+  // due to soft-wrapping. So in this case we have to lower res by one so
+  // that it is not possible to select that last white space. However, for
+  // a hard wrapped line it still have to be possible to select that last char.
+  if(lineCharsWidth-res == 0 &&
+     text[lineCharsWidth-1] <= ' ')
+  {
+    res--;
+  }
 
   RETURN(res);
   return res;

@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-06-18  Jens Langner <Jens.Langner@light-speed.de>
+
+    * mcc/Navigation.c: fixed a bug in the CursorOffset() function which cures
+      the problem with being unable to select the last character of a hard
+      wrapped line with the mouse.
+
 2005-06-14  Jens Langner <Jens.Langner@light-speed.de>
 
     * mcp/KeyStorage.c: improved the extended keycode recognition to also
