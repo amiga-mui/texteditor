@@ -56,8 +56,8 @@ VOID SimpleMarkText (UWORD startx, struct line_node *startline, UWORD stopx, str
   LEAVE();
 }
 
-LONG Native_strncmp (STRPTR str1, STRPTR str2, LONG len) { return strncmp(str1, str2, len); }
-LONG Utility_strnicmp (STRPTR str1, STRPTR str2, LONG len) { return Strnicmp(str1, str2, len); }
+static LONG Native_strncmp (STRPTR str1, STRPTR str2, LONG len) { return strncmp(str1, str2, len); }
+static LONG Utility_strnicmp (STRPTR str1, STRPTR str2, LONG len) { return Strnicmp((unsigned char *)str1, (unsigned char *)str2, len); }
 
 ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
 {
