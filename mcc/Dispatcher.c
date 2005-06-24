@@ -21,6 +21,8 @@
 ***************************************************************************/
 
 #include <string.h>
+
+#include <intuition/classes.h>
 #include <clib/alib_protos.h>
 #include <exec/memory.h>
 #include <proto/dos.h>

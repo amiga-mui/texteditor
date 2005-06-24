@@ -20,6 +20,7 @@
 
 ***************************************************************************/
 
+#include <intuition/classes.h>
 #include <clib/alib_protos.h>
 #include <libraries/mui.h>
 #include <proto/graphics.h>

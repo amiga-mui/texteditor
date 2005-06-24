@@ -20,6 +20,7 @@
 
 ***************************************************************************/
 
+#include <intuition/classes.h>
 #include <utility/tagitem.h>
 #include <clib/alib_protos.h>
 #include <proto/exec.h>
