@@ -21,8 +21,6 @@
 ***************************************************************************/
 
 #include <proto/exec.h>
-#include <proto/utility.h>
-#include <proto/dos.h>
 
 /******************************************************************************/
 /*                                                                            */
@@ -72,27 +70,27 @@ BOOL ClassInitFunc(UNUSED struct Library *base)
   if((LocaleBase = OpenLibrary("locale.library", 38)) &&
      GETINTERFACE(ILocale, LocaleBase))
   {
-    if((LayersBase = OpenLibrary("layers.library", 38)) &&
+    if((LayersBase = OpenLibrary("layers.library", 36)) &&
        GETINTERFACE(ILayers, LayersBase))
     {
-      if((KeymapBase = OpenLibrary("keymap.library", 38)) &&
+      if((KeymapBase = OpenLibrary("keymap.library", 36)) &&
          GETINTERFACE(IKeymap, KeymapBase))
       {
         if((RexxSysBase = OpenLibrary("rexxsyslib.library", 36)) &&
            GETINTERFACE(IRexxSys, RexxSysBase))
         {
-          if((DiskfontBase = OpenLibrary("diskfont.library", 38)) &&
+          if((DiskfontBase = OpenLibrary("diskfont.library", 36)) &&
              GETINTERFACE(IDiskfont, DiskfontBase))
           {
-          	/* workbench.library is optional */
-          	if ((WorkbenchBase = OpenLibrary("workbench.library", 44)))
-          	{
-          		if (!(GETINTERFACE(IWorkbench, WorkbenchBase)))
-          		{
-          			CloseLibrary(WorkbenchBase);
-          			WorkbenchBase = NULL;
-          		}
-          	}
+            /* workbench.library is optional */
+            if ((WorkbenchBase = OpenLibrary("workbench.library", 44)))
+            {
+              if (!(GETINTERFACE(IWorkbench, WorkbenchBase)))
+              {
+                CloseLibrary(WorkbenchBase);
+                WorkbenchBase = NULL;
+              }
+            }
 
             RETURN(TRUE);
             return(TRUE);
@@ -127,12 +125,12 @@ VOID ClassExitFunc(UNUSED struct Library *base)
 {
   ENTER();
 
-	if(WorkbenchBase)
-	{
+  if(WorkbenchBase)
+  {
     DROPINTERFACE(IWorkbench);
     CloseLibrary(WorkbenchBase);
     WorkbenchBase = NULL;
-	}
+  }
 
   if(DiskfontBase)
   {
