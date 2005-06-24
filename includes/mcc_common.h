@@ -26,6 +26,9 @@
 #include "SDI_stdarg.h"
 
 #ifdef __amigaos4__
+
+#include <proto/intuition.h>
+
 /* redefine some defines to allow complexer macro use later on */
 #define DoMethod				IDoMethod
 #define DoMethodA 			IDoMethodA
@@ -51,8 +54,9 @@
 
 #else
 
+#include <clib/alib_protos.h>
+
 #define GETINTERFACE(iface, base)	TRUE
 #define DROPINTERFACE(iface)
 
-#endif /* __amigaos4__ */
-
+#endif /* ! __amigaos4__ */
