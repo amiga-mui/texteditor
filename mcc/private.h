@@ -23,10 +23,7 @@
 #ifndef TEXTEDITOR_MCC_PRIV_H
 #define TEXTEDITOR_MCC_PRIV_H
 
-#include <exec/types.h>
-#include <intuition/classes.h>
 #include <graphics/rastport.h>
-#include <devices/clipboard.h>
 
 #ifndef ClassAct
 #include <libraries/mui.h>
