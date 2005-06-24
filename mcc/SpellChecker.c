@@ -122,9 +122,14 @@ long SendRexx (char *word, char *command, struct InstData *data)
 }
 
 #if !defined(__amigaos4__) && !defined(__MORPHOS__)
+#undef WorkbenchControl
 BOOL WorkbenchControl(STRPTR name, ...)
-{
-  return WorkbenchControlA(name, (struct TagItem *)(&name+1));
+{ BOOL ret;
+  va_list args;
+  va_start(args, name);
+  ret=WorkbenchControlA(name, (struct TagItem *)args);
+  va_end(args);
+  return ret;
 }
 #endif
 
