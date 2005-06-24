@@ -25,6 +25,7 @@
 
 #include <exec/tasks.h>
 #include <libraries/mui.h>
+#include <devices/clipboard.h>
 #include <libraries/iffparse.h>
 #include <clib/alib_protos.h>
 #include <proto/dos.h>
