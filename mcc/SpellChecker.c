@@ -85,12 +85,12 @@ HOOKPROTONH(SelectCode, void, void *lvobj, long **parms)
 }
 MakeStaticHook(SelectHook, SelectCode);
 
-long SendRexx (char *word, char *command, struct InstData *data)
+LONG SendRexx (char *word, char *command, struct InstData *data)
 {
   struct MsgPort *rexxport;
   struct RexxMsg *rxmsg;
-  char    buffer[512];
-  LONG    result = FALSE;
+  char buffer[512];
+  LONG result = FALSE;
 
   ENTER();
 
@@ -215,10 +215,10 @@ static VOID FreeSearchPath(BPTR path)
   }
 }
 
-long SendCLI(char *word, char *command, UNUSED struct InstData *data)
+LONG SendCLI(char *word, char *command, UNUSED struct InstData *data)
 {
   char buffer[512];
-  long result = TRUE;
+  LONG result;
   BPTR path;
 
   sprintf(buffer, command, word);
@@ -230,7 +230,11 @@ long SendCLI(char *word, char *command, UNUSED struct InstData *data)
   {
     FreeSearchPath(path);
     result = FALSE;
+  } else
+  {
+    result = TRUE;
   }
+
   return result;
 }
 
@@ -285,15 +289,16 @@ void *SuggestWindow (struct InstData *data)
 
 BOOL LookupWord(STRPTR word, struct InstData *data)
 {
-    ULONG res;
+    char buf[4];
+    LONG res;
 
   if(data->LookupSpawn)
       res = SendRexx(word, data->LookupCmd, data);
   else  res = SendCLI(word, data->LookupCmd, data);
   if(res)
   {
-    GetVar("Found", (STRPTR)&res, 4, GVF_GLOBAL_ONLY);
-    if(res >> 24 == '0')
+    GetVar("Found", (STRPTR)&buf[0], sizeof(buf), GVF_GLOBAL_ONLY);
+    if(buf[0] == '0')
     {
       return(FALSE);
     }
@@ -357,7 +362,6 @@ void SuggestWord (struct InstData *data)
     if(data->blockinfo.stopx-data->blockinfo.startx < 256)
     {
         char word[256];
-        long res;
 
       strncpy(word, line->line.Contents+data->blockinfo.startx, data->blockinfo.stopx-data->blockinfo.startx);
       word[data->blockinfo.stopx-data->blockinfo.startx] = '\0';
@@ -378,6 +382,8 @@ void SuggestWord (struct InstData *data)
       }
       else
       {
+          LONG res;
+
         if(data->SuggestSpawn)
             res = SendRexx(word, data->SuggestCmd, data);
         else  res = SendCLI(word, data->SuggestCmd, data);
