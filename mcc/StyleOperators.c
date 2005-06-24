@@ -20,7 +20,6 @@
 
 ***************************************************************************/
 
-#include <clib/graphics_protos.h>
 #include <proto/intuition.h>
 
 #include "TextEditor_mcc.h"

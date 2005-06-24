@@ -20,11 +20,9 @@
 
 ***************************************************************************/
 
-#include <math.h>
-
+#include <graphics/text.h>
 #include <clib/alib_protos.h>
 #include <proto/graphics.h>
-#include <proto/intuition.h>
 
 #include "TextEditor_mcc.h"
 #include "private.h"

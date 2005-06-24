@@ -22,8 +22,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <exec/types.h>
-#include <clib/dos_protos.h>
+
+#include <exec/memory.h>
 #include <proto/exec.h>
 
 #include "TextEditor_mcc.h"
@@ -132,9 +132,9 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
   {
     // if h_Data is TRUE then this is an EMailHook call
     if(!hook->h_Data)
-      sprintf(buf->pointer, "\033[s:%d]", emsg->Separator);
+      sprintf(buf->pointer, "\033[s:%ld]", (LONG)emsg->Separator);
     else
-      sprintf(buf->pointer, ((emsg->Separator & LNSF_Thick) ? "<tsb>" : "<sb>"));
+      strcpy(buf->pointer, ((emsg->Separator & LNSF_Thick) ? "<tsb>" : "<sb>"));
 
     buf->pointer += strlen(buf->pointer);
   }
@@ -210,7 +210,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
       {
         if(color)
         {
-          sprintf(buf->pointer, "\033p[%d]", style);
+          sprintf(buf->pointer, "\033p[%ld]", (LONG)style);
           buf->pointer += strlen(buf->pointer);
         }
         else

@@ -23,16 +23,13 @@
 #include <intuition/classes.h>
 #include <utility/tagitem.h>
 #include <clib/alib_protos.h>
-#include <proto/exec.h>
-#include <proto/diskfont.h>
 #include <proto/graphics.h>
-#include <proto/intuition.h>
-#include <proto/layers.h>
 #include <proto/utility.h>
+#include <proto/layers.h>
 
 #ifndef ClassAct
-#include <proto/muimaster.h>
 #include <libraries/mui.h>
+#include <proto/muimaster.h>
 #else
 #include <images/bevel.h>
 #include <intuition/gadgetclass.h>

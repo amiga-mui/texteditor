@@ -23,12 +23,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <clib/alib_protos.h>
+#include <dos/rdargs.h>
 #include <exec/memory.h>
-#include <proto/dos.h>
-#include <proto/exec.h>
-#include <proto/intuition.h>
+#include <clib/alib_protos.h>
 #include <proto/utility.h>
+#include <proto/exec.h>
+#include <proto/dos.h>
 
 #include "TextEditor_mcc.h"
 #include "private.h"

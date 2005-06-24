@@ -22,7 +22,6 @@
 
 #include <string.h>
 
-#include <proto/exec.h>
 #include <proto/utility.h>
 
 #include "TextEditor_mcc.h"
@@ -33,7 +32,7 @@ void *ExportText(struct line_node *node, struct Hook *exportHook, LONG wraplen)
 	struct ExportMessage emsg;
 	void *user_data = NULL;
 
-  ENTER();
+	ENTER();
 
 	memset(&emsg,0,sizeof(emsg));
 
@@ -57,6 +56,6 @@ void *ExportText(struct line_node *node, struct Hook *exportHook, LONG wraplen)
 		node = next_node;
 	}
 
-  RETURN(user_data);
-  return user_data;
+	RETURN(user_data);
+	return user_data;
 }

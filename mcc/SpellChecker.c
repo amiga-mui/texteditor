@@ -23,23 +23,24 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <dos/dos.h>
+#include <exec/memory.h>
+#include <dos/dosextens.h>
 #include <dos/dostags.h>
-#include <clib/alib_protos.h>
-#include <proto/dos.h>
-#include <proto/exec.h>
-#include <proto/graphics.h>
-#include <proto/intuition.h>
-#include <proto/locale.h>
-#include <proto/muimaster.h>
-#include <proto/rexxsyslib.h>
-#include <proto/wb.h>
+#include <dos/var.h>
 #include <rexx/storage.h>
+#include <workbench/workbench.h>
+#include <clib/alib_protos.h>
+#include <proto/rexxsyslib.h>
+#include <proto/muimaster.h>
+#include <proto/intuition.h>
+#include <proto/graphics.h>
+#include <proto/locale.h>
+#include <proto/exec.h>
+#include <proto/dos.h>
+#include <proto/wb.h>
 
 #include "TextEditor_mcc.h"
 #include "private.h"
-
-#include "SDI_hook.h"
 
 #if !defined(__amigaos4__) || (INCLUDE_VERSION < 50)
 struct PathNode
@@ -133,23 +134,23 @@ BOOL WorkbenchControl(STRPTR name, ...)
 ************************************************************************/
 static BPTR CloneSearchPath(void)
 {
-	BPTR path = 0;
+  BPTR path = 0;
 
-	if (WorkbenchBase && WorkbenchBase->lib_Version >= 44)
-	{
+  if (WorkbenchBase && WorkbenchBase->lib_Version >= 44)
+  {
     WorkbenchControl(NULL, WBCTRLA_DuplicateSearchPath, &path, TAG_DONE);
-	} else
-	{
-		/* We don't like this evil code in OS4 compile, as we should have
-		 * a recent enough workbench available */
+  } else
+  {
+    /* We don't like this evil code in OS4 compile, as we should have
+     * a recent enough workbench available */
 #ifndef __amigaos4__
-		struct Process *pr;
+    struct Process *pr;
 
-		pr = (struct Process*)FindTask(NULL);
+    pr = (struct Process*)FindTask(NULL);
 
-		if (pr->pr_Task.tc_Node.ln_Type == NT_PROCESS)
-		{
-			struct CommandLineInterface *cli = BADDR(pr->pr_CLI);
+    if (pr->pr_Task.tc_Node.ln_Type == NT_PROCESS)
+    {
+      struct CommandLineInterface *cli = BADDR(pr->pr_CLI);
 
       if (cli)
       {
@@ -179,11 +180,11 @@ static BPTR CloneSearchPath(void)
           *p = MKBADDR(node);
           p = &node->pn_Next;
         }
-		  }
-		}
+      }
+    }
 #endif
-	}
-	return path;
+  }
+  return path;
 }
 
 /***********************************************************************
@@ -191,23 +192,23 @@ static BPTR CloneSearchPath(void)
 ************************************************************************/
 static VOID FreeSearchPath(BPTR path)
 {
-	if (path == 0) return;
+  if (path == 0) return;
 
-	if (WorkbenchBase && WorkbenchBase->lib_Version >= 44)
-	{
-		WorkbenchControl(NULL, WBCTRLA_FreeSearchPath, path, TAG_DONE);
-	} else
-	{
+  if (WorkbenchBase && WorkbenchBase->lib_Version >= 44)
+  {
+    WorkbenchControl(NULL, WBCTRLA_FreeSearchPath, path, TAG_DONE);
+  } else
+  {
 #ifndef __amigaos4__
-  	 while (path)
-  	 {
-  	    struct PathNode *node = BADDR(path);
-  	    path = node->pn_Next;
-  	    UnLock(node->pn_Lock);
-  	    FreeVec(node);
-  	 }
+     while (path)
+     {
+        struct PathNode *node = BADDR(path);
+        path = node->pn_Next;
+        UnLock(node->pn_Lock);
+        FreeVec(node);
+     }
 #endif
-	}
+  }
 }
 
 long SendCLI(char *word, char *command, UNUSED struct InstData *data)
@@ -218,13 +219,13 @@ long SendCLI(char *word, char *command, UNUSED struct InstData *data)
 
   sprintf(buffer, command, word);
 
-	/* path maybe 0, which is allowed */
-	path = CloneSearchPath();
+  /* path maybe 0, which is allowed */
+  path = CloneSearchPath();
 
   if (SystemTags(buffer, NP_Path, path, TAG_DONE) == -1)
   {
+    FreeSearchPath(path);
     result = FALSE;
-		FreeSearchPath(path);
   }
   return result;
 }

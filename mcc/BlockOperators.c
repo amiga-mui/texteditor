@@ -20,19 +20,13 @@
 
 ***************************************************************************/
 
-#include <stdio.h>
-#include <string.h>
-
+#include <exec/io.h>
 #include <devices/clipboard.h>
 #include <libraries/iffparse.h>
 
 #include <clib/alib_protos.h>
-#include <proto/dos.h>
-#include <proto/exec.h>
-#include <proto/intuition.h>
-#include <proto/iffparse.h>
 #include <proto/utility.h>
-#include <dos/dostags.h>
+#include <proto/exec.h>
 
 #include "TextEditor_mcc.h"
 #include "private.h"
