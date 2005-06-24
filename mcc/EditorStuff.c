@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <devices/clipboard.h>
 #include <libraries/iffparse.h>
 
 #include <clib/alib_protos.h>
