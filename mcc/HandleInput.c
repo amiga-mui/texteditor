@@ -20,18 +20,17 @@
 
 ***************************************************************************/
 
+#include <libraries/mui.h>
 #include <intuition/classes.h>
 #include <clib/alib_protos.h>
-#include <libraries/mui.h>
-#include <proto/graphics.h>
+#include <proto/muimaster.h>
 #include <proto/intuition.h>
 #include <proto/keymap.h>
 #include <proto/locale.h>
-#include <proto/muimaster.h>
-#include <proto/utility.h>
 
 #include "TextEditor_mcc.h"
 #include "private.h"
+
 #include "newmouse.h"
 
 extern struct keybindings keys[];

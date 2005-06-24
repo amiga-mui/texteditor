@@ -22,16 +22,14 @@
 
 #include <string.h>
 
+#include <exec/memory.h>
 #include <intuition/classes.h>
 #include <clib/alib_protos.h>
-#include <exec/memory.h>
-#include <proto/dos.h>
-#include <proto/exec.h>
 #include <proto/intuition.h>
 #include <proto/graphics.h>
-#include <proto/layers.h>
-#include <proto/locale.h>
 #include <proto/utility.h>
+#include <proto/locale.h>
+#include <proto/exec.h>
 
 #ifdef __MORPHOS__
 #include <proto/alib.h>

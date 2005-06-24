@@ -20,18 +20,18 @@
 
 ***************************************************************************/
 
-#include <stdio.h>
 #include <string.h>
 
-#include <clib/alib_protos.h>
+#include <exec/memory.h>
 #include <libraries/mui.h>
-#include <proto/dos.h>
-#include <proto/diskfont.h>
-#include <proto/exec.h>
-#include <proto/graphics.h>
-#include <proto/intuition.h>
-#include <proto/keymap.h>
+#include <clib/alib_protos.h>
 #include <proto/muimaster.h>
+#include <proto/intuition.h>
+#include <proto/diskfont.h>
+#include <proto/graphics.h>
+#include <proto/keymap.h>
+#include <proto/exec.h>
+#include <proto/dos.h>
 
 #include "TextEditor_mcc.h"
 #include "TextEditor_mcp.h"
@@ -43,7 +43,7 @@ struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
 {
   char *setting;
   char *fontname;
- 	char *size_ptr;
+  char *size_ptr;
   struct TextFont *f;
   struct TextAttr myfont;
 
@@ -55,7 +55,7 @@ struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
     return NULL;
   }
 
-	if(!setting)
+  if(!setting)
   {
     RETURN(NULL);
     return NULL;
@@ -67,29 +67,29 @@ struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
     return NULL;
   }
 
-	f = NULL;
+  f = NULL;
 
   myfont.ta_Name = fontname;
   myfont.ta_YSize = 8;
   myfont.ta_Style = FS_NORMAL;
   myfont.ta_Flags = 0;
 
-	strcpy(fontname,setting);
-	size_ptr = strchr(fontname,'/');
-	if (size_ptr)
-	{
-		long size;
+  strcpy(fontname,setting);
+  size_ptr = strchr(fontname,'/');
+  if (size_ptr)
+  {
+    LONG size;
 
-   	StrToLong(size_ptr + 1, &size);
-   	strncpy(size_ptr, ".font", 6);
-   	myfont.ta_YSize = size;
-	}
+    StrToLong(size_ptr + 1, &size);
+    strncpy(size_ptr, ".font", 6);
+    myfont.ta_YSize = size;
+  }
 
   f = OpenDiskFont(&myfont);
   FreeVec(fontname);
 
   RETURN(f);
-	return f;
+  return f;
 }
 
 void SetCol (struct InstData *data, void *obj, long item, ULONG *storage, long bit)

@@ -20,16 +20,14 @@
 
 ***************************************************************************/
 
-#include <stdio.h>
 #include <string.h>
 
-#include <clib/alib_protos.h>
-#include <proto/dos.h>
-#include <proto/exec.h>
-#include <proto/graphics.h>
-#include <proto/intuition.h>
-#include <proto/layers.h>
 #include <graphics/text.h>
+#include <libraries/mui.h>
+#include <clib/alib_protos.h>
+#include <proto/graphics.h>
+#include <proto/layers.h>
+#include <proto/exec.h>
 
 #ifndef CLASSACT
 #include <proto/muimaster.h>
