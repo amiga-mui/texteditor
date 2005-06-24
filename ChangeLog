@@ -5,6 +5,31 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-06-24  Gunther Nikl <gni@gecko.de>
+
+    * mcc/library.c: Only open V36 of layers.library, keymap.library and
+      diskfont.library
+    * mcc/BlockOperators.c, mcc/EditorStuff.c, mcc/TextEditor-Test.c: Added
+      "#include <devices/clipboard.h>" for <libraries/iffparse.h>.
+    * mcc/Dispatcher.c, mcc/GetSetAttrs.c, mcc/HandleInput.c: Added
+      "#include <intuition/classes.h>" for INST_DATA #define.
+    * mcc/private.h: Cleanup #include statements.
+    * mcc/AllocBitMap.c: Free allocated bitmap on failure in non-V39 case.
+      Move version check into USE_OS3 #define.
+      (MUIG_AllocBitMap): Improved friend handling.
+    * mcc/AllocFunctions.c: Minor changes.
+    * mcc/BlockOperators.c, mcc/Dispatcher.c, mcc/EditorStuff.c, mcc/ExportHook.c,
+      mcc/ExportText.c, GetSetAttrs.c, mcc/HandleARexx.c, mcc/HandleInput.c,
+      mcc/ImportHook.c, mcc/ImportText.c, mcc/InitConfig.c, mcc/MixedFunctions.c,
+      mcc/PrintLineWithStyles.c, mcc/Search.c, mcc/SpellChecker.c,
+      mcc/StyleOperators.c: Cleanup #include statements.
+    * mcc/SpellChecker.c: Fixed WorkbenchControl() replacement for GCC 3.4.x
+      and newer (has to use stdarg.h macros!)
+      (CloneSearchPath, FreeSearchPath): Delete >=44 check since thats what     
+      OpenLibrary() requests.
+      (SendRexx, SendCLI): Use LONG as return type.
+      (LookupWord, SuggestWord): Update to match SendRexx and SendCLI.
+
 2005-06-18  Jens Langner <Jens.Langner@light-speed.de>
 
     * mcc/Navigation.c: fixed a bug in the CursorOffset() function which cures
