@@ -5,6 +5,20 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-06-26 Jens Langner <Jens.Langner@light-speed.de>
+
+    * mcc/HandleInput.c, mcc/Methods.c, mcc/Navigation.c, misc: fixed another
+      bunch of problems with hard wrapped lines. There were still some problems
+      in correctly selecting a whole hard wrapped line by tripleclicking on it.
+      Now TextEditor.mcc should hopefully behave correct with hard wrapped lines
+      and display it as correct as it allows to select such lines.
+    * mcc/HandleInput.c, mcc/PrintLineWithStyle.c: on a doubleclick on a word
+      the editor always marked the block from zero which in fact was a bit
+      unintuitive and uncommon compared to other editors. Now if a user double-
+      clicks on a word that is e.g. centered only the word is marked.
+      In contrast, now also the whole line is drawed marked if the line is
+      triple clicked.
+
 2005-06-24  Gunther Nikl <gni@gecko.de>
 
     * mcc/library.c: Only open V36 of layers.library, keymap.library and
