@@ -5,6 +5,8 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+#### v15.13 RELEASE ############################################################
+
 2005-06-26 Jens Langner <Jens.Langner@light-speed.de>
 
     * mcc/PrintLineWithStyles.c: fixed a bug where we did also paint the
