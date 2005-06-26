@@ -174,7 +174,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
 
       SetFont(data->rport, data->font);
 
-      if(startx <= x+c_length && stopx > x)
+      if(startx < x+c_length && stopx > x)
       {
         if(startx > x)
           blockstart = TextLength(data->rport, text+x, startx-x);
@@ -183,23 +183,20 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
 
         blockwidth = ((stopx >= c_length+x) ? data->innerwidth-(blockstart+flow) : TextLength(data->rport, text+startx, stopx-startx));
       }
-      else
+      else if(!(data->flags & (FLG_ReadOnly | FLG_Ghosted)) &&
+              line == data->actualline && data->CPos_X >= x &&
+              data->CPos_X < x+c_length && !Enabled(data) &&
+              !data->scrollaction && (data->flags & FLG_Active))
       {
-        if(!(data->flags & (FLG_ReadOnly | FLG_Ghosted)) &&
-           line == data->actualline && data->CPos_X >= x &&
-           data->CPos_X <= x+c_length && !Enabled(data) &&
-           !data->scrollaction && (data->flags & FLG_Active))
-        {
-          cursor = TRUE;
-          blockstart = TextLength(data->rport, text+x, data->CPos_X-x);
+        cursor = TRUE;
+        blockstart = TextLength(data->rport, text+x, data->CPos_X-x);
 
-          // calculate the cursor width
-          // if it is set to 6 then we should find out how the width of the current char is
-          if(data->CursorWidth == 6)
-            blockwidth = TextLength(data->rport, (*(text+data->CPos_X) < ' ') ? (char *)" " : (char *)(text+data->CPos_X), 1);
-          else
-            blockwidth = data->CursorWidth;
-        }
+        // calculate the cursor width
+        // if it is set to 6 then we should find out how the width of the current char is
+        if(data->CursorWidth == 6)
+          blockwidth = TextLength(data->rport, (*(text+data->CPos_X) < ' ') ? (char *)" " : (char *)(text+data->CPos_X), 1);
+        else
+          blockwidth = data->CursorWidth;
       }
 
       SetDrMd(rp, JAM1);
@@ -208,20 +205,28 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
 #else
       data->rport = rp;
 #endif
+
+      // clear the background first
+      DoMethod(data->object, MUIM_DrawBackground, xoffset, starty, flow+blockstart, data->height, (data->flags & FLG_InVGrp) ? 0 : data->xpos, (data->flags & FLG_InVGrp) ? data->height*(data->visual_y+line_nr-2) : data->realypos+data->height * (data->visual_y+line_nr-2));
+
       if(blockwidth)
       {
-        if(blockstart || cursor)
-        {
-          DoMethod(data->object, MUIM_DrawBackground, xoffset, starty, flow+blockstart, data->height, (data->flags & FLG_InVGrp) ? 0 : data->xpos, (data->flags & FLG_InVGrp) ? data->height*(data->visual_y+line_nr-2) : data->realypos+data->height * (data->visual_y+line_nr-2));
-          SetAPen(rp, cursor ? data->cursorcolor : data->markedcolor);
-          RectFill(rp, xoffset+flow+blockstart, starty, xoffset+flow+blockstart+blockwidth-1, starty+data->height-1);
-        }
-        else
+        // if selectmode == 2 then a whole line should be drawn as being marked, so
+        // we have to start at xoffset instead of xoffset+flow+blockstart.
+        if(data->selectmode == 2 ||
+           (flow && startx == 0 && cursor == FALSE && (line != data->blockinfo.startline || line != data->blockinfo.stopline)))
         {
           SetAPen(rp, data->markedcolor);
           RectFill(rp, xoffset, starty, xoffset+flow+blockwidth-1, starty+data->height-1);
         }
+        else
+        {
+          SetAPen(rp, cursor ? data->cursorcolor : data->markedcolor);
+          RectFill(rp, xoffset+flow+blockstart, starty, xoffset+flow+blockstart+blockwidth-1, starty+data->height-1);
+        }
       }
+
+
       {
         LONG  x_start = xoffset+blockstart+blockwidth,
             y_start = starty,
@@ -241,6 +246,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
           x_ptrn += data->xpos;
           y_ptrn += data->realypos;
         }
+
         DoMethod(data->object, MUIM_DrawBackground, x_start, y_start, x_width, y_width, x_ptrn, y_ptrn);
       }
 #ifndef ClassAct

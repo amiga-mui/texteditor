@@ -27,6 +27,7 @@
 #include <proto/intuition.h>
 #include <proto/keymap.h>
 #include <proto/locale.h>
+#include <proto/utility.h>
 
 #include "TextEditor_mcc.h"
 #include "private.h"
@@ -233,17 +234,18 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                     if((data->DoubleClickHook && !CallHook(data->DoubleClickHook, (Object *)data->object, data->actualline->line.Contents, data->CPos_X)) || (!data->DoubleClickHook))
                     {
                       if(!CheckSep(data->actualline->line.Contents[data->CPos_X], data))
-//                      if(*(data->actualline->line.Contents+data->CPos_X) != ' ' && *(data->actualline->line.Contents+data->CPos_X) != '\n')
                       {
                         if(data->selectmode)
                         {
                           GoStartOfLine(data);
                           data->blockinfo.startx = data->CPos_X;
                           GoEndOfLine(data);
-                          data->blockinfo.stopline = data->actualline;
-                          data->blockinfo.stopx = data->CPos_X;
-                          MarkText(data->blockinfo.stopx, data->blockinfo.stopline, data->CPos_X, data->actualline, data);
-                          data->selectmode  = 2;
+
+                          // set selectmode to 2 so that PrintLine() knows that the user has tripple clicked
+                          // on a line, it will afterwards automatically set to 3 anyway.
+                          data->selectmode = 2;
+
+                          // reset the time values
                           data->StartSecs = 0;
                           data->StartMicros = 0;
                         }
@@ -252,7 +254,6 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                           int x = data->CPos_X;
 
                           while(x > 0 && !CheckSep(*(data->actualline->line.Contents+x-1), data))
-//                          while(x > 0 && *(data->actualline->line.Contents+x-1) != ' ')
                             x--;
 
                           data->blockinfo.startx = x;

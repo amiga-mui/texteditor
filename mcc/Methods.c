@@ -291,10 +291,28 @@ ULONG InputTrigger(UNUSED struct IClass *cl, struct InstData *data)
 
     if(data->blockinfo.enabled)
     {
-      if(data->blockinfo.stopline != data->actualline || data->blockinfo.stopx != data->CPos_X)
+      // if selectmode == 2, then the user has trippleclicked at the line
+      // and wants to get the whole line marked
+      if(data->selectmode == 2 || data->selectmode == 3)
+      {
+        data->selectmode = 2;
+
+        // if the line is a hard wrapped one we have to increase CPos_X by one
+        if(data->actualline->line.Contents[data->CPos_X] > ' ')
+        {
+          data->CPos_X++;
+          MarkText(data->blockinfo.stopx, data->blockinfo.stopline, data->CPos_X, data->actualline, data);
+        }
+        else
+          MarkText(data->blockinfo.stopx, data->blockinfo.stopline, data->CPos_X+1, data->actualline, data);
+
+        data->selectmode = 3;
+      }
+      else if(data->blockinfo.stopline != data->actualline || data->blockinfo.stopx != data->CPos_X)
       {
         MarkText(data->blockinfo.stopx, data->blockinfo.stopline, data->CPos_X, data->actualline, data);
       }
+
       data->blockinfo.stopline = data->actualline;
       data->blockinfo.stopx = data->CPos_X;
     }
