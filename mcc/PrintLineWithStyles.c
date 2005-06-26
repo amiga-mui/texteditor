@@ -313,7 +313,10 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       }
 */
 
-      Text(rp, text+x, p_length);
+      if(text[x+p_length-1] < ' ')
+        Text(rp, text+x, p_length-1);
+      else
+        Text(rp, text+x, p_length);
 
       x += p_length;
       c_length -= p_length;
