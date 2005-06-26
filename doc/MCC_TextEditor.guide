@@ -1,5 +1,5 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.12 (28.05.2005)
+@$VER: TextEditor.Guide 15.13 (27.06.2005)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
@@ -156,10 +156,10 @@ TextEditor requires:
 - @{"Magic User Interface" Link MUI} 3.6 or above.
 
 TextEditor.mcp requires BetterString.mcc and HotkeyString.mcc,
-http:\//www.diku.dk/students/duff/
+http:\//www.sf.net/projects/bstring-mcc/
 
-TextEditor-Demo requires Toolbar.mcc and InfoText.mcc by Benny Kjær Nielsen
-<Floyd@Amiga,DK>, http:\//www.diku.dk/students/benny/
+TextEditor-Demo requires Toolbar.mcc and InfoText.mcc by Benny Kjær Nielsen,
+http:\//main.aminet.net/package.php?package=dev/mui/MCC_Toolbar.lha
 
 
 Automatic installation
@@ -339,6 +339,19 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.13 (27.06.2005)
+
+- fixed doubleclick behaviour on the first words of a line that is displayed either
+  centered or right aligned.
+- fixed some bugs concerning hard wrapped lines. Now TextEditor.mcc should properly
+  wrap lines without any spaces, as well as allowing to mark them properly.
+- fixed the plain ImportHook to also recognize escape sequences like the old 15.9
+  version did.
+- added recognition for the extended keycodes mainly known to OS4/MOS. This also includes
+  the keycodes for the newmouse standard.
+- if a texteditor.mcc object is now being disabled a connected slider also gets
+  automatically disabled as well.
 
 15.12 (28.05.2005)
 

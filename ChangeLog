@@ -8,8 +8,8 @@ $Source$
 2005-06-26 Jens Langner <Jens.Langner@light-speed.de>
 
     * mcc/PrintLineWithStyles.c: fixed a bug where we did also paint the
-	   non printable newline characters at the end of each line. This caused
-		that with some fonts the newlines where printed with special glyphes.
+      non printable newline characters at the end of each line. This caused
+      that with some fonts the newlines where printed with special glyphes.
     * mcc/ExportHook.c: fixed bug #1227680 where the ExportText() method did
       always export one line too much due to not clearing the last 0x0a, which
       in fact is always articial.
