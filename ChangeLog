@@ -7,6 +7,9 @@ $Source$
 
 2005-06-26 Jens Langner <Jens.Langner@light-speed.de>
 
+    * mcc/ExportHook.c: fixed bug #1227680 where the ExportText() method did
+      always export one line too much due to not clearing the last 0x0a, which
+      in fact is always articial.
     * mcc/HandleInput.c, mcc/Methods.c, mcc/Navigation.c, misc: fixed another
       bunch of problems with hard wrapped lines. There were still some problems
       in correctly selecting a whole hard wrapped line by tripleclicking on it.

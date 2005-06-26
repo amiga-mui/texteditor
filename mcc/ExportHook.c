@@ -312,8 +312,9 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
 
   if(emsg->Last)
   {
-    *buf->pointer = '\0';
+    *(buf->pointer-1) = '\0'; // this clears the last 0x0A which is artifical anyway.
     result = buf->buffer;
+
     if(data)
     {
       MyFreePooled(data->mypool, buf);
