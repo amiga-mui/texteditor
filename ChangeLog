@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-06-28 Jens Langner <Jens.Langner@light-speed.de>
+
+    * mcc/HandleInput.c: fixed bug #1229170 where due to a signedness problem
+      characters with a code >128 couldn't be typed in under OS3.
+
 #### v15.13 RELEASE ############################################################
 
 2005-06-26 Jens Langner <Jens.Langner@light-speed.de>
