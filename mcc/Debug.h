@@ -71,7 +71,8 @@ void kprintf(const char *formatString,...);
 
 // debug flags
 #define DBF_ALWAYS   (1<<0)
-#define DBF_STARTUP  (1<<1)     // for startup/shutdown events (YAM.c)
+#define DBF_STARTUP  (1<<1)     // for startup/shutdown events
+#define DBF_INPUT    (1<<2)     // input events and handleinput stuff etc. (HandleInput.c)
 #define DBF_ALL      0xffffffff
 
 void SetupDebug(void);

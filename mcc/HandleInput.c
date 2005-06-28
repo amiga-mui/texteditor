@@ -686,7 +686,7 @@ void Key_Normal(UBYTE key, struct InstData *data)
 static long ConvertKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
 {
   long result = TRUE;
-  char code;
+  unsigned char code;
 #ifndef ClassAct
   struct   InputEvent  event;
 
@@ -699,13 +699,15 @@ static long ConvertKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, st
   event.ie_Qualifier      = qualifier;
   event.ie_EventAddress   = (APTR *) *((ULONG *)imsg->IAddress);
 
-  if(MapRawKey(&event, &code, 1, NULL) > 0)
+  if(MapRawKey(&event, (STRPTR)&code, 1, NULL) > 0)
 #else
   ENTER();
 
   if(MapRawKey((struct InputEvent *)imsg, &code, 1, NULL) > 0)
 #endif
   {
+    SHOWVALUE(DBF_INPUT, code);
+
 #ifdef FILTER_NONPRINTABLE
     if((code < 32) || ((code > 126) && (code < 160)))
 #else
