@@ -1032,16 +1032,15 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
 
 static LONG ReactOnRawKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
 {
-  BOOL result = TRUE;
-  LONG dummy;
   struct line_node *oldactualline = data->actualline;
   UWORD oldCPos_X = data->CPos_X;
+  LONG result = TRUE;
 
   ENTER();
 
   if(key <= IECODE_KEY_CODE_LAST)
   {
-    dummy = FindKey(key, qualifier, data);
+    LONG dummy = FindKey(key, qualifier, data);
     if(dummy == 1)
     {
       data->pixel_x = 0;
