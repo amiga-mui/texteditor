@@ -241,7 +241,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                           data->blockinfo.startx = data->CPos_X;
                           GoEndOfLine(data);
 
-                          // set selectmode to 2 so that PrintLine() knows that the user has tripple clicked
+                          // set selectmode to 2 so that PrintLine() knows that the user has tripleclicked
                           // on a line, it will afterwards automatically set to 3 anyway.
                           data->selectmode = 2;
 
@@ -264,9 +264,34 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                       }
                       else
                       {
-                        data->selectmode  = 0;
-                        data->StartSecs = imsg->Seconds;
-                        data->StartMicros = imsg->Micros;
+                        // if the user clicked somewhere where we didn't find any separator
+                        // we have to check wheter this is already a tripleclick or still a doubleclick
+                        // because we ensure that on a tripleclick ALWAYS the whole line is marked
+                        // regardless if the user clicked on a actual word that can be separated or not.
+                        if(data->selectmode == 1)
+                        {
+                          GoStartOfLine(data);
+                          data->blockinfo.startx = data->CPos_X;
+                          GoEndOfLine(data);
+
+                          // set selectmode to 2 so that PrintLine() knows that the user has tripleclicked
+                          // on a line, it will afterwards automatically set to 3 anyway.
+                          data->selectmode = 2;
+
+                          // reset the time values
+                          data->StartSecs = 0;
+                          data->StartMicros = 0;
+                        }
+                        else
+                        {
+                          if(data->selectmode == 0)
+                            data->selectmode = 1;
+                          else
+                            data->selectmode = 0;
+
+                          data->StartSecs = imsg->Seconds;
+                          data->StartMicros = imsg->Micros;
+                        }
                       }
                     }
                   }

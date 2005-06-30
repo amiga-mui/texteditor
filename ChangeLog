@@ -7,6 +7,10 @@ $Source$
 
 2005-06-30 Jens Langner <Jens.Langner@light-speed.de>
 
+    * mcc/HandleInput.c: if the user tripleclicks on a character that is
+      a separating character the texteditor previously didn't allow to mark
+      the whole line. Now always the whole line is marked if the user
+      tripleclicks somewhere on a line.
     * mcc/PrintLineWithStyles.c: fixed a minor bug in the text marking display
       routines where on centered and right aligned lines not always the whole
       line was correctly displayed as being marked. Now it should be fairly
