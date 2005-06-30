@@ -5,6 +5,14 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-06-30 Jens Langner <Jens.Langner@light-speed.de>
+
+    * mcc/PrintLineWithStyles.c: fixed a minor bug in the text marking display
+      routines where on centered and right aligned lines not always the whole
+      line was correctly displayed as being marked. Now it should be fairly
+      better, however the current solution still doesn't cover all cases and
+      probably requires a rewrite in some day in future :)
+
 2005-06-28 Jens Langner <Jens.Langner@light-speed.de>
 
     * mcc/HandleInput.c: fixed bug #1229170 where due to a signedness problem
