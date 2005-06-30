@@ -40,7 +40,7 @@ static long ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessag
 static ULONG RAWToANSI(struct IntuiMessage *imsg)
 {
   struct  InputEvent  event;
-  char code = 0;
+  unsigned char code = 0;
 
   ENTER();
 
@@ -51,7 +51,9 @@ static ULONG RAWToANSI(struct IntuiMessage *imsg)
   event.ie_Qualifier      = imsg->Qualifier;
   event.ie_EventAddress   = (APTR *) *((ULONG *)imsg->IAddress);
 
-  MapRawKey(&event, &code, 1, NULL);
+  MapRawKey(&event, (STRPTR)&code, 1, NULL);
+
+  SHOWVALUE(DBF_INPUT, code);
 
   RETURN(code);
   return(code);
@@ -711,7 +713,7 @@ void Key_Normal(UBYTE key, struct InstData *data)
 static long ConvertKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
 {
   long result = TRUE;
-  unsigned char code;
+  unsigned char code = 0;
 #ifndef ClassAct
   struct   InputEvent  event;
 
