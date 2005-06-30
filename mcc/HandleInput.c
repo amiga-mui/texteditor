@@ -35,21 +35,22 @@
 #include "newmouse.h"
 
 extern struct keybindings keys[];
-static long ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data);
+
+static LONG ReactOnRawKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data);
 
 static ULONG RAWToANSI(struct IntuiMessage *imsg)
 {
-  struct  InputEvent  event;
-  unsigned char code = 0;
+  struct InputEvent event;
+  UBYTE code = 0;
 
   ENTER();
 
-  event.ie_NextEvent      = NULL;
-  event.ie_Class          = IECLASS_RAWKEY;
-  event.ie_SubClass       = 0;
-  event.ie_Code           = imsg->Code;
-  event.ie_Qualifier      = imsg->Qualifier;
-  event.ie_EventAddress   = (APTR *) *((ULONG *)imsg->IAddress);
+  event.ie_NextEvent    = NULL;
+  event.ie_Class        = IECLASS_RAWKEY;
+  event.ie_SubClass     = 0;
+  event.ie_Code         = imsg->Code;
+  event.ie_Qualifier    = imsg->Qualifier;
+  event.ie_EventAddress = (APTR *) *((ULONG *)imsg->IAddress);
 
   MapRawKey(&event, (STRPTR)&code, 1, NULL);
 
@@ -165,7 +166,8 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
         }
         break;
 
-/*        case IDCMP_INACTIVEWINDOW:
+/*
+        case IDCMP_INACTIVEWINDOW:
         {
           if(data->mousemove)
           {
@@ -175,7 +177,8 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
         }
         break;
 */
-/*        case IDCMP_MOUSEMOVE:
+/*
+        case IDCMP_MOUSEMOVE:
           if(data->mousemove && !data->smooth_wait)
             InputTrigger(cl, data);
           break;
@@ -494,7 +497,7 @@ void Key_Copy (struct InstData *data)
 
 void Key_Paste (struct InstData *data)
 {
-  BOOL  update;
+  BOOL update;
   struct marking block;
 
   ENTER();
@@ -619,6 +622,7 @@ void Key_Delete (struct InstData *data)
 
   LEAVE();
 }
+
 /*
 void cutcopypasteerase (UBYTE key, ULONG qualifier, struct InstData *data)
 {
@@ -710,27 +714,28 @@ void Key_Normal(UBYTE key, struct InstData *data)
 /*----------------*
  * Convert Rawkey *
  *----------------*/
-static long ConvertKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
+static LONG ConvertKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
 {
-  long result = TRUE;
-  unsigned char code = 0;
+  LONG result = TRUE;
+  UBYTE code = 0;
 #ifndef ClassAct
-  struct   InputEvent  event;
+  struct InputEvent event;
 
   ENTER();
 
-  event.ie_NextEvent      = NULL;
-  event.ie_Class          = IECLASS_RAWKEY;
-  event.ie_SubClass       = 0;
-  event.ie_Code           = key;
-  event.ie_Qualifier      = qualifier;
-  event.ie_EventAddress   = (APTR *) *((ULONG *)imsg->IAddress);
+  event.ie_NextEvent    = NULL;
+  event.ie_Class        = IECLASS_RAWKEY;
+  event.ie_SubClass     = 0;
+  event.ie_Code         = key;
+  event.ie_Qualifier    = qualifier;
+  event.ie_EventAddress = (APTR *) *((ULONG *)imsg->IAddress);
 
   if(MapRawKey(&event, (STRPTR)&code, 1, NULL) > 0)
 #else
   ENTER();
 
-  if(MapRawKey((struct InputEvent *)imsg, &code, 1, NULL) > 0)
+  // XXX: why shall imsg be an InputEvent!?
+  if(MapRawKey((struct InputEvent *)imsg, (STRPTR)&code, 1, NULL) > 0)
 #endif
   {
     SHOWVALUE(DBF_INPUT, code);
@@ -757,7 +762,6 @@ static long ConvertKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, st
 
 /*  data->pixel_x = 0;
   return(MUI_EventHandlerRC_Eat);
-
 */
 
 static BOOL MatchQual(ULONG input, ULONG match, UWORD action, struct InstData *data)
@@ -788,10 +792,10 @@ static BOOL MatchQual(ULONG input, ULONG match, UWORD action, struct InstData *d
 /*---------------------------------*
  * Function to handle a cursormove *
  *---------------------------------*/
-static long FindKey (unsigned char key, unsigned long qualifier, struct InstData *data)
+static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
 {
-  struct   keybindings *t_keys = data->RawkeyBindings;
-  BOOL    speed = FALSE;
+  struct keybindings *t_keys = data->RawkeyBindings;
+  BOOL speed = FALSE;
 
   ENTER();
 
@@ -1026,10 +1030,10 @@ static long FindKey (unsigned char key, unsigned long qualifier, struct InstData
   return(2);
 }
 
-static long ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
+static LONG ReactOnRawKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
 {
   BOOL result = TRUE;
-  long dummy;
+  LONG dummy;
   struct line_node *oldactualline = data->actualline;
   UWORD oldCPos_X = data->CPos_X;
 
@@ -1094,12 +1098,14 @@ static long ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessag
         {
           result = TRUE;
         }
-/*        else
+/*
+        else
         {
           if(((data->flags & FLG_ReadOnly || qualifier & IEQUALIFIER_RCOMMAND) || !ConvertKey(key, qualifier, imsg, data)))
             result = FALSE;
         }
-*/      }
+*/
+      }
     }
   }
   else
@@ -1118,8 +1124,8 @@ static long ReactOnRawKey(unsigned char key, ULONG qualifier, struct IntuiMessag
  *------------------------------------------------------*/
 void ScrollIntoDisplay(struct InstData *data)
 {
-  struct   pos_info pos;
-  LONG      diff;
+  struct pos_info pos;
+  LONG diff;
 
   ENTER();
 
