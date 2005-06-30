@@ -83,7 +83,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
   {
     Object *activeobj;
     Object *defaultobj;
-  	struct IntuiMessage *imsg = msg->imsg;
+    struct IntuiMessage *imsg = msg->imsg;
 
     get(_win(obj), MUIA_Window_ActiveObject, (APTR)&activeobj);
     get(_win(obj), MUIA_Window_DefaultObject, (APTR)&defaultobj);
@@ -122,39 +122,39 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
             return(MUI_EventHandlerRC_Eat);
           }
 
-    			// we check wheter the mouse is currently within our object borders
+          // we check wheter the mouse is currently within our object borders
           // and if so we check wheter the newmouse wheel stuff is used or not
           if(data->slider &&
              _isinwholeobject(obj, imsg->MouseX, imsg->MouseY))
-    			{
-		    		// MouseWheel events are only possible if the mouse is above the
-				    // object
-    				if(imsg->Code == NM_WHEEL_UP   || imsg->Code == NM_WHEEL_LEFT ||
-		    			 imsg->Code == NM_WHEEL_DOWN || imsg->Code == NM_WHEEL_RIGHT)
-				    {
-    					LONG visible;
+          {
+            // MouseWheel events are only possible if the mouse is above the
+            // object
+            if(imsg->Code == NM_WHEEL_UP   || imsg->Code == NM_WHEEL_LEFT ||
+               imsg->Code == NM_WHEEL_DOWN || imsg->Code == NM_WHEEL_RIGHT)
+            {
+              LONG visible;
 
               get(obj, MUIA_TextEditor_Prop_Visible, &visible);
-		    			if(visible > 0)
-				    	{
-						    // we scroll about 1/6 of the displayed text by default
-    						LONG delta = (visible + 3) / 6;
+              if(visible > 0)
+              {
+                // we scroll about 1/6 of the displayed text by default
+                LONG delta = (visible + 3) / 6;
 
-		    				// make sure that we scroll at least 1 line
-				    		if(delta < 1) delta = 1;
+                // make sure that we scroll at least 1 line
+                if(delta < 1) delta = 1;
 
-						    if(imsg->Code == NM_WHEEL_UP || imsg->Code == NM_WHEEL_LEFT)
-    						{
-		    					DoMethod(data->slider, MUIM_Prop_Decrease, delta);
-				    		}
-						    else
+                if(imsg->Code == NM_WHEEL_UP || imsg->Code == NM_WHEEL_LEFT)
+                {
+                  DoMethod(data->slider, MUIM_Prop_Decrease, delta);
+                }
+                else
                   DoMethod(data->slider, MUIM_Prop_Increase, delta);
-  					  }
+              }
 
               RETURN(MUI_EventHandlerRC_Eat);
-					    return MUI_EventHandlerRC_Eat;
-    				}
-		    	}
+              return MUI_EventHandlerRC_Eat;
+            }
+          }
 
           // if not we check wheter we have to react on that particular RAWKEY event
           if(ReactOnRawKey(imsg->Code, imsg->Qualifier, imsg, data) == 0)
