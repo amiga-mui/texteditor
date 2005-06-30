@@ -213,8 +213,14 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       {
         // if selectmode == 2 then a whole line should be drawn as being marked, so
         // we have to start at xoffset instead of xoffset+flow+blockstart.
+        // Please note that the second part of the following "empiric" evaluation should
+        // prevent that centered or right aligned lines are not correctly marked right
+        // from the beginning of the line. However, it seems to be not cover 100% of all different
+        // cases so that the evaluation if a line should be completely marked should be probably
+        // moved elsewhere in future.
         if(data->selectmode == 2 ||
-           (flow && startx == 0 && cursor == FALSE && (line != data->blockinfo.startline || line != data->blockinfo.stopline)))
+           (flow && data->selectmode != 1 && startx-x == 0 && cursor == FALSE &&
+            ((data->blockinfo.startline != data->blockinfo.stopline) || x > 0)))
         {
           SetAPen(rp, data->markedcolor);
           RectFill(rp, xoffset, starty, xoffset+flow+blockwidth-1, starty+data->height-1);
