@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-07-02 Sebastian Bauer <mail@sebastianbauer.info>
+
+    * doc/MCC_TextEditor.doc: Described that for other import hooks than the
+      plain hook, escape sequences had to be supported as well, as some
+      progams insist on this former undocumented "feature".
+
 2005-06-30 Jens Langner <Jens.Langner@light-speed.de>
 
     * mcc/HandleInput.c: if the user tripleclicks on a character that is
