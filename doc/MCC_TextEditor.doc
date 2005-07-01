@@ -424,7 +424,6 @@ is maintained and Copyright (C) 2005 by the TextEditor.mcc Open Source team.
         to MPEN_FILL.  To override it, just supply a colormap with entry 6
         set to whatever color you would like.
 
-
         MUIV_TextEditor_ImportHook_MIMEQuoted:
 
         Like the MIME import hook, but each line gets quoted and highlighted.
@@ -433,6 +432,12 @@ is maintained and Copyright (C) 2005 by the TextEditor.mcc Open Source team.
         MUIV_TextEditor_ImportHook_EMail:
 
         Like the MIME import hook, but it doesn't convert quoted printables.
+
+        Note, that the last three hooks also evaluate the escape sequences
+        described for the MUIV_TextEditor_ImportHook_Plain type. While it
+        never was documented there are some programs insisting on this
+        side effect of an old implementation. Hence starting with version
+        51.13 this behaviour had to be official supported.
 
 
         You can of course create your own import hook - there is an external
