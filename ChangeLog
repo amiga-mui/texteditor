@@ -8,8 +8,8 @@ $Source$
 2005-07-02 Sebastian Bauer <mail@sebastianbauer.info>
 
     * doc/MCC_TextEditor.doc: Described that for other import hooks than the
-      plain hook, escape sequences had to be supported as well, as some
-      progams insist on this former undocumented "feature".
+      plain hook, escape sequences have to be supported as well, as some
+      progams have insisted on this former undocumented "feature".
 
 2005-06-30 Jens Langner <Jens.Langner@light-speed.de>
 
