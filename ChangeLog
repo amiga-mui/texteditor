@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-07-02 Jens Langner <Jens.Langner@light-speed.de>
+
+    * mcc/HandleInput.c: fixed a bug where after having tripleclicked on an empty
+      line, another normal click on another line caused the empty line to stay
+      marked.
+
 2005-07-02 Sebastian Bauer <mail@sebastianbauer.info>
 
     * doc/MCC_TextEditor.doc: Described that for other import hooks than the
