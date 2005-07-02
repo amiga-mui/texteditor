@@ -431,6 +431,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
   * a '=' is detected at the end of a line this memory is not sufficient! */
 	if ((line->Contents = MyAllocPooled(msg->PoolHandle,len+4)))
 	{
+    BOOL lastWasSeparator = TRUE;
 		unsigned char *dest_start = (unsigned char *)line->Contents;
 		unsigned char *dest = dest_start;
 		unsigned char *dest_word_start = dest_start;
@@ -478,13 +479,21 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 		/* Copy loop */
 		while (src < eol)
 		{
-			unsigned char c = *src++;
+      unsigned char c = *src++;
 
-			if(c == '\t')
+      if(c == '\n')
+      {
+        lastWasSeparator = TRUE;
+      }
+			else if(c == '\t')
 			{
 				int i;
-				for (i=(dest - dest_start)% 4; i < 4; i++)
+				
+        for(i=(dest - dest_start)% 4; i < 4; i++)
 					*dest++ = ' ';
+
+        lastWasSeparator = TRUE;
+
 				continue;				
 			}
       else if(c == '/')
@@ -493,15 +502,19 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
         {
           if(shownext & ITALIC)
             shownext ^= ITALIC;
-          else if((state & ITALIC) || ContainsText(src, '/'))
+          else if((state & ITALIC) || (lastWasSeparator && ContainsText(src, '/')))
           {
 				    AddToGrow(&style_grow, dest - dest_start + 1, (state & ITALIC) ? ~ITALIC : ITALIC);
 				    state ^= ITALIC;
+
+            lastWasSeparator = TRUE;
             continue;
           }
           else
             shownext |= ITALIC;
 				}
+
+        lastWasSeparator = TRUE;
 			}
       else if(c == '*')
 			{
@@ -509,15 +522,19 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
         {
           if(shownext & BOLD)
             shownext ^= BOLD;
-          else if((state & BOLD) || ContainsText(src, '*'))
+          else if((state & BOLD) || (lastWasSeparator && ContainsText(src, '*')))
     			{
           	AddToGrow(&style_grow, dest - dest_start + 1, (state & BOLD) ? ~BOLD : BOLD);
 	    			state ^= BOLD;
+
+            lastWasSeparator = TRUE;
             continue;
           }
           else
             shownext |= BOLD;
 		    }
+
+        lastWasSeparator = TRUE;
 			}
       else if(c == '_')
 			{
@@ -525,15 +542,19 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
         {
           if(shownext & UNDERLINE)
             shownext ^= UNDERLINE;
-          else if((state & UNDERLINE) || ContainsText(src, '_'))
+          else if((state & UNDERLINE) || (lastWasSeparator && ContainsText(src, '_')))
   				{
             AddToGrow(&style_grow, dest - dest_start + 1, (state & UNDERLINE) ? ~UNDERLINE : UNDERLINE);
 	  			  state ^= UNDERLINE;
+
+            lastWasSeparator = TRUE;
             continue;
           }
           else
             shownext |= UNDERLINE;
         }
+
+        lastWasSeparator = TRUE;
 			}
       else if(c == '#')
 			{
@@ -541,15 +562,19 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
         {
           if(shownext & COLOURED)
             shownext ^= COLOURED;
-          else if((state & COLOURED) || ContainsText(src, '#'))
+          else if((state & COLOURED) || (lastWasSeparator && ContainsText(src, '#')))
           {
   				  AddToGrow(&color_grow, dest - dest_start + 1, (state & COLOURED) ? 0 : 7);
 	  			  state ^= COLOURED;
+
+            lastWasSeparator = TRUE;
             continue;
           }
           else
             shownext |= COLOURED;
 		    }
+
+        lastWasSeparator = TRUE;
 			}
       else if(c == '=')
 			{
@@ -584,6 +609,8 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 						dest = new_dest_start + (dest - dest_start);
             line->Contents = (char *)new_dest_start;
 						dest_start = (unsigned char *)line->Contents;
+
+            lastWasSeparator = FALSE;
 						continue;
 					}
 				}
@@ -670,6 +697,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
           break;
 				}
 
+        lastWasSeparator = FALSE;
 				continue;
 			}
 
@@ -678,9 +706,19 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 				/* src is already advanced */
 				src_word_start = (unsigned char *)src;
 				dest_word_start = dest;
-			}
 
-			if (wrap && ((ULONG)(dest - dest_start)) >= wrap)
+        lastWasSeparator = TRUE;
+			}
+      else if(c == '\n')
+      {
+        lastWasSeparator = TRUE;
+      }
+      else
+      {
+        lastWasSeparator = FALSE;
+      }
+
+			if(wrap && ((ULONG)(dest - dest_start)) >= wrap)
 			{
 				/* Only leave the loop, if we really have added some characters
 				 * (at least one word) to the line */

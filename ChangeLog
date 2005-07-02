@@ -7,6 +7,10 @@ $Source$
 
 2005-07-02 Jens Langner <Jens.Langner@light-speed.de>
 
+    * mcc/ImportHook.c: fixed bug #1229129 where the new "EMail" import hook
+      didn't correctly parse lines with typical email like highlight chars,
+      which in fact caused applications using this import to display some
+      hightligthed sections incorrect.
     * mcc/Search.c: fixed bug #1231207 where the MUIM_TextEditor_Search method
       was broken due to a changed datatype.
     * mcc/HandleInput.c: fixed a bug where after having tripleclicked on an empty
