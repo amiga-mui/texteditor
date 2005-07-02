@@ -274,13 +274,6 @@ char *GetBlock (struct marking *block, struct InstData *data)
   return(text);
 }
 
-long Enabled(struct InstData *data)
-{
-  if(data->blockinfo.enabled && (data->blockinfo.startx != data->blockinfo.stopx || data->blockinfo.startline != data->blockinfo.stopline))
-      return(TRUE);
-  else  return(FALSE);
-}
-
 void NiceBlock (struct marking *realblock, struct marking *newblock)
 {
   LONG  startx = realblock->startx, stopx = realblock->stopx;

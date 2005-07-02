@@ -52,6 +52,12 @@
 #define _isinobject(o,x,y) 				(_between(_mleft(o),(x),_mright (o)) && _between(_mtop(o) ,(y),_mbottom(o)))
 #define _isinwholeobject(o,x,y) 	(_between(_left(o),(x),_right (o)) && _between(_top(o) ,(y),_bottom(o)))
 
+// own common macros
+#define Enabled(data)   ((data)->blockinfo.enabled && \
+                         ((data)->blockinfo.startx != (data)->blockinfo.stopx || \
+                          (data)->blockinfo.startline != (data)->blockinfo.stopline || \
+                           data->selectmode == 3))
+
 struct bookmark
 {
   struct  line_node *line;
@@ -279,7 +285,6 @@ void  PosFromCursor     (short, short, struct InstData *);
 void  MarkText        (LONG, struct line_node *, LONG, struct line_node *, struct InstData *);
 
 VOID  RedrawArea        (UWORD, struct line_node *, UWORD, struct line_node *, struct InstData *);
-long  Enabled         (struct InstData *);
 void  NiceBlock       (struct marking *, struct marking *);
 LONG  CutBlock        (struct InstData *, long, long, BOOL);
 
