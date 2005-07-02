@@ -66,12 +66,12 @@ ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
 
   if(len && len <= 120)
   {
-    char map[256];
-//    int (*StrCmp) (const char *, const char *, size_t);
-    LONG (*StrCmp) (STRPTR, STRPTR, LONG);
-
+    BYTE map[256];
+    LONG (*StrCmp)(STRPTR, STRPTR, LONG);
     UWORD cursor;
     struct line_node *line;
+
+    // if the FromTop flag is set we start the search right from the top
     if(msg->Flags & MUIF_TextEditor_Search_FromTop)
     {
       cursor = 0;
@@ -84,12 +84,15 @@ ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
     }
 
     memset(map, len, 256);
+
+    // if a casesensitive search is requested we use a different
+    // compare function.
     if(msg->Flags & MUIF_TextEditor_Search_CaseSensitive)
     {
       StrCmp = Native_strncmp;
 
       while(*str)
-        map[(int)(*str++)] = step--;
+        map[(int)*str++] = step--;
     }
     else
     {
@@ -104,16 +107,20 @@ ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
     while(line)
     {
       LONG skip;
-      STRPTR contents = line->line.Contents + cursor + len-1, upper = line->line.Contents + line->line.Length;
+      STRPTR contents = line->line.Contents + cursor + len-1;
+      STRPTR upper = line->line.Contents + line->line.Length;
+
       while(contents < upper)
       {
         skip = map[(int)(*contents)];
         contents += skip;
+
         if(skip <= 0)
         {
           if(!StrCmp(contents, msg->SearchString, len))
           {
             UWORD startx = contents - line->line.Contents;
+
             SimpleMarkText(startx, line, startx+len, line, data);
 
             RETURN(TRUE);
