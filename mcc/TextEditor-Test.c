@@ -168,9 +168,9 @@ int main(void)
       if((MUIMasterBase = OpenLibrary("muimaster.library", MUIMASTER_VMIN)) &&
         GETINTERFACE(IMUIMaster, MUIMasterBase))
       {
-          void    *app, *window, *clear, *cut, *copy, *paste, *erase,
-                *bold, *italic, *underline, *ischanged, *undo, *redo, *string,
-                *xslider, *yslider, *flow;
+          Object *app, *window, *clear, *cut, *copy, *paste, *erase,
+                 *bold, *italic, *underline, *ischanged, *undo, *redo, *string,
+                 *xslider, *yslider, *flow, *search;
           STRPTR  flow_text[] = {"Left", "Center", "Right", NULL};
           STRPTR  classes[] = {"TextEditor.mcc", NULL};
 
@@ -208,6 +208,7 @@ int main(void)
                       Child, erase = MUI_MakeObject(MUIO_Button, "Erase"),
                       Child, undo = MUI_MakeObject(MUIO_Button, "Undo"),
                       Child, redo = MUI_MakeObject(MUIO_Button, "Redo"),
+                      Child, search = MUI_MakeObject(MUIO_Button, "Search"),
                       Child, ischanged = MUI_MakeObject(MUIO_Checkmark, "Is changed?"),
                       Child, flow = MUI_MakeObject(MUIO_Cycle, NULL, flow_text),
 
@@ -442,7 +443,7 @@ int main(void)
           DoMethod(erase, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "Erase");
 //          DoMethod(undo,  MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 3, MUIM_Set, MUIA_TextEditor_Prop_First, 13*15);
           DoMethod(undo,  MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "Undo");
-          DoMethod(redo,  MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "Redo");
+          DoMethod(search,  MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 3, MUIM_TextEditor_Search, "is not", 0);//MUIF_TextEditor_Search_CaseSensitive);
 
           DoMethod(bold,      MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_StyleBold, MUIV_TriggerValue);
           DoMethod(italic,    MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_StyleItalic, MUIV_TriggerValue);
