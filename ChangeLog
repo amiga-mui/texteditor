@@ -5,6 +5,8 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+#### v15.14 RELEASE ############################################################
+
 2005-07-02 Jens Langner <Jens.Langner@light-speed.de>
 
     * mcc/ImportHook.c: fixed bug #1229129 where the new "EMail" import hook
