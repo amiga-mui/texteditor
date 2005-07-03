@@ -1,5 +1,5 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.13 (27.06.2005)
+@$VER: TextEditor.Guide 15.14 (03.07.2005)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
@@ -339,6 +339,17 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.14 (03.07.2005)
+
+- fixed the "EMail" importhook to only use soft styles on a line if the /*_ characters
+  are prefixed by a linear white space.
+- fixed a bug that prevented the MUIM_TextEditor_Search method to work properly.
+- a tripleclick on a line now always marks the whole line, regardless if the user clicks
+  on a separating/non existing character.
+- fixed a bug where centered/right aligned text wasn't displayed correctly if marked
+  with the mouse.
+- fixed a bug where under m68k characters > 126 couldn't be typed.
 
 15.13 (27.06.2005)
 
