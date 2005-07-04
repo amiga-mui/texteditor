@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-07-04  Ilkka Lehtoranta <ilkleht@isoveli.org>
+
+    * mcc/MixedFunctions.c: Antialias font detection didnt work in MorphOS
+      (there isn't FSF_ANTIALIAS flag) and cursor background was not cleared
+      accordingly. Rather assume font is always antialiased what is true in
+      most cases.
+
 #### v15.14 RELEASE ############################################################
 
 2005-07-02 Jens Langner <Jens.Langner@light-speed.de>
