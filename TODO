@@ -29,3 +29,4 @@ Items that ought to be implemented in future TextEditor.mcc releases:
 * Implement more different Import/Export hooks.
 * Change all import/export hooks to use a flex template whereever possible.
 * Inline image display
+* Fix background rendering when certain types of gradients are used.
