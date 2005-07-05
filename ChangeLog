@@ -8,8 +8,8 @@ $Source$
 2005-07-05 Jens Langner <Jens.Langner@light-speed.de>
 
     * mcc/MixedFunctions.c: fixed another possible signedness problem which
-	   might have caused problem with characters > 127 and was found by Georg
-		Steger.
+      might have caused problem with characters > 127 and was found by Georg
+      Steger.
 
 2005-07-04  Ilkka Lehtoranta <ilkleht@isoveli.org>
 
