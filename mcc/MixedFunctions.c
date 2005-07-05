@@ -323,7 +323,7 @@ void  OffsetToLines (LONG x, struct line_node *line, struct pos_info *pos, struc
  *------------------*/
 void SetCursor(LONG x, struct line_node *line, long Set, struct InstData *data)
 {
-  char chars[4] = "   \0";
+  unsigned char chars[4] = "   \0";
   LONG   line_nr;
   struct pos_info pos;
   ULONG  xplace, yplace, cursorxplace;
@@ -381,7 +381,7 @@ void SetCursor(LONG x, struct line_node *line, long Set, struct InstData *data)
     /* if font is anti aliased, clear area near the cursor first */
     if(IS_ANTIALIASED(data->font))
       DoMethod(data->object, MUIM_DrawBackground, xplace, yplace,
-                                                  TextLength(data->rport, start == 0 ? chars+1 : chars, stop-start+1), data->height,
+                                                  TextLength(data->rport, start == 0 ? (STRPTR)chars+1 : (STRPTR)chars, stop-start+1), data->height,
                                                   cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0),
                                                   ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2),
                                                   0);
@@ -419,7 +419,7 @@ void SetCursor(LONG x, struct line_node *line, long Set, struct InstData *data)
     {
       SetAPen(data->rport, ConvertPen(colors[1+c], line->line.Color, data));
       SetSoftStyle(data->rport, styles[1+c], ~0);
-      Text(data->rport, &chars[1+c], 1);
+      Text(data->rport, (STRPTR)&chars[1+c], 1);
     }
 
     /* This is really bad code!!! */
