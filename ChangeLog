@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-07-07 Jens Langner <Jens.Langner@light-speed.de>
+
+    * mcc/library.c: added missing USEDCLASSESP define so that MUI knowns
+      which mcp class belongs to the mcc.
+		
 2005-07-05 Jens Langner <Jens.Langner@light-speed.de>
 
     * mcc/MixedFunctions.c: fixed another possible signedness problem which
