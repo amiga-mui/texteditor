@@ -144,7 +144,7 @@ int main(void)
     GETINTERFACE(ILayers, LayersBase))
   if((LocaleBase = OpenLibrary("locale.library", 38)) &&
     GETINTERFACE(ILocale, LocaleBase))
-  if((RexxSysBase = OpenLibrary("rexxsyslib.library", 38)) &&
+  if((RexxSysBase = OpenLibrary("rexxsyslib.library", 36)) &&
     GETINTERFACE(IRexxSys, RexxSysBase))
   if((UtilityBase = OpenLibrary("utility.library", 38)) &&
     GETINTERFACE(IUtility, UtilityBase))
