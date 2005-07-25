@@ -272,9 +272,9 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
           break;
 
           case 'n':
-    				AddToGrow(&style_grow, dest - dest_start + 1, ~BOLD);
-    				AddToGrow(&style_grow, dest - dest_start + 1, ~ITALIC);
-    				AddToGrow(&style_grow, dest - dest_start + 1, ~UNDERLINE);
+            if(state & BOLD)      AddToGrow(&style_grow, dest - dest_start + 1, ~BOLD);
+    				if(state & ITALIC)    AddToGrow(&style_grow, dest - dest_start + 1, ~ITALIC);
+    				if(state & UNDERLINE) AddToGrow(&style_grow, dest - dest_start + 1, ~UNDERLINE);
             state ^= ~(BOLD | ITALIC | UNDERLINE);
           break;
 
@@ -639,9 +639,10 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
           break;
 					
           case 'n':
-    				AddToGrow(&style_grow, dest - dest_start + 1, ~BOLD);
-    				AddToGrow(&style_grow, dest - dest_start + 1, ~ITALIC);
-    				AddToGrow(&style_grow, dest - dest_start + 1, ~UNDERLINE);
+            if(state & BOLD)      AddToGrow(&style_grow, dest - dest_start + 1, ~BOLD);
+    				if(state & ITALIC)    AddToGrow(&style_grow, dest - dest_start + 1, ~ITALIC);
+    				if(state & UNDERLINE) AddToGrow(&style_grow, dest - dest_start + 1, ~UNDERLINE);
+            state ^= ~(BOLD | ITALIC | UNDERLINE);
             escstate ^= ~(BOLD | ITALIC | UNDERLINE);
           break;
 

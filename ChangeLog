@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-07-25 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcc/ImportHook.c: fixed a minor bug in the ImportHook routines where
+     upon an import of bold/italic/underline via escape sequences always
+     terminating grow elements where inserted for all possible soft-types.
+
 2005-07-14 Ilkka Lehtoranta <ilkleht@isoveli.org>
 
    * mcc/TextEditor-Test.c: Request version 36 of rexxsyslib for AmigaOS
