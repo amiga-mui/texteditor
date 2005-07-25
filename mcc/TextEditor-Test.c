@@ -511,10 +511,10 @@ int main(void)
     }
     else
     {
-        char  prgname[32];
-        long  error = IoErr();
+      char prgname[32];
+      long error = IoErr();
 
-      GetProgramName(prgname, 32);
+      GetProgramName((unsigned char *)prgname, 32);
       PrintFault(error, prgname);
     }
   }

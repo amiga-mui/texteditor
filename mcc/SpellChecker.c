@@ -297,7 +297,7 @@ BOOL LookupWord(STRPTR word, struct InstData *data)
   else  res = SendCLI(word, data->LookupCmd, data);
   if(res)
   {
-    GetVar("Found", (STRPTR)&buf[0], sizeof(buf), GVF_GLOBAL_ONLY);
+    GetVar("Found", (unsigned char *)&buf[0], sizeof(buf), GVF_GLOBAL_ONLY);
     if(buf[0] == '0')
     {
       return(FALSE);
@@ -397,7 +397,7 @@ void SuggestWord (struct InstData *data)
               Object  *group;
 
             DoMethod(data->SuggestListview, MUIM_List_Clear);
-            while(FGets(fh, entry, 128))
+            while(FGets(fh, (unsigned char *)entry, 128))
             {
               entry[strlen(entry)-1] = '\0';
               DoMethod(data->SuggestListview, MUIM_List_InsertSingle, entry, MUIV_List_Insert_Sorted);
