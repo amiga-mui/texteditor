@@ -204,6 +204,9 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
             RETURN(MUI_EventHandlerRC_Eat);
             return MUI_EventHandlerRC_Eat;
           }
+
+          RETURN(0);
+          return(0);
         }
         break;
         #endif
