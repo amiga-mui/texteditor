@@ -61,7 +61,7 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
     "scrolllock=scrlock/S"
     #endif
     "media_stop/S,media_play/S,media_prev/S,media_next/S,media_rewind/S,media_forward/S,"
-    "wheel_up/S,wheel_down/S,wheel_left/S,wheel_right/S,wheel_button/S"
+    "nm_wheel_up/S,nm_wheel_down/S,nm_wheel_left/S,nm_wheel_right/S,nm_wheel_button/S"
     "escape=esc/S,tab/S,return=enter/S,space/S,backspace=bs/S,delete=del/S,key/F";
 
   storage->vanilla = FALSE;
@@ -303,11 +303,11 @@ void KeyToString (STRPTR buffer, struct KeyAction *ka)
 			case RAWKEY_AUD_SHUFFLE:    strcat(buffer, "media_rewind"); break;
 			case RAWKEY_AUD_REPEAT:     strcat(buffer, "media_forward"); break;
 
-			case NM_WHEEL_UP:           strcat(buffer, "wheel_up"); break;
-			case NM_WHEEL_DOWN:         strcat(buffer, "wheel_down"); break;
-			case NM_WHEEL_LEFT:         strcat(buffer, "wheel_left"); break;
-  		case NM_WHEEL_RIGHT:        strcat(buffer, "wheel_right"); break;
-			case NM_BUTTON_FOURTH:      strcat(buffer, "wheel_button"); break;
+			case NM_WHEEL_UP:           strcat(buffer, "nm_wheel_up"); break;
+			case NM_WHEEL_DOWN:         strcat(buffer, "nm_wheel_down"); break;
+			case NM_WHEEL_LEFT:         strcat(buffer, "nm_wheel_left"); break;
+  		case NM_WHEEL_RIGHT:        strcat(buffer, "nm_wheel_right"); break;
+			case NM_BUTTON_FOURTH:      strcat(buffer, "nm_wheel_button"); break;
 
       default:
         strcat(buffer, "???");

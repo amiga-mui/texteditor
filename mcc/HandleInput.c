@@ -32,7 +32,9 @@
 #include "TextEditor_mcc.h"
 #include "private.h"
 
+#if !defined(__amigaos4__)
 #include "newmouse.h"
+#endif
 
 extern struct keybindings keys[];
 
@@ -97,11 +99,17 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
       return(MUI_EventHandlerRC_Eat);
     }
 
+    #if defined(__amigaos4__)
+    if((imsg->Class == IDCMP_MOUSEBUTTONS) || (activeobj == obj) ||
+       (data->flags & FLG_ReadOnly && defaultobj == obj && !activeobj) ||
+       (imsg->Class == IDCMP_EXTENDEDMOUSE && imsg->Code & IMSGCODE_INTUIWHEELDATA))
+    #else
     if((imsg->Class == IDCMP_MOUSEBUTTONS) || (activeobj == obj) ||
        (data->flags & FLG_ReadOnly && defaultobj == obj && !activeobj) ||
        (imsg->Class == IDCMP_RAWKEY &&
         (imsg->Code == NM_WHEEL_UP || imsg->Code == NM_WHEEL_DOWN ||
          imsg->Code == NM_WHEEL_LEFT || imsg->Code == NM_WHEEL_RIGHT)))
+    #endif
     {
       if(!(data->flags & FLG_Draw))
       {
@@ -123,6 +131,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
             return(MUI_EventHandlerRC_Eat);
           }
 
+          #if !defined(__amigaos4__)
           // we check wheter the mouse is currently within our object borders
           // and if so we check wheter the newmouse wheel stuff is used or not
           if(data->slider &&
@@ -156,6 +165,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
               return MUI_EventHandlerRC_Eat;
             }
           }
+          #endif
 
           // if not we check wheter we have to react on that particular RAWKEY event
           if(ReactOnRawKey(imsg->Code, imsg->Qualifier, imsg, data) == 0)
@@ -165,6 +175,38 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
           }
         }
         break;
+
+        #if defined(__amigaos4__)
+        case IDCMP_EXTENDEDMOUSE:
+        {
+          if(data->slider &&
+             _isinwholeobject(obj, imsg->MouseX, imsg->MouseY))
+          {
+            LONG visible;
+
+            get(obj, MUIA_TextEditor_Prop_Visible, &visible);
+            if(visible > 0)
+            {
+          		struct IntuiWheelData *iwd = (struct IntuiWheelData *)imsg->IAddress;
+
+              // we scroll about 1/6 of the displayed text by default
+              LONG delta = (visible + 3) / 6;
+
+              // make sure that we scroll at least 1 line
+              if(delta < 1) delta = 1;
+
+          		if(iwd->WheelY < 0 || iwd->WheelX < 0)
+                DoMethod(data->slider, MUIM_Prop_Decrease, delta);
+	            else if(iwd->WheelY > 0 || iwd->WheelX > 0)
+                DoMethod(data->slider, MUIM_Prop_Increase, delta);
+            }
+
+            RETURN(MUI_EventHandlerRC_Eat);
+            return MUI_EventHandlerRC_Eat;
+          }
+        }
+        break;
+        #endif
 
 /*
         case IDCMP_INACTIVEWINDOW:

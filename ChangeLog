@@ -5,6 +5,15 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-07-30 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcc/HandleInput.c,Dispatcher.c: added IDCMP_EXTENDEDMOUSE support to
+     catch the new wheelmouse events supported since intuition.library
+     v51.28+ in AmigaOS4.
+   * mcp/KeyStorage.c: changed the rawkey based wheelmouse name to carry
+     a "nm_" prefix so that it refers to newmouse based wheelmouse events
+     and doesn't conflict with the new wheelmouse events in AmigaOS4.
+
 2005-07-25 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcc/ImportHook.c: fixed a minor bug in the ImportHook routines where
