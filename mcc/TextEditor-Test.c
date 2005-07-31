@@ -170,7 +170,7 @@ int main(void)
       {
           Object *app, *window, *clear, *cut, *copy, *paste, *erase,
                  *bold, *italic, *underline, *ischanged, *undo, *redo, *string,
-                 *xslider, *yslider, *flow, *search;
+                 *xslider, *yslider, *flow, *search, *replace;
           STRPTR  flow_text[] = {"Left", "Center", "Right", NULL};
           STRPTR  classes[] = {"TextEditor.mcc", NULL};
 
@@ -209,6 +209,7 @@ int main(void)
                       Child, undo = MUI_MakeObject(MUIO_Button, "Undo"),
                       Child, redo = MUI_MakeObject(MUIO_Button, "Redo"),
                       Child, search = MUI_MakeObject(MUIO_Button, "Search"),
+                      Child, replace = MUI_MakeObject(MUIO_Button, "Replace"),
                       Child, ischanged = MUI_MakeObject(MUIO_Checkmark, "Is changed?"),
                       Child, flow = MUI_MakeObject(MUIO_Cycle, NULL, flow_text),
 
@@ -305,8 +306,9 @@ int main(void)
 //                              MUIA_TextEditor_ReadOnly, TRUE,
 //                              MUIA_TextEditor_InVirtualGroup, TRUE,
 //                              MUIA_Disabled, TRUE,
-                              MUIA_TextEditor_CursorX, 30,
-                              MUIA_TextEditor_CursorY, 7,
+//                              MUIA_TextEditor_Columns,  40,
+//                              MUIA_TextEditor_CursorX, 30,
+//                              MUIA_TextEditor_CursorY, 7,
                               MUIA_ControlChar, 'a',
                               MUIA_TextEditor_Contents,
                                 "\33r\33b" __DATE__ "\33n\n"
@@ -443,7 +445,9 @@ int main(void)
           DoMethod(erase, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "Erase");
 //          DoMethod(undo,  MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 3, MUIM_Set, MUIA_TextEditor_Prop_First, 13*15);
           DoMethod(undo,  MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "Undo");
+          DoMethod(redo,  MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "Redo");
           DoMethod(search,  MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 3, MUIM_TextEditor_Search, "is not", 0);//MUIF_TextEditor_Search_CaseSensitive);
+          DoMethod(replace, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 3, MUIM_TextEditor_Replace, "replaced", 0);
 
           DoMethod(bold,      MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_StyleBold, MUIV_TriggerValue);
           DoMethod(italic,    MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_StyleItalic, MUIV_TriggerValue);
