@@ -331,46 +331,49 @@ ULONG Cleanup(struct IClass *cl, Object *obj, Msg msg)
   return(DoSuperMethodA(cl, obj, msg));
 }
 
-ULONG AskMinMax (struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
+ULONG AskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
-  UWORD fontheight;
-  struct TextFont *font;
+	struct MUI_MinMax *mi;
+  ULONG fontheight;
 
   ENTER();
 
-  DoSuperMethodA(cl,obj,(Msg)msg);
+	// call the supermethod first
+	DoSuperMethodA(cl, obj, (Msg)msg);
 
-  font = data->font ? data->font : muiAreaData(obj)->mad_Font;
-  SetFont(data->rport, font);
+	mi = ((struct MUIP_AskMinMax *)msg)->MinMaxInfo;
 
   if(data->Columns)
   {
-    ULONG width = (data->Columns+1) * TextLength(data->rport, "n", 1);
-    msg->MinMaxInfo->MinWidth += width;
-    msg->MinMaxInfo->DefWidth += width;
-    msg->MinMaxInfo->MaxWidth += width;
+    // for the font width we take the nominal font width provided by the tf_XSize attribute
+    ULONG width = data->Columns * (data->font ? data->font->tf_XSize : muiAreaData(obj)->mad_Font->tf_XSize);
+
+    mi->MinWidth += width;
+    mi->DefWidth += width;
+    mi->MaxWidth += width;
   }
   else
   {
-    msg->MinMaxInfo->MinWidth += 40;
-    msg->MinMaxInfo->DefWidth += 300;
-    msg->MinMaxInfo->MaxWidth = MUI_MAXMAX;
+    mi->MinWidth += 40;
+    mi->DefWidth += 300;
+    mi->MaxWidth = MUI_MAXMAX;
   }
 
-  fontheight = font->tf_YSize;
+  fontheight = data->font ? data->font->tf_YSize : muiAreaData(obj)->mad_Font->tf_YSize;
   if(data->Rows)
   {
     ULONG height = data->Rows * fontheight;
-    msg->MinMaxInfo->MinHeight += height;
-    msg->MinMaxInfo->DefHeight += height;
-    msg->MinMaxInfo->MaxHeight += height;
+
+    mi->MinHeight += height;
+    mi->DefHeight += height;
+    mi->MaxHeight += height;
   }
   else
   {
-    msg->MinMaxInfo->MinHeight +=  1 * fontheight;
-    msg->MinMaxInfo->DefHeight += 15 * fontheight;
-    msg->MinMaxInfo->MaxHeight = MUI_MAXMAX;
+    mi->MinHeight +=  1 * fontheight;
+    mi->DefHeight += 15 * fontheight;
+    mi->MaxHeight = MUI_MAXMAX;
   }
 
   RETURN(0);
@@ -673,13 +676,14 @@ DISPATCHERPROTO(_Dispatcher)
     case MUIM_TextEditor_InputTrigger:  result = InputTrigger(cl, data);  break;
     case MUIM_TextEditor_InsertText:
     {
+      struct MUIP_TextEditor_InsertText *ins_msg = (struct MUIP_TextEditor_InsertText *)msg;
       struct marking block;
 
-      block.startx = data->CPos_X,
-      block.startline = data->actualline,
-      result = InsertText(data, (STRPTR)*((long *)msg+1), TRUE);
-      block.stopx = data->CPos_X,
-      block.stopline = data->actualline,
+      block.startx = data->CPos_X;
+      block.startline = data->actualline;
+      result = InsertText(data, ins_msg->text, TRUE);
+      block.stopx = data->CPos_X;
+      block.stopline = data->actualline;
       AddToUndoBuffer(pasteblock, (char *)&block, data);
     }
     break;
