@@ -7,6 +7,10 @@ $Source$
 
 2005-07-31 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcc/ImportHook.c: fixed bug #1235375 that caused the EMail import hook not
+     to stop analyzing a string at the line end and caused e.g. single slashes in
+     a line to set text to italic if some other text on more lines contain a
+     slash as well.
    * mcc/ExportHook.c: fixed bug #1235756 where the ExportHook always cleared out
      the last character of an export operation instead of checking for the
      particular newline character we wanted to clear. This had the effect that the

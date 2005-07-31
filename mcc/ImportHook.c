@@ -160,11 +160,11 @@ static BOOL ContainsText(char *str, char stopchar)
   {
     BOOL foundText = FALSE;
 
-    while(*str != '\0')
+    while(*str >= ' ')
     {
       if(*str == stopchar)
         return foundText;
-      else if(*str > 0x20) // greater than 0x20 (space) == readable text
+      else if(*str > ' ') // greater than 0x20 (space) == readable text
         foundText = TRUE;
 
       str++;
