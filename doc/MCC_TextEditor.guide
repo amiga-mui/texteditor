@@ -1,5 +1,5 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.14 (03.07.2005)
+@$VER: TextEditor.Guide 15.15 (31.07.2005)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
@@ -339,6 +339,13 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.15 (31.07.2005)
+
+- added AmigaOS4 specific IDCMP_EXTENDEDMOUSE wheelmouse support.
+- fixed a bug where the use of MUIA_TextEditor_Columns was broken.
+- fixed a bug in the import/export hooks where some soft-style recognition was still
+  broken.
 
 15.14 (03.07.2005)
 
