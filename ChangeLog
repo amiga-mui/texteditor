@@ -5,6 +5,20 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-07-31 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcc/ExportHook.c: fixed bug #1235756 where the ExportHook always cleared out
+     the last character of an export operation instead of checking for the
+     particular newline character we wanted to clear. This had the effect that the
+     undo/redo operations of TextEditor was slightly broken and did always redo
+     one character less that the undo operation cutted.
+   * mcc/Dispatcher.c: fixed bug #1246944 where the use of MUIA_TextEditor_Columns
+     seemed to have caused crashes because the rastport was not completly ready
+     at the time the AskMinMax() method was called by MUI. Now we take the
+     nominal fontwidth size attribute tf_XSize instead of using TextLength(), so
+     that this function should now also hopefully match the column with a bit
+     better.
+
 2005-07-30 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcc/HandleInput.c,Dispatcher.c: added IDCMP_EXTENDEDMOUSE support to
