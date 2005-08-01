@@ -5,11 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+#### v15.16 RELEASE ############################################################
+
 2005-08-01 Jens Langner <Jens.Langner@light-speed.de>
 
-   * mcc/MixedFunctions.c: fixed a bug in the SetCursor() function where on use
-     of a non antialiased font, the cursor background was not successfully cleared
-     and caused the cursor to leave graphical trails.
+   * mcc/MixedFunctions.c: fixed a bug #1249673 in the SetCursor() function where
+     on use of a non antialiased font, the cursor background was not successfully
+     cleared and caused the cursor to leave graphical trails.
 
 #### v15.15 RELEASE ############################################################
 
