@@ -1,5 +1,5 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.15 (31.07.2005)
+@$VER: TextEditor.Guide 15.16 (01.08.2005)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
@@ -339,6 +339,11 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.16 (01.08.2005)
+
+- fixed a major bug introduced in version 15.15 which caused to cursor trails because
+  of an uncleared background if non anti-aliased fonts where used on OS3/OS4 systems.
 
 15.15 (31.07.2005)
 
