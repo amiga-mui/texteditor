@@ -42,7 +42,7 @@
 #ifdef __MORPHOS__
 #define IS_ANTIALIASED(x) (1)
 #else
-#define IS_ANTIALIASED(x) ((x)->tf_Style & FSF_ANTIALIASED)
+#define IS_ANTIALIASED(x) (((x)->tf_Style & FSF_ANTIALIASED) == FSF_ANTIALIASED)
 #endif
 
 /*************************************************************************/
@@ -378,7 +378,7 @@ void SetCursor(LONG x, struct line_node *line, long Set, struct InstData *data)
     yplace  = data->ypos + (data->height * (line_nr + pos.lines - 1));
     cursorxplace = xplace + TextLength(data->rport, line->line.Contents+(x+start), 0-start);
 
-    /* if font is anti aliased, clear area near the cursor first */
+    // if font is anti aliased, clear area near the cursor first
     if(IS_ANTIALIASED(data->font))
     {
       DoMethod(data->object, MUIM_DrawBackground, xplace, yplace,
@@ -396,12 +396,15 @@ void SetCursor(LONG x, struct line_node *line, long Set, struct InstData *data)
     }
     else
     {
-      // Clear the place of the cursor, if not already done
-      DoMethod(data->object, MUIM_DrawBackground, cursorxplace, yplace,
-                                                  cursor_width, data->height,
-                                                  cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0),
-                                                  ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2),
-                                                  0);
+      // Clear the place of the cursor in case we are using NO anti-aliased font
+      if(IS_ANTIALIASED(data->font) == FALSE)
+      {
+        DoMethod(data->object, MUIM_DrawBackground, cursorxplace, yplace,
+                                                    cursor_width, data->height,
+                                                    cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0),
+                                                    ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2),
+                                                    0);
+      }
     }
 
     SetDrMd(data->rport, JAM1);
