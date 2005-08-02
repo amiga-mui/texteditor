@@ -233,7 +233,10 @@ short VisualHeight  (struct line_node *line, struct InstData *data)
 
   ENTER();
 
-  if(data->flags & FLG_HScroll)
+  /* If we dont have a valid rastport (i.e. our object is not visible)
+     return 1 as a visual height - itix */
+
+  if(data->flags & FLG_HScroll || !data->shown)
   {
     lines = 1;
   }
