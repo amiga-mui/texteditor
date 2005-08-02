@@ -40,7 +40,7 @@
 #endif
 
 #ifdef __MORPHOS__
-#define IS_ANTIALIASED(x) (1)
+#define IS_ANTIALIASED(x) (((x)->tf_Style & FSF_COLORFONT) == FSF_COLORFONT && (((struct ColorTextFont *)(x))->ctf_Flags & CT_ANTIALIAS) == CT_ANTIALIAS)
 #else
 #define IS_ANTIALIASED(x) (((x)->tf_Style & FSF_ANTIALIASED) == FSF_ANTIALIASED)
 #endif
