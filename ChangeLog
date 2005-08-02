@@ -8,9 +8,11 @@ $Source$
 2005-08-02 Ilkka Lehtoranta <ilkleht@isoveli.org>
 
   * mcc/Debug.c,mcc/Debug.h,mcp/Debug.c,mcp/Debug.h: Fixed KPutFmt() to use
-    VNewRawDoFmt() call in MorphOS for proper vararg handling. Also added
-    68kvarargs attribute to kprintf() prototype.
+    VNewRawDoFmt() call in MorphOS for proper vararg handling.
   * mcc/MixedFunctions.c: Added proper test for antialiased fonts in MorphOS.
+  * mcc/MixedFunctions.c: Fixed VisualHeight() to not call LineCharsWidth()
+    when object is not visible. Editor no longer crash in a hidden state when
+    inserting text.
 
 #### v15.16 RELEASE ############################################################
 
