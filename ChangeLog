@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-08-02 Ilkka Lehtoranta <ilkleht@isoveli.org>
+
+  * mcc/Debug.c,mcc/Debug.h,mcp/Debug.c,mcp/Debug.h: Fixed KPutFmt() to use
+    VNewRawDoFmt() call in MorphOS for proper vararg handling. Also added
+    68kvarargs attribute to kprintf() prototype.
+  * mcc/MixedFunctions.c: Added proper test for antialiased fonts in MorphOS.
+
 #### v15.16 RELEASE ############################################################
 
 2005-08-01 Jens Langner <Jens.Langner@light-speed.de>
