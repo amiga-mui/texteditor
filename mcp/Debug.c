@@ -42,7 +42,9 @@
 #define CLEAR_FLAG(v,f)     ((v) &= ~(f))         // clear the flag f in v
 #define MASK_FLAG(v,f)      ((v) &= (f))          // mask the variable v with flag f bitwise
 
+#ifndef __MORPHOS__
 extern void KPutFmt(const char *format, va_list arg);
+#endif
 
 // our static variables with default values
 static int indent_level = 0;
