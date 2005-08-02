@@ -59,7 +59,7 @@
   #include <exec/rawfmt.h>
   #include <proto/exec.h>
   #define KPutFmt(format, args)  VNewRawDoFmt(format, (APTR)RAWFMTFUNC_SERIAL, NULL, args)
-void kprintf(const char *formatString,...) VARARGS68K;
+void kprintf(const char *formatString,...);
 #else
 void kprintf(const char *formatString,...);
 #endif
