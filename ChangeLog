@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-08-03 Gunther Nikl <gni@gecko.de>
+
+  * mcp/CreatePrefsGroup.c/CreatePrefsGroup (editpopupdata): Move GetStr()
+    calls into a separate loop to save stackspace and to reduce programsize.
+
 2005-08-02 Ilkka Lehtoranta <ilkleht@isoveli.org>
 
   * mcc/Debug.c,mcc/Debug.h,mcp/Debug.c,mcp/Debug.h: Fixed KPutFmt() to use
