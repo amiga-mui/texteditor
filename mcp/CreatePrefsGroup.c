@@ -274,41 +274,47 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
          *editor, *keylist, *defaultkeys, *functionname,
          *plist, *popbutton;
 
-  struct NewMenu editpopupdata[] =
+  struct NewMenu *nm, editpopupdata[] =
   {
-    { NM_TITLE, GetStr(MSG_MenuTitle_Edit),    0, 0, 0, (APTR)0 },
-    { NM_ITEM,  GetStr(MSG_MenuItem_Cut),       NULL, NM_COMMANDSTRING, 0, (APTR)1 },
-    { NM_ITEM,  GetStr(MSG_MenuItem_Copy),     NULL, NM_COMMANDSTRING, 0, (APTR)2 },
-    { NM_ITEM,  GetStr(MSG_MenuItem_Paste),   NULL, NM_COMMANDSTRING, 0, (APTR)3 },
-    { NM_ITEM,  GetStr(MSG_MenuItem_Delete), NULL, NM_COMMANDSTRING, 0, (APTR)4 },
+    { NM_TITLE, MSG_MenuTitle_Edit,    0, 0, 0, (APTR)0 },
+    { NM_ITEM,  MSG_MenuItem_Cut,       NULL, NM_COMMANDSTRING, 0, (APTR)1 },
+    { NM_ITEM,  MSG_MenuItem_Copy,     NULL, NM_COMMANDSTRING, 0, (APTR)2 },
+    { NM_ITEM,  MSG_MenuItem_Paste,   NULL, NM_COMMANDSTRING, 0, (APTR)3 },
+    { NM_ITEM,  MSG_MenuItem_Delete, NULL, NM_COMMANDSTRING, 0, (APTR)4 },
     { NM_ITEM,  NM_BARLABEL, 0, 0, 0, (APTR)0 },
-    { NM_ITEM,  GetStr(MSG_MenuItem_Undo), NULL, NM_COMMANDSTRING, 0, (APTR)5 },
-    { NM_ITEM,  GetStr(MSG_MenuItem_Redo), NULL, NM_COMMANDSTRING, 0, (APTR)6 },
+    { NM_ITEM,  MSG_MenuItem_Undo, NULL, NM_COMMANDSTRING, 0, (APTR)5 },
+    { NM_ITEM,  MSG_MenuItem_Redo, NULL, NM_COMMANDSTRING, 0, (APTR)6 },
     { NM_ITEM,  NM_BARLABEL, 0, 0, 0, (APTR)0 },
-    { NM_ITEM,  GetStr(MSG_MenuItem_Bold), NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)7 },
-    { NM_ITEM,  GetStr(MSG_MenuItem_Italic), NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)8 },
-    { NM_ITEM,  GetStr(MSG_MenuItem_Underline), NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)9 },
+    { NM_ITEM,  MSG_MenuItem_Bold, NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)7 },
+    { NM_ITEM,  MSG_MenuItem_Italic, NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)8 },
+    { NM_ITEM,  MSG_MenuItem_Underline, NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)9 },
     { NM_ITEM,  NM_BARLABEL, 0, 0, 0, (APTR)0 },
-    { NM_ITEM,  GetStr(MSG_MenuSubTitle_Alignment), 0, 0, 0, (APTR)0 },
-    { NM_SUB,   GetStr(MSG_MenuItem_Left), NULL, NM_COMMANDSTRING | CHECKIT|CHECKED, ~1, (APTR)10 },
-    { NM_SUB,   GetStr(MSG_MenuItem_Center), NULL, NM_COMMANDSTRING | CHECKIT, ~2, (APTR)11 },
-    { NM_SUB,   GetStr(MSG_MenuItem_Right), NULL, NM_COMMANDSTRING | CHECKIT, ~4, (APTR)12 },
+    { NM_ITEM,  MSG_MenuSubTitle_Alignment, 0, 0, 0, (APTR)0 },
+    { NM_SUB,   MSG_MenuItem_Left, NULL, NM_COMMANDSTRING | CHECKIT|CHECKED, ~1, (APTR)10 },
+    { NM_SUB,   MSG_MenuItem_Center, NULL, NM_COMMANDSTRING | CHECKIT, ~2, (APTR)11 },
+    { NM_SUB,   MSG_MenuItem_Right, NULL, NM_COMMANDSTRING | CHECKIT, ~4, (APTR)12 },
 
-    { NM_ITEM,  GetStr(MSG_MenuSubTitle_Color), 0, 0, 0, (APTR)0 },
-    { NM_SUB,   GetStr(MSG_MenuItem_Normal), NULL, NM_COMMANDSTRING | CHECKIT|CHECKED, ~1, (APTR)13 },
-    { NM_SUB,   GetStr(MSG_MenuItem_Shine), NULL, NM_COMMANDSTRING | CHECKIT, ~2, (APTR)14 },
-    { NM_SUB,   GetStr(MSG_MenuItem_Halfshine), NULL, NM_COMMANDSTRING | CHECKIT, ~4, (APTR)15 },
-    { NM_SUB,   GetStr(MSG_MenuItem_Background), NULL, NM_COMMANDSTRING | CHECKIT, ~8, (APTR)16 },
-    { NM_SUB,   GetStr(MSG_MenuItem_Halfshadow), NULL, NM_COMMANDSTRING | CHECKIT, ~16, (APTR)17 },
-    { NM_SUB,   GetStr(MSG_MenuItem_Shadow), NULL, NM_COMMANDSTRING | CHECKIT, ~32, (APTR)18 },
-    { NM_SUB,   GetStr(MSG_MenuItem_Text), NULL, NM_COMMANDSTRING | CHECKIT, ~64, (APTR)19 },
-    { NM_SUB,   GetStr(MSG_MenuItem_Fill), NULL, NM_COMMANDSTRING | CHECKIT, ~128, (APTR)20 },
-    { NM_SUB,   GetStr(MSG_MenuItem_Mark), NULL, NM_COMMANDSTRING | CHECKIT, ~256, (APTR)21 },
+    { NM_ITEM,  MSG_MenuSubTitle_Color, 0, 0, 0, (APTR)0 },
+    { NM_SUB,   MSG_MenuItem_Normal, NULL, NM_COMMANDSTRING | CHECKIT|CHECKED, ~1, (APTR)13 },
+    { NM_SUB,   MSG_MenuItem_Shine, NULL, NM_COMMANDSTRING | CHECKIT, ~2, (APTR)14 },
+    { NM_SUB,   MSG_MenuItem_Halfshine, NULL, NM_COMMANDSTRING | CHECKIT, ~4, (APTR)15 },
+    { NM_SUB,   MSG_MenuItem_Background, NULL, NM_COMMANDSTRING | CHECKIT, ~8, (APTR)16 },
+    { NM_SUB,   MSG_MenuItem_Halfshadow, NULL, NM_COMMANDSTRING | CHECKIT, ~16, (APTR)17 },
+    { NM_SUB,   MSG_MenuItem_Shadow, NULL, NM_COMMANDSTRING | CHECKIT, ~32, (APTR)18 },
+    { NM_SUB,   MSG_MenuItem_Text, NULL, NM_COMMANDSTRING | CHECKIT, ~64, (APTR)19 },
+    { NM_SUB,   MSG_MenuItem_Fill, NULL, NM_COMMANDSTRING | CHECKIT, ~128, (APTR)20 },
+    { NM_SUB,   MSG_MenuItem_Mark, NULL, NM_COMMANDSTRING | CHECKIT, ~256, (APTR)21 },
 
     { NM_END,   NULL, 0, 0, 0, (APTR)0 }
   };
 
   ENTER();
+
+  nm = editpopupdata;
+  do {
+    if (nm->nm_Label != NM_BARLABEL)
+      nm->nm_Label = GetStr(nm->nm_Label);
+  } while (++nm,nm->nm_Type != NM_END);
 
   data->editpopup = MUI_MakeObject(MUIO_MenustripNM, editpopupdata, NULL);
 
