@@ -7,6 +7,12 @@ $Source$
 
 2005-08-06 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcc/AllocFunctions.c: implemented new AllocLine/FreeLine functions where
+     certain operations during the allocation/memory freeing times can be
+     performed to ensure the consistency of certian other structures. In fact
+     by adding checks for the global blockinfo structure in FreeLine() a
+     crash bug is now fixed that occurred when having deleted some empty
+     lines at the end of a document.
    * mcc/ExportHook.c,ExportText.c: fixed another bug in the undo/redo
      processing where TextEditor.mcc did always strip the last newline char
      of a line due to the bugfix of bug #1227680. Now the proper bugfix for

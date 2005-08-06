@@ -22,6 +22,8 @@
 
 #include <proto/exec.h>
 
+#include "private.h"
+
 #include "Debug.h"
 
 APTR MyAllocPooled(APTR pool, ULONG length)
@@ -51,6 +53,51 @@ VOID MyFreePooled(APTR pool, APTR mem)
   length = *memptr;
 
   FreePooled(pool, memptr, length);
+
+  LEAVE();
+}
+
+struct line_node *AllocLine(struct InstData *data)
+{
+  ENTER();
+  struct line_node *newline;
+
+  newline = AllocPooled(data->mypool, sizeof(struct line_node));
+
+  RETURN(newline);
+  return newline;
+}
+
+void FreeLine(struct line_node* line, struct InstData *data)
+{
+  ENTER();
+
+  // we make sure the line is not references by other
+  // structures as well such as the global blockinfo structure.
+  if(data->blockinfo.startline == line)
+  {
+    if(line->next)
+      data->blockinfo.startline = line->next;
+    else
+    {
+      data->blockinfo.startline = NULL;
+      data->blockinfo.enabled = FALSE;
+    }
+  }
+
+  if(data->blockinfo.stopline == line)
+  {
+    if(line->previous)
+      data->blockinfo.stopline = line->previous;
+    else
+    {
+      data->blockinfo.stopline = NULL;
+      data->blockinfo.enabled = FALSE;
+    }
+  }
+
+  // lets use FreePooled to free the memory of the line
+  FreePooled(data->mypool, line, sizeof(struct line_node));
 
   LEAVE();
 }

@@ -31,7 +31,7 @@
  Import the given 0 terminated text by invoking the gicen import Hook
  for every line
 ***********************************************************************/
-struct line_node *ImportText(char *contents, void *mempool, struct Hook *importHook, LONG wraplength)
+struct line_node *ImportText(char *contents, struct InstData *data, struct Hook *importHook, LONG wraplength)
 {
 	struct line_node *first_line, *line;
 	struct ImportMessage im;
@@ -40,9 +40,9 @@ struct line_node *ImportText(char *contents, void *mempool, struct Hook *importH
 
 	im.Data = contents;
 	im.ImportWrap = wraplength;
-	im.PoolHandle = mempool;
+	im.PoolHandle = data->mypool;
 
-	line = AllocPooled(mempool,sizeof(struct line_node));
+	line = AllocLine(data);
 	if(!line)
 	{
 		RETURN(NULL);
@@ -71,7 +71,7 @@ struct line_node *ImportText(char *contents, void *mempool, struct Hook *importH
 				{
 					line->previous->next = NULL;
 
-					FreePooled(mempool,line,sizeof(struct line_node));
+					FreeLine(line, data);
 				}
 				else
 				{
@@ -80,7 +80,7 @@ struct line_node *ImportText(char *contents, void *mempool, struct Hook *importH
 					// if the line has nor predecessor it was obviously the first line
 					// so we prepare a "fake" line_node to let the textEditor clear our
 					// text
-					if((ctext = MyAllocPooled(mempool, 2)))
+					if((ctext = MyAllocPooled(data->mypool, 2)))
 					{
 						ctext[0] = '\n';
 						ctext[1] = '\0';
@@ -88,7 +88,7 @@ struct line_node *ImportText(char *contents, void *mempool, struct Hook *importH
 						line->line.Length	 = 1;
 					} else
 					{
-						FreePooled(mempool,first_line,sizeof(struct line_node));
+						FreeLine(first_line, data);
 						first_line = NULL;
 					}
 				}
@@ -96,7 +96,7 @@ struct line_node *ImportText(char *contents, void *mempool, struct Hook *importH
 			break;
 		}
 
-		if(!(new_line = AllocPooled(mempool,sizeof(struct line_node))))
+		if(!(new_line = AllocLine(data)))
 			break;
 
 		memset(new_line,0,sizeof(*new_line));

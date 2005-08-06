@@ -152,7 +152,7 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
     {
       if((data->mylocale = OpenLocale(NULL)))
       {
-        if((data->firstline = AllocPooled(data->mypool, sizeof(struct line_node))))
+        if((data->firstline = AllocLine(data)))
         {
           if(Init_LineNode(data->firstline, NULL, "\n", data))
           {

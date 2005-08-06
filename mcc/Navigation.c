@@ -355,6 +355,7 @@ void  GoDown   (struct InstData *data)
     {
       data->pixel_x = GetPosInPixels(pos.bytes, pos.x, data);
     }
+
     if(pos.lines == data->actualline->visual)
     {
       if(data->actualline->next)

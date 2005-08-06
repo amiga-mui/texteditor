@@ -720,7 +720,8 @@ LONG CutBlock2 (struct InstData *data, long Clipboard, long NoCut, struct markin
           MyFreePooled(data->mypool, c_startline->line.Styles);
         data->totallines -= c_startline->visual;
         c_startline = c_startline->next;
-        FreePooled(data->mypool, cc_startline, sizeof(struct line_node));
+
+        FreeLine(cc_startline, data);
       }
       else  c_startline = c_startline->next;
     }
