@@ -268,7 +268,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                   data->selectmode  = 0;
                 }
 
-                if(!((data->blockinfo.enabled) && (imsg->Qualifier & (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT))))
+                if(!(data->blockinfo.enabled && (imsg->Qualifier & (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT))))
                 {
                   // if we already have an enabled block we have to disable it
                   // and clear the marking area with MarkText()

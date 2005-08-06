@@ -296,6 +296,9 @@ void  AddStyleToLine      (LONG, struct line_node *, LONG, UWORD, struct InstDat
 void  *MyAllocPooled    (void *, unsigned long);
 void  MyFreePooled      (void *, void *);
 
+struct line_node  *AllocLine(struct InstData *data);
+void FreeLine(struct line_node *line, struct InstData *data);
+
 /* ------------ */
 
 extern SAVEDS ASM ULONG _Dispatcher(REG(a0, struct IClass * cl), REG(a2, Object * obj), REG(a1, Msg msg));
@@ -305,7 +308,7 @@ void  FreeConfig        (struct InstData *, struct MUI_RenderInfo *);
 
 ULONG HandleARexx (struct InstData *, STRPTR command);
 
-struct line_node *ImportText(char *, void *, struct Hook *, LONG);
+struct line_node *ImportText(char *, struct InstData *, struct Hook *, LONG);
 void *ExportText(struct line_node *, struct Hook *, LONG);
 
 struct  line_node *loadtext (void);
@@ -323,7 +326,7 @@ ULONG ClearText   (struct InstData *);
 ULONG ToggleCursor  (struct InstData *);
 ULONG InputTrigger  (struct IClass *, struct InstData *);
 ULONG InsertText    (struct InstData *, STRPTR, BOOL);
-void  FreeTextMem   (void *, struct line_node *);
+void  FreeTextMem   (struct line_node *, struct InstData *);
 void  ResetDisplay  (struct InstData *);
 
 void CheckWord    (struct InstData *);

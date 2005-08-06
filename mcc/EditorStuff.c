@@ -232,7 +232,7 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
                   }
                   *(contents+header[1]) = '\0';
   
-                  if((line = ImportText(contents, data->mypool, &ImPlainHook, data->ImportWrap)))
+                  if((line = ImportText(contents, data, &ImPlainHook, data->ImportWrap)))
                   {
                     if(!startline)
                       startline = line;
@@ -270,7 +270,7 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
                   }
                   textline[header[1]] = '\0';
   
-                  if((line = AllocPooled(data->mypool, sizeof(struct line_node))))
+                  if((line = AllocLine(data)))
                   {
                     line->next     = NULL;
                     line->previous   = previous;
@@ -416,7 +416,7 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
   }
   visual = line->visual + line->next->visual;
 
-  if((newbuffer = MyAllocPooled(data->mypool, strlen(line->line.Contents)+strlen(line->next->line.Contents)+1)))
+  if((newbuffer = MyAllocPooled(data->mypool, line->line.Length+line->next->line.Length+1)))
   {
     CopyMem(line->line.Contents, newbuffer, line->line.Length-1);
     CopyMem(line->next->line.Contents, newbuffer+line->line.Length-1, line->next->line.Length+1);
@@ -427,21 +427,23 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
     {
       if(line->line.Styles)
         MyFreePooled(data->mypool, line->line.Styles);
+
       line->line.Styles = line->next->line.Styles;
 
       if(line->line.Colors)
         MyFreePooled(data->mypool, line->line.Colors);
+
       line->line.Colors = line->next->line.Colors;
     }
     else
     {
-        UWORD *styles;
-        UWORD *styles1 = line->line.Styles;
-        UWORD *styles2 = line->next->line.Styles;
-        UWORD *colors;
-        UWORD *colors1 = line->line.Colors;
-        UWORD *colors2 = line->next->line.Colors;
-        UWORD length = 12;
+      UWORD *styles;
+      UWORD *styles1 = line->line.Styles;
+      UWORD *styles2 = line->next->line.Styles;
+      UWORD *colors;
+      UWORD *colors1 = line->line.Colors;
+      UWORD *colors2 = line->next->line.Colors;
+      UWORD length = 12;
 
       if(styles1)
         length += *((long *)styles1-1) - 4;
@@ -563,7 +565,7 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
     line->line.Flow = flow;
     line->line.Separator = separator;
 
-    FreePooled(data->mypool, next, sizeof(struct line_node));
+    FreeLine(next, data);
 
     line_nr = LineToVisual(line, data);
     if(!(emptyline && (line_nr + line->visual - 1 < data->maxlines)))
@@ -649,7 +651,7 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
   lines = pos.lines;
 
   next = line->next;
-  if((newline = AllocPooled(data->mypool, sizeof(struct line_node))))
+  if((newline = AllocLine(data)))
   {
     UWORD *styles = line->line.Styles;
     UWORD *newstyles = NULL;

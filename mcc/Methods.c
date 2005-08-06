@@ -87,7 +87,7 @@ ULONG ClearText (struct InstData *data)
 
   ENTER();
   
-  if((newcontents = AllocPooled(data->mypool, sizeof(struct line_node))))
+  if((newcontents = AllocLine(data)))
   {
     if(Init_LineNode(newcontents, NULL, "\n", data))
     {
@@ -108,13 +108,13 @@ ULONG ClearText (struct InstData *data)
         data->actualline = data->firstline;
         AddToUndoBuffer(deleteblock, (char *)&newblock, data);
       }
-      FreeTextMem(data->mypool, data->firstline);
+      FreeTextMem(data->firstline, data);
       data->firstline = newcontents;
       ResetDisplay(data);
     }
     else
     {
-      FreePooled(data->mypool, newcontents, sizeof(struct line_node));
+      FreeLine(newcontents, data);
     }
   }
 
@@ -343,7 +343,7 @@ ULONG InsertText (struct InstData *data, STRPTR text, BOOL movecursor)
 
   ENTER();
 
-  if((line = ImportText(text, data->mypool, data->ImportHook, data->ImportWrap)))
+  if((line = ImportText(text, data, data->ImportHook, data->ImportWrap)))
   {
     long  oneline = FALSE;
     long  newline = FALSE;

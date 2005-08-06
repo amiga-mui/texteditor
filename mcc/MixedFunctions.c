@@ -79,19 +79,21 @@ void  RemoveClipping (struct InstData *data)
   LEAVE();
 }
 
-void  FreeTextMem (void *mypool, struct line_node *line)
+void  FreeTextMem(struct line_node *line, struct InstData *data)
 {
   ENTER();
 
   while(line)
   {
-      struct  line_node *tline = line;
+    struct  line_node *tline = line;
 
-    MyFreePooled(mypool, line->line.Contents);
+    MyFreePooled(data->mypool, line->line.Contents);
     if(line->line.Styles)
-      MyFreePooled(mypool, line->line.Styles);
+      MyFreePooled(data->mypool, line->line.Styles);
+
     line = line->next;
-    FreePooled(mypool, tline, sizeof(struct line_node));
+
+    FreeLine(tline, data);
   }
 
   LEAVE();
@@ -185,10 +187,12 @@ LONG LineCharsWidth(char *text, struct InstData *data)
 {
   LONG c;
   LONG w = data->innerwidth;
-  LONG textlen = strlen(text)-1; // the last char is always a "\n"
+  LONG textlen;
   struct TextExtent tExtend;
 
   ENTER();
+
+  textlen = strlen(text)-1; // the last char is always a "\n"
 
   // make sure the correct font is set
   SetFont(data->rport, data->font);
@@ -307,14 +311,14 @@ void  OffsetToLines (LONG x, struct line_node *line, struct pos_info *pos, struc
       lines++;
     }
     pos->lines  = lines;
-    pos->x    = x - d;
+    pos->x      = x - d;
     pos->bytes  = d;
     pos->extra  = c;
   }
   else
   {
     pos->lines  = 1;
-    pos->x    = x;
+    pos->x      = x;
     pos->bytes  = 0;
     pos->extra  = line->line.Length-1;
   }

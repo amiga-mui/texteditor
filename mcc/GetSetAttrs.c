@@ -680,9 +680,9 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
   {
     struct line_node *newcontents;
 
-    if((newcontents = ImportText(contents, data->mypool, data->ImportHook, data->ImportWrap)))
+    if((newcontents = ImportText(contents, data, data->ImportHook, data->ImportWrap)))
     {
-      FreeTextMem(data->mypool, data->firstline);
+      FreeTextMem(data->firstline, data);
       data->firstline = newcontents;
       ResetDisplay(data);
       ResetUndoBuffer(data);
