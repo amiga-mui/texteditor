@@ -51,6 +51,12 @@ void *ExportText(struct line_node *node, struct Hook *exportHook, LONG wraplen)
 		emsg.ExportWrap = wraplen;
 		emsg.Last = !next_node;
 
+    // to make sure that for the last line we don't export the
+    // additional, articial newline '\n' we reduce the passed length
+    // value by one.
+    if(next_node == NULL && emsg.Contents[node->line.Length-1] == '\n')
+      emsg.Length--;
+
 		user_data = (void*)CallHookPkt(exportHook, NULL, &emsg);
 
 		node = next_node;

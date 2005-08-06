@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-08-06 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcc/ExportHook.c,ExportText.c: fixed another bug in the undo/redo
+     processing where TextEditor.mcc did always strip the last newline char
+     of a line due to the bugfix of bug #1227680. Now the proper bugfix for
+     that bug is located in ExportText.c instead.
+
 2005-08-03 Gunther Nikl <gni@gecko.de>
 
   * mcp/CreatePrefsGroup.c/CreatePrefsGroup (editpopupdata): Move GetStr()
