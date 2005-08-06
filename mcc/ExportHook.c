@@ -312,10 +312,6 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
 
   if(emsg->Last)
   {
-    // this clears the last 0x0A which is artifical anyway.
-    if(*(buf->pointer-1) == '\n')
-      *(buf->pointer-1) = '\0';
-
     result = buf->buffer;
 
     if(data)
