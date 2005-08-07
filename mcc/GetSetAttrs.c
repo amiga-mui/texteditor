@@ -60,26 +60,21 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
     case MUIA_TextEditor_CursorPosition:
     {
       UWORD xplace, yplace, cursor_width;
-
       UWORD x = data->CPos_X;
-
       struct line_node *line = data->actualline;
       LONG line_nr = LineToVisual(line, data) - 1;
-
       struct pos_info pos;
-      OffsetToLines(x, line, &pos, data);
 
-      // make sure the correct font is set
-      SetFont(data->rport, data->font);
+      OffsetToLines(x, line, &pos, data);
 
       // calculate the cursor width
       // if it is set to 6 then we should find out how the width of the current char is
       if(data->CursorWidth == 6)
-        cursor_width = TextLength(data->rport, line->line.Contents[x] < ' ' ? (char *)" " : (char *)&line->line.Contents[x], 1);
+        cursor_width = TextLength(&data->tmprp, line->line.Contents[x] < ' ' ? (char *)" " : (char *)&line->line.Contents[x], 1);
       else
         cursor_width = data->CursorWidth;
 
-      xplace  = data->xpos + TextLength(data->rport, &line->line.Contents[x-pos.x], pos.x);
+      xplace  = data->xpos + TextLength(&data->tmprp, &line->line.Contents[x-pos.x], pos.x);
       xplace += FlowSpace(line->line.Flow, line->line.Contents+pos.bytes, data);
       yplace  = data->ypos + (data->height * (line_nr + pos.lines - 1));
 

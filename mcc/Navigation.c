@@ -38,9 +38,8 @@ ULONG FlowSpace (UWORD flow, STRPTR text, struct InstData *data)
 
   if(flow != MUIV_TextEditor_Flow_Left)
   {
-    SetFont(data->rport, data->font);
-    flowspace  = (data->innerwidth-TextLength(data->rport, text, LineCharsWidth(text, data)-1));
-    flowspace -= (data->CursorWidth == 6) ? TextLength(data->rport, " ", 1) : data->CursorWidth;
+    flowspace  = (data->innerwidth-TextLength(&data->tmprp, text, LineCharsWidth(text, data)-1));
+    flowspace -= (data->CursorWidth == 6) ? TextLength(&data->tmprp, " ", 1) : data->CursorWidth;
     if(flow == MUIV_TextEditor_Flow_Center)
     {
       flowspace /= 2;
@@ -65,12 +64,9 @@ static ULONG CursorOffset(struct InstData *data)
   if(offset < 1)
     offset = 1;
 
-  // make sure the correct font is set
-  SetFont(data->rport, data->font);
-
   // call TextFit() to find out how many chars would fit.
   lineCharsWidth = LineCharsWidth(text, data);
-  res = TextFit(data->rport, text, lineCharsWidth, &tExtend, NULL, 1, offset, data->font->tf_YSize);
+  res = TextFit(&data->tmprp, text, lineCharsWidth, &tExtend, NULL, 1, offset, data->font->tf_YSize);
 
   // in case of a hard-wrapped line we have to deal with
   // the possibility that the user tries to
@@ -97,13 +93,12 @@ static LONG GetPosInPixels(LONG bytes, LONG x, struct InstData *data)
 
   ENTER();
 
-  SetFont(data->rport, data->font);
-  pos = TextLength(data->rport, data->actualline->line.Contents+bytes, x);
+  pos = TextLength(&data->tmprp, data->actualline->line.Contents+bytes, x);
 
   if(*(data->actualline->line.Contents+data->CPos_X) == '\n')
-    pos += TextLength(data->rport, " ", 1)/2;
+    pos += TextLength(&data->tmprp, " ", 1)/2;
   else
-    pos += TextLength(data->rport, data->actualline->line.Contents+data->CPos_X, 1)/2;
+    pos += TextLength(&data->tmprp, data->actualline->line.Contents+data->CPos_X, 1)/2;
 
   pos += FlowSpace(data->actualline->line.Flow, data->actualline->line.Contents+bytes, data);
 

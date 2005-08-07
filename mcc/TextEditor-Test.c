@@ -125,6 +125,8 @@ struct WorkbenchIFace *IWorkbench = NULL;
 DISPATCHERPROTO(_Dispatcher);
 #endif
 
+static char *page_titles[] = { "Shown", "Hided", NULL };
+
 int main(void)
 {
   void    *slider;
@@ -286,65 +288,74 @@ int main(void)
                               Child, NewObject(mcc->mcc_Class, NULL, End,
                             End,
 */
-                            MUIA_Group_Spacing, 0,
-                            Child, editorgad = NewObject(mcc->mcc_Class, NULL,
-//                              MUIA_Frame, "602211",
-//                              InputListFrame,
-//                              MUIA_Background, MUII_GroupBack,
-//                              MUIA_TextEditor_FixedFont, TRUE,
-                              MUIA_TextEditor_AutoClip, FALSE,
-//                              MUIA_TextEditor_ReadOnly, TRUE,
-                              MUIA_TextEditor_DoubleClickHook, &URLHook,
-//                              MUIA_TextEditor_HorizontalScroll, TRUE,
-/*                              MUIA_TextEditor_ImportWrap, 1023,
-                              MUIA_TextEditor_WrapBorder, 80,
-                              MUIA_TextEditor_ExportWrap, 80,*/
-//                              MUIA_TextEditor_ExportHook, MUIV_TextEditor_ExportHook_EMail,
-//                              MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_EMail,
-                              MUIA_CycleChain,    TRUE,
-//                              MUIA_TextEditor_WrapBorder, 80,
-//                              MUIA_TextEditor_ReadOnly, TRUE,
-//                              MUIA_TextEditor_InVirtualGroup, TRUE,
-//                              MUIA_Disabled, TRUE,
-//                              MUIA_TextEditor_Columns,  40,
-//                              MUIA_TextEditor_CursorX, 30,
-//                              MUIA_TextEditor_CursorY, 7,
-                              MUIA_ControlChar, 'a',
-                              MUIA_TextEditor_Contents,
-                                "\33r\33b" __DATE__ "\33n\n"
-                                "\n\33cTextEditor.gadget V15.0ß\n"
-                                "Copyright 1997 by Allan Odgaard\n"
-                                "\33l\n\33[s:9]\n"
-                                "For feedback write to: Duff@DIKU.DK\n"
-                                "For the latest version, try: \33p[7]\33uhttp://www.DIKU.dk/students/duff/texteditor/\33n\n"
-                                "\n"
-                                "\33hThis gadget is not \33ifreeware\33n. You may not use it in your own programs without a licence. A licence can be obtained thru the author.\n"
-                                "\nColor test: \33b\33p[1]SHINE, \33p[2]HALFSHINE, \33p[3]BACKGROUND, \33p[4]HALFSHADOW, \33p[5]SHADOW, \33p[6]TEXT, \33p[7]FILL, \33p[8]MARK\33n\n"
-                                "\n"
-                                "\33[s:2]\33c\33u\33b Usage: \33n\n"
-                                "\33l\n"
-                                "You can doubleclick a word to select it, if you hold LMB after a doubleclick, then it will only mark \33bcomplete\33n words. Tripleclicking has the same effect, but for lines.\n"
-                                "You can extend your block by holding down shift while you press LMB where you want the block to end.\n"
-                                "While you drag to scroll, the farther away from the gadget your mouse pointer is, the faster the gadget will scroll.\n"
-                                "\n"
-                                "\33c\33[s:2]\33u\33b Keybindigns \33n\n\33l"
-                                "\n"
-                                "Hold down shift and press a navigation key to mark. When something is marked you can use: LAmiga x, c to cut or copy. Delete or Backspace to erase. Or any other key to overwrite.\n"
-                                "LAmiga + z, Z, v = Undo, Redo, Paste.\n"
-                                "TAB will insert 3 spaces.\n"
-                                "\n"
-                                "  \33u  Navigation combinations:  \33n\n"
-                                "Ctrl + left, right, up, down = BOL, EOF, Top, Bottm.\n"
-                                "Alt + left, right, up, down = BOW(PrevWord), NextWord, StartOfPage(PrevPage), EndOfPage(NextPage).\n"
-                                "Ctrl-Alt + left, right, up, down = PrevSentence, NextSentence, PrevParagraph, NextParagraph.\n"
-                                "\n"
-                                "  \33u  Delete combinations:  \33n\n"
-                                "Ctrl + Backspace, Delete = \"Delele To BOL\", \"Delele To EOL\".\n"
-                                "Alt + Backspace, Delete = \"Delele To BOW\", \"Delete To NextWord\".\n",
+                            Child, RegisterGroup(page_titles),
+                            	MUIA_Register_Frame, TRUE,
+                              Child,HGroup,
+                                MUIA_Group_Spacing, 0,
+                                Child, editorgad = NewObject(mcc->mcc_Class, NULL,
+//                                MUIA_Frame, "602211",
+//                                InputListFrame,
+//                                MUIA_Background, MUII_GroupBack,
+//                                MUIA_TextEditor_FixedFont, TRUE,
+                                  MUIA_TextEditor_AutoClip, FALSE,
+//                                MUIA_TextEditor_ReadOnly, TRUE,
+                                  MUIA_TextEditor_DoubleClickHook, &URLHook,
+//                                MUIA_TextEditor_HorizontalScroll, TRUE,
+/*                                MUIA_TextEditor_ImportWrap, 1023,
+                                  MUIA_TextEditor_WrapBorder, 80,
+                                  MUIA_TextEditor_ExportWrap, 80,*/
+//                                MUIA_TextEditor_ExportHook, MUIV_TextEditor_ExportHook_EMail,
+//                                MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_EMail,
+                                  MUIA_CycleChain,    TRUE,
+//                                MUIA_TextEditor_WrapBorder, 80,
+//                                MUIA_TextEditor_ReadOnly, TRUE,
+//                                MUIA_TextEditor_InVirtualGroup, TRUE,
+//                                MUIA_Disabled, TRUE,
+//                                MUIA_TextEditor_Columns,  40,
+//                                MUIA_TextEditor_CursorX, 30,
+//                                MUIA_TextEditor_CursorY, 7,
+                                  MUIA_ControlChar, 'a',
+                                  MUIA_TextEditor_Contents,
+                                    "\33r\33b" __DATE__ "\33n\n"
+                                    "\n\33cTextEditor.gadget V15.0ß\n"
+                                    "Copyright 1997 by Allan Odgaard\n"
+                                    "\33l\n\33[s:9]\n"
+                                    "For feedback write to: Duff@DIKU.DK\n"
+                                    "For the latest version, try: \33p[7]\33uhttp://www.DIKU.dk/students/duff/texteditor/\33n\n"
+                                    "\n"
+                                    "\33hThis gadget is not \33ifreeware\33n. You may not use it in your own programs without a licence. A licence can be obtained thru the author.\n"
+                                    "\nColor test: \33b\33p[1]SHINE, \33p[2]HALFSHINE, \33p[3]BACKGROUND, \33p[4]HALFSHADOW, \33p[5]SHADOW, \33p[6]TEXT, \33p[7]FILL, \33p[8]MARK\33n\n"
+                                    "\n"
+                                    "\33[s:2]\33c\33u\33b Usage: \33n\n"
+                                    "\33l\n"
+                                    "You can doubleclick a word to select it, if you hold LMB after a doubleclick, then it will only mark \33bcomplete\33n words. Tripleclicking has the same effect, but for lines.\n"
+                                    "You can extend your block by holding down shift while you press LMB where you want the block to end.\n"
+                                    "While you drag to scroll, the farther away from the gadget your mouse pointer is, the faster the gadget will scroll.\n"
+                                    "\n"
+                                    "\33c\33[s:2]\33u\33b Keybindigns \33n\n\33l"
+                                    "\n"
+                                    "Hold down shift and press a navigation key to mark. When something is marked you can use: LAmiga x, c to cut or copy. Delete or Backspace to erase. Or any other key to overwrite.\n"
+                                    "LAmiga + z, Z, v = Undo, Redo, Paste.\n"
+                                    "TAB will insert 3 spaces.\n"
+                                    "\n"
+                                    "  \33u  Navigation combinations:  \33n\n"
+                                    "Ctrl + left, right, up, down = BOL, EOF, Top, Bottm.\n"
+                                    "Alt + left, right, up, down = BOW(PrevWord), NextWord, StartOfPage(PrevPage), EndOfPage(NextPage).\n"
+                                    "Ctrl-Alt + left, right, up, down = PrevSentence, NextSentence, PrevParagraph, NextParagraph.\n"
+                                    "\n"
+                                    "  \33u  Delete combinations:  \33n\n"
+                                    "Ctrl + Backspace, Delete = \"Delele To BOL\", \"Delele To EOL\".\n"
+                                    "Alt + Backspace, Delete = \"Delele To BOW\", \"Delete To NextWord\".\n",
+                                End,
+                                Child, slider = MUI_NewObject("Scrollbar.mui", End,
                               End,
-                            Child, slider = MUI_NewObject("Scrollbar.mui",
-                              End,
+                              Child, VGroup,
+	                              Child, TextObject,
+                              	  MUIA_Text_Contents, "TextEditor object is now hided!!!",
+                            	  End,
+                            	End,
                             End,
+                          End,
 /*                          End,
                         End,
 */

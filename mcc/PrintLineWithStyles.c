@@ -97,7 +97,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
     rp = &data->copyrp;
   }
 
-  if((line_nr > 0) && (data->update) && !(data->flags & FLG_Quiet))
+  if((line_nr > 0) && (data->update) && !(data->flags & FLG_Quiet) && data->rport != NULL && data->shown == TRUE)
   {
     LONG c_length = length;
     LONG startx = 0, stopx = 0;
@@ -172,16 +172,14 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       struct RastPort *old = data->rport;
 #endif
 
-      SetFont(data->rport, data->font);
-
       if(startx < x+c_length && stopx > x)
       {
         if(startx > x)
-          blockstart = TextLength(data->rport, text+x, startx-x);
+          blockstart = TextLength(&data->tmprp, text+x, startx-x);
         else
           startx = x;
 
-        blockwidth = ((stopx >= c_length+x) ? data->innerwidth-(blockstart+flow) : TextLength(data->rport, text+startx, stopx-startx));
+        blockwidth = ((stopx >= c_length+x) ? data->innerwidth-(blockstart+flow) : TextLength(&data->tmprp, text+startx, stopx-startx));
       }
       else if(!(data->flags & (FLG_ReadOnly | FLG_Ghosted)) &&
               line == data->actualline && data->CPos_X >= x &&
@@ -189,12 +187,12 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
               !data->scrollaction && (data->flags & FLG_Active))
       {
         cursor = TRUE;
-        blockstart = TextLength(data->rport, text+x, data->CPos_X-x);
+        blockstart = TextLength(&data->tmprp, text+x, data->CPos_X-x);
 
         // calculate the cursor width
         // if it is set to 6 then we should find out how the width of the current char is
         if(data->CursorWidth == 6)
-          blockwidth = TextLength(data->rport, (*(text+data->CPos_X) < ' ') ? (char *)" " : (char *)(text+data->CPos_X), 1);
+          blockwidth = TextLength(&data->tmprp, (*(text+data->CPos_X) < ' ') ? (char *)" " : (char *)(text+data->CPos_X), 1);
         else
           blockwidth = data->CursorWidth;
       }
