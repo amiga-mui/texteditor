@@ -133,6 +133,7 @@ struct InstData
   WORD    scr_direction;      // Scroll direction
   struct  RastPort  doublerp; // Doublebuffer rastport
   struct  RastPort  copyrp;
+  struct  RastPort  tmprp;    // temporary rastport (for TextFit/TextLength checks)
   struct  marking   blockinfo;
   struct  Rectangle CursorPosition;
   struct  RastPort  *rport;

@@ -270,10 +270,7 @@ ULONG InputTrigger(UNUSED struct IClass *cl, struct InstData *data)
         OffsetToLines(data->CPos_X, data->actualline, &pos, data);
         flow = FlowSpace(data->actualline->line.Flow, data->actualline->line.Contents+pos.bytes, data);
         
-        // make sure the correct font is set
-        SetFont(data->rport, data->font);
-
-        if(MouseX <= (LONG)(data->xpos+flow+TextLength(data->rport, data->actualline->line.Contents+pos.bytes, pos.extra-pos.bytes-1)))
+        if(MouseX <= (LONG)(data->xpos+flow+TextLength(&data->tmprp, data->actualline->line.Contents+pos.bytes, pos.extra-pos.bytes-1)))
         {
           if(data->selectmode == 1)
           {

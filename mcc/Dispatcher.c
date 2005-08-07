@@ -171,7 +171,8 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
             data->DoubleClickHook = NULL;
             data->WrapBorder = 0;
 
-*/            data->ImportHook = &ImPlainHook;
+*/
+            data->ImportHook = &ImPlainHook;
             data->ImportWrap = 1023;
 
             data->ExportHook = &ExportHookPlain;
@@ -270,9 +271,14 @@ ULONG Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
   {
     if(!(data->flags & FLG_ReadOnly))
       _flags(obj) |= (1<<7);
+
     if(SuggestWindow(data))
     {
       DoMethod(_app(obj), OM_ADDMEMBER, data->SuggestWindow);
+
+      // initialize our temporary rastport
+      InitRastPort(&data->tmprp);
+      SetFont(&data->tmprp, data->font);
 
       data->mousemove = FALSE;
       data->ehnode.ehn_Priority = 0;
@@ -431,17 +437,21 @@ ULONG Show(struct IClass *cl, Object *obj, Msg msg)
             MUIA_TextEditor_Prop_Visible,     data->maxlines*data->height,
             TAG_DONE);
 
+  // initialize the doublebuffering rastport
   InitRastPort(&data->doublerp);
   data->doublebuffer = MUIG_AllocBitMap(data->innerwidth+((data->height-data->font->tf_Baseline+1)>>1)+1, data->height, GetBitMapAttr(data->rport->BitMap, BMA_DEPTH), (BMF_CLEAR | BMF_INTERLEAVED), data->rport->BitMap);
   data->doublerp.BitMap = data->doublebuffer;
   SetFont(&data->doublerp, data->font);
+
+  // initialize the copyrp rastport
   data->copyrp = *muiRenderInfo(obj)->mri_RastPort;
   SetFont(&data->copyrp, data->font);
 
-//#ifndef ClassAct
-//  DoMethod(_win(obj), MUIM_Window_AddEventHandler, &data->ehnode);
+  // initialize our temporary rastport
+  InitRastPort(&data->tmprp);
+  SetFont(&data->tmprp, data->font);
+
   set(data->SuggestWindow, MUIA_Window_Open, (data->flags & FLG_PopWindow ? TRUE : FALSE));
-//#endif
 
   data->shown   = TRUE;
 
@@ -458,10 +468,10 @@ ULONG Hide(struct IClass *cl, Object *obj, Msg msg)
   data->shown   = FALSE;
 
   nnset(data->SuggestWindow, MUIA_Window_Open, FALSE);
-//  DoMethod(_win(obj), MUIM_Window_RemEventHandler, &data->ehnode);
   set(_win(obj), MUIA_Window_DisableKeys, 0L);
   MUIG_FreeBitMap(data->doublebuffer);
-  data->rport   = NULL;
+  data->doublerp.BitMap = NULL;
+  data->rport = NULL;
 
   LEAVE();
   return(DoSuperMethodA(cl, obj, msg));
