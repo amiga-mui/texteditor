@@ -59,8 +59,9 @@ VOID MyFreePooled(APTR pool, APTR mem)
 
 struct line_node *AllocLine(struct InstData *data)
 {
-  ENTER();
   struct line_node *newline;
+
+  ENTER();
 
   newline = AllocPooled(data->mypool, sizeof(struct line_node));
 
