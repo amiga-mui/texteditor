@@ -125,7 +125,7 @@ struct WorkbenchIFace *IWorkbench = NULL;
 DISPATCHERPROTO(_Dispatcher);
 #endif
 
-static char *page_titles[] = { "Shown", "Hided", NULL };
+static char *page_titles[] = { "Shown", "Hidden", NULL };
 
 int main(void)
 {
@@ -351,7 +351,7 @@ int main(void)
                               End,
                               Child, VGroup,
 	                              Child, TextObject,
-                              	  MUIA_Text_Contents, "TextEditor object is now hided!!!",
+                              	  MUIA_Text_Contents, "TextEditor object is now hidden!!!",
                             	  End,
                             	End,
                             End,
