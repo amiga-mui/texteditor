@@ -5,14 +5,18 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-08-08 Gunther Nikl <gni@gecko.de>
+
+   * mcc/ExportText.c, mcc/TextEditor-Test.c, ChangeLog: Fix typos.
+
 2005-08-07 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcc: reverted ilkka's fix on VisualHeight() because it didn't catch all
-     cases which gave trouble on a hided TextEditor object. Now all TextFit()
+     cases which gave trouble on a hidden TextEditor object. Now all TextFit()
      and TextLength() functions always use a temporary rastport for finding
      out the text limits. In addition, some checks for data->rport and
      data->shown were added to various functions such that a texteditor object
-     should not crash anymore if it is used in a hidden state (e.g. hided in
+     should not crash anymore if it is used in a hidden state (e.g. hidden in
      a registergroup)
 
 2005-08-06 Jens Langner <Jens.Langner@light-speed.de>
