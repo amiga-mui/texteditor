@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-08-11 Ilkka Lehtoranta <ilkleht@isoveli.org>
+
+   * mcc/Makefile.mos: Added 'dump' rule to actually make some use of debug
+     binaries. Didn't change other makefiles (probably not interesting).
+
 2005-08-08 Gunther Nikl <gni@gecko.de>
 
    * mcc/ExportText.c, mcc/TextEditor-Test.c, ChangeLog: Fix typos.
