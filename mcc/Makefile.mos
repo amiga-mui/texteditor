@@ -148,6 +148,9 @@ $(OBJDIR)/library.o: library.c ../includes/mccheader.c \
 $(OBJDIR)/library.o: library.c ../includes/mccheader.c TextEditor_mcc.h \
   private.h rev.h
 
+dump:
+	ppc-morphos-objdump --section-headers --all-headers --reloc --syms --disassemble-all $(TESTTARGET).debug >$(TESTTARGET).dump
+
 #
 
 .PHONY: clean
