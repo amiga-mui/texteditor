@@ -157,36 +157,11 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
           if(Init_LineNode(data->firstline, NULL, "\n", data))
           {
             data->actualline = data->firstline;
-/*            data->CPos_X = 0;
-
-            data->flags  = 0L;
-
-            data->clipcount = 0;
-
-              data->shown  = FALSE;
-*/            data->update = TRUE;
-/*            data->use_fixedfont = FALSE;
-            data->font = NULL;
-
-            data->DoubleClickHook = NULL;
-            data->WrapBorder = 0;
-
-*/
+            data->update = TRUE;
             data->ImportHook = &ImPlainHook;
             data->ImportWrap = 1023;
 
             data->ExportHook = &ExportHookPlain;
-/*            data->ExportWrap = 0;
-
-            data->slider = NULL;
-
-            data->colormap = NULL;
-
-            data->HasChanged = FALSE;
-            data->undosize = 0L;
-
-            data->NoNotify = FALSE;
-*/
             data->flags |= FLG_AutoClip;
 #ifndef ClassAct
             if(FindTagItem(MUIA_Background, msg->ops_AttrList))
@@ -194,13 +169,10 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
             if(FindTagItem(MUIA_Frame, msg->ops_AttrList))
               data->flags |= FLG_OwnFrame;
 #endif
-            Set(cl, obj, (struct opSet *)msg);
 
-//            data->blockinfo.enabled = FALSE;
+            Set(cl, obj, (struct opSet *)msg);
             data->visual_y = 1;
-/*            data->pixel_x = 0;
-            data->undosize = 0;
-*/
+
 #ifdef ClassAct
             InitSemaphore(&data->semaphore);
 /*
@@ -224,6 +196,7 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
               data->BevelVert  = (UWORD)temp;
             }
 #endif
+
             RETURN((long)obj);
             return((long)obj);
           }
@@ -265,6 +238,8 @@ ULONG Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
 
   ENTER();
 
+  // initialize the configuration of our TextEditor
+  // object from the configuration set by the user
   InitConfig(obj, data);
 
   if(DoSuperMethodA(cl, obj, (Msg)rinfo))
@@ -272,13 +247,21 @@ ULONG Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
     if(!(data->flags & FLG_ReadOnly))
       _flags(obj) |= (1<<7);
 
-    if(SuggestWindow(data))
+    // now we check whether we have a valid font or not
+    // and if not we take the default one of our muiAreaData
+    if(data->font == NULL)
+      data->font = muiAreaData(obj)->mad_Font;
+
+    // initialize our temporary rastport
+    InitRastPort(&data->tmprp);
+    SetFont(&data->tmprp, data->font);
+
+    // make sure we have a proper font setup here and
+    // that our spellchecker suggest window object is also
+    // correctly initialized.
+    if(data->font && SuggestWindow(data))
     {
       DoMethod(_app(obj), OM_ADDMEMBER, data->SuggestWindow);
-
-      // initialize our temporary rastport
-      InitRastPort(&data->tmprp);
-      SetFont(&data->tmprp, data->font);
 
       data->mousemove = FALSE;
       data->ehnode.ehn_Priority = 0;
@@ -397,8 +380,11 @@ ULONG Show(struct IClass *cl, Object *obj, Msg msg)
 
   DoSuperMethodA(cl, obj, msg);
 
+  // now we check whether we have a valid font or not
+  // and if not we take the default one of our muiAreaData
   if(!data->font)
-    data->font      = ad->mad_Font;
+    data->font = ad->mad_Font;
+
   data->rport       = muiRenderInfo(obj)->mri_RastPort;
   data->height      = data->font->tf_YSize;
   data->xpos        = ad->mad_Box.Left + ad->mad_addleft;

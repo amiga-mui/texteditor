@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-08-16 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcc/Dispatcher.c: fixed a crash bug in the MUIM_Setup function where we did
+     forgot to initialize the font pointer if no explicit font was configured by
+     the user.
+
 2005-08-11 Ilkka Lehtoranta <ilkleht@isoveli.org>
 
    * mcc/Makefile.mos: Added 'dump' rule to actually make some use of debug
