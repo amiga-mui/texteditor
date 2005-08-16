@@ -538,6 +538,11 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
               data->font = data->normalfont;
               data->use_fixedfont = FALSE;
             }
+
+            // now we check whether we have a valid font or not
+            // and if not we take the default one of our muiAreaData
+            if(data->font == NULL)
+              data->font = muiAreaData(obj)->mad_Font;
           }
           break;
         }

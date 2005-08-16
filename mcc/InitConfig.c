@@ -109,7 +109,7 @@ void SetCol (struct InstData *data, void *obj, long item, ULONG *storage, long b
 
 BOOL iswarned = FALSE;
 
-void InitConfig (void *obj, struct InstData *data)
+void InitConfig(Object *obj, struct InstData *data)
 {
   long  setting;
   UWORD *muipens = _pens(obj);

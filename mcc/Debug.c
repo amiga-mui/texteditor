@@ -61,7 +61,7 @@ void SetupDebug(void)
   kprintf("** TextEditor.mcc v" LIB_REV_STRING " startup ***********************\n");
   kprintf("Initializing runtime debugging:\n");
 
-	if(GetVar("texteditor.mcc.debug", (unsigned char *)var, sizeof(var), 0) > 0)
+	if(GetVar("texteditor.mcc.debug", var, sizeof(var), 0) > 0)
 	{
 		char *tok;
     char *debug = var;

@@ -529,7 +529,7 @@ int main(void)
       char prgname[32];
       long error = IoErr();
 
-      GetProgramName((unsigned char *)prgname, 32);
+      GetProgramName(prgname, 32);
       PrintFault(error, prgname);
     }
   }
