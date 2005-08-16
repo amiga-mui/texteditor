@@ -304,8 +304,8 @@ void FreeLine(struct line_node *line, struct InstData *data);
 
 extern SAVEDS ASM ULONG _Dispatcher(REG(a0, struct IClass * cl), REG(a2, Object * obj), REG(a1, Msg msg));
 
-void  InitConfig        (void *, struct InstData *);
-void  FreeConfig        (struct InstData *, struct MUI_RenderInfo *);
+void  InitConfig(Object *, struct InstData *);
+void  FreeConfig(struct InstData *, struct MUI_RenderInfo *);
 
 ULONG HandleARexx (struct InstData *, STRPTR command);
 
