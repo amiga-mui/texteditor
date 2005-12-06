@@ -76,7 +76,7 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
   if((myrdargs = AllocDosObject(DOS_RDARGS, NULL)))
   {
     ULONG length = strlen(keystring);
-    unsigned char *buffer;
+    char *buffer;
 
     if((buffer = AllocMem(length+2, MEMF_ANY)))
     {
