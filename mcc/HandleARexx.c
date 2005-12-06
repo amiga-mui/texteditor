@@ -413,7 +413,7 @@ ULONG HandleARexx (struct InstData *data, STRPTR command)
         if((myrdargs = AllocDosObject(DOS_RDARGS, NULL)))
         {
           ULONG length = strlen(txtargs);
-          unsigned char *buffer;
+          char *buffer;
 
           if((buffer = MyAllocPooled(data->mypool, length+2)))
           {

@@ -287,7 +287,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                     {
                       if(!CheckSep(data->actualline->line.Contents[data->CPos_X], data))
                       {
-                        if(data->selectmode)
+                        if(data->selectmode > 0)
                         {
                           GoStartOfLine(data);
                           data->blockinfo.startx = data->CPos_X;
@@ -339,7 +339,10 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                           if(data->selectmode == 0)
                             data->selectmode = 1;
                           else
+                          {
+                            data->blockinfo.enabled = FALSE;
                             data->selectmode = 0;
+                          }
 
                           data->StartSecs = imsg->Seconds;
                           data->StartMicros = imsg->Micros;
@@ -349,6 +352,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                   }
                   else
                   {
+                    data->blockinfo.enabled = FALSE;
                     data->selectmode  = 0;
                     data->StartSecs = imsg->Seconds;
                     data->StartMicros = imsg->Micros;
@@ -1111,6 +1115,7 @@ static LONG ReactOnRawKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg,
               data->blockinfo.startline = oldactualline;
               data->blockinfo.startx = oldCPos_X;
             }
+
             MarkText(oldCPos_X, oldactualline, data->CPos_X, data->actualline, data);
           }
           else
@@ -1122,6 +1127,7 @@ static LONG ReactOnRawKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg,
               MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
             }
           }
+
           ScrollIntoDisplay(data);
           SetCursor(data->CPos_X, data->actualline, TRUE, data);
         }

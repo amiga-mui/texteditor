@@ -639,7 +639,7 @@ void SetCursor(LONG x, struct line_node *line, long Set, struct InstData *data)
 /*-----------------------------------------*
  * Dump text from buffer and out to screen *
  *-----------------------------------------*/
-void  DumpText  (LONG visual_y, LONG line_nr, LONG lines, BOOL doublebuffer, struct InstData *data)
+void  DumpText(LONG visual_y, LONG line_nr, LONG lines, BOOL doublebuffer, struct InstData *data)
 {
   struct  pos_info    pos;
   struct  line_node *line;
