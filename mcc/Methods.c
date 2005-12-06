@@ -286,7 +286,7 @@ ULONG InputTrigger(UNUSED struct IClass *cl, struct InstData *data)
       }
     }
 
-    if(data->blockinfo.enabled)
+    if(data->blockinfo.enabled || data->selectmode == 0)
     {
       // if selectmode == 2, then the user has trippleclicked at the line
       // and wants to get the whole line marked
@@ -307,6 +307,7 @@ ULONG InputTrigger(UNUSED struct IClass *cl, struct InstData *data)
       }
       else if(data->blockinfo.stopline != data->actualline || data->blockinfo.stopx != data->CPos_X)
       {
+        data->blockinfo.enabled = TRUE;
         MarkText(data->blockinfo.stopx, data->blockinfo.stopline, data->CPos_X, data->actualline, data);
       }
 

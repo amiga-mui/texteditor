@@ -5,6 +5,15 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2005-12-07 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcc/HandleInput.c,Methods.c: fixed the long-standing bug #1286500 where
+     TextEditor.mcc deleted/overwrote certain text passages if the mouse was
+     initially used to position the cursor within some text. This really was
+     a very old bug, very hard to reproduce and very annoying. But due to
+     the help of the reporter of that bug it was much more easier to identify
+     and eliminate. Thanks AlexC.
+
 2005-08-16 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcc/Dispatcher.c: fixed a crash bug in the MUIM_Setup function where we did
