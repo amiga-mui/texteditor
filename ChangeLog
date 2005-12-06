@@ -5,6 +5,8 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+#### v15.17 RELEASE ############################################################
+
 2005-12-07 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcc/HandleInput.c,Methods.c: fixed the long-standing bug #1286500 where
