@@ -67,10 +67,10 @@ int main(void)
   if((UtilityBase = OpenLibrary("utility.library", 38)) &&
     GETINTERFACE(IUtility, UtilityBase))
   {
-    if((IntuitionBase = OpenLibrary("intuition.library", 38)) &&
+    if((IntuitionBase = (APTR)OpenLibrary("intuition.library", 38)) &&
       GETINTERFACE(IIntuition, IntuitionBase))
     {
-      if((LocaleBase = OpenLibrary("locale.library", 38)) &&
+      if((LocaleBase = (APTR)OpenLibrary("locale.library", 38)) &&
         GETINTERFACE(ILocale, LocaleBase))
       {
         OpenCat();
@@ -83,7 +83,7 @@ int main(void)
            GETINTERFACE(IMUIMaster, MUIMasterBase))
         {
           Object *app = NULL;
-          Object *window;
+          Object *window = NULL;
           struct MUI_CustomClass *mcc = NULL;
 
           if(CreateSubClasses())
@@ -121,7 +121,7 @@ int main(void)
 
           if(app)
           {
-              unsigned long sigs;
+            unsigned long sigs;
 
             DoMethod(window, MUIM_Notify, MUIA_Window_CloseRequest, TRUE, app, 2, MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit);
             set(window, MUIA_Window_Open, TRUE);
@@ -150,11 +150,11 @@ int main(void)
         CloseCat();
 
         DROPINTERFACE(ILocale);
-        CloseLibrary(LocaleBase);
+        CloseLibrary((struct Library *)LocaleBase);
       }
 
       DROPINTERFACE(IIntuition);
-      CloseLibrary(IntuitionBase);
+      CloseLibrary((struct Library *)IntuitionBase);
     }
 
     DROPINTERFACE(IUtility);
