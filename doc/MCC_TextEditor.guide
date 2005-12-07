@@ -1,5 +1,5 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.16 (01.08.2005)
+@$VER: TextEditor.Guide 15.17 (07.12.2005)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
@@ -339,6 +339,16 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.17 (07.12.2005)
+
+- fixed a long-standing bug where a too much text might have been deleted/overwritten
+  if the mouse pointer was used to initially start editing some text.
+- fixed another crash bug that happend on remove operation of some empty lines at the
+  end of an document.
+- fixed certain crash conditions when a TextEditor.mcc object as in a hidden state
+  (in a RegisterGroup)
+- fixed some important bugs in the undo/redo processing
 
 15.16 (01.08.2005)
 
