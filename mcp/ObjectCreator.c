@@ -200,67 +200,88 @@ char *FunctionName (UWORD func)
   return(name);
 }
 
-void *PrefsObject(struct InstData_MCP *data)
+#define ARRAY_SIZE(X) (sizeof(X)/sizeof(X[0]))
+/* compile time assert to cause a linker error. DO NOT CHANGE! */
+void __FAIL_ON_ME(void);
+#define _ASSERT(EXP) ((void) ((EXP) ? 0 : __FAIL_ON_ME()))
+
+static Object *PrefsObject(struct InstData_MCP *data)
 {
-  data->gTitles[0] = GetStr(MSG_Page_Settings);
-  data->gTitles[1] = GetStr(MSG_Page_Keybindings);
-  data->gTitles[2] = GetStr(MSG_Page_SpellChecker);
-  data->gTitles[3] = GetStr(MSG_Page_Sample);
-  data->gTitles[4] = NULL;
+  static const void *titles[] = {
+    MSG_Page_Settings,
+    MSG_Page_Keybindings,
+    MSG_Page_SpellChecker,
+    MSG_Page_Sample
+  };
+  static const void *functions[] = {
+    MSG_Function_Up,
+    MSG_Function_Down,
+    MSG_Function_Left,
+    MSG_Function_Right,
+    MSG_Function_PrvPage,
+    MSG_Function_NxtPage,
+    MSG_Function_BOL,
+    MSG_Function_EOL,
+    MSG_Function_Top,
+    MSG_Function_Bottom,
+    MSG_Function_PrvWord,
+    MSG_Function_NxtWord,
+    MSG_Function_PrvPara,
+    MSG_Function_NxtPara,
+    MSG_Function_PrvSent,
+    MSG_Function_NxtSent,
+    MSG_Function_SuggestSpelling,
+    MSG_Function_Backspace,
+    MSG_Function_Delete,
+    MSG_Function_Return,
+    MSG_Function_Tab,
+    MSG_Function_Cut,
+    MSG_Function_Copy,
+    MSG_Function_Paste,
+    MSG_Function_Undo,
+    MSG_Function_Redo,
+    MSG_Function_DelBOL,
+    MSG_Function_DelEOL,
+    MSG_Function_DelBOW,
+    MSG_Function_DelEOW,
+    MSG_Function_NextGadget,
+    MSG_Function_GotoBookmark1,
+    MSG_Function_GotoBookmark2,
+    MSG_Function_GotoBookmark3,
+    MSG_Function_SetBookmark1,
+    MSG_Function_SetBookmark2,
+    MSG_Function_SetBookmark3,
+    MSG_Function_DelLine
+  };
+  static const void *cycleentries[] = {
+    MSG_CycleItem_Shift,
+    MSG_CycleItem_Ctrl,
+    MSG_CycleItem_Alt,
+    MSG_CycleItem_Mouse
+  };
+  unsigned int i;
 
-  data->functions[0] = GetStr(MSG_Function_Up);
-  data->functions[1] = GetStr(MSG_Function_Down);
-  data->functions[2] = GetStr(MSG_Function_Left);
-  data->functions[3] = GetStr(MSG_Function_Right);
-  data->functions[4] = GetStr(MSG_Function_PrvPage);
-  data->functions[5] = GetStr(MSG_Function_NxtPage);
-  data->functions[6] = GetStr(MSG_Function_BOL);
-  data->functions[7] = GetStr(MSG_Function_EOL);
-  data->functions[8] = GetStr(MSG_Function_Top);
-  data->functions[9] = GetStr(MSG_Function_Bottom);
-  data->functions[10] = GetStr(MSG_Function_PrvWord);
-  data->functions[11] = GetStr(MSG_Function_NxtWord);
-  data->functions[12] = GetStr(MSG_Function_PrvPara);
-  data->functions[13] = GetStr(MSG_Function_NxtPara);
-  data->functions[14] = GetStr(MSG_Function_PrvSent);
-  data->functions[15] = GetStr(MSG_Function_NxtSent);
+  _ASSERT( ARRAY_SIZE(data->gTitles) == (ARRAY_SIZE(titles)+1) );
+  for(i=0; i<ARRAY_SIZE(titles); i++)
+    data->gTitles[i] = GetStr((APTR)titles[i]);
+  data->gTitles[ARRAY_SIZE(titles)] = NULL;
 
-  data->functions[16] = GetStr(MSG_Function_SuggestSpelling);
-  data->functions[17] = GetStr(MSG_Function_Backspace);
-  data->functions[18] = GetStr(MSG_Function_Delete);
-  data->functions[19] = GetStr(MSG_Function_Return);
-  data->functions[20] = GetStr(MSG_Function_Tab);
-  data->functions[21] = GetStr(MSG_Function_Cut);
-  data->functions[22] = GetStr(MSG_Function_Copy);
-  data->functions[23] = GetStr(MSG_Function_Paste);
-  data->functions[24] = GetStr(MSG_Function_Undo);
-  data->functions[25] = GetStr(MSG_Function_Redo);
-  data->functions[26] = GetStr(MSG_Function_DelBOL);
-  data->functions[27] = GetStr(MSG_Function_DelEOL);
-  data->functions[28] = GetStr(MSG_Function_DelBOW);
-  data->functions[29] = GetStr(MSG_Function_DelEOW);
-  data->functions[30] = GetStr(MSG_Function_NextGadget);
-  data->functions[31] = GetStr(MSG_Function_GotoBookmark1);
-  data->functions[32] = GetStr(MSG_Function_GotoBookmark2);
-  data->functions[33] = GetStr(MSG_Function_GotoBookmark3);
-  data->functions[34] = GetStr(MSG_Function_SetBookmark1);
-  data->functions[35] = GetStr(MSG_Function_SetBookmark2);
-  data->functions[36] = GetStr(MSG_Function_SetBookmark3);
-  data->functions[37] = GetStr(MSG_Function_DelLine);
-  data->functions[38] = NULL;
+  _ASSERT( ARRAY_SIZE(data->functions) == (ARRAY_SIZE(functions)+1) );
+  for(i=0; i<ARRAY_SIZE(functions); i++)
+    data->functions[i] = GetStr((APTR)functions[i]);
+  data->functions[ARRAY_SIZE(functions)] = NULL;
 
+  _ASSERT( ARRAY_SIZE(data->execution) == 3 );
   data->execution[0] = GetStr(MSG_Execution_CLI);
   data->execution[1] = GetStr(MSG_Execution_ARexx);
   data->execution[2] = NULL;
 
-  data->cycleentries[0] = GetStr(MSG_CycleItem_Shift);
-  data->cycleentries[1] = GetStr(MSG_CycleItem_Ctrl);
-  data->cycleentries[2] = GetStr(MSG_CycleItem_Alt);
-  data->cycleentries[3] = GetStr(MSG_CycleItem_Mouse);
-  data->cycleentries[4] = NULL;
+  _ASSERT( ARRAY_SIZE(data->cycleentries) == (ARRAY_SIZE(cycleentries)+1) );
+  for(i=0; i<ARRAY_SIZE(cycleentries); i++)
+    data->cycleentries[i] = GetStr((APTR)cycleentries[i]);
+  data->cycleentries[ARRAY_SIZE(cycleentries)] = NULL;
 
   data->obj = CreatePrefsGroup(data);
-
   if(data->obj)
   {
     set(data->normalfont, MUIA_String_AdvanceOnCR, TRUE);
@@ -275,8 +296,8 @@ void *PrefsObject(struct InstData_MCP *data)
             data->typenspell, data->undosize, data->LookupExeType,
             data->SuggestExeType, data->CheckWord, data->insertkey,
             data->separatorshadow, data->separatorshine, NULL);
-
   }
+
   return(data->obj);
 }
 
