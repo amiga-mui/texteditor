@@ -7,6 +7,12 @@ $Source$
 
 #### v15.17 RELEASE ############################################################
 
+2005-12-09 Gunther Nikl <gni@gecko.de>
+
+   * mcp/private.h (FunctionName): Make "char *".
+     mcp/ObjectCreator.c (FunctionName): Adapt.
+     (PrefsObject): Use loops to initialize arrays.
+
 2005-12-07 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcc/HandleInput.c,Methods.c: fixed the long-standing bug #1286500 where
