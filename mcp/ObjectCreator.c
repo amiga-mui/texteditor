@@ -393,14 +393,14 @@ ULONG GadgetsToConfig(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, 
   {
     ULONG buffer[260/4];
 
-    get(data->LookupExeType, MUIA_Cycle_Active, &buffer);
+    get(data->LookupExeType, MUIA_Cycle_Active, buffer);
     get(data->lookupcmd, MUIA_String_Contents, &cfg_data);
-    CopyMem((void *)cfg_data, buffer+1, 256);
+    CopyMem((APTR)cfg_data, &buffer[1], 256);
     DoMethod(msg->configdata, MUIM_Dataspace_Add, buffer, strlen((char *)cfg_data)+5, MUICFG_TextEditor_LookupCmd);
 
-    get(data->SuggestExeType, MUIA_Cycle_Active, &buffer);
+    get(data->SuggestExeType, MUIA_Cycle_Active, buffer);
     get(data->suggestcmd, MUIA_String_Contents, &cfg_data);
-    CopyMem((void *)cfg_data, buffer+1, 256);
+    CopyMem((APTR)cfg_data, &buffer[1], 256);
     DoMethod(msg->configdata, MUIM_Dataspace_Add, buffer, strlen((char *)cfg_data)+5, MUICFG_TextEditor_SuggestCmd);
   }
 
