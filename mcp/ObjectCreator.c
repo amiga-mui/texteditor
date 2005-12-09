@@ -21,7 +21,6 @@
 ***************************************************************************/
 
 #include <string.h>
-#include <stdio.h>
 
 #include <clib/alib_protos.h>
 #include <devices/inputevent.h>
@@ -37,9 +36,9 @@
 
 #include "TextEditor_mcc.h"
 
-STRPTR FunctionName (UWORD func)
+char *FunctionName (UWORD func)
 {
-  STRPTR name;
+  char *name;
 
   switch(func)
   {
