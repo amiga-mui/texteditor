@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2006-04-05 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mccheader.c: slightly reworked the library init/expunge/open/close
+     interface to make the library handling a bit more robust.
+
 2006-01-17 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcp/locale: added russian catalog translation kindly created and
