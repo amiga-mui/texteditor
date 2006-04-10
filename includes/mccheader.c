@@ -394,11 +394,11 @@ STATIC CONST struct TagItem LibCreateTags[] =
 
 #else
 
-STATIC CONST APTR LibVectors[] =
+static const APTR LibVectors[] =
 {
-	#ifdef __MORPHOS__
-	(APTR)FUNCARRAY_32BIT_NATIVE,
-	#endif
+  #ifdef __MORPHOS__
+  (APTR)FUNCARRAY_32BIT_NATIVE,
+  #endif
   (APTR)LibOpen,
   (APTR)LibClose,
   (APTR)LibExpunge,
@@ -407,13 +407,17 @@ STATIC CONST APTR LibVectors[] =
   (APTR)-1
 };
 
-STATIC CONST ULONG LibInitTab[] =
+static const ULONG LibInitTab[] =
 {
-	sizeof(struct LibraryHeader),
-	(ULONG)LibVectors,
-	(ULONG)NULL,
-	(ULONG)LibInit
+  sizeof(struct LibraryHeader),
+  (ULONG)LibVectors,
+  0,
+  (ULONG)LibInit
 };
+
+#ifndef RTF_PPC
+#define RTF_PPC 0
+#endif
 
 #endif
 
@@ -425,10 +429,8 @@ static const USED_VAR struct Resident ROMTag =
   (struct Resident *)&ROMTag + 1,
   #if defined(__amigaos4__)
   RTF_AUTOINIT|RTF_NATIVE,      // The Library should be set up according to the given table.
-  #elif defined(__MORPHOS__)
-  RTF_AUTOINIT|RTF_PPC,
   #else
-  RTF_AUTOINIT,
+  RTF_AUTOINIT|RTF_PPC,
   #endif
   VERSION,
   NT_LIBRARY,
@@ -438,7 +440,7 @@ static const USED_VAR struct Resident ROMTag =
   #if defined(__amigaos4__)
   (APTR)LibCreateTags,           // This table is for initializing the Library.
   #else
-  (APTR)LibInit,
+  (APTR)LibInitTab,
   #endif
   #if defined(__MORPHOS__)
   REVISION,
@@ -452,8 +454,7 @@ static const USED_VAR struct Resident ROMTag =
  * one for the ppc.library.
  * ** IMPORTANT **
  */
-const USED_VAR ULONG __amigappc__ = 1;
-const USED_VAR ULONG __abox__ = 1;
+const ULONG __abox__ = 1;
 
 #endif /* __MORPHOS__ */
 
@@ -499,15 +500,8 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(a0, BPTR librarySegment), REG(
   StackSwap( stack );
   #endif
 
-  // cleanup the library header structure beginning with the
-  // library base.
-  base->lh_Library.lib_Node.ln_Type = NT_LIBRARY;
-  base->lh_Library.lib_Node.ln_Pri  = 0;
-  base->lh_Library.lib_Node.ln_Name = (char *)UserLibName;
-  base->lh_Library.lib_Flags        = LIBF_CHANGED | LIBF_SUMUSED;
-  base->lh_Library.lib_Version      = VERSION;
-  base->lh_Library.lib_Revision     = REVISION;
-  base->lh_Library.lib_IdString     = (char *)(UserLibID+6);
+  // fill-in revision (all other fields are initialized from ROMTag values)
+  base->lh_Library.lib_Revision = REVISION;
 
   base->lh_Segment = librarySegment;
 
@@ -541,7 +535,7 @@ static BPTR LibExpunge(struct LibraryManagerInterface *Self)
 #elif defined(__MORPHOS__)
 static BPTR LibExpunge(void)
 {
-	struct LibraryHeader *base = (struct LibraryHeader*)REG_A6;
+  struct LibraryHeader *base = (struct LibraryHeader*)REG_A6;
 #else
 static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
 {
@@ -608,7 +602,7 @@ static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base
 
   ReleaseSemaphore(&base->lh_Semaphore);
 
-	return res;
+  return res;
 }
 
 /*****************************************************************************************************/
@@ -621,7 +615,7 @@ static BPTR LibClose(struct LibraryManagerInterface *Self)
 #elif defined(__MORPHOS__)
 static BPTR LibClose(void)
 {
-	struct LibraryHeader *base = (struct LibraryHeader *)REG_A6;
+  struct LibraryHeader *base = (struct LibraryHeader *)REG_A6;
 #else
 static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
 {
@@ -640,10 +634,10 @@ static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
   // in case the opern counter is <= 0 we can
   // make sure that we free everything
   if(base->lh_Library.lib_OpenCnt <= 0)
-	{
+  {
     // in case the late expunge flag is set we go and
     // expunge the library base right now
-		if(base->lh_Library.lib_Flags & LIBF_DELEXP)
+    if(base->lh_Library.lib_Flags & LIBF_DELEXP)
     {
       ReleaseSemaphore(&base->lh_Semaphore);
 
@@ -657,11 +651,11 @@ static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
 
       return rc;
     }
-	}
+  }
 
   ReleaseSemaphore(&base->lh_Semaphore);
 
-	return rc;
+  return rc;
 }
 
 /*****************************************************************************************************/
