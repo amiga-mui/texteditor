@@ -22,7 +22,7 @@
 
 # Programs
 CC    = ppc-morphos-gcc
-STRIP = ppc-morphos-strip
+STRIP = ppc-morphos-strip -R .comment
 RM    = rm -f
 RMDIR = rm -rf
 MKDIR	= mkdir
