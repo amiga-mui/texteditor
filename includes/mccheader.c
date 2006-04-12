@@ -272,16 +272,16 @@ static ULONG                  LIBFUNC MCC_Query  (UNUSED struct Interface *self,
 
 #elif defined(__MORPHOS__)
 
-static struct LibraryHeader * LIBFUNC LibInit   (struct LibraryHeader *base, BPTR librarySegment, struct ExecBase *sb);
-static BPTR                   LIBFUNC LibExpunge(void);
-static struct LibraryHeader * LIBFUNC LibOpen   (void);
-static BPTR                   LIBFUNC LibClose  (void);
-static LONG                   LIBFUNC LibNull   (void);
-static ULONG                  LIBFUNC MCC_Query (void);
+static struct LibraryHeader * LIBFUNC LibInit    (struct LibraryHeader *base, BPTR librarySegment, struct ExecBase *sb);
+static BPTR                   LIBFUNC LibExpunge (void);
+static struct LibraryHeader * LIBFUNC LibOpen    (void);
+static BPTR                   LIBFUNC LibClose   (void);
+static LONG                   LIBFUNC LibNull    (void);
+static ULONG                  LIBFUNC MCC_Query  (void);
 
 #else
 
-static struct LibraryHeader * LIBFUNC LibInit    (REG(a0, BPTR Segment), REG(d0, struct LibraryHeader *lh), REG(a6, struct ExecBase *sb));
+static struct LibraryHeader * LIBFUNC LibInit    (REG(d0, struct LibraryHeader *base), REG(a0, BPTR librarySegment), REG(a6, struct ExecBase *sb));
 static BPTR                   LIBFUNC LibExpunge (REG(a6, struct LibraryHeader *base));
 static struct LibraryHeader * LIBFUNC LibOpen    (REG(a6, struct LibraryHeader *base));
 static BPTR                   LIBFUNC LibClose   (REG(a6, struct LibraryHeader *base));
@@ -471,7 +471,7 @@ static struct LibraryHeader * LibInit(struct LibraryHeader *base, BPTR librarySe
 static struct LibraryHeader * LibInit(struct LibraryHeader *base, BPTR librarySegment, struct ExecBase *sb)
 {
 #else
-static struct LibraryHeader * LIBFUNC LibInit(REG(a0, BPTR librarySegment), REG(d0, struct LibraryHeader *base), REG(a6, struct ExecBase *sb))
+static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base), REG(a0, BPTR librarySegment), REG(a6, struct ExecBase *sb))
 {
 #endif
   #if defined(CLASS_STACKSWAP)
@@ -492,9 +492,9 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(a0, BPTR librarySegment), REG(
   if ( !( stack = AllocMem( sizeof( struct StackSwapStruct ) + 8192, MEMF_PUBLIC | MEMF_CLEAR ) ) )
     return( NULL );
 
-  stack->stk_Lower  = (APTR)( (ULONG)stack + sizeof( struct StackSwapStruct ) );
-  stack->stk_Upper  = (ULONG)( (ULONG)stack->stk_Lower + 8192 );
-  stack->stk_Pointer  = (APTR)stack->stk_Upper;
+  stack->stk_Lower   = (APTR)( (ULONG)stack + sizeof( struct StackSwapStruct ) );
+  stack->stk_Upper   = (ULONG)( (ULONG)stack->stk_Lower + 8192 );
+  stack->stk_Pointer = (APTR)stack->stk_Upper;
 
   D(DBF_STARTUP, "Before StackSwap()");
   StackSwap( stack );
@@ -508,7 +508,7 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(a0, BPTR librarySegment), REG(
   InitSemaphore(&base->lh_Semaphore);
 
   #if defined(CLASS_STACKSWAP)
-  base->lh_Stack    = stack;
+  base->lh_Stack = stack;
   #endif
 
   #if defined(CLASS_STACKSWAP)
@@ -535,7 +535,7 @@ static BPTR LibExpunge(struct LibraryManagerInterface *Self)
 #elif defined(__MORPHOS__)
 static BPTR LibExpunge(void)
 {
-  struct LibraryHeader *base = (struct LibraryHeader*)REG_A6;
+  struct LibraryHeader *base = (struct LibraryHeader *)REG_A6;
 #else
 static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
 {
@@ -571,7 +571,7 @@ static struct LibraryHeader *LibOpen(struct LibraryManagerInterface *Self, ULONG
 #elif defined(__MORPHOS__)
 static struct LibraryHeader *LibOpen(void)
 {
-  struct LibraryHeader *base = (struct LibraryHeader*)REG_A6;
+  struct LibraryHeader *base = (struct LibraryHeader *)REG_A6;
 #else
 static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base))
 {
@@ -585,7 +585,7 @@ static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base
   if(UserLibOpen(&base->lh_Library))
   {
     base->lh_Library.lib_Flags &= ~LIBF_DELEXP; // delete the late expung flag.
-  	base->lh_Library.lib_OpenCnt++; // increase the open counter.
+    base->lh_Library.lib_OpenCnt++; // increase the open counter.
 
     #ifdef CLASS_VERSIONFAKE
     base->lh_Library.lib_Version  = MUIMasterBase->lib_Version;
