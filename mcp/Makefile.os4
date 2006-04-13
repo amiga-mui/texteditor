@@ -35,6 +35,7 @@ BINDIR = bin_os4
 LOCALE = locale
 
 # Compiler/Linker flags
+CRT      = newlib
 CPU      = -mcpu=604e
 CPUFLAGS = -mmultiple
 CDEFS    = -D__TE_VERDATE=\"`date +%d.%m.%Y`\" -D__TE_VERDAYS="`expr \`date +%s\` / 86400 - 2922`"
@@ -42,10 +43,10 @@ WARN     = -W -Wall
 OPTFLAGS = -O3 -finline-functions -fomit-frame-pointer -funroll-loops
 DEBUG    = -DDEBUG -g -O0
 REDEFINE =
-CFLAGS   = -I. -I../mcc -I../includes $(CPU) $(CPUFLAGS) $(WARN) $(OPTFLAGS) $(DEBUG)\
-           -D__USE_INLINE__ $(REDEFINE) -c
-LDFLAGS  = -nostartfiles $(CPU)
-LDLIBS   = -ldebug
+CFLAGS   = -pipe -mcrt=$(CRT) -I. -I../mcc -I../includes $(CPU) $(CPUFLAGS) $(WARN) $(OPTFLAGS)\
+           $(DEBUG) -D__USE_INLINE__ $(REDEFINE) -c
+LDFLAGS  = $(CPU) -mcrt=$(CRT) -nostartfiles
+LDLIBS   =
 
 # CPU and DEBUG can be defined outside, defaults to above
 # using e.g. "make DEBUG= CPU=-mcpu=603e" produces optimized non-debug PPC-603e version
@@ -112,12 +113,12 @@ $(LOCALE)/%.catalog: $(LOCALE)/%.ct
 $(MCPTARGET): $(M68KSTUBS) $(MCPOBJS)
 	@printf '\033[32mLinking \033[1m$@\033[0m\n'
 	@$(CC) $(LDFLAGS) -o $@.debug $(MCPOBJS) $(M68KSTUBS) $(LDLIBS)
-	@$(STRIP) -o $@ $@.debug
+	@$(STRIP) -R .comment -o $@ $@.debug
 
 $(PREFTARGET): $(PREFOBJS) $(OBJDIR)/Preference.o
 	@printf '\033[32mLinking \033[1m$@\033[0m\n'
 	@$(CC) -o $@.debug $(PREFOBJS) $(LDLIBS)
-	@$(STRIP) -o $@ $@.debug
+	@$(STRIP) -R .comment -o $@ $@.debug
 
 $(OBJDIR)/library.o: library.c ../includes/mccheader.c \
   ../mcc/TextEditor_mcc.h private.h rev.h
