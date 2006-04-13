@@ -154,6 +154,20 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
         #endif
 
         // lets address the media/CDTV keys as well
+        #if defined(__amigaos4__)
+        if(args[count++])
+          storage->key = RAWKEY_MEDIA_STOP;
+        if(args[count++])
+          storage->key = RAWKEY_MEDIA_PLAY_PAUSE;
+        if(args[count++])
+          storage->key = RAWKEY_MEDIA_PREV_TRACK;
+        if(args[count++])
+          storage->key = RAWKEY_MEDIA_NEXT_TRACK;
+        if(args[count++])
+          storage->key = RAWKEY_MEDIA_SHUFFLE;
+        if(args[count++])
+          storage->key = RAWKEY_MEDIA_REPEAT;
+        #else
         if(args[count++])
           storage->key = RAWKEY_AUD_STOP;
         if(args[count++])
@@ -166,6 +180,7 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
           storage->key = RAWKEY_AUD_SHUFFLE;
         if(args[count++])
           storage->key = RAWKEY_AUD_REPEAT;
+        #endif
 
         // take respect of the NEWMOUSE RAWKEY based wheel events as well
         if(args[count++])
@@ -296,12 +311,21 @@ void KeyToString (STRPTR buffer, struct KeyAction *ka)
       case RAWKEY_SCRLOCK:    strcat(buffer, "scrolllock"); break;
       #endif
 
+      #if defined(__amigaos4__)
+			case RAWKEY_MEDIA_STOP:       strcat(buffer, "media_stop"); break;
+			case RAWKEY_MEDIA_PLAY_PAUSE: strcat(buffer, "media_play"); break;
+			case RAWKEY_MEDIA_PREV_TRACK: strcat(buffer, "media_prev"); break;
+			case RAWKEY_MEDIA_NEXT_TRACK: strcat(buffer, "media_next"); break;
+			case RAWKEY_MEDIA_SHUFFLE:    strcat(buffer, "media_rewind"); break;
+			case RAWKEY_MEDIA_REPEAT:     strcat(buffer, "media_forward"); break;
+      #else
 			case RAWKEY_AUD_STOP:       strcat(buffer, "media_stop"); break;
 			case RAWKEY_AUD_PLAY_PAUSE: strcat(buffer, "media_play"); break;
 			case RAWKEY_AUD_PREV_TRACK: strcat(buffer, "media_prev"); break;
 			case RAWKEY_AUD_NEXT_TRACK: strcat(buffer, "media_next"); break;
 			case RAWKEY_AUD_SHUFFLE:    strcat(buffer, "media_rewind"); break;
 			case RAWKEY_AUD_REPEAT:     strcat(buffer, "media_forward"); break;
+      #endif
 
 			case NM_WHEEL_UP:           strcat(buffer, "nm_wheel_up"); break;
 			case NM_WHEEL_DOWN:         strcat(buffer, "nm_wheel_down"); break;
