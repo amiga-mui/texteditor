@@ -21,10 +21,10 @@
 ***************************************************************************/
 
 #define LIB_VERSION    15
-#define LIB_REVISION   12
+#define LIB_REVISION   13
 
-#define LIB_REV_STRING "15.12"
-#define LIB_DATE       "07.12.2005"
+#define LIB_REV_STRING "15.13"
+#define LIB_DATE       "13.04.2006"
 
 #if defined(__PPC__)
   #if defined(__MORPHOS__)
@@ -44,4 +44,4 @@
   #define CPU ""
 #endif
 
-#define LIB_COPYRIGHT  "Copyright (C) 2005 TextEditor.mcc Open Source Team"
+#define LIB_COPYRIGHT  "Copyright (C) 2005-2006 TextEditor.mcc Open Source Team"
