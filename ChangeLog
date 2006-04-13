@@ -5,6 +5,20 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2006-04-13 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcp/KeyStorage.c: adapted MEDIA key definition to latest OS4 SDK.
+   * Makefile.mos: moved the .comment section strip definition to its more apprpriate
+     section (the top-level programs definition is just for overriding the command
+     name by the user).
+   * Makefile.os4: switched to newlib compilation/linkage per default and removed
+     the unecessary -ldebug link definition.
+   * Debug.c: replaced the KPutFmt() use by direct calls to OS4 exec debug functions
+     were appropriate.
+   * mccheader.c: added support for OS4/newlib use and slightly reintroduced
+     some of the parts previously stripped by Gunther. We really should prefer
+     code readability instead of minimizing passages.
+
 2006-04-10 Gunther Nikl <gni@gecko.de>
 
    * include/mccheader.c: Fix ROMTag for non-OS4 systems.
