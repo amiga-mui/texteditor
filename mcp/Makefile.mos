@@ -22,7 +22,7 @@
 
 # Programs
 CC    = ppc-morphos-gcc
-STRIP = ppc-morphos-strip -R .comment
+STRIP = ppc-morphos-strip
 RM    = rm -f
 RMDIR = rm -rf
 MKDIR	= mkdir
@@ -104,12 +104,12 @@ $(LOCALE)/%.catalog: $(LOCALE)/%.ct
 $(MCPTARGET): $(MCPOBJS)
 	@printf '\033[32mLinking \033[1m$@\033[0m\n'
 	@$(CC) $(LDFLAGS) -o $@.debug $(MCPOBJS) $(LDLIBS)
-	@$(STRIP) -o $@ $@.debug
+	@$(STRIP) -R .comment -o $@ $@.debug
 
 $(PREFTARGET): $(PREFOBJS) $(OBJDIR)/Preference.o
 	@printf '\033[32mLinking \033[1m$@\033[0m\n'
 	@$(CC) -noixemul -o $@.debug $(PREFOBJS) $(LDLIBS)
-	@$(STRIP) -o $@ $@.debug
+	@$(STRIP) -R .comment -o $@ $@.debug
 
 $(OBJDIR)/library.o: library.c ../includes/mccheader.c \
   ../mcc/TextEditor_mcc.h private.h rev.h
