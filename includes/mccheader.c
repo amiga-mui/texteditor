@@ -203,6 +203,10 @@ struct UtilityIFace *IUtility     = NULL;
 struct DOSIFace *IDOS             = NULL;
 struct GraphicsIFace *IGraphics   = NULL;
 struct IntuitionIFace *IIntuition = NULL;
+#if defined(__NEWLIB__)
+struct Library *NewlibBase = NULL;
+struct NewlibIFace* INewlib = NULL;
+#endif
 #else
 struct Library        *MUIMasterBase = NULL;
 struct ExecBase       *SysBase       = NULL;
@@ -221,7 +225,7 @@ static struct MUI_CustomClass *ThisClassP = NULL;
 #endif
 
 #ifdef __GNUC__
-  #ifdef USE_UTILITYBASE
+  #if defined(USE_UTILITYBASE) && !defined(__NEWLIB__)
   struct Library *__UtilityBase = NULL; // required by libnix & clib2
   #endif
   #ifdef __libnix__
@@ -246,7 +250,9 @@ struct LibraryHeader
   BPTR                   lh_Segment;
   struct SignalSemaphore lh_Semaphore;
   UWORD                  lh_Pad2;
+  #if defined(CLASS_STACKSWAP)
   struct StackSwapStruct *lh_Stack;
+  #endif
 };
 
 /******************************************************************************/
@@ -411,13 +417,9 @@ static const ULONG LibInitTab[] =
 {
   sizeof(struct LibraryHeader),
   (ULONG)LibVectors,
-  0,
+  (ULONG)NULL,
   (ULONG)LibInit
 };
-
-#ifndef RTF_PPC
-#define RTF_PPC 0
-#endif
 
 #endif
 
@@ -429,8 +431,10 @@ static const USED_VAR struct Resident ROMTag =
   (struct Resident *)&ROMTag + 1,
   #if defined(__amigaos4__)
   RTF_AUTOINIT|RTF_NATIVE,      // The Library should be set up according to the given table.
-  #else
+  #elif defined(__MORPHOS__)
   RTF_AUTOINIT|RTF_PPC,
+  #else
+  RTF_AUTOINIT,
   #endif
   VERSION,
   NT_LIBRARY,
@@ -454,7 +458,7 @@ static const USED_VAR struct Resident ROMTag =
  * one for the ppc.library.
  * ** IMPORTANT **
  */
-const ULONG __abox__ = 1;
+const USED_VAR ULONG __abox__ = 1;
 
 #endif /* __MORPHOS__ */
 
@@ -474,50 +478,64 @@ static struct LibraryHeader * LibInit(struct LibraryHeader *base, BPTR librarySe
 static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base), REG(a0, BPTR librarySegment), REG(a6, struct ExecBase *sb))
 {
 #endif
+  struct LibraryHeader *ret_base = NULL;
   #if defined(CLASS_STACKSWAP)
   static struct StackSwapStruct *stack;
   #endif
 
   SysBase = (APTR)sb;
 
-  D(DBF_STARTUP, "LibInit()");
-
-  // make sure that this is really a 68020+ machine if optimized for 020+
-  #if _M68060 || _M68040 || _M68030 || _M68020 || __mc68020 || __mc68030 || __mc68040 || __mc68060
-  if(!(SysBase->AttnFlags & AFF_68020))
-    return(NULL);
+  #if defined(__amigaos4__) && defined(__NEWLIB__)
+  if((NewlibBase = OpenLibrary("newlib.library", 3)) &&
+     GETINTERFACE(INewlib, NewlibBase))
   #endif
+  {
+    D(DBF_STARTUP, "LibInit()");
 
-  #if defined(CLASS_STACKSWAP)
-  if ( !( stack = AllocMem( sizeof( struct StackSwapStruct ) + 8192, MEMF_PUBLIC | MEMF_CLEAR ) ) )
-    return( NULL );
+    // make sure that this is really a 68020+ machine if optimized for 020+
+    #if _M68060 || _M68040 || _M68030 || _M68020 || __mc68020 || __mc68030 || __mc68040 || __mc68060
+    if(!(SysBase->AttnFlags & AFF_68020))
+      return(NULL);
+    #endif
 
-  stack->stk_Lower   = (APTR)( (ULONG)stack + sizeof( struct StackSwapStruct ) );
-  stack->stk_Upper   = (ULONG)( (ULONG)stack->stk_Lower + 8192 );
-  stack->stk_Pointer = (APTR)stack->stk_Upper;
+    #if defined(CLASS_STACKSWAP)
+    if(!(stack = AllocMem(sizeof(struct StackSwapStruct)+8192, MEMF_PUBLIC|MEMF_CLEAR)))
+      return( NULL );
 
-  D(DBF_STARTUP, "Before StackSwap()");
-  StackSwap( stack );
-  #endif
+    stack->stk_Lower   = (APTR)((ULONG)stack + sizeof(struct StackSwapStruct));
+    stack->stk_Upper   = (ULONG)((ULONG)stack->stk_Lower+8192);
+    stack->stk_Pointer = (APTR)stack->stk_Upper;
 
-  // fill-in revision (all other fields are initialized from ROMTag values)
-  base->lh_Library.lib_Revision = REVISION;
+    D(DBF_STARTUP, "Before StackSwap()");
+    StackSwap( stack );
+    #endif
 
-  base->lh_Segment = librarySegment;
+    // cleanup the library header structure beginning with the
+    // library base, even if that is done automcatically, we explicitly
+    // do it here for consistency reasons.
+    base->lh_Library.lib_Node.ln_Type = NT_LIBRARY;
+    base->lh_Library.lib_Node.ln_Pri  = 0;
+    base->lh_Library.lib_Node.ln_Name = (char *)UserLibName;
+    base->lh_Library.lib_Flags        = LIBF_CHANGED | LIBF_SUMUSED;
+    base->lh_Library.lib_Version      = VERSION;
+    base->lh_Library.lib_Revision     = REVISION;
+    base->lh_Library.lib_IdString     = (char *)UserLibID; // here without +6 or otherwise MUI didn't identify it.
 
-  InitSemaphore(&base->lh_Semaphore);
+    base->lh_Segment = librarySegment;
 
-  #if defined(CLASS_STACKSWAP)
-  base->lh_Stack = stack;
-  #endif
+    InitSemaphore(&base->lh_Semaphore);
 
-  #if defined(CLASS_STACKSWAP)
-  StackSwap(base->lh_Stack);
-  FreeMem(base->lh_Stack, sizeof(struct StackSwapStruct) + 8192);
-  D(DBF_STARTUP, "After second StackSwap()");
-  #endif
+    #if defined(CLASS_STACKSWAP)
+    base->lh_Stack = stack;
+    StackSwap(base->lh_Stack);
+    FreeMem(base->lh_Stack, sizeof(struct StackSwapStruct) + 8192);
+    D(DBF_STARTUP, "After second StackSwap()");
+    #endif
 
-  return(base);
+    ret_base = base;
+  }
+
+  return(ret_base);
 }
 
 /*****************************************************************************************************/
@@ -553,6 +571,15 @@ static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
   }
   else
   {
+    #if defined(__amigaos4__) && defined(__NEWLIB__)
+    if(NewlibBase)
+    {
+      DROPINTERFACE(INewlib);
+      CloseLibrary(NewlibBase);
+      NewlibBase = NULL;
+    }
+    #endif
+
     Remove((struct Node *)base);
     rc = base->lh_Segment;
     DeleteLibrary(&base->lh_Library);
@@ -714,7 +741,7 @@ static BOOL UserLibOpen(struct Library *base)
         GfxBase       = (APTR)THISCLASS->mcc_GfxBase;
         IntuitionBase = (APTR)THISCLASS->mcc_IntuitionBase;
 
-        #ifdef USE_UTILITYBASE
+        #if defined(USE_UTILITYBASE) && !defined(__NEWLIB__)
         __UtilityBase = (APTR)UtilityBase;
         #endif
 
