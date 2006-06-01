@@ -144,7 +144,9 @@ static BPTR CloneSearchPath(void)
   if (WorkbenchBase)
   {
     WorkbenchControl(NULL, WBCTRLA_DuplicateSearchPath, &path, TAG_DONE);
-  } else
+  }
+
+  if (!path)
   {
     /* We don't like this evil code in OS4 compile, as we should have
      * a recent enough workbench available */
@@ -170,9 +172,9 @@ static BPTR CloneSearchPath(void)
           dir2 = DupLock(lock->fl_Key);
           if (!dir2) break;
 
-          /* TODO: Check out if AllocVec() is correct, because this memory is
-           * freed by the system later */
-          node = AllocVec(sizeof(struct PathNode), MEMF_PUBLIC);
+          /* Use AllocVec(), because this memory is freed by FreeVec()
+           * by the system later */
+          node = AllocVec(sizeof(struct PathNode), MEMF_ANY);
           if (!node)
           {
             UnLock(dir2);
@@ -198,12 +200,16 @@ static VOID FreeSearchPath(BPTR path)
   if (path == 0)
     return;
 
+#ifndef __MORPHOS__
   if (WorkbenchBase)
   {
     WorkbenchControl(NULL, WBCTRLA_FreeSearchPath, path, TAG_DONE);
   } else
+#endif
   {
 #ifndef __amigaos4__
+     /* This is compatible with WorkbenchControl(NULL, WBCTRLA_FreeSearchPath, ...)
+      * in Ambient */
      while (path)
      {
         struct PathNode *node = BADDR(path);

@@ -5,6 +5,14 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2006-06-01 Ilkka Lehtoranta <ilkleht@isoveli.org>
+
+   * mcc/SpellChecker.c: fall back to manual search path duplication if
+     WorkbenchControl() call fails. MorphOS is shipped with workbench.library
+     having version number greater than 44 but search path routines were not
+     implemented until V50.16. Disabled WBCTRLA_FreeSearchPath for MOS because
+     it does nothing in the most MOS installs.
+
 2006-04-13 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcp/KeyStorage.c: adapted MEDIA key definition to latest OS4 SDK.
