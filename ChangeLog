@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2006-06-12 Ilkka Lehtoranta <ilkleht@isoveli.org>
+
+   * mcc/GetSetAttrs.c: MUIA_Font now returns the text editor font always
+     (patch by Mathias Parnaudedau).
+
 2006-06-01 Ilkka Lehtoranta <ilkleht@isoveli.org>
 
    * mcc/SpellChecker.c: fall back to manual search path duplication if
