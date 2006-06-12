@@ -189,6 +189,9 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
     case MUIA_TextEditor_WrapBorder:
       ti_Data = data->WrapBorder;
       break;
+    case MUIA_Font:
+      ti_Data = (ULONG)data->font;
+      break;
 
     default:
       LEAVE();
