@@ -675,6 +675,16 @@ DISPATCHERPROTO(_Dispatcher)
       struct MUIP_TextEditor_InsertText *ins_msg = (struct MUIP_TextEditor_InsertText *)msg;
       struct marking block;
 
+		switch (ins_msg->pos)
+		{
+			case MUIV_TextEditor_InsertText_Top:
+				GoTop(data);
+				break;
+			case MUIV_TextEditor_InsertText_Bottom:
+				GoBottom(data);
+				break;
+		}
+
       block.startx = data->CPos_X;
       block.startline = data->actualline;
       result = InsertText(data, ins_msg->text, TRUE);

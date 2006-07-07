@@ -1,28 +1,67 @@
-#include <StdIO.h>
-#include <String.h>
-#include <Exec/Tasks.h>
-#include <Libraries/MUI.h>
-#include <Rexx/Storage.h>
-#include <Utility/Hooks.h>
-#include <Proto/DOS.h>
-#include <Proto/Exec.h>
-#include <Proto/Graphics.h>
-#include <Proto/MUIMaster.h>
-#include <Proto/Intuition.h>
-#include <Proto/RexxSysLib.h>
 
-#include <TextEditor_mcc.h>
+/*
+ * TextEditor-Demo.c
+ *
+ * To compile this demo of some features of the TextEditor class,
+ * depending on your OS and compiler :
+ *
+ * -  MorphOS GCC : gcc -noixemul -o TextEditor-Demo TextEditor-Demo.c
+ * -  MorphOS VBCC : vc -o TextEditor-Demo TextEditor-Demo.c -lamiga
+ * -  AmigaOS4 GCC : gcc -ggdb -D__USE_BASETYPE__ -D__USE_INLINE__ -o TextEditor-Demo TextEditor-Demo.c
+ * -  AmigaOS 3.x SAS/C : sc TextEditor-Demo.c link to TextEditor-Demo
+ *
+ * Requirements : SDI_headers.lha
+ *
+ */
 
-	struct	Library	*MUIMasterBase;
-	Object	*app, *window, *editorgad;
-	STRPTR	StdEntries[] = {"Kind regards ", "Yours ", "Mvh ", NULL}; //"Duff@DIKU.DK", "http://www.DIKU.dk/students/duff/", NULL};
-	LONG		cmap[8];
+#include <stdio.h>
+#include <string.h>
 
-LONG ARexxHookCode (register __a1 struct RexxMsg *rexxmsg, register __a2 Object *app)
+#include <libraries/mui.h>
+#include <libraries/iffparse.h>
+
+#include <clib/alib_protos.h>
+
+#include <proto/dos.h>
+#include <proto/intuition.h>
+#include <proto/muimaster.h>
+#include <proto/exec.h>
+#include <proto/graphics.h>
+#include <proto/rexxsyslib.h>
+
+#include <mui/TextEditor_mcc.h>
+
+#include <SDI_hook.h>
+
+struct GfxBase *GfxBase;
+struct IntuitionBase *IntuitionBase;
+struct	Library	*MUIMasterBase;
+struct Library *RexxSysBase;
+
+#ifdef __amigaos4__
+struct GraphicsIFace *IGraphics;
+struct IntuitionIFace *IIntuition;
+struct MUIMasterIFace *IMUIMaster;
+struct RexxSysIFace *IRexxSys;
+#endif
+
+#define	MUIA_Application_UsedClasses	0x8042e9a7	/* V20 STRPTR *	i..	*/
+
+long __stack = 16384;
+
+Object	*app, *window, *editorgad;
+STRPTR	StdEntries[] = {"Kind regards ", "Yours ", "Mvh ", NULL};
+LONG		cmap[8];
+
+
+
+HOOKPROTONH(ARexxHookCode, LONG, Object *app, struct RexxMsg *rexxmsg)
 {
-		LONG result;
+	LONG result;
 
-	if(result = DoMethod(editorgad, MUIM_TextEditor_ARexxCmd, rexxmsg->rm_Args[0]))
+	result = DoMethod(editorgad, MUIM_TextEditor_ARexxCmd, rexxmsg->rm_Args[0]);
+
+	if (result)
 	{
 		if(result != TRUE)
 		{
@@ -32,16 +71,20 @@ LONG ARexxHookCode (register __a1 struct RexxMsg *rexxmsg, register __a2 Object 
 	}
 	return(0);
 }
-struct Hook ARexxHook = {0, 0, (APTR)ARexxHookCode};
 
-ULONG TextEditor_Dispatcher (register __a0 struct IClass *cl, register __a2 Object *obj, register __a1 struct MUIP_TextEditor_HandleError *msg)
+MakeStaticHook(ARexxHook, ARexxHookCode);
+
+
+
+DISPATCHERPROTO(TextEditor_Dispatcher)
 {
+
+
 	switch(msg->MethodID)
 	{
 		case MUIM_Show:
 		{
-				struct ColorMap *cm = muiRenderInfo(obj)->mri_Screen->ViewPort.ColorMap;
-
+			struct ColorMap *cm = muiRenderInfo(obj)->mri_Screen->ViewPort.ColorMap;
 			cmap[0] = ObtainBestPenA(cm, 0x00<<24, 0x00<<24, 0x00<<24, NULL);
 			cmap[1] = ObtainBestPenA(cm, 0xff<<24, 0xff<<24, 0xff<<24, NULL);
 			cmap[2] = ObtainBestPenA(cm, 0xff<<24, 0x00<<24, 0x00<<24, NULL);
@@ -55,8 +98,8 @@ ULONG TextEditor_Dispatcher (register __a0 struct IClass *cl, register __a2 Obje
 
 		case MUIM_Hide:
 		{
-				struct ColorMap *cm = muiRenderInfo(obj)->mri_Screen->ViewPort.ColorMap;
-				int c;
+			struct ColorMap *cm = muiRenderInfo(obj)->mri_Screen->ViewPort.ColorMap;
+			int c;
 
 			for(c = 0; c < 8; c++)
 			{
@@ -75,8 +118,8 @@ ULONG TextEditor_Dispatcher (register __a0 struct IClass *cl, register __a2 Obje
 
 		case MUIM_DragDrop:
 		{
-				struct MUIP_DragDrop *drop_msg = (struct MUIP_DragDrop *)msg;
-				ULONG active;
+			struct MUIP_DragDrop *drop_msg = (struct MUIP_DragDrop *)msg;
+			ULONG active;
 
 			if(GetAttr(MUIA_List_Active, drop_msg->obj, &active))
 			{
@@ -87,9 +130,12 @@ ULONG TextEditor_Dispatcher (register __a0 struct IClass *cl, register __a2 Obje
 
 		case MUIM_TextEditor_HandleError:
 		{
-				char *errortxt = NULL;
+			char *errortxt = NULL;
+			struct MUIP_TextEditor_HandleError *msgerr;
 
-			switch(msg->errorcode)
+			msgerr = (struct MUIP_TextEditor_HandleError *)msg;
+
+			switch(msgerr->errorcode)
 			{
 				case Error_ClipboardIsEmpty:
 					errortxt = "\33cThe clipboard is empty.";
@@ -131,7 +177,8 @@ ULONG TextEditor_Dispatcher (register __a0 struct IClass *cl, register __a2 Obje
 			break;
 		}
 	}
-	return(DoSuperMethodA(cl, obj, (Msg)msg));
+
+	return DoSuperMethodA(cl, obj, (Msg)msg);
 }
 
 Object *ImageGad (STRPTR text, UBYTE key)
@@ -153,26 +200,54 @@ Object *ImageGad (STRPTR text, UBYTE key)
 
 #define MUIV_RunARexxScript 0xad800000
 
-VOID main (VOID)
+ULONG OpenLibs(void)
 {
-		struct	RDArgs				*args;
-		struct	StackSwapStruct	stackswap;
-		struct	Task					*mytask = FindTask(NULL);
-		Object	*slider;
-		LONG		argarray[6]	=		{0,0,0,0,0,0};
-		ULONG		stacksize	=		(ULONG)mytask->tc_SPUpper-(ULONG)mytask->tc_SPLower+8192;
-		APTR		newstack		=		AllocVec(stacksize, 0L);
+	GfxBase = (struct GfxBase *)OpenLibrary("graphics.library", 39);
+	IntuitionBase = (struct IntuitionBase *)OpenLibrary("intuition.library", 39);
+	MUIMasterBase = OpenLibrary("muimaster.library", 11);  //MUIMASTER_VMIN)
+	RexxSysBase = OpenLibrary("rexxsyslib.library", 36);
 
-	stackswap.stk_Lower   = newstack;
-	stackswap.stk_Upper   = (ULONG)newstack+stacksize;
-	stackswap.stk_Pointer = (APTR)stackswap.stk_Upper;
-	if(newstack)
+	if (GfxBase && MUIMasterBase && IntuitionBase && RexxSysBase)
 	{
-		StackSwap(&stackswap);
+
+#ifdef __amigaos4__
+	IGraphics = (struct GraphicsIFace *)GetInterface((struct Library *)GfxBase, "main", 1, NULL);
+	IIntuition = (struct IntuitionIFace *)GetInterface((struct Library *)IntuitionBase, "main", 1, NULL);
+	IMUIMaster = (struct MUIMasterIFace *)GetInterface(MUIMasterBase, "main", 1, NULL);
+	IRexxSys = (struct RexxSysIFace *)GetInterface(RexxSysBase, "main", 1, NULL);
+#endif
+
+		return TRUE;
+	}else{
+		return FALSE;
+	}
+}
+
+void CloseLibs(void)
+{
+#ifdef __amigaos4__
+	if (IRexxSys) DropInterface((struct Interface *)IRexxSys);
+	if (IMUIMaster) DropInterface((struct Interface *)IMUIMaster);
+	if (IIntuition) DropInterface((struct Interface *)IIntuition);
+	if (IGraphics) DropInterface((struct Interface *)IGraphics);
+#endif
+
+	if (RexxSysBase) CloseLibrary(RexxSysBase);
+	if (MUIMasterBase) CloseLibrary(MUIMasterBase);
+	if (IntuitionBase) CloseLibrary((struct Library *)IntuitionBase);
+	if (GfxBase) CloseLibrary((struct Library *)GfxBase);
+}
+
+int main (VOID)
+{
+	struct	RDArgs				*args;
+	Object	*slider;
+	LONG		argarray[6]	=		{0,0,0,0,0,0};
+
 
 		if(args = ReadArgs("Filename/A,EMail/S,MIME/S,MIMEQuoted/S,SkipHeader/S,Fixed/S", argarray, NULL))
 		{
-			if(MUIMasterBase = OpenLibrary("muimaster.library", 11)) //MUIMASTER_VMIN))
+			if(OpenLibs() == TRUE)
 			{
 					struct	MUI_CustomClass	*editor_mcc;
 					Object	*clear, *cut, *copy, *paste, *erase,
@@ -182,8 +257,9 @@ VOID main (VOID)
 					STRPTR	colors[] = {"Normal", "Black", "White", "Red", "Gren", "Cyan", "Yellow", "Blue", "Magenta", NULL};
 					STRPTR	classes[] = {"TextEditor.mcc"};
 
-				if(editor_mcc = MUI_CreateCustomClass(NULL, "TextEditor.mcc", NULL, 0, (void *)TextEditor_Dispatcher))
+				if(editor_mcc = MUI_CreateCustomClass(NULL, "TextEditor.mcc", NULL, 0, ENTRY(TextEditor_Dispatcher)))
 				{
+
 					app = ApplicationObject,
 								MUIA_Application_Author,      "Allan Odgaard",
 								MUIA_Application_Base,        "TextEditor-Demo",
@@ -195,7 +271,7 @@ VOID main (VOID)
 								MUIA_Application_UsedClasses, classes,
 								SubWindow, window = WindowObject,
 									MUIA_Window_Title,      "TextEditor-Demo",
-									MUIA_Window_ID,         'MAIN',
+									MUIA_Window_ID,         MAKE_ID('M','A','I','N'),
 									WindowContents, VGroup,
 										Child, VGroup,
 											MUIA_Background, MUII_GroupBack,
@@ -231,18 +307,20 @@ VOID main (VOID)
 												Child, underline = ImageGad("\33I[5:ProgDir:Underline.Brush]\n\n\nUnderline", 'u'),
 												End,
 
+
 											Child, HGroup,
+
 
 												Child, HGroup,
 													MUIA_Group_Spacing, 0,
 													Child, editorgad = NewObject(editor_mcc->mcc_Class, NULL,
-														MUIA_TextEditor_Slider, slider,
 														MUIA_TextEditor_ColorMap, cmap,
 														MUIA_CycleChain, TRUE,
 														End,
 													Child, slider = ScrollbarObject,
 														End,
 													End,
+
 
 												Child, VGroup,
 													Child, ListviewObject,
@@ -263,12 +341,11 @@ VOID main (VOID)
 										End,
 									End,
 								End;
-
 					if(app)
 					{
-							ULONG sigs;
-							ULONG running = 1;
-							BPTR  fh;
+						ULONG sigs;
+						ULONG running = 1;
+						BPTR  fh;
 
 						if(argarray[5])
 						{
@@ -364,6 +441,8 @@ VOID main (VOID)
 						DoMethod(italic,    MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_StyleItalic,    MUIV_TriggerValue);
 						DoMethod(underline, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_StyleUnderline, MUIV_TriggerValue);
 
+						set(editorgad, MUIA_TextEditor_Slider, slider);
+
 						SetAttrs(window,	MUIA_Window_ActiveObject, editorgad,
 												MUIA_Window_Open, TRUE,
 												TAG_DONE);
@@ -373,7 +452,7 @@ VOID main (VOID)
 								struct RexxMsg *rxmsg;
 								ULONG	changed;
 								ULONG ReturnID;
-								BPTR	rxstdout = NULL;
+								BPTR	rxstdout = 0L;
 
 							while((ReturnID = DoMethod(app, MUIM_Application_NewInput, &sigs)) != MUIV_Application_ReturnID_Quit)
 							{
@@ -437,24 +516,22 @@ VOID main (VOID)
 					MUI_DeleteCustomClass(editor_mcc);
 				}
 				else printf("Failed to open TextEditor.mcc\n");
-				CloseLibrary(MUIMasterBase);
+
+				CloseLibs();
 			}
 			else printf("Failed to open MUIMaster.Library V%d\n", MUIMASTER_VMIN);
+
 			FreeArgs(args);
 		}
 		else
 		{
-				UBYTE	prgname[32];
-				LONG	error = IoErr();
+			UBYTE	prgname[32];
+			LONG	error = IoErr();
 
 			GetProgramName(prgname, 32);
 			PrintFault(error, prgname);
 		}
-		StackSwap(&stackswap);
-		FreeVec(newstack);
-	}
+
+	return 0;
 }
 
-VOID wbmain (VOID)
-{
-}

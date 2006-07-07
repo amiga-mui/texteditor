@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $Source$
 
+2006-07-07 Mathias Parnaudeau <mathias.p@wanadoo.fr>
+
+   * demo/TextEditor-Demo.c : After deep changes it now compiles and runs
+     with vbcc, GCC and SAS/C (tested on MorphOS and OS4) [bug #1376518].
+   * mcc/Dispatcher.c : Added the support of MUIV_TextEditor_InsertText_Top
+     and MUIV_TextEditor_InsertText_Bottom [bug #1416562].
+
 2006-06-12 Ilkka Lehtoranta <ilkleht@isoveli.org>
 
    * mcc/GetSetAttrs.c: MUIA_Font now returns the text editor font always
