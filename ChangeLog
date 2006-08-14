@@ -3,7 +3,12 @@ MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
 $Id$
-$Source$
+
+2006-08-14 Jens Langner <Jens.Langner@light-speed.de>
+
+   * demo/TextEditor-Demo.c: added Makefiles for all 3 major targets and
+     fixed all still existing compiler warnings and problems when compiling
+     the demonstration program.
 
 2006-07-07 Mathias Parnaudeau <mathias.p@wanadoo.fr>
 
