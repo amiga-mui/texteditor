@@ -542,7 +542,8 @@ DISPATCHERPROTO(_Dispatcher)
   ENTER();
 
 //  kprintf("Method: 0x%lx\n", msg->MethodID);
-//  kprintf("Stack usage: %ld\n", (ULONG)FindTask(NULL)->tc_SPUpper - (ULONG)FindTask(NULL)->tc_SPReg);
+  //D(DBF_STARTUP, "Stack usage: %ld", (ULONG)FindTask(NULL)->tc_SPUpper - (ULONG)FindTask(NULL)->tc_SPReg);
+
   if(data->shown && !(data->flags & FLG_Draw))
   {
     switch(msg->MethodID)

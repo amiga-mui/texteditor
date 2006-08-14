@@ -493,15 +493,17 @@ int main(void)
             }
 
             get(editorgad, MUIA_TextEditor_HasChanged, &changed);
-            if(changed && !(sigs & SIGBREAKF_CTRL_C))
+            if(argarray[0] && changed && !(sigs & SIGBREAKF_CTRL_C))
               running = MUI_Request(app, window, 0L, "Warning", "*_Proceed|_Save|_Cancel", "\33cText '%s'\n is modified. Save it?", argarray[0]);
-          } while(running == 0);
+
+          }
+          while(running == 0);
 
           if(running == 2)
           {
               void  *text = (void *)DoMethod(editorgad, MUIM_TextEditor_ExportText);
 
-            if((fh = Open((char *)argarray[0], MODE_NEWFILE)))
+            if(argarray[0] && (fh = Open((char *)argarray[0], MODE_NEWFILE)))
             {
               Write(fh, text, strlen(text));
               Close(fh);
