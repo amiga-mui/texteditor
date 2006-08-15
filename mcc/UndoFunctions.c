@@ -90,71 +90,97 @@ long Undo (struct InstData *data)
     switch(buffer->type)
     {
       case pastechar:
+      {
         buffer->del.character = *(data->actualline->line.Contents+data->CPos_X);
         buffer->del.style = GetStyle(data->CPos_X, data->actualline);
         buffer->del.flow = data->actualline->line.Flow;
         buffer->del.separator = data->actualline->line.Separator;
         RemoveChars(data->CPos_X, data->actualline, 1, data);
-        break;
-      case backspacechar:
-        PasteChars(data->CPos_X++, data->actualline, 1, (char *)&buffer->del.character, buffer, data);
-        break;
-      case deletechar:
-        PasteChars(data->CPos_X, data->actualline, 1, (char *)&buffer->del.character, buffer, data);
-        break;
-      case splitline:
-        MergeLines(data->actualline, data);
-        break;
-      case mergelines:
-        SplitLine(data->CPos_X, data->actualline, FALSE, buffer, data);
-        break;
-      case backspacemerge:
-        SplitLine(data->CPos_X, data->actualline, TRUE, buffer, data);
-        break;
-      case pasteblock:
-        {
-            struct marking block =
-            {
-              TRUE,
-              LineNode(buffer->y, data),
-              buffer->x,
-              LineNode(buffer->blk.y, data),
-              buffer->blk.x
-            };
-            char  *clip = GetBlock(&block, data);
+      }
+      break;
 
-          CutBlock2(data, FALSE, FALSE, &block, TRUE);
-          buffer->clip = (unsigned char *)clip;
-        }
-        break;
+      case backspacechar:
+      {
+        PasteChars(data->CPos_X++, data->actualline, 1, (char *)&buffer->del.character, buffer, data);
+      }
+      break;
+
+      case deletechar:
+      {
+        PasteChars(data->CPos_X, data->actualline, 1, (char *)&buffer->del.character, buffer, data);
+      }
+      break;
+
+      case splitline:
+      {
+        MergeLines(data->actualline, data);
+      }
+      break;
+
+      case mergelines:
+      {
+        SplitLine(data->CPos_X, data->actualline, FALSE, buffer, data);
+      }
+      break;
+
+      case backspacemerge:
+      {
+        SplitLine(data->CPos_X, data->actualline, TRUE, buffer, data);
+      }
+      break;
+
+      case pasteblock:
+      {
+        struct marking block =
+        {
+          TRUE,
+          LineNode(buffer->y, data),
+          buffer->x,
+          LineNode(buffer->blk.y, data),
+          buffer->blk.x
+        };
+        char *clip = GetBlock(&block, data);
+
+        CutBlock2(data, FALSE, FALSE, &block, TRUE);
+        buffer->clip = (unsigned char *)clip;
+      }
+      break;
+
       case deleteblock_nomove:
-          crsr_move = FALSE;
+        crsr_move = FALSE;
+      // continue
+
       case deleteblock:
       {
-          struct Hook *oldhook = data->ImportHook;
-          char *clip = (char *)buffer->clip;
+        struct Hook *oldhook = data->ImportHook;
+        char *clip = (char *)buffer->clip;
 
-          data->ImportHook = &ImPlainHook;
-          InsertText(data, clip, crsr_move);
-          data->ImportHook = oldhook;
-          MyFreePooled(data->mypool, clip);
+        data->ImportHook = &ImPlainHook;
+        InsertText(data, clip, crsr_move);
+        data->ImportHook = oldhook;
+        MyFreePooled(data->mypool, clip);
 
-          buffer->blk.x = data->CPos_X;
-          buffer->blk.y = LineNr(data->actualline, data);
-          if(!crsr_move)
-          {
-            data->CPos_X = buffer->x;
-            data->actualline = LineNode(buffer->y, data);
-          }
+        buffer->blk.x = data->CPos_X;
+        buffer->blk.y = LineNr(data->actualline, data);
+
+        if(!crsr_move)
+        {
+          data->CPos_X = buffer->x;
+          data->actualline = LineNode(buffer->y, data);
         }
-        break;
+      }
+      break;
     }
+
     ScrollIntoDisplay(data);
+
     if(data->flags & FLG_Active)
       SetCursor(data->CPos_X, data->actualline, TRUE, data);
+
     if(data->undobuffer == data->undopointer)
     {
       set(data->object, MUIA_TextEditor_UndoAvailable, FALSE);
+
       if(!(data->flags & FLG_UndoLost))
         data->HasChanged = FALSE;
     }
@@ -340,49 +366,55 @@ long AddToUndoBuffer (long eventtype, char *eventdata, struct InstData *data)
     {
       case backspacemerge:
       case mergelines:
+      {
         buffer->del.style = data->actualline->next->line.Color;
         buffer->del.flow = data->actualline->next->line.Flow;
         buffer->del.separator = data->actualline->next->line.Separator;
-        break;
+      }
+      break;
+
       case deletechar:
       case backspacechar:
+      {
         buffer->del.character = *eventdata;
         buffer->del.style = GetStyle(data->CPos_X, data->actualline);
         buffer->del.flow = data->actualline->line.Flow;
         buffer->del.separator = data->actualline->line.Separator;
-        break;
+      }
+      break;
+
       case pasteblock:
-        {
-            struct marking *block = (struct marking *)eventdata;
+      {
+        struct marking *block = (struct marking *)eventdata;
 
-          buffer->x  = block->startx;
-          buffer->y  = LineNr(block->startline, data);
-          buffer->blk.x = block->stopx;
-          buffer->blk.y = LineNr(block->stopline, data);
-          break;
-        }
+        buffer->x  = block->startx;
+        buffer->y  = LineNr(block->startline, data);
+        buffer->blk.x = block->stopx;
+        buffer->blk.y = LineNr(block->stopline, data);
+      }
+      break;
+
       case deleteblock:
-        {
-          char *text;
-          struct marking *block = (struct marking *)eventdata;
+      {
+        char *text;
+        struct marking *block = (struct marking *)eventdata;
 
-          if((text = GetBlock((struct marking *)eventdata, data)))
-          {
-            buffer->x = block->startx;
-            buffer->y = LineNr(block->startline, data);
-            buffer->clip = (unsigned char *)text;
-            if(data->flags & FLG_FreezeCrsr)
-            {
-              buffer->type = deleteblock_nomove;
-            }
-          }
-          else
-          {
-            ResetUndoBuffer(data);
-            DoMethod(data->object, MUIM_TextEditor_HandleError, Error_NotEnoughUndoMem);
-          }
+        if((text = GetBlock((struct marking *)eventdata, data)))
+        {
+          buffer->x = block->startx;
+          buffer->y = LineNr(block->startline, data);
+          buffer->clip = (unsigned char *)text;
+
+          if(data->flags & FLG_FreezeCrsr)
+            buffer->type = deleteblock_nomove;
         }
-        break;
+        else
+        {
+          ResetUndoBuffer(data);
+          DoMethod(data->object, MUIM_TextEditor_HandleError, Error_NotEnoughUndoMem);
+        }
+      }
+      break;
     }
   }
 
