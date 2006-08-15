@@ -283,6 +283,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
 
   CopyMem(emsg->Contents+lastpos, buf->pointer, length);
   buf->pointer += length;
+  *buf->pointer = '\0';
 
   while(emsg->ExportWrap && buf->pointer-startx > (LONG)emsg->ExportWrap)
   {

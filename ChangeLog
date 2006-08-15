@@ -4,6 +4,12 @@ MUI TextEditor MCC class - ChangeLog
 
 $Id$
 
+2006-08-15 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcc/ExportHook.c: fixed bug #1493239 and #1376640 where the ExportHook()
+     functionality didn't correctly NUL-terminate the exported strings and
+     therefore caused problems with the Undo/Redo functionality.
+
 2006-08-14 Jens Langner <Jens.Langner@light-speed.de>
 
    * demo/TextEditor-Demo.c: added Makefiles for all 3 major targets and
