@@ -533,15 +533,15 @@ DISPATCHERPROTO(_Dispatcher)
 {
   struct InstData *data = INST_DATA(cl, obj);
   LONG t_totallines = data->totallines;
-  LONG t_visual_y   = data->visual_y;
-  BOOL  t_haschanged = data->HasChanged;
-  UWORD t_pen      = data->Pen;
-  BOOL  areamarked  = Enabled(data);
-  ULONG result;
+  LONG t_visual_y = data->visual_y;
+  BOOL t_haschanged = data->HasChanged;
+  UWORD t_pen = data->Pen;
+  BOOL areamarked = Enabled(data);
+  ULONG result = 0;
 
   ENTER();
 
-//  kprintf("Method: 0x%lx\n", msg->MethodID);
+  //kprintf("Method: 0x%lx\n", msg->MethodID);
   //D(DBF_STARTUP, "Stack usage: %ld", (ULONG)FindTask(NULL)->tc_SPUpper - (ULONG)FindTask(NULL)->tc_SPReg);
 
   if(data->shown && !(data->flags & FLG_Draw))
@@ -555,10 +555,9 @@ DISPATCHERPROTO(_Dispatcher)
       case MUIM_TextEditor_MarkText:
       case MUIM_TextEditor_ClearText:
       case MUIM_HandleEvent:
-//#ifndef ClassAct
       case MUIM_GoInactive:
       case MUIM_GoActive:
-//#endif
+      {
         data->UpdateInfo = msg;
         MUI_Redraw(obj, MADF_DRAWUPDATE);
         result = (ULONG)data->UpdateInfo;
@@ -566,18 +565,20 @@ DISPATCHERPROTO(_Dispatcher)
 
         RETURN(result);
         return(result);
+      }
     }
   }
 
   switch(msg->MethodID)
   {
-    case OM_NEW:          result = New(cl, obj, (struct opSet *)msg); RETURN(result); return(result); break;
-    case MUIM_Setup:      result = Setup(cl, obj, (struct MUI_RenderInfo *)msg); RETURN(result); return(result); break;
-    case MUIM_Show:       result = Show(cl, obj, msg); RETURN(result); return(result); break;
-    case MUIM_AskMinMax:  result = AskMinMax(cl, obj, (struct MUIP_AskMinMax *)msg); RETURN(result); return(result); break;
-    case MUIM_Draw:       result = mDraw(cl, obj, (struct MUIP_Draw *)msg); RETURN(result); return(result); break;
-    case OM_GET:          result = Get(cl, obj, (struct opGet *)msg); RETURN(result); return(result); break;
+    case OM_NEW:          result = New(cl, obj, (struct opSet *)msg);                 RETURN(result); return(result); break;
+    case MUIM_Setup:      result = Setup(cl, obj, (struct MUI_RenderInfo *)msg);      RETURN(result); return(result); break;
+    case MUIM_Show:       result = Show(cl, obj, msg);                                RETURN(result); return(result); break;
+    case MUIM_AskMinMax:  result = AskMinMax(cl, obj, (struct MUIP_AskMinMax *)msg);  RETURN(result); return(result); break;
+    case MUIM_Draw:       result = mDraw(cl, obj, (struct MUIP_Draw *)msg);           RETURN(result); return(result); break;
+    case OM_GET:          result = Get(cl, obj, (struct opGet *)msg);                 RETURN(result); return(result); break;
     case OM_SET:          result = Set(cl, obj, (struct opSet *)msg); break;
+
     case MUIM_HandleEvent:
     {
       ULONG oldx = data->CPos_X;
@@ -665,26 +666,28 @@ DISPATCHERPROTO(_Dispatcher)
     }
     break;
 
-    case MUIM_Hide:                     result = Hide(cl, obj, msg); RETURN(result); return(result); break;
+    case MUIM_Hide:                     result = Hide(cl, obj, msg);    RETURN(result); return(result); break;
     case MUIM_Cleanup:                  result = Cleanup(cl, obj, msg); RETURN(result); return(result); break;
     case OM_DISPOSE:                    result = Dispose(cl, obj, msg); RETURN(result); return(result); break;
-    case MUIM_TextEditor_ClearText:     result = ClearText(data); break;
-    case MUIM_TextEditor_ToggleCursor:  result = ToggleCursor(data); RETURN(result); return(result); break;
-    case MUIM_TextEditor_InputTrigger:  result = InputTrigger(cl, data);  break;
+    case MUIM_TextEditor_ClearText:     result = ClearText(data);       break;
+    case MUIM_TextEditor_ToggleCursor:  result = ToggleCursor(data);    RETURN(result); return(result); break;
+    case MUIM_TextEditor_InputTrigger:  result = InputTrigger(cl, data);break;
+
     case MUIM_TextEditor_InsertText:
     {
       struct MUIP_TextEditor_InsertText *ins_msg = (struct MUIP_TextEditor_InsertText *)msg;
       struct marking block;
 
-		switch (ins_msg->pos)
-		{
-			case MUIV_TextEditor_InsertText_Top:
-				GoTop(data);
+  		switch(ins_msg->pos)
+	  	{
+		  	case MUIV_TextEditor_InsertText_Top:
+			  	GoTop(data);
 				break;
-			case MUIV_TextEditor_InsertText_Bottom:
-				GoBottom(data);
+
+			  case MUIV_TextEditor_InsertText_Bottom:
+				  GoBottom(data);
 				break;
-		}
+  		}
 
       block.startx = data->CPos_X;
       block.startline = data->actualline;
@@ -696,7 +699,7 @@ DISPATCHERPROTO(_Dispatcher)
     break;
 
     case MUIM_TextEditor_ExportText:  result = (ULONG)ExportText(data->firstline, data->ExportHook, data->ExportWrap); RETURN(result); return(result); break;
-    case MUIM_TextEditor_ARexxCmd:    result = HandleARexx(data, (char *)*((long *)msg+1)); break;
+    case MUIM_TextEditor_ARexxCmd:    result = HandleARexx(data, ((struct MUIP_TextEditor_ARexxCmd *)msg)->command); break;
     case MUIM_TextEditor_MarkText:    result = OM_MarkText((struct MUIP_TextEditor_MarkText *)msg, data); break;
     case MUIM_TextEditor_BlockInfo:   result = OM_BlockInfo((struct MUIP_TextEditor_BlockInfo *)msg, data); break;
     case MUIM_TextEditor_Search:      result = OM_Search((struct MUIP_TextEditor_Search *)msg, data); break;
@@ -745,9 +748,7 @@ DISPATCHERPROTO(_Dispatcher)
   }
 
   if(t_haschanged != data->HasChanged)
-  {
     set(obj, MUIA_TextEditor_HasChanged, data->HasChanged);
-  }
 
   if(msg->MethodID == OM_SET)
   {
@@ -784,29 +785,26 @@ DISPATCHERPROTO(_Dispatcher)
     data->Pen = GetColor(data->blockinfo.stopx - ((data->blockinfo.stopx && newblock.startx == data->blockinfo.startx && newblock.startline == data->blockinfo.startline) ? 1 : 0), data->blockinfo.stopline);
   }
   else
-  {
     data->Pen = GetColor(data->CPos_X, data->actualline);
-  }
 
   if(t_pen != data->Pen)
-  {
     set(obj, MUIA_TextEditor_Pen, data->Pen);
-  }
 
   if(data->actualline->line.Flow != data->Flow)
   {
     data->Flow = data->actualline->line.Flow;
     set(obj, MUIA_TextEditor_Flow, data->actualline->line.Flow);
   }
+
   if(data->actualline->line.Separator != data->Separator)
   {
     data->Separator = data->actualline->line.Separator;
     set(obj, MUIA_TextEditor_Separator, data->actualline->line.Separator);
   }
+
   if(areamarked != Enabled(data))
-  {
     set(obj, MUIA_TextEditor_AreaMarked, Enabled(data));
-  }
+
   data->NoNotify = FALSE;
   UpdateStyles(data);
 
