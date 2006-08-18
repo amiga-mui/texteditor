@@ -4,6 +4,8 @@ MUI TextEditor MCC class - ChangeLog
 
 $Id$
 
+#### v15.18 RELEASE ############################################################
+
 2006-08-15 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcc/ExportHook.c: fixed bug #1493239 and #1376640 where the ExportHook()
