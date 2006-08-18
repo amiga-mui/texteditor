@@ -1,12 +1,12 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.17 (07.12.2005)
+@$VER: TextEditor.Guide 15.18 (18.08.2006)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
 Welcome to the @{b}TextEditor @{ub}AmigaGuide(R) documentation.
 
 TextEditor is (C) 1997-2000 by Allan Odgaard,
-(C) 2005 by the TextEditor.mcc Open Source team
+(C) 2005-2006 by the TextEditor.mcc Open Source team
 
 
 @{b}@{uu}Table of contents @{uu}@{ub}
@@ -339,6 +339,23 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.18 (18.08.2006)
+
+- all non buffer overflow safe functions where replaced by safe variants which
+  should improve the stability of TextEditor.mcc a bit.
+- fixed various problems with the Undo/Redo facility previsouly causing text
+  corruption.
+- TextEditor-Demo should not crash anymore and is provided in native OS4/MorphOS
+  versions as well.
+- MUIV_TextEditor_Insert_Top/MUIV_TextEditor_Insert_Bottom should work as expected
+  now.
+- querying MUIA_Font on a TextEditor object should now always return the currently
+  active font.
+- fixed search path cloning on MorphOS systems.
+- the AmigaOS4 version is now compiled/linked against newlib instead of clib2.
+- adapted MEDIA key definitions to latest OS4 SDK changes.
+- fixed certain problems with the library and mcc init code.
 
 15.17 (07.12.2005)
 
@@ -680,7 +697,7 @@ Modula-2:   Sönke Tesch (soenke.tesch@elmshorn.netsurf.de)
 
 MUI - Magic User Interface
 
-(C) 1992-2005 by Stefan Stuntz
+(C) 1992-2006 by Stefan Stuntz
 
 
 MUI is a system to generate and maintain graphical user interfaces. With the
