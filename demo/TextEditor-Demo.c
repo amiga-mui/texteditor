@@ -466,7 +466,7 @@ int main(VOID)
               do
               {
                 struct MsgPort *myport = NULL;
-                struct RexxMsg *rxmsg;
+                struct RexxMsg *rxmsg = NULL;
                 ULONG changed;
                 ULONG ReturnID;
                 BPTR  rxstdout = 0L;
