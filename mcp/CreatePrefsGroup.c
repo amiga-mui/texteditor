@@ -42,7 +42,7 @@
 
 HOOKPROTONH(ListDisplayFunc, void, char **array, struct te_key *entry)
 {
-  static char buffer[118];
+  static char buffer[256];
   struct KeyAction ka;
 
   ENTER();
@@ -60,7 +60,7 @@ HOOKPROTONH(ListDisplayFunc, void, char **array, struct te_key *entry)
       ka.vanilla = FALSE;
     
     ka.qualifier = entry->qual;
-    KeyToString(buffer, &ka);
+    KeyToString(buffer, sizeof(buffer), &ka);
 
     *array++ = buffer;
     *array++ = "=";
@@ -168,7 +168,7 @@ HOOKPROTONHNO(SelectCode, void, APTR **array)
   
   if(entry)
   {
-    char buffer[100];
+    char buffer[256];
     struct KeyAction ka;
     ULONG result;
 
@@ -186,7 +186,7 @@ HOOKPROTONHNO(SelectCode, void, APTR **array)
       ka.vanilla = FALSE;
     
     ka.qualifier = entry->qual;
-    KeyToString(buffer, &ka);
+    KeyToString(buffer, sizeof(buffer), &ka);
     nnset(data->hotkey, MUIA_String_Contents, buffer);
   }
 
