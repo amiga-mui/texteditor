@@ -283,8 +283,8 @@ ULONG CallFunction (UWORD function, LONG *args, STRPTR txtargs, struct InstData 
 
       case GETCURSOR:
       {
-          STRPTR buffer = AllocVec(6, MEMF_ANY);
-          LONG   pos = 0;
+        STRPTR buffer = AllocVec(6, MEMF_ANY);
+        LONG pos = 0;
 
         if(buffer)
         {
@@ -292,7 +292,7 @@ ULONG CallFunction (UWORD function, LONG *args, STRPTR txtargs, struct InstData 
               get(data->object, MUIA_TextEditor_CursorY, &pos);
           else  get(data->object, MUIA_TextEditor_CursorX, &pos);
 
-          sprintf(buffer, "%ld", pos);
+          snprintf(buffer, 6, "%ld", pos);
           result = (ULONG)buffer;
         }
         break;

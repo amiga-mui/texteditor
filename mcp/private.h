@@ -196,7 +196,7 @@ void ImportKeys(void *, struct InstData_MCP *data);
 void ExportKeys(void *, struct InstData_MCP *);
 void AddKeyBinding (STRPTR keystring, UWORD action, struct KeyAction *storage);
 void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage);
-void KeyToString(STRPTR buffer, struct KeyAction *ka);
+void KeyToString(STRPTR buffer, ULONG buffer_len, struct KeyAction *ka);
 char *FunctionName(UWORD func);
 BOOL CreateSubClasses(void);
 void DeleteSubClasses(void);

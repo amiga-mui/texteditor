@@ -6,6 +6,13 @@ $Id$
 
 #### v15.18 RELEASE ############################################################
 
+2006-08-18 Jens Langner <Jens.Langner@light-speed.de>
+
+   * misc: final 15.18 release preparations.
+   * all: replaced all non bufferoverflow safe functions like sprintf() with
+     bufferoverflow safe variants. This should hopefully increase the stability
+     of TextEditor.mcc once more.
+
 2006-08-15 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcc/ExportHook.c: fixed bug #1493239 and #1376640 where the ExportHook()

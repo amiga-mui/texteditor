@@ -223,47 +223,47 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
   }
 }
 
-void KeyToString (STRPTR buffer, struct KeyAction *ka)
+void KeyToString(STRPTR buffer, ULONG buffer_len, struct KeyAction *ka)
 {
   buffer[0] = '\0';
 
   // lets first put the qualifiers in our buffer string
   if(ka->qualifier & IEQUALIFIER_LSHIFT)
-    strcat(buffer, "lshift ");
+    strlcat(buffer, "lshift ", buffer_len);
   if(ka->qualifier & IEQUALIFIER_RSHIFT)
-    strcat(buffer, "rshift ");
+    strlcat(buffer, "rshift ", buffer_len);
   if(ka->qualifier & IEQUALIFIER_CAPSLOCK)
-    strcat(buffer, "capslock ");
+    strlcat(buffer, "capslock ", buffer_len);
   if(ka->qualifier & IEQUALIFIER_CONTROL)
-    strcat(buffer, "control ");
+    strlcat(buffer, "control ", buffer_len);
   if(ka->qualifier & IEQUALIFIER_LALT)
-    strcat(buffer, "lalt ");
+    strlcat(buffer, "lalt ", buffer_len);
   if(ka->qualifier & IEQUALIFIER_RALT)
-    strcat(buffer, "ralt ");
+    strlcat(buffer, "ralt ", buffer_len);
   if(ka->qualifier & IEQUALIFIER_LCOMMAND)
-    strcat(buffer, "lcommand ");
+    strlcat(buffer, "lcommand ", buffer_len);
   if(ka->qualifier & IEQUALIFIER_RCOMMAND)
-    strcat(buffer, "rcommand ");
+    strlcat(buffer, "rcommand ", buffer_len);
   if(ka->qualifier & IEQUALIFIER_NUMERICPAD)
-    strcat(buffer, "numpad ");
+    strlcat(buffer, "numpad ", buffer_len);
   if(ka->qualifier & IEQUALIFIER_SHIFT)
-    strcat(buffer, "shift ");
+    strlcat(buffer, "shift ", buffer_len);
   if(ka->qualifier & IEQUALIFIER_ALT)
-    strcat(buffer, "alt ");
+    strlcat(buffer, "alt ", buffer_len);
   if(ka->qualifier & IEQUALIFIER_COMMAND)
-    strcat(buffer, "command ");
+    strlcat(buffer, "command ", buffer_len);
 
   // then we check wheter this are vanilla key codes or RAWKEY codes
   if(ka->vanilla)
   {
     switch(ka->key)
     {
-      case 8:   strcat(buffer, "backspace"); break;
-      case 9:   strcat(buffer, "tab"); break;
-      case 13:  strcat(buffer, ((ka->qualifier & IEQUALIFIER_NUMERICPAD) ? "enter" : "return")); break;
-      case 27:  strcat(buffer, "esc"); break;
-      case 32:  strcat(buffer, "space"); break;
-      case 0x7f:strcat(buffer, "del"); break;
+      case 8:   strlcat(buffer, "backspace", buffer_len); break;
+      case 9:   strlcat(buffer, "tab", buffer_len); break;
+      case 13:  strlcat(buffer, ((ka->qualifier & IEQUALIFIER_NUMERICPAD) ? "enter" : "return"), buffer_len); break;
+      case 27:  strlcat(buffer, "esc", buffer_len); break;
+      case 32:  strlcat(buffer, "space", buffer_len); break;
+      case 0x7f:strlcat(buffer, "del", buffer_len); break;
 
       default:
       {
@@ -279,62 +279,62 @@ void KeyToString (STRPTR buffer, struct KeyAction *ka)
   {
     switch(ka->key)
     {
-      case RAWKEY_CRSRUP:     strcat(buffer, "up"); break;
-      case RAWKEY_CRSRDOWN:   strcat(buffer, "down"); break;
-      case RAWKEY_CRSRRIGHT:  strcat(buffer, "right"); break;
-      case RAWKEY_CRSRLEFT:   strcat(buffer, "left"); break;
-      case RAWKEY_F1:         strcat(buffer, "f1"); break;
-      case RAWKEY_F2:         strcat(buffer, "f2"); break;
-      case RAWKEY_F3:         strcat(buffer, "f3"); break;
-      case RAWKEY_F4:         strcat(buffer, "f4"); break;
-      case RAWKEY_F5:         strcat(buffer, "f5"); break;
-      case RAWKEY_F6:         strcat(buffer, "f6"); break;
-      case RAWKEY_F7:         strcat(buffer, "f7"); break;
-      case RAWKEY_F8:         strcat(buffer, "f8"); break;
-      case RAWKEY_F9:         strcat(buffer, "f9"); break;
-      case RAWKEY_F10:        strcat(buffer, "f10"); break;
-      case RAWKEY_F11:        strcat(buffer, "f11"); break;
-      case RAWKEY_F12:        strcat(buffer, "f12"); break;
-      case RAWKEY_HELP:       strcat(buffer, "help"); break;
-      case RAWKEY_HOME:       strcat(buffer, "home"); break;
-      case RAWKEY_END:        strcat(buffer, "end"); break;
-      case RAWKEY_PAGEUP:     strcat(buffer, "page_up"); break;
-      case RAWKEY_PAGEDOWN:   strcat(buffer, "page_down"); break;
-      case RAWKEY_INSERT:     strcat(buffer, "insert"); break;
-      case RAWKEY_PRINTSCR:   strcat(buffer, "printscreen"); break;
-      case RAWKEY_BREAK:      strcat(buffer, "pause"); break;
-      case RAWKEY_NUMLOCK:    strcat(buffer, "numlock"); break;
+      case RAWKEY_CRSRUP:     strlcat(buffer, "up", buffer_len); break;
+      case RAWKEY_CRSRDOWN:   strlcat(buffer, "down", buffer_len); break;
+      case RAWKEY_CRSRRIGHT:  strlcat(buffer, "right", buffer_len); break;
+      case RAWKEY_CRSRLEFT:   strlcat(buffer, "left", buffer_len); break;
+      case RAWKEY_F1:         strlcat(buffer, "f1", buffer_len); break;
+      case RAWKEY_F2:         strlcat(buffer, "f2", buffer_len); break;
+      case RAWKEY_F3:         strlcat(buffer, "f3", buffer_len); break;
+      case RAWKEY_F4:         strlcat(buffer, "f4", buffer_len); break;
+      case RAWKEY_F5:         strlcat(buffer, "f5", buffer_len); break;
+      case RAWKEY_F6:         strlcat(buffer, "f6", buffer_len); break;
+      case RAWKEY_F7:         strlcat(buffer, "f7", buffer_len); break;
+      case RAWKEY_F8:         strlcat(buffer, "f8", buffer_len); break;
+      case RAWKEY_F9:         strlcat(buffer, "f9", buffer_len); break;
+      case RAWKEY_F10:        strlcat(buffer, "f10", buffer_len); break;
+      case RAWKEY_F11:        strlcat(buffer, "f11", buffer_len); break;
+      case RAWKEY_F12:        strlcat(buffer, "f12", buffer_len); break;
+      case RAWKEY_HELP:       strlcat(buffer, "help", buffer_len); break;
+      case RAWKEY_HOME:       strlcat(buffer, "home", buffer_len); break;
+      case RAWKEY_END:        strlcat(buffer, "end", buffer_len); break;
+      case RAWKEY_PAGEUP:     strlcat(buffer, "page_up", buffer_len); break;
+      case RAWKEY_PAGEDOWN:   strlcat(buffer, "page_down", buffer_len); break;
+      case RAWKEY_INSERT:     strlcat(buffer, "insert", buffer_len); break;
+      case RAWKEY_PRINTSCR:   strlcat(buffer, "printscreen", buffer_len); break;
+      case RAWKEY_BREAK:      strlcat(buffer, "pause", buffer_len); break;
+      case RAWKEY_NUMLOCK:    strlcat(buffer, "numlock", buffer_len); break;
 
       #if defined(__amigaos4__)
-      case RAWKEY_MENU:       strcat(buffer, "menu"); break;
+      case RAWKEY_MENU:       strlcat(buffer, "menu", buffer_len); break;
       #elif defined(__MORPHOS__)
-      case RAWKEY_SCRLOCK:    strcat(buffer, "scrolllock"); break;
+      case RAWKEY_SCRLOCK:    strlcat(buffer, "scrolllock", buffer_len); break;
       #endif
 
       #if defined(__amigaos4__)
-			case RAWKEY_MEDIA_STOP:       strcat(buffer, "media_stop"); break;
-			case RAWKEY_MEDIA_PLAY_PAUSE: strcat(buffer, "media_play"); break;
-			case RAWKEY_MEDIA_PREV_TRACK: strcat(buffer, "media_prev"); break;
-			case RAWKEY_MEDIA_NEXT_TRACK: strcat(buffer, "media_next"); break;
-			case RAWKEY_MEDIA_SHUFFLE:    strcat(buffer, "media_rewind"); break;
-			case RAWKEY_MEDIA_REPEAT:     strcat(buffer, "media_forward"); break;
+			case RAWKEY_MEDIA_STOP:       strlcat(buffer, "media_stop", buffer_len); break;
+			case RAWKEY_MEDIA_PLAY_PAUSE: strlcat(buffer, "media_play", buffer_len); break;
+			case RAWKEY_MEDIA_PREV_TRACK: strlcat(buffer, "media_prev", buffer_len); break;
+			case RAWKEY_MEDIA_NEXT_TRACK: strlcat(buffer, "media_next", buffer_len); break;
+			case RAWKEY_MEDIA_SHUFFLE:    strlcat(buffer, "media_rewind", buffer_len); break;
+			case RAWKEY_MEDIA_REPEAT:     strlcat(buffer, "media_forward", buffer_len); break;
       #else
-			case RAWKEY_AUD_STOP:       strcat(buffer, "media_stop"); break;
-			case RAWKEY_AUD_PLAY_PAUSE: strcat(buffer, "media_play"); break;
-			case RAWKEY_AUD_PREV_TRACK: strcat(buffer, "media_prev"); break;
-			case RAWKEY_AUD_NEXT_TRACK: strcat(buffer, "media_next"); break;
-			case RAWKEY_AUD_SHUFFLE:    strcat(buffer, "media_rewind"); break;
-			case RAWKEY_AUD_REPEAT:     strcat(buffer, "media_forward"); break;
+			case RAWKEY_AUD_STOP:       strlcat(buffer, "media_stop", buffer_len); break;
+			case RAWKEY_AUD_PLAY_PAUSE: strlcat(buffer, "media_play", buffer_len); break;
+			case RAWKEY_AUD_PREV_TRACK: strlcat(buffer, "media_prev", buffer_len); break;
+			case RAWKEY_AUD_NEXT_TRACK: strlcat(buffer, "media_next", buffer_len); break;
+			case RAWKEY_AUD_SHUFFLE:    strlcat(buffer, "media_rewind", buffer_len); break;
+			case RAWKEY_AUD_REPEAT:     strlcat(buffer, "media_forward", buffer_len); break;
       #endif
 
-			case NM_WHEEL_UP:           strcat(buffer, "nm_wheel_up"); break;
-			case NM_WHEEL_DOWN:         strcat(buffer, "nm_wheel_down"); break;
-			case NM_WHEEL_LEFT:         strcat(buffer, "nm_wheel_left"); break;
-  		case NM_WHEEL_RIGHT:        strcat(buffer, "nm_wheel_right"); break;
-			case NM_BUTTON_FOURTH:      strcat(buffer, "nm_wheel_button"); break;
+			case NM_WHEEL_UP:           strlcat(buffer, "nm_wheel_up", buffer_len); break;
+			case NM_WHEEL_DOWN:         strlcat(buffer, "nm_wheel_down", buffer_len); break;
+			case NM_WHEEL_LEFT:         strlcat(buffer, "nm_wheel_left", buffer_len); break;
+  		case NM_WHEEL_RIGHT:        strlcat(buffer, "nm_wheel_right", buffer_len); break;
+			case NM_BUTTON_FOURTH:      strlcat(buffer, "nm_wheel_button", buffer_len); break;
 
       default:
-        strcat(buffer, "???");
+        strlcat(buffer, "???", buffer_len);
     }
   }
 }

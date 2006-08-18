@@ -60,8 +60,8 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
 
   if(args.sigbit != -1)
   {
-    UBYTE str_args[10];
-    sprintf(str_args, "%lx", &args);
+    char str_args[10];
+    snprintf(str_args, sizeof(str_args), "%lx", &args);
 
     ReleaseGIRPort(data->rport);
     ReleaseSemaphore(&data->semaphore);
@@ -963,31 +963,24 @@ void  UpdateChange(LONG x, struct line_node *line, LONG length, char *characters
 
   if(characters)
   {
-//    if((data->flags & FLG_InsertMode) || (x+length >= line->line.Length))
+    strcpyback(line->line.Contents+x+length, line->line.Contents+x);
+    memcpy(line->line.Contents+x, characters, length);
+    width += length;
+    line->line.Length += length;
+    if(buffer)
     {
-      strcpyback(line->line.Contents+x+length, line->line.Contents+x);
-      strncpy(line->line.Contents+x, characters, length);
-      width += length;
-      line->line.Length += length;
-      if(buffer)
-      {
-          UWORD style = buffer->del.style;
+      UWORD style = buffer->del.style;
   
-        AddStyleToLine(x, line, 1, (style & BOLD) ? BOLD : ~BOLD, data);
-        AddStyleToLine(x, line, 1, (style & ITALIC) ? ITALIC : ~ITALIC, data);
-        AddStyleToLine(x, line, 1, (style & UNDERLINE) ? UNDERLINE : ~UNDERLINE, data);
-        line->line.Flow = buffer->del.flow;
-        line->line.Separator = buffer->del.separator;
-      }
+      AddStyleToLine(x, line, 1, (style & BOLD) ? BOLD : ~BOLD, data);
+      AddStyleToLine(x, line, 1, (style & ITALIC) ? ITALIC : ~ITALIC, data);
+      AddStyleToLine(x, line, 1, (style & UNDERLINE) ? UNDERLINE : ~UNDERLINE, data);
+      line->line.Flow = buffer->del.flow;
+      line->line.Separator = buffer->del.separator;
     }
-/*    else    // Attempt of doing non-InsertMode (overwrite)
-    {
-      strncpy(line->line.Contents+x, characters, length);
-    }
-*/  }
+  }
   else
   {
-    strcpy(line->line.Contents+x, line->line.Contents+x+length);
+    strlcpy(line->line.Contents+x, line->line.Contents+x+length, line->line.Length);
     width -= length;
     line->line.Length -= length;
   }

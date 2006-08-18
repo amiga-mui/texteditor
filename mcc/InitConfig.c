@@ -46,6 +46,7 @@ struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
   char *size_ptr;
   struct TextFont *f;
   struct TextAttr myfont;
+  int fontname_len;
 
   ENTER();
 
@@ -61,7 +62,8 @@ struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
     return NULL;
   }
 
-  if(!(fontname = AllocVec(strlen(setting)+6, MEMF_ANY|MEMF_CLEAR)))
+  fontname_len = strlen(setting)+6;
+  if(!(fontname = AllocVec(fontname_len, MEMF_ANY|MEMF_CLEAR)))
   {
     RETURN(NULL);
     return NULL;
@@ -74,14 +76,14 @@ struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
   myfont.ta_Style = FS_NORMAL;
   myfont.ta_Flags = 0;
 
-  strcpy(fontname,setting);
+  strlcpy(fontname, setting, fontname_len);
   size_ptr = strchr(fontname,'/');
   if (size_ptr)
   {
     LONG size;
 
     StrToLong(size_ptr + 1, &size);
-    strncpy(size_ptr, ".font", 6);
+    strlcpy(size_ptr, ".font", fontname_len-(size_ptr-fontname));
     myfont.ta_YSize = size;
   }
 

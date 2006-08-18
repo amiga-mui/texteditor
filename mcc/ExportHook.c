@@ -132,9 +132,9 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
   {
     // if h_Data is TRUE then this is an EMailHook call
     if(!hook->h_Data)
-      sprintf(buf->pointer, "\033[s:%ld]", (LONG)emsg->Separator);
+      snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033[s:%ld]", (LONG)emsg->Separator);
     else
-      strcpy(buf->pointer, ((emsg->Separator & LNSF_Thick) ? "<tsb>" : "<sb>"));
+      strlcpy(buf->pointer, ((emsg->Separator & LNSF_Thick) ? "<tsb>" : "<sb>"), buf->size-(buf->pointer-buf->buffer));
 
     buf->pointer += strlen(buf->pointer);
   }
@@ -210,7 +210,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
       {
         if(color)
         {
-          sprintf(buf->pointer, "\033p[%ld]", (LONG)style);
+          snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033p[%ld]", (LONG)style);
           buf->pointer += strlen(buf->pointer);
         }
         else

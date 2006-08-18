@@ -642,8 +642,8 @@ LONG CutBlock2 (struct InstData *data, long Clipboard, long NoCut, struct markin
   struct CutArgs args = { data, Clipboard, NoCut, newblock, update, AllocSignal(-1), FindTask(NULL) };
   if(args.sigbit != -1)
   {
-    UBYTE str_args[10];
-    sprintf(str_args, "%lx", &args);
+    char str_args[10];
+    snprintf(str_args, sizeof(str_args), "%lx", &args);
 
     ReleaseGIRPort(data->rport);
     ReleaseSemaphore(&data->semaphore);

@@ -98,7 +98,7 @@ LONG SendRexx (char *word, char *command, struct InstData *data)
   {
     rxmsg = CreateRexxMsg(data->clipport, NULL, NULL);
     rxmsg->rm_Action = RXCOMM;
-    sprintf(buffer, command, word);
+    snprintf(buffer, sizeof(buffer), command, word);
     rxmsg->rm_Args[0] = (APTR)CreateArgstring(buffer, strlen(buffer));
 
     PutMsg(rexxport, (struct Message *)rxmsg);
@@ -227,7 +227,7 @@ LONG SendCLI(char *word, char *command, UNUSED struct InstData *data)
   LONG result;
   BPTR path;
 
-  sprintf(buffer, command, word);
+  snprintf(buffer, sizeof(buffer), command, word);
 
   /* path maybe 0, which is allowed */
   path = CloneSearchPath();
@@ -366,10 +366,9 @@ void SuggestWord (struct InstData *data)
 
     if(data->blockinfo.stopx-data->blockinfo.startx < 256)
     {
-        char word[256];
+      char word[256];
 
-      strncpy(word, line->line.Contents+data->blockinfo.startx, data->blockinfo.stopx-data->blockinfo.startx);
-      word[data->blockinfo.stopx-data->blockinfo.startx] = '\0';
+      strlcpy(word, line->line.Contents+data->blockinfo.startx, data->blockinfo.stopx-data->blockinfo.startx);
 
       set(_win(data->object), MUIA_Window_Sleep, TRUE);
 
@@ -447,8 +446,8 @@ void CheckWord (struct InstData *data)
 
     if(start-end < 256 && data->actualline == line)
     {
-      strncpy(word, data->actualline->line.Contents+start, end-start);
-      word[end-start] = '\0';
+      strlcpy(word, data->actualline->line.Contents+start, end-start);
+
       if(!LookupWord(word, data))
         DisplayBeep(NULL);
     }
