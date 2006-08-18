@@ -1,11 +1,12 @@
-Short:    Texteditor custom class for MUI (v15.18) [OS3/OS4/MOS]
-Author:   TextEditor.mcc Open Source Team, Allan Odgaard <duff@diku.dk>
-Uploader: Jens Langner <Jens.Langner@light-speed.de>
-Version:  15.18 (18-Aug-06)
-Type:     dev/mui
-Requires: AmigaOS 3.0+ or MorphOS, MUI 3.8+, 68020+/PPC604e+
-Replaces: dev/mui/MCC_TextEditor.lha
+Short:        Texteditor custom class for MUI
+Author:       TextEditor.mcc Open Source Team, Allan Odgaard <duff@diku.dk>
+Uploader:     Jens Langner <Jens.Langner@light-speed de>
+Type:         dev/mui
+Version:      15.18
+Replaces:     dev/mui/mcc_texteditor-15.17.lha
+Requires:     AmigaOS 3.0+ or MorphOS, MUI 3.8+, 68020+/PPC604e+
 Architecture: ppc-amigaos >= 4.0.0; m68k-amigaos >= 3.0; ppc-morphos >= 1.4.2
+Distribution: Aminet
 
 TextEditor.mcc is a multiline string gadget which holds most of the features
 of a normal text editor, but embedded in a MUI custom class. It is used by a
