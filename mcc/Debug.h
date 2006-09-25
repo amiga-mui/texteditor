@@ -2,7 +2,7 @@
 
  TextEditor.mcc - Textediting MUI Custom Class
  Copyright (C) 1997-2000 Allan Odgaard
- Copyright (C) 2005 by TextEditor.mcc Open Source Team
+ Copyright (C) 2005-2006 by TextEditor.mcc Open Source Team
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -41,29 +41,6 @@
 
 #if defined(DEBUG)
 
-#ifndef EXEC_TYPES_H
-#include <exec/types.h>
-#endif
-
-#if defined(__amigaos4__)
-  #include <proto/exec.h>
-  #ifdef __USE_INLINE__
-    #ifdef DebugPrintF
-      #undef DebugPrintF
-    #endif
-  #endif
-  #ifndef kprintf
-    #define kprintf(format, args...)  ((struct ExecIFace *)((*(struct ExecBase **)4)->MainInterface))->DebugPrintF(format, ## args)
-  #endif
-#elif defined(__MORPHOS__)
-  #include <exec/rawfmt.h>
-  #include <proto/exec.h>
-  #define KPutFmt(format, args)  VNewRawDoFmt(format, (APTR)RAWFMTFUNC_SERIAL, NULL, args)
-void kprintf(const char *formatString,...);
-#else
-void kprintf(const char *formatString,...);
-#endif
-
 // debug classes
 #define DBC_CTRACE   (1<<0) // call tracing (ENTER/LEAVE etc.)
 #define DBC_REPORT   (1<<1) // reports (SHOWVALUE/SHOWSTRING etc.)
@@ -77,7 +54,7 @@ void kprintf(const char *formatString,...);
 // debug flags
 #define DBF_ALWAYS   (1<<0)
 #define DBF_STARTUP  (1<<1)     // for startup/shutdown events
-#define DBF_INPUT    (1<<2)     // input events and handleinput stuff etc. (HandleInput.c)
+#define DBF_INPUT    (1<<2)     // HandleInput.c
 #define DBF_ALL      0xffffffff
 
 void SetupDebug(void);
@@ -92,45 +69,46 @@ void _SHOWMSG(unsigned long dclass, unsigned long dflags, const char *msg, const
 void _DPRINTF(unsigned long dclass, unsigned long dflags, const char *file, int line, const char *format, ...);
 
 // Core class information class messages
-#define ENTER()					     _ENTER(DBC_CTRACE, __FILE__, __LINE__, __FUNCTION__)
-#define LEAVE()					     _LEAVE(DBC_CTRACE, __FILE__, __LINE__, __FUNCTION__)
-#define RETURN(r)				     _RETURN(DBC_CTRACE, __FILE__, __LINE__, __FUNCTION__, (long)r)
-#define SHOWVALUE(f, v)		   _SHOWVALUE(DBC_REPORT, f, (long)v, sizeof(v), #v, __FILE__, __LINE__)
-#define SHOWPOINTER(f, p)	   _SHOWPOINTER(DBC_REPORT, f, p, #p, __FILE__, __LINE__)
-#define SHOWSTRING(f, s)	   _SHOWSTRING(DBC_REPORT, f, s, #s, __FILE__, __LINE__)
-#define SHOWMSG(f, m)			   _SHOWMSG(DBC_REPORT, f, m, __FILE__, __LINE__)
-#define D(f, s, vargs...)	   _DPRINTF(DBC_DEBUG, f, __FILE__, __LINE__, s, ## vargs)
-#define E(f, s, vargs...)	   _DPRINTF(DBC_ERROR, f, __FILE__, __LINE__, s, ## vargs)
-#define W(f, s, vargs...)	   _DPRINTF(DBC_WARNING, f, __FILE__, __LINE__, s, ## vargs)
+#define ENTER()               _ENTER(DBC_CTRACE, __FILE__, __LINE__, __FUNCTION__)
+#define LEAVE()               _LEAVE(DBC_CTRACE, __FILE__, __LINE__, __FUNCTION__)
+#define RETURN(r)             _RETURN(DBC_CTRACE, __FILE__, __LINE__, __FUNCTION__, (long)r)
+#define SHOWVALUE(f, v)       _SHOWVALUE(DBC_REPORT, f, (long)v, sizeof(v), #v, __FILE__, __LINE__)
+#define SHOWPOINTER(f, p)     _SHOWPOINTER(DBC_REPORT, f, p, #p, __FILE__, __LINE__)
+#define SHOWSTRING(f, s)      _SHOWSTRING(DBC_REPORT, f, s, #s, __FILE__, __LINE__)
+#define SHOWMSG(f, m)         _SHOWMSG(DBC_REPORT, f, m, __FILE__, __LINE__)
+#define D(f, ...)             _DPRINTF(DBC_DEBUG, f, __FILE__, __LINE__, __VA_ARGS__)
+#define E(f, ...)             _DPRINTF(DBC_ERROR, f, __FILE__, __LINE__, __VA_ARGS__)
+#define W(f, ...)             _DPRINTF(DBC_WARNING, f, __FILE__, __LINE__, __VA_ARGS__)
 #define ASSERT(expression)      \
-	((void)                       \
-	 ((expression) ? 0 :          \
-	  (														\
-	   _DPRINTF(DBC_ASSERT,       \
+  ((void)                       \
+   ((expression) ? 0 :          \
+    (                            \
+     _DPRINTF(DBC_ASSERT,       \
               DBF_ALWAYS,       \
               __FILE__,         \
               __LINE__,         \
               "failed assertion '%s'", \
-	            #expression),     \
-	   abort(),                   \
-	   0                          \
-	  )                           \
-	 )                            \
-	)
+              #expression),     \
+     abort(),                   \
+     0                          \
+    )                           \
+   )                            \
+  )
 
 #else // DEBUG
 
-#define ENTER()							((void)0)
-#define LEAVE()							((void)0)
-#define RETURN(r)						((void)0)
-#define SHOWVALUE(f, v)			((void)0)
-#define SHOWPOINTER(f, p)		((void)0)
-#define SHOWSTRING(f, s)		((void)0)
-#define SHOWMSG(f, m)			  ((void)0)
-#define D(f, s, vargs...)		((void)0)
-#define E(f, s, vargs...)		((void)0)
-#define W(f, s, vargs...)		((void)0)
-#define ASSERT(expression)	((void)0)
+// to replace with NOPs is important here!
+#define ENTER()              ((void)0)
+#define LEAVE()              ((void)0)
+#define RETURN(r)            ((void)0)
+#define SHOWVALUE(f, v)      ((void)0)
+#define SHOWPOINTER(f, p)    ((void)0)
+#define SHOWSTRING(f, s)     ((void)0)
+#define SHOWMSG(f, m)        ((void)0)
+#define D(f, ...)            ((void)0)
+#define E(f, ...)            ((void)0)
+#define W(f, ...)            ((void)0)
+#define ASSERT(expression)   ((void)0)
 
 #endif // DEBUG
 

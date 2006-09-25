@@ -20,6 +20,8 @@
 
 ***************************************************************************/
 
+#include <string.h>
+
 #include <exec/io.h>
 #include <devices/clipboard.h>
 #include <libraries/iffparse.h>
@@ -122,7 +124,7 @@ char *GetBlock (struct marking *block, struct InstData *data)
     emsg.Colors = NULL;
     if(emsg.Contents)
     {
-      CopyMem(startline->line.Contents + startx, emsg.Contents, startline->line.Length - startx);
+      memcpy(emsg.Contents, startline->line.Contents + startx, startline->line.Length - startx);
       emsg.Length = startline->line.Length - startx;
       emsg.Flow = startline->line.Flow;
       emsg.Separator = startline->line.Separator;
@@ -186,7 +188,7 @@ char *GetBlock (struct marking *block, struct InstData *data)
     emsg.Colors = NULL;
     if(emsg.Contents)
     {
-      CopyMem(stopline->line.Contents, emsg.Contents, stopx);
+      memcpy(emsg.Contents, stopline->line.Contents, stopx);
       emsg.Length = stopx;
       emsg.Flow = stopline->line.Flow;
       emsg.Separator = stopline->line.Separator;
@@ -256,7 +258,7 @@ char *GetBlock (struct marking *block, struct InstData *data)
     emsg.Colors = NULL;
     if(emsg.Contents)
     {
-      CopyMem(startline->line.Contents+startx, emsg.Contents, stopx-startx);
+      memcpy(emsg.Contents, startline->line.Contents+startx, stopx-startx);
       emsg.Length = stopx-startx;
       emsg.Flow = startline->line.Flow;
       emsg.Separator = startline->line.Separator;

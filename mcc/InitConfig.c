@@ -113,7 +113,7 @@ BOOL iswarned = FALSE;
 
 void InitConfig(Object *obj, struct InstData *data)
 {
-  long  setting;
+  ULONG setting = 0;
   UWORD *muipens = _pens(obj);
 
   ENTER();
@@ -138,31 +138,31 @@ void InitConfig(Object *obj, struct InstData *data)
 
   if(!(data->flags & FLG_OwnBkgn))
   {
-      LONG background = MUII_BACKGROUND;
+    LONG background = MUII_BACKGROUND;
 
     data->backgroundcolor = 0;
     data->fastbackground = TRUE;
-    if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_Background, &setting))
+
+    if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_Background, &setting) && setting != 0)
     {
-      if(*(char *)setting == '2' && *((char *)setting+1) == ':' )
+      char *bg_setting = (char *)setting;
+
+      if(bg_setting[0] == '2' && bg_setting[1] == ':' )
       {
-          struct MUI_PenSpec *spec = (struct MUI_PenSpec *)(char *)(setting+2);
+        struct MUI_PenSpec *spec = (struct MUI_PenSpec *)(bg_setting+2);
 
         data->backgroundcolor = MUI_ObtainPen(muiRenderInfo(obj), spec, 0L);
         data->allocatedpens |= 1<<5;
       }
-      else
-      {
-        if(*(char *)setting != '\0')
-        {
-          data->fastbackground = FALSE;
-        }
-      }
+      else if(bg_setting[0] != '\0')
+        data->fastbackground = FALSE;
+
       background = setting;
     }
     set(obj, MUIA_Background, background);
   }
-  else  data->fastbackground = FALSE;
+  else
+    data->fastbackground = FALSE;
 
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_TabSize, &setting))
   {
@@ -352,7 +352,7 @@ void InitConfig(Object *obj, struct InstData *data)
       unsigned long count;
       struct keybindings *mykeys = data->RawkeyBindings;
 
-      CopyMem((APTR)setting, data->RawkeyBindings, c*sizeof(struct te_key));
+      memcpy(data->RawkeyBindings, (void *)setting, c*sizeof(struct te_key));
       (mykeys+c)->keydata.code = (UWORD)-1;
 
       for(count = 0;count != c;count++)

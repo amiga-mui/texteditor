@@ -37,8 +37,8 @@ CRT      = newlib
 CPU      = -mcpu=604e
 CPUFLAGS = -mmultiple
 CDEFS    = -D__TE_VERDATE=\"`date +%d.%m.%Y`\" -D__TE_VERDAYS="`expr \`date +%s\` / 86400 - 2922`"
-WARN     = -W -Wall
-OPTFLAGS = -O3 -finline-functions -fomit-frame-pointer -funroll-loops
+WARN     = -W -Wall -Wwrite-strings
+OPTFLAGS = -O3 -fomit-frame-pointer -funroll-loops
 DEBUG    = -DDEBUG -g -O0
 REDEFINE =
 CFLAGS   = -pipe -mcrt=$(CRT) -I. -I../mcp -I../includes $(CPU) $(CPUFLAGS) $(WARN) $(OPTFLAGS)\

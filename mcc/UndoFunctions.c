@@ -20,7 +20,10 @@
 
 ***************************************************************************/
 
+#include <string.h>
+
 #include <clib/alib_protos.h>
+
 #include <proto/exec.h>
 #include <proto/intuition.h>
 
@@ -343,7 +346,8 @@ long AddToUndoBuffer (long eventtype, char *eventdata, struct InstData *data)
 
         t_undobuffer += sizeof(struct UserAction);
       }
-      CopyMem(t_undobuffer, data->undobuffer, data->undosize-(t_undobuffer-(char *)data->undobuffer));
+
+      memcpy(data->undobuffer, t_undobuffer, data->undosize-(t_undobuffer-(char *)data->undobuffer));
       
       data->undopointer -= t_undobuffer-(char *)data->undobuffer;
       

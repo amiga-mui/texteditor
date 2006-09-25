@@ -70,7 +70,7 @@
 
 #define MUI_NewObjectA(__p0, __p1) \
 	LP2(30, Object *, MUI_NewObjectA, \
-		char *, __p0, a0, \
+		const char *, __p0, a0, \
 		struct TagItem *, __p1, a1, \
 		, MUIMASTER_BASE_NAME, 0, 0, 0, 0, 0, 0)
 
@@ -95,7 +95,7 @@
 #define MUI_CreateCustomClass(__p0, __p1, __p2, __p3, __p4) \
 	LP5(108, struct MUI_CustomClass *, MUI_CreateCustomClass, \
 		struct Library *, __p0, a0, \
-		char *, __p1, a1, \
+		const char *, __p1, a1, \
 		struct MUI_CustomClass *, __p2, a2, \
 		int , __p3, d0, \
 		APTR , __p4, a3, \
@@ -106,9 +106,9 @@
 		APTR , __p0, d0, \
 		APTR , __p1, d1, \
 		LONGBITS , __p2, d2, \
-		char *, __p3, a0, \
-		char *, __p4, a1, \
-		char *, __p5, a2, \
+		const char *, __p3, a0, \
+		const char *, __p4, a1, \
+		const char *, __p5, a2, \
 		APTR , __p6, a3, \
 		, MUIMASTER_BASE_NAME, 0, 0, 0, 0, 0, 0)
 
@@ -144,7 +144,7 @@
 
 #define MUI_GetClass(__p0) \
 	LP1(78, struct IClass *, MUI_GetClass, \
-		char *, __p0, a0, \
+		const char *, __p0, a0, \
 		, MUIMASTER_BASE_NAME, 0, 0, 0, 0, 0, 0)
 
 #define MUI_RejectIDCMP(__p0, __p1) \

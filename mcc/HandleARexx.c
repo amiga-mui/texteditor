@@ -37,11 +37,11 @@
 
 struct RexxCommand
 {
-  STRPTR Command;
-  STRPTR Template;
+  const char *Command;
+  const char *Template;
 };
 
-static const struct RexxCommand Commands[] =
+static const struct RexxCommand const Commands[] =
 {
   { "CLEAR",        NULL },
   { "CUT",          NULL },
@@ -81,21 +81,7 @@ enum
 };
 #define MaxArgs 8
 
-STRPTR StringCompare (STRPTR str1, STRPTR str2)
-{
-  ENTER();
-
-  while(*str1 && *str2)
-  {
-    if(ToUpper(*str1++) != *str2++)
-      return(FALSE);
-  }
-
-  LEAVE();
-  return((*str2 == '\0') ? str1 : FALSE);
-}
-
-ULONG CallFunction (UWORD function, LONG *args, STRPTR txtargs, struct InstData *data)
+static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struct InstData *data)
 {
   struct line_node *oldactualline = data->actualline;
   UWORD oldCPos_X = data->CPos_X;
@@ -274,7 +260,7 @@ ULONG CallFunction (UWORD function, LONG *args, STRPTR txtargs, struct InstData 
 
         if((buffer = AllocVec(data->actualline->line.Length+1, MEMF_ANY)))
         {
-          CopyMem(data->actualline->line.Contents, buffer, data->actualline->line.Length);
+          memcpy(buffer, data->actualline->line.Contents, data->actualline->line.Length);
           buffer[data->actualline->line.Length] = '\0';
           result = (ULONG)buffer;
         }
@@ -382,25 +368,24 @@ ULONG CallFunction (UWORD function, LONG *args, STRPTR txtargs, struct InstData 
   return(result);
 }
 
-ULONG HandleARexx (struct InstData *data, STRPTR command)
+BOOL HandleARexx(struct InstData *data, STRPTR command)
 {
-  struct RDArgs *myrdargs   = NULL;
-  struct RDArgs *ra_result  = NULL;
-  STRPTR cmd;
-  STRPTR txtargs = "";
+  const char *txtargs = "";
   UWORD  function;
-  ULONG  result = FALSE;
+  BOOL result = FALSE;
 
   ENTER();
 
   if(data->shown)
   {
+    const char *cmd;
+
     for(function = 0; (cmd = Commands[function].Command); function++)
     {
-      if((txtargs = StringCompare(command, cmd)))
+      if(strnicmp(command, cmd, strlen(cmd)) == 0)
       {
-        if(*txtargs == ' ' || *txtargs == '\0')
-          break;
+        txtargs = command;
+        break;
       }
     }
 
@@ -410,6 +395,8 @@ ULONG HandleARexx (struct InstData *data, STRPTR command)
 
       if(*txtargs++ && function != InsTEXT)
       {
+        struct RDArgs *myrdargs = NULL;
+
         if((myrdargs = AllocDosObject(DOS_RDARGS, NULL)))
         {
           ULONG length = strlen(txtargs);
@@ -417,9 +404,12 @@ ULONG HandleARexx (struct InstData *data, STRPTR command)
 
           if((buffer = MyAllocPooled(data->mypool, length+2)))
           {
-            CopyMem(txtargs, buffer, length);
+            struct RDArgs *ra_result = NULL;
+
+            memcpy(buffer, txtargs, length);
             buffer[length] = '\n';
             buffer[length+1] = '\0';
+
             myrdargs->RDA_Source.CS_Buffer = buffer;
             myrdargs->RDA_Source.CS_Length = length+1;
             myrdargs->RDA_Source.CS_CurChr = 0;
@@ -437,7 +427,7 @@ ULONG HandleARexx (struct InstData *data, STRPTR command)
       }
       else
       {
-        result = CallFunction(function, Args, txtargs, data);
+        result = CallFunction(function, Args, (char *)txtargs, data);
       }
     }
   }

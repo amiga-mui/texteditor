@@ -90,7 +90,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
     }
     buf->pointer = buf->buffer+offset;
 
-    CopyMem(oldbuf, buf->buffer, offset);
+    memcpy(buf->buffer, oldbuf, offset);
 
     if(data)
       MyFreePooled(data->mypool, oldbuf);
@@ -165,7 +165,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
         color = TRUE;
       }
 
-      CopyMem(emsg->Contents+lastpos, buf->pointer, pos-lastpos);
+      memcpy(buf->pointer, emsg->Contents+lastpos, pos-lastpos);
       buf->pointer += pos-lastpos;
 
       // if h_Data is TRUE then this is an EMailHook call
@@ -281,7 +281,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
     }
   }
 
-  CopyMem(emsg->Contents+lastpos, buf->pointer, length);
+  memcpy(buf->pointer, emsg->Contents+lastpos, length);
   buf->pointer += length;
   *buf->pointer = '\0';
 

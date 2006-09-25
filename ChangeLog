@@ -4,6 +4,12 @@ MUI TextEditor MCC class - ChangeLog
 
 $Id$
 
+2006-09-25 Jens Langner <Jens.Langner@light-speed.de>
+
+   * misc: general minor cleanup of certain areas. added -Wwrite-strings to all
+     GCC makefiles. That should make sure we don't accidently write into const
+     strings.
+
 #### v15.18 RELEASE ############################################################
 
 2006-08-18 Jens Langner <Jens.Langner@light-speed.de>
