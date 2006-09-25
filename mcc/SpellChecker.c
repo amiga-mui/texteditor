@@ -85,7 +85,7 @@ HOOKPROTONH(SelectCode, void, void *lvobj, long **parms)
 }
 MakeStaticHook(SelectHook, SelectCode);
 
-LONG SendRexx (char *word, char *command, struct InstData *data)
+static LONG SendRexx(char *word, const char *command, struct InstData *data)
 {
   struct MsgPort *rexxport;
   struct RexxMsg *rxmsg;
@@ -221,7 +221,7 @@ static VOID FreeSearchPath(BPTR path)
   }
 }
 
-LONG SendCLI(char *word, char *command, UNUSED struct InstData *data)
+static LONG SendCLI(char *word, const char *command, UNUSED struct InstData *data)
 {
   char buffer[512];
   LONG result;
@@ -299,8 +299,10 @@ BOOL LookupWord(STRPTR word, struct InstData *data)
     LONG res;
 
   if(data->LookupSpawn)
-      res = SendRexx(word, data->LookupCmd, data);
-  else  res = SendCLI(word, data->LookupCmd, data);
+    res = SendRexx(word, data->LookupCmd, data);
+  else
+    res = SendCLI(word, data->LookupCmd, data);
+
   if(res)
   {
     GetVar("Found", &buf[0], sizeof(buf), GVF_GLOBAL_ONLY);

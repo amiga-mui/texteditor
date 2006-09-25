@@ -532,17 +532,26 @@ ULONG mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 DISPATCHERPROTO(_Dispatcher)
 {
   struct InstData *data = INST_DATA(cl, obj);
-  LONG t_totallines = data->totallines;
-  LONG t_visual_y = data->visual_y;
-  BOOL t_haschanged = data->HasChanged;
-  UWORD t_pen = data->Pen;
-  BOOL areamarked = Enabled(data);
+  LONG t_totallines;
+  LONG t_visual_y;
+  BOOL t_haschanged;
+  UWORD t_pen;
+  BOOL areamarked;
   ULONG result = 0;
 
   ENTER();
 
   //kprintf("Method: 0x%lx\n", msg->MethodID);
-  //D(DBF_STARTUP, "Stack usage: %ld", (ULONG)FindTask(NULL)->tc_SPUpper - (ULONG)FindTask(NULL)->tc_SPReg);
+//  D(DBF_STARTUP, "Stack usage: %ld %lx", (ULONG)FindTask(NULL)->tc_SPUpper - (ULONG)FindTask(NULL)->tc_SPReg, data);
+
+  // set some variables:
+  t_totallines = data->totallines;
+  t_visual_y = data->visual_y;
+  t_haschanged = data->HasChanged;
+  t_pen = data->Pen;
+  areamarked = Enabled(data);
+
+//  D(DBF_STARTUP, "cont...");
 
   if(data->shown && !(data->flags & FLG_Draw))
   {

@@ -418,8 +418,8 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
 
   if((newbuffer = MyAllocPooled(data->mypool, line->line.Length+line->next->line.Length+1)))
   {
-    CopyMem(line->line.Contents, newbuffer, line->line.Length-1);
-    CopyMem(line->next->line.Contents, newbuffer+line->line.Length-1, line->next->line.Length+1);
+    memcpy(newbuffer, line->line.Contents, line->line.Length-1);
+    memcpy(newbuffer+line->line.Length-1, line->next->line.Contents, line->next->line.Length+1);
     MyFreePooled(data->mypool, line->line.Contents);
     MyFreePooled(data->mypool, line->next->line.Contents);
 
@@ -940,7 +940,7 @@ void  OptimizedPrint  (LONG x, struct line_node *line, LONG line_nr, LONG width,
   LEAVE();
 }
 
-void  UpdateChange(LONG x, struct line_node *line, LONG length, char *characters, struct UserAction *buffer, struct InstData *data)
+static void UpdateChange(LONG x, struct line_node *line, LONG length, const char *characters, struct UserAction *buffer, struct InstData *data)
 {
   LONG diff;
   LONG skip=0;
@@ -1030,7 +1030,7 @@ void  UpdateChange(LONG x, struct line_node *line, LONG length, char *characters
 /*------------------------------*
  * Paste n characters to a line *
  *------------------------------*/
-long  PasteChars    (LONG x, struct line_node *line, LONG length, char *characters, struct UserAction *buffer, struct InstData *data)
+BOOL PasteChars(LONG x, struct line_node *line, LONG length, const char *characters, struct UserAction *buffer, struct InstData *data)
 {
   ENTER();
 

@@ -125,7 +125,7 @@ struct WorkbenchIFace *IWorkbench = NULL;
 DISPATCHERPROTO(_Dispatcher);
 #endif
 
-static char *page_titles[] = { "Shown", "Hidden", NULL };
+static const char *page_titles[] = { "Shown", "Hidden", NULL };
 
 int main(void)
 {
@@ -173,8 +173,8 @@ int main(void)
           Object *app, *window, *clear, *cut, *copy, *paste, *erase,
                  *bold, *italic, *underline, *ischanged, *undo, *redo, *string,
                  *xslider, *yslider, *flow, *search, *replace;
-          STRPTR  flow_text[] = {"Left", "Center", "Right", NULL};
-          STRPTR  classes[] = {"TextEditor.mcc", NULL};
+          const char *flow_text[] = { "Left", "Center", "Right", NULL };
+          const char *classes[] = { "TextEditor.mcc", NULL };
 
         mcc = MUI_CreateCustomClass(NULL, "Area.mui", NULL, sizeof(struct InstData), ENTRY(_Dispatcher));
         

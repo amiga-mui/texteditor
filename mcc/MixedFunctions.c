@@ -102,10 +102,11 @@ void  FreeTextMem(struct line_node *line, struct InstData *data)
 /*-----------------------------------*
  * Initializes a line_node structure *
  *-----------------------------------*/
-long  Init_LineNode (struct line_node *line, struct line_node *previous, char *text, struct InstData *data)
+BOOL Init_LineNode(struct line_node *line, struct line_node *previous, const char *text, struct InstData *data)
 {
-  LONG  textlength = 0;
-  char  *ctext;
+  BOOL success = FALSE;
+  LONG textlength = 0;
+  char *ctext;
 
   ENTER();
 
@@ -114,12 +115,12 @@ long  Init_LineNode (struct line_node *line, struct line_node *previous, char *t
 
   if((ctext = MyAllocPooled(data->mypool, textlength+2)))
   {
-    CopyMem(text, ctext, textlength+1);
+    memcpy(ctext, text, textlength+1);
     ctext[textlength+1] = 0;
 
-    line->next     = NULL;
-    line->previous   = previous;
-    line->line.Contents   = ctext;
+    line->next          = NULL;
+    line->previous      = previous;
+    line->line.Contents = ctext;
     line->line.Length   = textlength+1;
     if(data->rport)
       line->visual = VisualHeight(line, data);
@@ -129,15 +130,14 @@ long  Init_LineNode (struct line_node *line, struct line_node *previous, char *t
     line->line.Flow     = MUIV_TextEditor_Flow_Left;
     line->line.Separator = 0;
 
-    if (previous)
+    if(previous)
       previous->next  = line;
 
-    RETURN(TRUE);
-    return(TRUE);
+    success = TRUE;
   }
 
-  RETURN(FALSE);
-  return(FALSE);
+  RETURN(success);
+  return(success);
 }
 
 long  ExpandLine    (struct line_node *line, LONG length, struct InstData *data)
@@ -148,7 +148,7 @@ long  ExpandLine    (struct line_node *line, LONG length, struct InstData *data)
 
   if((newbuffer = MyAllocPooled(data->mypool, line->line.Length+40+length)))
   {
-    CopyMem(line->line.Contents, newbuffer, line->line.Length+1);
+    memcpy(newbuffer, line->line.Contents, line->line.Length+1);
     MyFreePooled(data->mypool, line->line.Contents);
     line->line.Contents = newbuffer;
 
@@ -168,7 +168,7 @@ long  CompressLine  (struct line_node *line, struct InstData *data)
 
   if((newbuffer = MyAllocPooled(data->mypool, strlen(line->line.Contents)+1)))
   {
-    CopyMem(line->line.Contents, newbuffer, line->line.Length+1);
+    memcpy(newbuffer, line->line.Contents, line->line.Length+1);
     MyFreePooled(data->mypool, line->line.Contents);
     line->line.Contents = newbuffer;
     line->line.Length  = strlen(newbuffer);

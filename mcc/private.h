@@ -56,7 +56,7 @@
 #define Enabled(data)   ((data)->blockinfo.enabled && \
                          ((data)->blockinfo.startx != (data)->blockinfo.stopx || \
                           (data)->blockinfo.startline != (data)->blockinfo.stopline || \
-                           data->selectmode == 3))
+                          (data)->selectmode == 3))
 
 struct bookmark
 {
@@ -194,8 +194,8 @@ struct InstData
   APTR            SuggestListview;
   UWORD           SuggestSpawn;
   UWORD           LookupSpawn;
-  STRPTR          SuggestCmd;
-  STRPTR          LookupCmd;
+  const char *    SuggestCmd;
+  const char *    LookupCmd;
   ULONG           clipcount;
   APTR            cliphandle;
 
@@ -248,7 +248,7 @@ long  ExpandLine    (struct line_node *, LONG, struct InstData *);
 long  CompressLine  (struct line_node *, struct InstData *);
 void  OffsetToLines (LONG, struct line_node *, struct pos_info *, struct InstData *);
 void  DumpText    (LONG, LONG, LONG, BOOL, struct InstData *);
-long  Init_LineNode (struct line_node *, struct line_node *, char *, struct InstData *);
+BOOL Init_LineNode(struct line_node *, struct line_node *, const char *, struct InstData *);
 short VisualHeight  (struct line_node *, struct InstData *);
 void  GetLine     (LONG, struct pos_info *, struct InstData *);
 LONG  LineToVisual  (struct line_node *, struct InstData *);
@@ -257,7 +257,7 @@ LONG  PasteClip   (LONG x, struct line_node *line, struct InstData *);
 long  SplitLine   (LONG x, struct line_node *, BOOL, struct UserAction *, struct InstData *);
 long  MergeLines    (struct line_node *, struct InstData *);
 long  RemoveChars   (LONG, struct line_node *, LONG, struct InstData *);
-long  PasteChars    (LONG, struct line_node *, LONG, char *, struct UserAction *, struct InstData *);
+BOOL PasteChars(LONG, struct line_node *, LONG, const char *, struct UserAction *, struct InstData *);
 
 void  SetBookmark       (UWORD, struct InstData *);
 void  GotoBookmark      (UWORD, struct InstData *);
@@ -307,7 +307,7 @@ extern SAVEDS ASM ULONG _Dispatcher(REG(a0, struct IClass * cl), REG(a2, Object 
 void  InitConfig(Object *, struct InstData *);
 void  FreeConfig(struct InstData *, struct MUI_RenderInfo *);
 
-ULONG HandleARexx (struct InstData *, STRPTR command);
+BOOL HandleARexx(struct InstData *, STRPTR command);
 
 struct line_node *ImportText(char *, struct InstData *, struct Hook *, LONG);
 void *ExportText(struct line_node *, struct Hook *, LONG);

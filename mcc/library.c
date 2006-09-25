@@ -45,7 +45,7 @@
 #define MASTERVERSION 19
 
 #define USEDCLASSESP  used_classesP
-static const STRPTR used_classesP[] = { "TextEditor.mcp", NULL };
+static const char * const used_classesP[] = { "TextEditor.mcp", NULL };
 
 #define ClassInit
 #define ClassExit
