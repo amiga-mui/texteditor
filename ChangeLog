@@ -4,6 +4,12 @@ MUI TextEditor MCC class - ChangeLog
 
 $Id$
 
+2006-09-27 Jens Langner <Jens.Langner@light-speed.de>
+
+   * HandleARexx.c: fixed a recently introduced bug where the Arexx support was
+     somewhat broken.
+   * Debug.c: added new 'arexx' debug class.
+
 2006-09-25 Jens Langner <Jens.Langner@light-speed.de>
 
    * misc: general minor cleanup of certain areas. added -Wwrite-strings to all
