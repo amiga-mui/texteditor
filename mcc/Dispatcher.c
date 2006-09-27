@@ -531,7 +531,7 @@ ULONG mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 
 DISPATCHERPROTO(_Dispatcher)
 {
-  struct InstData *data = INST_DATA(cl, obj);
+  struct InstData *data;
   LONG t_totallines;
   LONG t_visual_y;
   BOOL t_haschanged;
@@ -543,6 +543,15 @@ DISPATCHERPROTO(_Dispatcher)
 
   //kprintf("Method: 0x%lx\n", msg->MethodID);
 //  D(DBF_STARTUP, "Stack usage: %ld %lx", (ULONG)FindTask(NULL)->tc_SPUpper - (ULONG)FindTask(NULL)->tc_SPReg, data);
+
+  // get the instance data
+  if((data = INST_DATA(cl, obj)) == NULL)
+  {
+    ASSERT(data != NULL);
+
+    RETURN(0);
+    return 0;
+  }
 
   // set some variables:
   t_totallines = data->totallines;
@@ -636,8 +645,8 @@ DISPATCHERPROTO(_Dispatcher)
 
       DoSuperMethodA(cl, obj, msg);
 
-      RETURN(TRUE);
-      return(TRUE);
+      RETURN(1);
+      return(1);
     }
     break;
 
@@ -670,8 +679,8 @@ DISPATCHERPROTO(_Dispatcher)
 
       DoSuperMethodA(cl, obj, msg);
 
-      RETURN(TRUE);
-      return(TRUE);
+      RETURN(1);
+      return(1);
     }
     break;
 

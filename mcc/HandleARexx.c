@@ -90,6 +90,8 @@ static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struc
 
   ENTER();
 
+  SHOWVALUE(DBF_REXX, function);
+
   if(data->flags & FLG_ReadOnly)
   {
     switch(function)
@@ -370,30 +372,44 @@ static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struc
 
 BOOL HandleARexx(struct InstData *data, STRPTR command)
 {
-  const char *txtargs = "";
-  UWORD  function;
   BOOL result = FALSE;
 
   ENTER();
 
-  if(data->shown)
+  if(data->shown && command && command[0] != '\0')
   {
+    const char *txtargs = "";
     const char *cmd;
+    int function;
 
-    for(function = 0; (cmd = Commands[function].Command); function++)
+    SHOWSTRING(DBF_REXX, command);
+
+    for(function=0; (cmd = Commands[function].Command); function++)
     {
-      if(strnicmp(command, cmd, strlen(cmd)) == 0)
+      int cmdlen = strlen(cmd);
+
+      if(strnicmp(command, cmd, cmdlen) == 0 &&
+         (command[cmdlen] == ' ' || command[cmdlen] == '\0'))
       {
-        txtargs = command;
+        txtargs = &command[cmdlen];
         break;
       }
     }
 
+    SHOWVALUE(DBF_REXX, function);
+    SHOWSTRING(DBF_REXX, txtargs);
+
     if(Commands[function].Command && (*txtargs == '\0' || Commands[function].Template))
     {
-      LONG Args[MaxArgs] = { };
+      LONG Args[MaxArgs];
 
-      if(*txtargs++ && function != InsTEXT)
+      memset(Args, 0, sizeof(Args));
+
+      // skip leading spaces
+      while(*txtargs == ' ')
+        txtargs++;
+
+      if(*txtargs != '\0' && function != InsTEXT)
       {
         struct RDArgs *myrdargs = NULL;
 
@@ -426,9 +442,7 @@ BOOL HandleARexx(struct InstData *data, STRPTR command)
         }
       }
       else
-      {
         result = CallFunction(function, Args, (char *)txtargs, data);
-      }
     }
   }
 
