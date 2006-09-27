@@ -23,6 +23,8 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include <stdlib.h>
+
 // first we make sure all previously defined symbols are undefined now so
 // that no other debug system interferes with ours.
 #undef ENTER
@@ -55,6 +57,7 @@
 #define DBF_ALWAYS   (1<<0)
 #define DBF_STARTUP  (1<<1)     // for startup/shutdown events
 #define DBF_INPUT    (1<<2)     // HandleInput.c
+#define DBF_REXX     (1<<3)     // HandleARexx.c
 #define DBF_ALL      0xffffffff
 
 void SetupDebug(void);
