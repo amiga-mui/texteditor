@@ -80,7 +80,7 @@ void SetupDebug(void)
   kprintf("Exec version: v%ld.%ld\n", ((struct Library *)SysBase)->lib_Version, ((struct Library *)SysBase)->lib_Revision);
   kprintf("Initializing runtime debugging:\n");
 
-  if(GetVar("yamdebug", var, sizeof(var), 0) > 0)
+  if(GetVar("texteditor.mcc.debug", var, sizeof(var), 0) > 0)
   {
     char *s = var;
 
@@ -104,6 +104,7 @@ void SetupDebug(void)
       { "always",   DBF_ALWAYS  },
       { "startup",  DBF_STARTUP },
       { "input",    DBF_INPUT   },
+      { "rexx",     DBF_REXX    },
       { "all",      DBF_ALL     },
       { NULL,       0           }
     };
