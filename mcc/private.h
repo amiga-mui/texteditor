@@ -24,6 +24,7 @@
 #define TEXTEDITOR_MCC_PRIV_H
 
 #include <graphics/rastport.h>
+#include <libraries/iffparse.h>
 
 #ifndef ClassAct
 #include <libraries/mui.h>
@@ -144,8 +145,7 @@ struct InstData
   BOOL    shown;
   BOOL    update;
 
-  struct  MsgPort   *clipport;
-  struct  IOClipReq *clipboard;
+  struct  IFFHandle *iff;
 
   ULONG   StartSecs, StartMicros;
   UWORD   selectmode;

@@ -29,11 +29,22 @@
 #include <proto/graphics.h>
 #include <proto/layers.h>
 #include <proto/exec.h>
+#include <proto/iffparse.h>
 
 #include "TextEditor_mcc.h"
 #include "private.h"
+#include "Debug.h"
 
-BOOL InitClipboard (struct InstData *);
+#define ID_FTXT    MAKE_ID('F','T','X','T')
+#define ID_CHRS    MAKE_ID('C','H','R','S')
+#define ID_FLOW    MAKE_ID('F','L','O','W')
+#define ID_HIGH    MAKE_ID('H','I','G','H')
+#define ID_SBAR    MAKE_ID('S','B','A','R')
+#define ID_COLS    MAKE_ID('C','O','L','S')
+#define ID_STYL    MAKE_ID('S','T','Y','L')
+
+BOOL InitClipboard(struct InstData *data, ULONG flags);
+void EndClipSession(struct InstData *data);
 
 /*----------------------*
  * Paste from Clipboard *
@@ -89,16 +100,14 @@ VOID PasteClipProcess (REG(a0) STRPTR arguments)
 LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
 {
 #endif
-    struct line_node *line = NULL;
-    struct line_node *startline = NULL;
-    struct line_node *previous = NULL;
-    ULONG   header[3];
-    LONG    length;
-    UWORD   *styles = NULL;
-    UWORD   *colors = NULL;
-    STRPTR  textline;
-    BOOL    newline = TRUE;
-    LONG    res = FALSE;
+  struct line_node *line = NULL;
+  struct line_node *startline = NULL;
+  struct line_node *previous = NULL;
+  UWORD   *styles = NULL;
+  UWORD   *colors = NULL;
+  STRPTR  textline;
+  BOOL    newline = TRUE;
+  LONG    res = FALSE;
 
   ENTER();
 
@@ -107,138 +116,135 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
   data->rport = ObtainGIRPort(data->GInfo);
 #endif
 
-  if(InitClipboard(data))
+  if(InitClipboard(data, IFFF_READ))
   {
-    data->clipboard->io_ClipID    = 0;
-    data->clipboard->io_Command = CMD_READ;
-    data->clipboard->io_Offset    = 0;
-  
-    data->clipboard->io_Data    = (void *)header;
-    data->clipboard->io_Length    = 12;
-    DoIO((struct IORequest*)data->clipboard);
-  
-    if(data->clipboard->io_Actual != 12)
+    if(StopChunk(data->iff, ID_FTXT, ID_CHRS) == 0 &&
+       StopChunk(data->iff, ID_FTXT, ID_FLOW) == 0 &&
+       StopChunk(data->iff, ID_FTXT, ID_HIGH) == 0 &&
+       StopChunk(data->iff, ID_FTXT, ID_SBAR) == 0 &&
+       StopChunk(data->iff, ID_FTXT, ID_COLS) == 0 &&
+       StopChunk(data->iff, ID_FTXT, ID_STYL) == 0)
     {
-      DoMethod(data->object, MUIM_TextEditor_HandleError, Error_ClipboardIsEmpty);
-    }
-    else
-    {
-      length = header[1] - 4;
-      if((header[0] == MAKE_ID('F','O','R','M')) && (header[2] == MAKE_ID('F','T','X','T')))
+      LONG error;
+      UWORD flow = MUIV_TextEditor_Flow_Left;
+      UWORD color = FALSE;
+      UWORD separator = 0;
+      BOOL ownclip = FALSE;
+      LONG updatefrom;
+
+      while(TRUE)
       {
-          UWORD flow = MUIV_TextEditor_Flow_Left;
-          UWORD separator = 0;
-          BOOL  color = FALSE;
-          long  ownclip = FALSE;
-          long  chunksize;
-          LONG  updatefrom;
+        struct ContextNode *cn;
 
-        while((length > 0) && (data->clipboard->io_Length == data->clipboard->io_Actual))
+        error = ParseIFF(data->iff, IFFPARSE_SCAN);
+        SHOWVALUE(DBF_CLIPBOARD, error);
+        if(error == IFFERR_EOC)
+          continue;
+        else if(error)
+          break;
+
+        if((cn = CurrentChunk(data->iff)) != NULL)
         {
-            BOOL chunk_used;
-  
-          data->clipboard->io_Data  = (void *)header;
-          data->clipboard->io_Length  = 8;
-          DoIO((struct IORequest*)data->clipboard);
-          chunksize = (header[1]+1) & (ULONG)-2;
-          length -= 8 + chunksize;
-  
-          chunk_used = FALSE;
-          switch(header[0])
+          switch (cn->cn_ID)
           {
-            case MAKE_ID('F','L','O','W'):
-              if(header[1] == 2)
+            case ID_FLOW:
+              D(DBF_CLIPBOARD, "reading FLOW");
+              SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
+              if(cn->cn_Size == 2)
               {
-                data->clipboard->io_Data  = (APTR)&flow;
-                data->clipboard->io_Length  = 2;
-                DoIO((struct IORequest*)data->clipboard);
-                if(flow > MUIV_TextEditor_Flow_Right)
-                  flow = MUIV_TextEditor_Flow_Left;
-                chunk_used = TRUE;
+                if(ReadChunkBytes(data->iff, &flow, 2) == 2)
+                  if(flow > MUIV_TextEditor_Flow_Right)
+                    flow = MUIV_TextEditor_Flow_Left;
+                SHOWVALUE(DBF_CLIPBOARD, flow);
               }
               break;
 
-            case MAKE_ID('H','I','G','H'):
-              if(header[1] == 2)
+            case ID_HIGH:
+              D(DBF_CLIPBOARD, "reading HIGH");
+              SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
+              if (cn->cn_Size == 2)
               {
-                data->clipboard->io_Data  = (APTR)&color;
-                data->clipboard->io_Length  = 2;
-                DoIO((struct IORequest*)data->clipboard);
-                chunk_used = TRUE;
+                error = ReadChunkBytes(data->iff, &color, 2);
+                SHOWVALUE(DBF_CLIPBOARD, color);
+                SHOWVALUE(DBF_CLIPBOARD, error);
               }
               break;
 
-            case MAKE_ID('S','B','A','R'):
-              if(header[1] == 2)
+            case ID_SBAR:
+              D(DBF_CLIPBOARD, "reading SBAR");
+              SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
+              if (cn->cn_Size == 2)
               {
-                data->clipboard->io_Data  = (APTR)&separator;
-                data->clipboard->io_Length  = 2;
-                DoIO((struct IORequest*)data->clipboard);
-                chunk_used = TRUE;
+                error = ReadChunkBytes(data->iff, &separator, 2);
+                SHOWVALUE(DBF_CLIPBOARD, separator);
+                SHOWVALUE(DBF_CLIPBOARD, error);
               }
               break;
 
-            case MAKE_ID('C','O','L','S'):
+            case ID_COLS:
+              D(DBF_CLIPBOARD, "reading COLS");
+              SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
               if(colors)
               {
                 MyFreePooled(data->mypool, colors);
+                colors = NULL;
               }
-              if(chunksize && (colors = (UWORD *)MyAllocPooled(data->mypool, header[1]+4)))
+              if(cn->cn_Size > 0 && (colors = (UWORD *)MyAllocPooled(data->mypool, cn->cn_Size)) != NULL)
               {
-                data->clipboard->io_Data  = (void *)colors;
-                data->clipboard->io_Length  = header[1];
-                DoIO((struct IORequest*)data->clipboard);
-                colors[header[1]/2] = 0xffff;
-                chunk_used = TRUE;
+                error = ReadChunkBytes(data->iff, colors, cn->cn_Size);
+                SHOWVALUE(DBF_CLIPBOARD, error);
+                colors[cn->cn_Size / 2] = 0xffff;
               }
               break;
 
-            case MAKE_ID('S','T','Y','L'):
+            case ID_STYL:
+              D(DBF_CLIPBOARD, "reading STYL");
+              SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
               ownclip = TRUE;
               if(styles)
               {
                 MyFreePooled(data->mypool, styles);
+                styles = NULL;
               }
-              if(chunksize && (styles = (UWORD *)MyAllocPooled(data->mypool, header[1]+4)))
+              if(cn->cn_Size > 0 && (styles = (UWORD *)MyAllocPooled(data->mypool, cn->cn_Size)) != NULL)
               {
-                data->clipboard->io_Data  = (void *)styles;
-                data->clipboard->io_Length  = header[1];
-                DoIO((struct IORequest*)data->clipboard);
-                styles[header[1]/2] = EOS;
-                chunk_used = TRUE;
+                error = ReadChunkBytes(data->iff, styles, cn->cn_Size);
+                SHOWVALUE(DBF_CLIPBOARD, error);
+                styles[cn->cn_Size / 2] = EOS;
               }
               break;
 
-            case MAKE_ID('C','H','R','S'):
+            case ID_CHRS:
+              D(DBF_CLIPBOARD, "reading CHRS");
+              SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
               data->HasChanged = TRUE;
-              if(chunksize && !ownclip)
+              if(cn->cn_Size > 0 && !ownclip)
               {
                 char *contents;
-  
-                if((contents = (char *)MyAllocPooled(data->mypool, header[1]+4)))
+                ULONG length = cn->cn_Size;
+
+                if((contents = (char *)MyAllocPooled(data->mypool, length + 1)) != NULL)
                 {
-                  data->clipboard->io_Data    = contents;
-                  data->clipboard->io_Length    = header[1];
-                  DoIO((struct IORequest*)data->clipboard);
-                  data->clipboard->io_Offset    += header[1] & 1;
-  
-                  if(*(contents+header[1]-1) != '\n')
+                  error = ReadChunkBytes(data->iff, contents, length);
+                  SHOWVALUE(DBF_CLIPBOARD, error);
+
+                  if(contents[length - 1] != '\n')
                   {
                     newline = FALSE;
                   }
                   else
                   {
-                    header[1]--;
+                    length--;
                   }
-                  *(contents+header[1]) = '\0';
-  
+                  contents[length] = '\0';
+
                   if((line = ImportText(contents, data, &ImPlainHook, data->ImportWrap)))
                   {
                     if(!startline)
                       startline = line;
                     if(previous)
                       previous->next  = line;
-  
+
                     line->previous    = previous;
                     line->visual    = VisualHeight(line, data);
                     data->totallines += line->visual;
@@ -251,31 +257,31 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
                     previous = line;
                   }
                   MyFreePooled(data->mypool, contents);
-                  chunk_used = TRUE;
                 }
               }
               else
               {
-                if(chunksize && (textline = (char *)MyAllocPooled(data->mypool, header[1]+4)))
+                ULONG length = cn->cn_Size;
+
+                if(length > 0 && (textline = (char *)MyAllocPooled(data->mypool, length + 1)) != NULL)
                 {
-                  data->clipboard->io_Data    = textline;
-                  data->clipboard->io_Length    = header[1];
-                  DoIO((struct IORequest*)data->clipboard);
-                  data->clipboard->io_Offset    += header[1] & 1;
-                  if(textline[header[1]-1] != '\n')
+                  error = ReadChunkBytes(data->iff, textline, length);
+                  SHOWVALUE(DBF_CLIPBOARD, error);
+
+                  if (textline[length - 1] != '\n')
                   {
                     newline = FALSE;
-                    textline[header[1]] = '\n';
-                    header[1]++;
+                    textline[length] = '\n';
+                    length++;
                   }
-                  textline[header[1]] = '\0';
-  
+                  textline[length] = '\0';
+
                   if((line = AllocLine(data)))
                   {
                     line->next     = NULL;
                     line->previous   = previous;
                     line->line.Contents   = textline;
-                    line->line.Length   = header[1];
+                    line->line.Length   = length;
                     line->visual   = VisualHeight(line, data);
                     line->line.Color    = color;
                     line->line.Flow     = flow;
@@ -283,12 +289,12 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
                     line->line.Styles   = styles;
                     line->line.Colors   = colors;
                     data->totallines += line->visual;
-  
+
                     if(!startline)
                       startline = line;
                     if(previous)
                       previous->next  = line;
-  
+
                     previous = line;
                   }
                   else
@@ -298,7 +304,6 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
                     if(colors)
                       MyFreePooled(data->mypool, (void *)colors);
                   }
-                  chunk_used  = TRUE;
                 }
                 else
                 {
@@ -316,66 +321,66 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
               }
               break;
           }
-          if(chunk_used == FALSE)
-            data->clipboard->io_Offset += chunksize;
         }
-        data->clipboard->io_Data  = NULL;
-        data->clipboard->io_Length  = (ULONG)-1;
-        data->clipboard->io_Offset  = (ULONG)-1;
-        DoIO((struct IORequest*)data->clipboard);
-  
-        if(line)
+      }
+
+      if(line)
+      {
+        BOOL oneline = FALSE;
+
+        SplitLine(x, actline, FALSE, NULL, data);
+        line->next = actline->next;
+        actline->next->previous = line;
+        actline->next = startline;
+        startline->previous = actline;
+        data->CPos_X = line->line.Length-1;
+        if(actline->next == line)
         {
-            long  oneline = FALSE;
-  
-          SplitLine(x, actline, FALSE, NULL, data);
-          line->next = actline->next;
-          actline->next->previous = line;
-          actline->next = startline;
-          startline->previous = actline;
-          data->CPos_X = line->line.Length-1;
-          if(actline->next == line)
-          {
-            data->CPos_X += actline->line.Length-1;
-            oneline = TRUE;
-          }
-          if(!newline)
-            MergeLines(line, data);
-          MergeLines(actline, data);
-          if(oneline)
-            line = actline;
-          if(newline)
-          {
-            line = line->next;
-            data->CPos_X = 0;
-          }
-          data->actualline = line;
+          data->CPos_X += actline->line.Length-1;
+          oneline = TRUE;
         }
-        data->update = TRUE;
-  
-        ScrollIntoDisplay(data);
-        updatefrom = LineToVisual(actline, data)-1;
-        if(updatefrom < 0)
-          updatefrom = 0;
-        DumpText(data->visual_y+updatefrom, updatefrom, data->maxlines, TRUE, data);
+        if(!newline)
+          MergeLines(line, data);
+        MergeLines(actline, data);
+        if(oneline)
+          line = actline;
+        if(newline)
+        {
+          line = line->next;
+          data->CPos_X = 0;
+        }
+        data->actualline = line;
       }
       else
       {
-        DoMethod(data->object, MUIM_TextEditor_HandleError, Error_ClipboardIsNotFTXT);
+        switch(error)
+        {
+          case IFFERR_MANGLED:
+          case IFFERR_SYNTAX:
+          case IFFERR_NOTIFF:
+            D(DBF_CLIPBOARD, "no FTXT clip!");
+            DoMethod(data->object, MUIM_TextEditor_HandleError, Error_ClipboardIsNotFTXT);
+            break;
+          default:
+            D(DBF_CLIPBOARD, "clipboard is empty!");
+            DoMethod(data->object, MUIM_TextEditor_HandleError, Error_ClipboardIsEmpty);
+            break;
+        }
       }
+      data->update = TRUE;
+
+      ScrollIntoDisplay(data);
+      updatefrom = LineToVisual(actline, data)-1;
+      if(updatefrom < 0)
+        updatefrom = 0;
+      DumpText(data->visual_y+updatefrom, updatefrom, data->maxlines, TRUE, data);
+
+      if(data->update)
+          res = TRUE;
+      else  data->update = TRUE;
     }
-    data->clipboard->io_Data  = NULL;
-    data->clipboard->io_Length  = (ULONG)-1;
-    data->clipboard->io_Offset  = (ULONG)-1;
-    DoIO((struct IORequest*)data->clipboard);
-  
-    CloseDevice((struct IORequest*)data->clipboard);
-    DeleteIORequest((struct IORequest*)data->clipboard);
-    DeleteMsgPort(data->clipport);
-  
-    if(data->update)
-        res = TRUE;
-    else  data->update = TRUE;
+
+    EndClipSession(data);
   }
 
 #ifdef ClassAct

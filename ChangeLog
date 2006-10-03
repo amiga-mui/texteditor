@@ -4,6 +4,23 @@ MUI TextEditor MCC class - ChangeLog
 
 $Id$
 
+2006-10-03 Thore Böckelmann <tboeckel@gmx.de>
+
+   * Debug.c: added new 'clipboard' debug class.
+   * mcc/EditorStuff.c: fixed bug #1462840 by replacing the handcrafted IFF
+     parsing routine by calls to iffparse.library. Pasting clips from
+     PageStream did not work, becasue PGS embeds FORM-FTXT chunks in CAT-CLIP
+     files. The old functions just recognized simple FORM-FTXT files.
+   * mcc/BlockOperators.c: replaced all handcrafted IFF writing functions by
+     calls to iffparse.library. This makes it much easier to extend clip
+     handling. The complete handcrafted access to clipboard.device is gone now.
+   * mcc/SpellChecker.c: FindPort() was called without being surrounded by
+     Forbid() and Permit().
+   * mcc/TextEditor-Test.c, mcc/library.c: added necessary definitions of
+     IFFParseBase and IIFFParse to make use of iffparse.library
+   * Makefile.os4: removed "-pipe" from all CFLAGS definitions, because the OS4
+     native GCC doesn't seem to handle this correctly.
+
 2006-09-27 Jens Langner <Jens.Langner@light-speed.de>
 
    * HandleARexx.c: fixed a recently introduced bug where the Arexx support was
@@ -16,6 +33,7 @@ $Id$
      GCC makefiles. That should make sure we don't accidently write into const
      strings.
 
+>>>>>>> .r254
 #### v15.18 RELEASE ############################################################
 
 2006-08-18 Jens Langner <Jens.Langner@light-speed.de>
