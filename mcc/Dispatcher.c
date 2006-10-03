@@ -35,15 +35,8 @@
 #include <proto/alib.h>
 #endif
 
-#ifndef ClassAct
 #include <proto/muimaster.h>
 #include <libraries/mui.h>
-#else
-#include <intuition/classusr.h>
-#include <intuition/gadgetclass.h>
-#include <images/bevel.h>
-#include <proto/bevel.h>
-#endif
 
 #include "TextEditor_mcc.h"
 #include "private.h"
@@ -84,24 +77,15 @@ void ResetDisplay(struct InstData *data)
     SetAttrs(data->object,  MUIA_TextEditor_Pen,            data->Pen,
                     MUIA_TextEditor_Flow,         data->Flow,
                     MUIA_TextEditor_Separator,        data->Separator,
-#ifdef ClassAct
-                    MUIA_TextEditor_Prop_Entries,     lines,
-                    MUIA_TextEditor_Prop_Visible,     data->maxlines,
-                    MUIA_TextEditor_Prop_First,     (data->visual_y-1),
-                    MUIA_TextEditor_Prop_DeltaFactor, 1,
-#else
                     MUIA_TextEditor_Prop_Entries,     lines*data->height,
                     MUIA_TextEditor_Prop_Visible,     data->maxlines*data->height,
                     MUIA_TextEditor_Prop_First,     (data->visual_y-1)*data->height,
                     MUIA_TextEditor_Prop_DeltaFactor, data->height,
-#endif
                     TAG_DONE);
     data->NoNotify = FALSE;
 
 
-#ifndef ClassAct
     UpdateStyles(data);
-#endif
 
     DumpText(data->visual_y, 0, data->maxlines, FALSE, data);
 /*    get(_win(data->object), MUIA_Window_ActiveObject, &tst);
@@ -118,10 +102,8 @@ void  RequestInput(struct InstData *data)
 {
   ENTER();
 
-#ifndef ClassAct
   if(!(data->scrollaction || (data->mousemove)))
     DoMethod(_app(data->object), MUIM_Application_AddInputHandler, &data->ihnode);
-#endif
 
   LEAVE();
 }
@@ -130,10 +112,8 @@ void  RejectInput(struct InstData *data)
 {
   ENTER();
 
-#ifndef ClassAct
   if(!(data->scrollaction || (data->mousemove)))
     DoMethod(_app(data->object), MUIM_Application_RemInputHandler, &data->ihnode);
-#endif
 
   LEAVE();
 }
@@ -163,39 +143,13 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
 
             data->ExportHook = &ExportHookPlain;
             data->flags |= FLG_AutoClip;
-#ifndef ClassAct
             if(FindTagItem(MUIA_Background, msg->ops_AttrList))
               data->flags |= FLG_OwnBkgn;
             if(FindTagItem(MUIA_Frame, msg->ops_AttrList))
               data->flags |= FLG_OwnFrame;
-#endif
 
             Set(cl, obj, (struct opSet *)msg);
             data->visual_y = 1;
-
-#ifdef ClassAct
-            InitSemaphore(&data->semaphore);
-/*
-            data->doublebuffer = NULL;
-            data->RawkeyBindings = NULL;
-            data->font = NULL;
-*/            InitConfig(obj, data);
-
-            if(data->Bevel = (struct Image *)NewObject(BEVEL_GetClass(), NULL,
-              BEVEL_Style,       BVS_FIELD,
-              BEVEL_Transparent, FALSE,
-              BEVEL_FillPen, 0,
-              TAG_DONE))
-            {
-                ULONG temp;
-
-              GetAttr(BEVEL_VertSize,  data->Bevel, &temp);
-              data->BevelHoriz = (UWORD)temp;
-
-              GetAttr(BEVEL_HorizSize, data->Bevel, &temp);
-              data->BevelVert  = (UWORD)temp;
-            }
-#endif
 
             RETURN((long)obj);
             return((long)obj);
@@ -231,7 +185,6 @@ ULONG Dispose(struct IClass *cl, Object *obj, Msg msg)
   return(DoSuperMethodA(cl, obj, msg));
 }
 
-#ifndef ClassAct
 ULONG Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
 {
   struct InstData *data = INST_DATA(cl, obj);
@@ -830,4 +783,3 @@ DISPATCHERPROTO(_Dispatcher)
   return(result);
 }
 
-#endif

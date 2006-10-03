@@ -42,11 +42,7 @@ extern "C" {
 #define MUIC_TextEditor     "TextEditor.mcc"
 #define TextEditorObject    MUI_NewObject(MUIC_TextEditor
 
-#ifdef ClassAct
-#define TextEditor_Dummy   (((ULONG)(1L<<31)) + 0x5000000 + 0x26000) // ClassAct
-#else
 #define TextEditor_Dummy   (0xad000000) // MUI
-#endif
 
 #define MUIA_TextEditor_AreaMarked        (TextEditor_Dummy + 0x14)
 #define MUIA_TextEditor_ColorMap          (TextEditor_Dummy + 0x2f)
@@ -91,11 +87,6 @@ extern "C" {
 #define MUIA_TextEditor_CursorPosition    (TextEditor_Dummy + 0x35)
 #define MUIA_TextEditor_KeyUpFocus        (TextEditor_Dummy + 0x36)
 
-#ifdef ClassAct
-#undef TextEditor_Dummy
-#define TextEditor_Dummy   (0x45000)
-#endif
-
 #define MUIM_TextEditor_AddKeyBindings    (TextEditor_Dummy + 0x22)
 #define MUIM_TextEditor_ARexxCmd          (TextEditor_Dummy + 0x23)
 #define MUIM_TextEditor_BlockInfo         (TextEditor_Dummy + 0x30)
@@ -110,17 +101,6 @@ extern "C" {
 #define MUIM_TextEditor_Replace           (TextEditor_Dummy + 0x2a)
 #define MUIM_TextEditor_Search            (TextEditor_Dummy + 0x2b)
 
-#ifdef ClassAct
-struct MUIP_TextEditor_ARexxCmd          { ULONG MethodID; struct GadgetInfo *GInfo; STRPTR command; };
-struct MUIP_TextEditor_BlockInfo         { ULONG MethodID; struct GadgetInfo *GInfo; ULONG *startx; ULONG *starty; ULONG *stopx; ULONG *stopy; };
-struct MUIP_TextEditor_ClearText         { ULONG MethodID; struct GadgetInfo *GInfo; };
-struct MUIP_TextEditor_ExportText        { ULONG MethodID; struct GadgetInfo *GInfo; };
-struct MUIP_TextEditor_HandleError       { ULONG MethodID; struct GadgetInfo *GInfo; ULONG errorcode; }; /* See below for error codes */
-struct MUIP_TextEditor_InsertText        { ULONG MethodID; struct GadgetInfo *GInfo; STRPTR text; LONG pos; }; /* See below for positions */
-struct MUIP_TextEditor_MarkText          { ULONG MethodID; struct GadgetInfo *GInfo; ULONG start_crsr_x; ULONG start_crsr_y; ULONG stop_crsr_x; ULONG stop_crsr_y; };
-struct MUIP_TextEditor_Search            { ULONG MethodID; struct GadgetInfo *GInfo; STRPTR SearchString; ULONG Flags; };
-struct MUIP_TextEditor_Replace           { ULONG MethodID; struct GadgetInfo *GInfo; STRPTR NewString; ULONG Flags; };
-#else
 struct MUIP_TextEditor_ARexxCmd          { ULONG MethodID; STRPTR command; };
 struct MUIP_TextEditor_BlockInfo         { ULONG MethodID; ULONG *startx; ULONG *starty; ULONG *stopx; ULONG *stopy; };
 struct MUIP_TextEditor_ClearText         { ULONG MethodID; };
@@ -130,7 +110,6 @@ struct MUIP_TextEditor_InsertText        { ULONG MethodID; STRPTR text; LONG pos
 struct MUIP_TextEditor_MarkText          { ULONG MethodID; ULONG start_crsr_x; ULONG start_crsr_y; ULONG stop_crsr_x; ULONG stop_crsr_y; };
 struct MUIP_TextEditor_Search            { ULONG MethodID; STRPTR SearchString; ULONG Flags; };
 struct MUIP_TextEditor_Replace           { ULONG MethodID; STRPTR NewString; ULONG Flags; };
-#endif
 
 #define MUIF_TextEditor_Search_FromTop       (1 << 0)
 #define MUIF_TextEditor_Search_Next          (1 << 1)

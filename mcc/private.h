@@ -26,15 +26,8 @@
 #include <graphics/rastport.h>
 #include <libraries/iffparse.h>
 
-#ifndef ClassAct
 #include <libraries/mui.h>
 #include "muiextra.h"
-#else
-#include <exec/semaphores.h>
-#define MUIM_DrawBackground 0x804238ca
-#define MUIM_GetConfigItem  0x80423edb
-#define set(obj,attr,value) SetAttrs(obj,attr,value,TAG_DONE)
-#endif
 
 #include <mcc_common.h>
 
@@ -209,18 +202,9 @@ struct InstData
 
   struct  bookmark    bookmarks[4];
 
-  #ifndef ClassAct
   struct  MUI_EventHandlerNode ehnode;
   struct  MUI_InputHandlerNode ihnode;
   struct  MUI_InputHandlerNode blinkhandler;
-  #else
-  struct  GadgetInfo      *GInfo;
-  struct  SignalSemaphore semaphore;
-  struct  Image         *Bevel;
-  UWORD               BevelVert;
-  UWORD               BevelHoriz;
-  struct  TextAttr        *TextAttrPtr;
-  #endif
 
   UBYTE   CtrlChar;
 };

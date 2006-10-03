@@ -148,11 +148,7 @@ ULONG OM_Replace (Object *obj, struct MUIP_TextEditor_Replace *msg, struct InstD
   if(Enabled(data))
   {
     Key_Clear(data);
-#ifdef ClassAct
-    DoMethod(obj, MUIM_TextEditor_InsertText, msg->GInfo, msg->NewString, MUIV_TextEditor_InsertText_Cursor);
-#else
     DoMethod(obj, MUIM_TextEditor_InsertText, msg->NewString, MUIV_TextEditor_InsertText_Cursor);
-#endif
     res = TRUE;
   }
 

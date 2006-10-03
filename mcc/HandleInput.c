@@ -589,9 +589,7 @@ void Key_Tab (struct InstData *data)
       data->CPos_X+data->TabSize
     };
 
-#ifndef ClassAct
     CheckWord(data);
-#endif
     AddToUndoBuffer(pasteblock, (char *)&block, data);
     data->CPos_X += data->TabSize;
     PasteChars(data->CPos_X-data->TabSize, data->actualline, data->TabSize, "            ", NULL, data);
@@ -607,9 +605,7 @@ void Key_Return (struct InstData *data)
   if(Enabled(data))
     Key_Clear(data);
 
-#ifndef ClassAct
   CheckWord(data);
-#endif
   AddToUndoBuffer(splitline, NULL, data);
   SplitLine(data->CPos_X, data->actualline, TRUE, NULL, data);
 
@@ -734,10 +730,8 @@ void Key_Normal(UBYTE key, struct InstData *data)
     Key_Clear(data);
   }
 
-#ifndef ClassAct
   if((!IsAlpha(data->mylocale, key)) && key != '-')
     CheckWord(data);
-#endif
 
   AddToUndoBuffer(pastechar, NULL, data);
   PasteChars(data->CPos_X++, data->actualline, 1, (char *)&key, NULL, data);
@@ -769,7 +763,6 @@ static LONG ConvertKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, st
 {
   LONG result = TRUE;
   UBYTE code = 0;
-#ifndef ClassAct
   struct InputEvent event;
 
   ENTER();
@@ -782,12 +775,6 @@ static LONG ConvertKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, st
   event.ie_EventAddress = (APTR *) *((ULONG *)imsg->IAddress);
 
   if(MapRawKey(&event, (STRPTR)&code, 1, NULL) > 0)
-#else
-  ENTER();
-
-  // XXX: why shall imsg be an InputEvent!?
-  if(MapRawKey((struct InputEvent *)imsg, (STRPTR)&code, 1, NULL) > 0)
-#endif
   {
     SHOWVALUE(DBF_INPUT, code);
 
@@ -901,11 +888,9 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
           case kCopy:
             Key_Copy(data);
             break;
-#ifndef ClassAct
           case kNextGadget:
             set(_win(data->object), MUIA_Window_ActiveObject, MUIV_Window_ActiveObject_Next);
             break;
-#endif
         }
         if(new_y != data->visual_y-1)
         {
@@ -996,9 +981,7 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
             RETURN(TRUE);
             return(TRUE);
           case kSuggestWord:
-#ifndef ClassAct
             SuggestWord(data);
-#endif
             break;
           case kBackspace:
             Key_Backspace(data);
@@ -1043,9 +1026,7 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
             Key_DelLine(data);
             break;
           case kNextGadget:
-#ifndef ClassAct
             set(_win(data->object), MUIA_Window_ActiveObject, MUIV_Window_ActiveObject_Next);
-#endif
             break;
           case kGotoBookmark1:
             GotoBookmark(0, data);
