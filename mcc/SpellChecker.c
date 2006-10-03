@@ -85,36 +85,44 @@ HOOKPROTONH(SelectCode, void, void *lvobj, long **parms)
 }
 MakeStaticHook(SelectHook, SelectCode);
 
-static LONG SendRexx(char *word, const char *command, struct InstData *data)
+static LONG SendRexx(char *word, const char *command, UNUSED struct InstData *data)
 {
   struct MsgPort *rexxport;
+  struct MsgPort *clipport;
   struct RexxMsg *rxmsg;
   char buffer[512];
   LONG result = FALSE;
 
   ENTER();
 
-  if((rexxport = FindPort("REXX")) && (data->clipport = CreateMsgPort()))
+  Forbid();
+  rexxport = FindPort("REXX");
+  Permit();
+
+  if(rexxport != NULL)
   {
-    rxmsg = CreateRexxMsg(data->clipport, NULL, NULL);
-    rxmsg->rm_Action = RXCOMM;
-    snprintf(buffer, sizeof(buffer), command, word);
-    rxmsg->rm_Args[0] = (APTR)CreateArgstring(buffer, strlen(buffer));
-
-    PutMsg(rexxport, (struct Message *)rxmsg);
-    if(Wait((1 << data->clipport->mp_SigBit) | SIGBREAKF_CTRL_C) != SIGBREAKF_CTRL_C)
+    if((clipport = CreateMsgPort()) != NULL)
     {
-      GetMsg(data->clipport);
+      rxmsg = CreateRexxMsg(clipport, NULL, NULL);
+      rxmsg->rm_Action = RXCOMM;
+      snprintf(buffer, sizeof(buffer), command, word);
+      rxmsg->rm_Args[0] = (APTR)CreateArgstring(buffer, strlen(buffer));
 
-      if(rxmsg->rm_Result1 == 0)
+      PutMsg(rexxport, (struct Message *)rxmsg);
+      if(Wait((1 << clipport->mp_SigBit) | SIGBREAKF_CTRL_C) != SIGBREAKF_CTRL_C)
       {
-        result = TRUE;
-        DeleteArgstring((APTR)rxmsg->rm_Result2);
+        GetMsg(clipport);
+
+        if(rxmsg->rm_Result1 == 0)
+        {
+          result = TRUE;
+          DeleteArgstring((APTR)rxmsg->rm_Result2);
+        }
       }
+      DeleteArgstring((APTR)rxmsg->rm_Args[0]);
+      DeleteRexxMsg(rxmsg);
+      DeleteMsgPort(clipport);
     }
-    DeleteArgstring((APTR)rxmsg->rm_Args[0]);
-    DeleteRexxMsg(rxmsg);
-    DeleteMsgPort(data->clipport);
   }
 
   RETURN(result);

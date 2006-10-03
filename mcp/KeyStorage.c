@@ -39,29 +39,92 @@
 
 #include "private.h"
 #include "newmouse.h"
+#include "Debug.h"
 
-#define KEYS_COUNT (64)
+enum Keys {
+    key_lshift = 0,
+    key_rshift,
+    key_capslock,
+    key_control,
+    key_lalt,
+    key_ralt,
+    key_lamiga,
+    key_ramiga,
+    key_numpad,
+    key_shift,
+    key_alt,
+    key_amiga,
+    key_f1,
+    key_f2,
+    key_f3,
+    key_f4,
+    key_f5,
+    key_f6,
+    key_f7,
+    key_f8,
+    key_f9,
+    key_f10,
+    key_f11,
+    key_f12,
+    key_help,
+    key_up,
+    key_down,
+    key_right,
+    key_left,
+    key_home,
+    key_end,
+    key_page_up,
+    key_page_down,
+    key_insert,
+    key_prtscr,
+    key_pause,
+    key_numlock,
+#if defined(__amigaos4__)
+    key_menu,
+#elif defined(__MORPHOS__)
+    key_scrlock,
+#endif
+    key_mm_stop,
+    key_mm_play,
+    key_mm_prev,
+    key_mm_next,
+    key_mm_rewind,
+    key_mm_forward,
+    key_wheel_up,
+    key_wheel_down,
+    key_wheel_left,
+    key_wheel_right,
+    key_wheel_button,
+    key_escape,
+    key_tab,
+    key_return,
+    key_space,
+    key_backspace,
+    key_delete,
+    key_key,
+    key_count,
+};
 
 void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage)
 {
-  LONG args[KEYS_COUNT];
+  LONG args[key_count];
   struct RDArgs *ra_result;
   struct RDArgs *myrdargs;
-  ULONG count = 0;
+  enum Keys count = key_lshift;
 
   static const STRPTR ratemplate =
     "LSHIFT/S,RSHIFT/S,CAPSLOCK/S,CONTROL=CTRL/S,LALT/S,RALT/S,LAMIGA=LCOMMAND/S,RAMIGA=RCOMMAND/S,NUMPAD=NUMERICPAD/S,SHIFT/S,ALT/S,AMIGA=COMMAND/S,"
-    "f1/S,f2/S,f3/S,f4/S,f5/S,f6/S,f7/S,f8/S,f9/S,f10/S,f11/S,f12/S"
+    "f1/S,f2/S,f3/S,f4/S,f5/S,f6/S,f7/S,f8/S,f9/S,f10/S,f11/S,f12/S,"
     "help/S,"
     "up/S,down/S,right/S,left/S,"
     "home/S,end/S,page_up=pageup/S,page_down=pagedown/S,insert/S,printscreen=prtscr/S,pause=break/S,numlock/S,"
     #if defined(__amigaos4__)
-    "menu/S"
+    "menu/S,"
     #elif defined(__MORPHOS__)
-    "scrolllock=scrlock/S"
+    "scrolllock=scrlock/S,"
     #endif
     "media_stop/S,media_play/S,media_prev/S,media_next/S,media_rewind/S,media_forward/S,"
-    "nm_wheel_up/S,nm_wheel_down/S,nm_wheel_left/S,nm_wheel_right/S,nm_wheel_button/S"
+    "nm_wheel_up/S,nm_wheel_down/S,nm_wheel_left/S,nm_wheel_right/S,nm_wheel_button/S,"
     "escape=esc/S,tab/S,return=enter/S,space/S,backspace=bs/S,delete=del/S,key/F";
 
   storage->vanilla = FALSE;
@@ -70,7 +133,7 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
   storage->action = action;
 
   // clear all args
-  while(count < KEYS_COUNT)
+  while(count < key_count)
     args[count++] = 0L;
 
   if((myrdargs = AllocDosObject(DOS_RDARGS, NULL)))
@@ -80,7 +143,7 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
 
     if((buffer = AllocMem(length+2, MEMF_ANY)))
     {
-      CopyMem(keystring, buffer, length);
+      strlcpy(buffer, keystring, length + 1);
       buffer[length] = '\n';
       buffer[length+1] = '\0';
       myrdargs->RDA_Source.CS_Buffer = buffer;
@@ -93,7 +156,7 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
         ULONG qual = 1;
 
         // Scan for 12 qualifier keys
-        for(count = 0;count < 12;count++)
+        for(count = key_lshift; count <= key_amiga; count++)
         {
           if(args[count])
           {
@@ -103,116 +166,116 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
         }
 
         // Scan for the 10 standard F-keys (f1-f10)
-        for(;count < 22;count++)
+        for(count = key_f1; count <= key_f10; count++)
         {
           if(args[count])
             storage->key = count+0x44;
         }
 
         // Scan for the 2 extended f-keys (f11,f12)
-        if(args[count++])
+        if(args[key_f11])
           storage->key = RAWKEY_F11;
-        if(args[count++])
+        if(args[key_f12])
           storage->key = RAWKEY_F12;
 
         // Help
-        if(args[count++])
+        if(args[key_help])
           storage->key = RAWKEY_HELP;
 
         // Scan for cursor-keys
-        for(;count < 27;count++)
+        for(count = key_up; count <= key_left; count++)
         {
           if(args[count])
             storage->key = count+0x35;
         }
 
         // scan for the other extended (non-standard) keys
-        if(args[count++])
+        if(args[key_home])
           storage->key = RAWKEY_HOME;
-        if(args[count++])
+        if(args[key_end])
           storage->key = RAWKEY_END;
-        if(args[count++])
+        if(args[key_page_up])
           storage->key = RAWKEY_PAGEUP;
-        if(args[count++])
+        if(args[key_page_down])
           storage->key = RAWKEY_PAGEDOWN;
-        if(args[count++])
+        if(args[key_insert])
           storage->key = RAWKEY_INSERT;
-        if(args[count++])
+        if(args[key_prtscr])
           storage->key = RAWKEY_PRINTSCR;
-        if(args[count++])
+        if(args[key_pause])
           storage->key = RAWKEY_BREAK;
-        if(args[count++])
+        if(args[key_numlock])
           storage->key = RAWKEY_NUMLOCK;
 
         // some keys are mutual excluse on some platforms
         #if defined(__amigso4__)
-        if(args[count++])
+        if(args[key_menu])
           storage->key = RAWKEY_MENU;
         #elif defined(__MORPHOS__)
-        if(args[count++])
+        if(args[key_scrlock])
           storage->key = RAWKEY_SCRLOCK;
         #endif
 
         // lets address the media/CDTV keys as well
         #if defined(__amigaos4__)
-        if(args[count++])
+        if(args[key_mm_stop])
           storage->key = RAWKEY_MEDIA_STOP;
-        if(args[count++])
+        if(args[key_mm_play])
           storage->key = RAWKEY_MEDIA_PLAY_PAUSE;
-        if(args[count++])
+        if(args[key_mm_prev])
           storage->key = RAWKEY_MEDIA_PREV_TRACK;
-        if(args[count++])
+        if(args[key_mm_next])
           storage->key = RAWKEY_MEDIA_NEXT_TRACK;
-        if(args[count++])
+        if(args[key_mm_rewind])
           storage->key = RAWKEY_MEDIA_SHUFFLE;
-        if(args[count++])
+        if(args[key_mm_forward])
           storage->key = RAWKEY_MEDIA_REPEAT;
         #else
-        if(args[count++])
+        if(args[key_mm_stop])
           storage->key = RAWKEY_AUD_STOP;
-        if(args[count++])
+        if(args[key_mm_play])
           storage->key = RAWKEY_AUD_PLAY_PAUSE;
-        if(args[count++])
+        if(args[key_mm_prev])
           storage->key = RAWKEY_AUD_PREV_TRACK;
-        if(args[count++])
+        if(args[key_mm_next])
           storage->key = RAWKEY_AUD_NEXT_TRACK;
-        if(args[count++])
+        if(args[key_mm_rewind])
           storage->key = RAWKEY_AUD_SHUFFLE;
-        if(args[count++])
+        if(args[key_mm_forward])
           storage->key = RAWKEY_AUD_REPEAT;
         #endif
 
         // take respect of the NEWMOUSE RAWKEY based wheel events as well
-        if(args[count++])
+        if(args[key_wheel_up])
           storage->key = NM_WHEEL_UP;
-        if(args[count++])
+        if(args[key_wheel_down])
           storage->key = NM_WHEEL_DOWN;
-        if(args[count++])
+        if(args[key_wheel_left])
           storage->key = NM_WHEEL_LEFT;
-        if(args[count++])
+        if(args[key_wheel_right])
           storage->key = NM_WHEEL_RIGHT;
-        if(args[count++])
+        if(args[key_wheel_button])
           storage->key = NM_BUTTON_FOURTH;
 
         if(!storage->key)
         {
           storage->vanilla = TRUE;
-          if(args[count++])
+          if(args[key_escape])
             storage->key = 27;  /* Esc */
-          if(args[count++])
+          if(args[key_tab])
             storage->key = 9;   /* Tab */
-          if(args[count++])
+          if(args[key_return])
             storage->key = 13;  /* CR */
-          if(args[count++])
+          if(args[key_space])
             storage->key = ' '; /* Space */
-          if(args[count++])
+          if(args[key_backspace])
             storage->key = 8;   /* Backspace */
-          if(args[count++])
+          if(args[key_delete])
             storage->key = 0x7f;  /* Delete */
 
           if(!storage->key)
           {
-            storage->key = (UWORD)*(STRPTR)args[count];
+            storage->key = (UWORD)*(STRPTR)args[key_key];
           }
         }
         FreeArgs(ra_result);

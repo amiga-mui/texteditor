@@ -41,7 +41,7 @@ WARN     = -W -Wall -Wwrite-strings
 OPTFLAGS = -O3 -fomit-frame-pointer -funroll-loops
 DEBUG    = -DDEBUG -g -O0
 REDEFINE =
-CFLAGS   = -pipe -mcrt=$(CRT) -I. -I../mcp -I../includes $(CPU) $(CPUFLAGS) $(WARN) $(OPTFLAGS)\
+CFLAGS   = -mcrt=$(CRT) -I. -I../mcp -I../includes $(CPU) $(CPUFLAGS) $(WARN) $(OPTFLAGS)\
            $(DEBUG) -D__USE_INLINE__ $(REDEFINE) -c
 LDFLAGS  = $(CPU) -mcrt=$(CRT) -nostartfiles
 LDLIBS   =

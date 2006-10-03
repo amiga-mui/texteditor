@@ -83,6 +83,7 @@ struct Library *LocaleBase = NULL;
 struct Library *MUIMasterBase = NULL;
 struct Library *RexxSysBase = NULL;
 struct Library *UtilityBase = NULL;
+struct Library *IFFParseBase = NULL;
 struct Library *WorkbenchBase = NULL;
 #elif defined(__MORPHOS__)
 struct Library *DiskfontBase = NULL;
@@ -94,6 +95,7 @@ struct Library *LocaleBase = NULL;
 struct Library *MUIMasterBase = NULL;
 struct Library *RexxSysBase = NULL;
 struct Library *UtilityBase = NULL;
+struct Library *IFFParseBase = NULL;
 struct Library *WorkbenchBase = NULL;
 #else
 struct Library *DiskfontBase = NULL;
@@ -105,6 +107,7 @@ struct Library *LocaleBase = NULL;
 struct Library *MUIMasterBase = NULL;
 struct Library *RexxSysBase = NULL;
 struct Library *UtilityBase = NULL;
+struct Library *IFFParseBase = NULL;
 struct Library *WorkbenchBase = NULL;
 #endif
 
@@ -118,6 +121,7 @@ struct LocaleIFace *ILocale = NULL;
 struct MUIMasterIFace *IMUIMaster = NULL;
 struct RexxSysIFace *IRexxSys = NULL;
 struct UtilityIFace *IUtility = NULL;
+struct IFFParseIFace *IIFFParse = NULL;
 struct WorkbenchIFace *IWorkbench = NULL;
 #endif
 
@@ -150,6 +154,8 @@ int main(void)
     GETINTERFACE(IRexxSys, RexxSysBase))
   if((UtilityBase = OpenLibrary("utility.library", 38)) &&
     GETINTERFACE(IUtility, UtilityBase))
+  if((IFFParseBase = OpenLibrary("iffparse.library", 36)) &&
+    GETINTERFACE(IIFFParse, IFFParseBase))
   {
   	/* Open workbench.library (optional) */
 		if ((WorkbenchBase = OpenLibrary("workbench.library",0)))
@@ -541,6 +547,12 @@ int main(void)
 		DROPINTERFACE(IWorkbench);
 		WorkbenchBase = NULL;
 	}
+  if(IFFParseBase)
+  {
+    DROPINTERFACE(IIFFParse);
+    CloseLibrary(IFFParseBase);
+    IFFParseBase = NULL;
+  }
   if(UtilityBase)
   {
     DROPINTERFACE(IUtility);
