@@ -176,7 +176,6 @@ ULONG InputTrigger(UNUSED struct IClass *cl, struct InstData *data)
     }
   }
 
-#ifndef ClassAct
   if(data->mousemove)
   {
       LONG  MouseX = muiRenderInfo(data->object)->mri_Window->MouseX,
@@ -326,7 +325,6 @@ ULONG InputTrigger(UNUSED struct IClass *cl, struct InstData *data)
       PosFromCursor(MouseX, MouseY, data);
     }
   }
-#endif
 
   RETURN(TRUE);
   return(TRUE);

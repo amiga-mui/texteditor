@@ -6,6 +6,11 @@ $Id$
 
 2006-10-03 Thore Böckelmann <tboeckel@gmx.de>
 
+   * misc: removed all that ClassAct stuff, as TextEditor.mcc is an MUI class
+     only now.
+
+2006-10-03 Thore Böckelmann <tboeckel@gmx.de>
+
    * Debug.c: added new 'clipboard' debug class.
    * mcc/EditorStuff.c: fixed bug #1462840 by replacing the handcrafted IFF
      parsing routine by calls to iffparse.library. Pasting clips from

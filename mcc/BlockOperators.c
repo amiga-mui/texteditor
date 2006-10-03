@@ -649,65 +649,14 @@ LONG CutBlock(struct InstData *data, long Clipboard, long NoCut, BOOL update)
   return(result);
 }
 
-#ifdef ClassAct
-
-struct CutArgs
-{
-  struct InstData *data;
-  long Clipboard, NoCut;
-  struct marking *newblock;
-  BOOL update;
-
-  WORD sigbit;
-  struct Task *task;
-  LONG res;
-};
-
-VOID CutBlockProcess (REG(a0) STRPTR arguments);
-
-LONG CutBlock2 (struct InstData *data, long Clipboard, long NoCut, struct marking *newblock, BOOL update)
-{
-  struct CutArgs args = { data, Clipboard, NoCut, newblock, update, AllocSignal(-1), FindTask(NULL) };
-  if(args.sigbit != -1)
-  {
-    char str_args[10];
-    snprintf(str_args, sizeof(str_args), "%lx", &args);
-
-    ReleaseGIRPort(data->rport);
-    ReleaseSemaphore(&data->semaphore);
-    if(CreateNewProcTags(NP_Entry, CutBlockProcess, NP_Name, "Texteditor slave", NP_StackSize, 2*4096, NP_Arguments, str_args, TAG_DONE))
-      Wait(1 << args.sigbit);
-    FreeSignal(args.sigbit);
-    ObtainSemaphore(&data->semaphore);
-    data->rport = ObtainGIRPort(data->GInfo);
-  }
-  return args.res;
-}
-
-VOID CutBlockProcess (REG(a0) STRPTR arguments)
-{
-  struct CutArgs *args;
-  if(sscanf(arguments, "%x", &args))
-  {
-    struct InstData *data = args->data;
-    long Clipboard = args->Clipboard, NoCut = args->NoCut;
-    struct marking *newblock = args->newblock;
-    BOOL update = args->update;
-#else
 LONG CutBlock2(struct InstData *data, long Clipboard, long NoCut, struct marking *newblock, BOOL update)
 {
-#endif
   LONG  tvisual_y;
   LONG  startx, stopx;
   LONG  res = 0;
   struct  line_node *startline, *stopline;
 
   ENTER();
-
-#ifdef ClassAct
-  ObtainSemaphore(&data->semaphore);
-  data->rport = ObtainGIRPort(data->GInfo);
-#endif
 
   startx    = newblock->startx;
   stopx     = newblock->stopx;
@@ -816,14 +765,6 @@ LONG CutBlock2(struct InstData *data, long Clipboard, long NoCut, struct marking
   res = tvisual_y;
 
 end:
-#ifdef ClassAct
-    args->res = res;
-    Forbid();
-    ReleaseGIRPort(data->rport);
-    ReleaseSemaphore(&data->semaphore);
-    Signal(args->task, 1 << args->sigbit);
-  }
-#else
 
   RETURN(res);
   return res;

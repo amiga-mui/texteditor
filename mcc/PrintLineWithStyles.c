@@ -43,11 +43,7 @@ ULONG convert(ULONG style)
 
 ULONG ConvertPen (UWORD color, BOOL highlight, struct InstData *data)
 {
-#ifdef ClassAct
-  return(color ? (data->colormap ? data->colormap[color-1] : color) : (highlight ? data->highlightcolor : data->textcolor));
-#else
   return(color ? (ULONG)(data->colormap ? (ULONG)data->colormap[color-1] : (ULONG)((color <= 8) ? _pens(data->object)[color-1] : color-9)) : (ULONG)(highlight ? (ULONG)data->highlightcolor : (ULONG)data->textcolor));
-#endif
 }
 
 VOID DrawSeparator (struct RastPort *rp, WORD X, WORD Y, WORD Width, WORD Height, struct InstData *data)
@@ -166,11 +162,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
 
     {
       UWORD blockstart = 0, blockwidth = 0;
-#ifndef ClassAct
       struct RastPort *old = muiRenderInfo(data->object)->mri_RastPort;
-#else
-      struct RastPort *old = data->rport;
-#endif
 
       if(startx < x+c_length && stopx > x)
       {
@@ -198,11 +190,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       }
 
       SetDrMd(rp, JAM1);
-#ifndef ClassAct
       muiRenderInfo(data->object)->mri_RastPort = rp;
-#else
-      data->rport = rp;
-#endif
 
       // clear the background first
       DoMethod(data->object, MUIM_DrawBackground, xoffset, starty, flow+blockstart, data->height, (data->flags & FLG_InVGrp) ? 0 : data->xpos, (data->flags & FLG_InVGrp) ? data->height*(data->visual_y+line_nr-2) : data->realypos+data->height * (data->visual_y+line_nr-2));
@@ -253,11 +241,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
 
         DoMethod(data->object, MUIM_DrawBackground, x_start, y_start, x_width, y_width, x_ptrn, y_ptrn);
       }
-#ifndef ClassAct
       muiRenderInfo(data->object)->mri_RastPort = old;
-#else
-      data->rport = old;
-#endif
     }
 
     if(!doublebuffer)
@@ -394,11 +378,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       }
 
       SetDrMd(rp, JAM1);
-#ifndef ClassAct
       SetAPen(rp, *(_pens(data->object)+MPEN_SHADOW));
-#else
-      SetAPen(rp, data->separatorshadow);
-#endif
       rp->AreaPtrn = newPattern;
       rp->AreaPtSz = 1;
       RectFill(rp, xoffset, starty, xoffset+data->innerwidth-1, starty+data->height-1);

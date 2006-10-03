@@ -602,11 +602,7 @@ void  NextLine (struct InstData *data)
 void PosFromCursor(WORD MouseX, WORD MouseY, struct InstData *data)
 {
   struct pos_info pos;
-#ifdef ClassAct
-  LONG limit = 0;
-#else
   LONG limit = data->ypos;
-#endif
 
   ENTER();
 
@@ -618,19 +614,11 @@ void PosFromCursor(WORD MouseX, WORD MouseY, struct InstData *data)
   if(MouseY >= limit)
     MouseY = limit-1;
 
-#ifndef ClassAct
   GetLine(((MouseY - data->ypos)/data->height) + data->visual_y, &pos, data);
-#else
-  GetLine((MouseY/data->height) + data->visual_y, &pos, data);
-#endif
 
   data->actualline = pos.line;
 
-#ifdef ClassAct
-  data->pixel_x = MouseX-data->BevelHoriz-2;
-#else
   data->pixel_x = MouseX-data->xpos+1;
-#endif
 
   if(data->pixel_x < 1)
     data->pixel_x = 1;

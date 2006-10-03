@@ -49,57 +49,8 @@ void EndClipSession(struct InstData *data);
 /*----------------------*
  * Paste from Clipboard *
  *----------------------*/
-#ifdef ClassAct
-
-struct PasteArgs
-{
-  LONG x;
-  struct line_node *actline;
-  struct InstData *data;
-  struct Task *task;
-  LONG sigbit;
-  LONG res;
-};
-
-VOID PasteClipProcess (REG(a0) STRPTR arguments);
-
 LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
 {
-  struct PasteArgs args = { x, actline, data, FindTask(NULL), AllocSignal(-1) };
-
-  ENTER();
-
-  if(args.sigbit != -1)
-  {
-    char str_args[10];
-    snprintf(str_args, sizeof(str_args), "%lx", &args);
-
-    ReleaseGIRPort(data->rport);
-    ReleaseSemaphore(&data->semaphore);
-    if(CreateNewProcTags(NP_Entry, PasteClipProcess, NP_Name, "Texteditor slave", NP_StackSize, 2*4096, NP_Arguments, str_args, TAG_DONE))
-      Wait(1 << args.sigbit);
-    FreeSignal(args.sigbit);
-    ObtainSemaphore(&data->semaphore);
-    data->rport = ObtainGIRPort(data->GInfo);
-  }
-
-  RETURN(args.res);
-  return args.res;
-}
-
-VOID PasteClipProcess (REG(a0) STRPTR arguments)
-{
-  struct PasteArgs *args;
-
-  if(sscanf(arguments, "%x", &args))
-  {
-    LONG x = args->x;
-    struct line_node *actline = args->actline;
-    struct InstData *data = args->data;
-#else
-LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
-{
-#endif
   struct line_node *line = NULL;
   struct line_node *startline = NULL;
   struct line_node *previous = NULL;
@@ -110,11 +61,6 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
   LONG    res = FALSE;
 
   ENTER();
-
-#ifdef ClassAct
-  ObtainSemaphore(&data->semaphore);
-  data->rport = ObtainGIRPort(data->GInfo);
-#endif
 
   if(InitClipboard(data, IFFF_READ))
   {
@@ -383,18 +329,8 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
     EndClipSession(data);
   }
 
-#ifdef ClassAct
-    args->res = res;
-    Forbid();
-    ReleaseGIRPort(data->rport);
-    ReleaseSemaphore(&data->semaphore);
-    Signal(args->task, 1 << args->sigbit);
-  }
-#else
-
   RETURN(res);
   return res;
-#endif
 }
 /*--------------------------*
  * Merge two lines into one *

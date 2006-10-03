@@ -27,21 +27,8 @@
 #include <proto/utility.h>
 #include <proto/layers.h>
 
-#ifndef ClassAct
 #include <libraries/mui.h>
 #include <proto/muimaster.h>
-#else
-#include <images/bevel.h>
-#include <intuition/gadgetclass.h>
-
-struct SpecialPens
-{
-    WORD sp_Version;
-    LONG sp_DarkPen;
-    LONG sp_LightPen;
-};
-
-#endif
 
 #include "TextEditor_mcc.h"
 #include "private.h"
@@ -98,7 +85,6 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = ((data->flags & FLG_AutoClip) ? TRUE : FALSE);
     break;
 
-#ifndef ClassAct
     case MUIA_TextEditor_KeyUpFocus:
       ti_Data = (ULONG)data->KeyUpFocus;
     break;
@@ -113,8 +99,8 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
 
     case MUIA_ControlChar:
       ti_Data = (ULONG)data->CtrlChar;
-    break;
-#endif
+      break;
+
     case MUIA_TextEditor_AreaMarked:
       ti_Data = Enabled(data);
       break;
@@ -162,12 +148,8 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = data->height;
       break;
     case MUIA_TextEditor_Prop_First:
-#ifdef ClassAct
-      ti_Data = (data->visual_y-1);
-#else
       ti_Data = (data->visual_y-1)*data->height;
-#endif
-    break;
+      break;
     case MUIA_TextEditor_ReadOnly:
       ti_Data = ((data->flags & FLG_ReadOnly) ? TRUE : FALSE);
       break;
@@ -213,7 +195,6 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
 
   ENTER();
 
-#ifndef ClassAct
   if(data->shown && !(data->flags & FLG_Draw))
   {
     if((tag = FindTagItem(MUIA_Disabled, msg->ops_AttrList)))
@@ -229,8 +210,6 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
     return((ULONG)data->UpdateInfo);
   }
 
-#endif
-
   tags = msg->ops_AttrList;
   while((tag = NextTagItem(&tags)))
   {
@@ -238,21 +217,11 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
 
     switch(tag->ti_Tag)
     {
-#ifdef ClassAct
-      case GA_TextAttr:
-        data->TextAttrPtr = (struct TextAttr *)ti_Data;
-        if(!data->font && FindTask(NULL)->tc_Node.ln_Type == NT_PROCESS)
-          data->font = OpenDiskFont(data->TextAttrPtr);
-      break;
-
-      case GA_Disabled:
-#else
       case MUIA_ControlChar:
         data->CtrlChar = (UBYTE)ti_Data;
       break;
 
       case MUIA_Disabled:
-#endif
         if(ti_Data)
           data->flags |= FLG_Ghosted;
         else
@@ -262,10 +231,7 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
         if(data->slider)
           set(data->slider, MUIA_Disabled, ti_Data);
 
-#ifndef ClassAct
-
         MUI_Redraw(obj, MADF_DRAWOBJECT);
-#endif
         break;
 
       case MUIA_TextEditor_Rows:
@@ -304,18 +270,6 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
         break;
 
       case MUIA_TextEditor_Prop_First:
-#ifdef ClassAct
-        if((data->visual_y-1 != ti_Data) && (data->shown))
-        {
-            LONG diff;
-
-          diff = data->visual_y - (ti_Data+1);
-          data->visual_y = ti_Data+1;
-          if(diff > 0)
-              ScrollDown(0, diff, data);
-          else  ScrollUp(0, -diff, data);
-        }
-#else
         if(((data->visual_y-1)*data->height+(data->realypos - data->ypos) != (LONG)ti_Data) && (data->shown))
         {
             LONG     diff, smooth;
@@ -435,11 +389,7 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
                       data->totallines))
                     * data->height,
                   TAG_DONE);
-#endif
         break;
-#ifdef ClassAct
-      case GA_ReadOnly:
-#endif
       case MUIA_TextEditor_ReadOnly:
         if(ti_Data)
         {
@@ -469,13 +419,11 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
         else
         {
           data->flags &= ~FLG_Quiet;
-#ifndef ClassAct
           MUI_Redraw(obj, MADF_DRAWOBJECT);
           if(data->maxlines > data->totallines)
               set(data->object, MUIA_TextEditor_Prop_Entries, data->maxlines*data->height);
           else  set(data->object, MUIA_TextEditor_Prop_Entries, data->totallines*data->height);
           set(data->object, MUIA_TextEditor_Prop_First, (data->visual_y-1)*data->height);
-#endif
         }
         break;
       case MUIA_TextEditor_StyleBold:
@@ -497,7 +445,6 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
         }
         break;
 
-#ifndef ClassAct
       case MUIA_TextEditor_KeyUpFocus:
         data->KeyUpFocus = (Object *)ti_Data;
       break;
@@ -549,27 +496,6 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
           }
           break;
         }
-#else
-      case TAG_USER + 0x5000006: //CLASSACT_ChangePrefs:
-        {
-            ULONG temp;
-
-          SetAttrs(data->Bevel, TAG_USER + 0x5000006, ti_Data, TAG_END);
-
-          GetAttr(BEVEL_VertSize,  data->Bevel, &temp);
-          data->BevelHoriz = temp;
-
-          GetAttr(BEVEL_HorizSize, data->Bevel, &temp);
-          data->BevelVert  = temp;
-        }
-        break;
-      case TAG_USER + 0x5000007: //CLASSACT_SpecialPens
-        {
-          SetAttrs(data->Bevel, TAG_USER + 0x5000007, ti_Data, TAG_END);
-          data->backgroundcolor = ((struct SpecialPens *)ti_Data)->sp_LightPen;
-        }
-        break;
-#endif
       case MUIA_TextEditor_DoubleClickHook:
         data->DoubleClickHook = (struct Hook *)ti_Data;
         break;
