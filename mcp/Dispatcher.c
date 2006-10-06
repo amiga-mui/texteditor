@@ -36,7 +36,7 @@
 #include "SDI_hook.h"
 
 // the main mcp dispatcher
-DISPATCHERPROTO(_DispatcherP)
+DISPATCHER(_DispatcherP)
 {
   switch(msg->MethodID)
   {
@@ -49,7 +49,7 @@ DISPATCHERPROTO(_DispatcherP)
   return(DoSuperMethodA(cl, obj, msg));
 }
 
-DISPATCHERPROTO(Text_Dispatcher)
+DISPATCHER(Text_Dispatcher)
 {
   switch(msg->MethodID)
   {
@@ -67,7 +67,7 @@ DISPATCHERPROTO(Text_Dispatcher)
   return(DoSuperMethodA(cl, obj, msg));
 }
 
-DISPATCHERPROTO(WidthSlider_Dispatcher)
+DISPATCHER(WidthSlider_Dispatcher)
 {
   if(msg->MethodID == MUIM_Numeric_Stringify)
   {
@@ -83,7 +83,7 @@ DISPATCHERPROTO(WidthSlider_Dispatcher)
   return(DoSuperMethodA(cl, obj, msg));
 }
 
-DISPATCHERPROTO(SpeedSlider_Dispatcher)
+DISPATCHER(SpeedSlider_Dispatcher)
 {
   if(msg->MethodID == MUIM_Numeric_Stringify)
   {
