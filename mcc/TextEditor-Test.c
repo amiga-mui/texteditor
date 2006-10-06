@@ -125,9 +125,7 @@ struct IFFParseIFace *IIFFParse = NULL;
 struct WorkbenchIFace *IWorkbench = NULL;
 #endif
 
-#ifdef __MORPHOS__
 DISPATCHERPROTO(_Dispatcher);
-#endif
 
 static const char *page_titles[] = { "Shown", "Hidden", NULL };
 
