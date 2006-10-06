@@ -4,6 +4,12 @@ MUI TextEditor MCC class - ChangeLog
 
 $Id$
 
+2006-10-06 Jens Langner <Jens.Langner@light-speed.de>
+
+   * includes/SDI_hook.h, misc: updated to latest version and adapted our whole
+     Dispatcher functions accordingly.
+   * mcc/classact: removed unrequired subdir.
+
 2006-10-03 Thore Böckelmann <tboeckel@gmx.de>
 
    * misc: removed all that ClassAct stuff, as TextEditor.mcc is an MUI class
@@ -38,7 +44,6 @@ $Id$
      GCC makefiles. That should make sure we don't accidently write into const
      strings.
 
->>>>>>> .r254
 #### v15.18 RELEASE ############################################################
 
 2006-08-18 Jens Langner <Jens.Langner@light-speed.de>

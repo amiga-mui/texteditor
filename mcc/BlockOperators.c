@@ -338,9 +338,9 @@ void NiceBlock(struct marking *realblock, struct marking *newblock)
 
 BOOL InitClipboard(struct InstData *data, ULONG flags)
 {
-  ENTER();
-
   struct IFFHandle *iff;
+
+  ENTER();
 
   if((iff = AllocIFF()) != NULL)
   {

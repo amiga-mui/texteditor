@@ -41,7 +41,7 @@ struct RexxCommand
   const char *Template;
 };
 
-static const struct RexxCommand const Commands[] =
+static const struct RexxCommand Commands[] =
 {
   { "CLEAR",        NULL },
   { "CUT",          NULL },

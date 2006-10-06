@@ -41,6 +41,8 @@
 #include "TextEditor_mcc.h"
 #include "private.h"
 
+DISPATCHERPROTO(_Dispatcher);
+
 void ResetDisplay(struct InstData *data)
 {
   struct  line_node *line = data->firstline;
@@ -482,7 +484,7 @@ ULONG mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
   return(0);
 }
 
-DISPATCHERPROTO(_Dispatcher)
+DISPATCHER(_Dispatcher)
 {
   struct InstData *data;
   LONG t_totallines;
