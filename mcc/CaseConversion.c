@@ -22,7 +22,6 @@
 
 #include <proto/utility.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 VOID MangleCharacters(UBYTE (*change)(UBYTE c), struct InstData *data)

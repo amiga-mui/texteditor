@@ -25,7 +25,6 @@
 #include <proto/graphics.h>
 #include <proto/intuition.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 ULONG FlowSpace(UWORD, STRPTR, struct InstData *);

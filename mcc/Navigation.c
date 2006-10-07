@@ -25,7 +25,6 @@
 #include <proto/intuition.h>
 #include <proto/locale.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 struct pos_info pos;

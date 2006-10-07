@@ -2,7 +2,7 @@
 
  TextEditor.mcc - Textediting MUI Custom Class
  Copyright (C) 1997-2000 Allan Odgaard
- Copyright (C) 2005 by TextEditor.mcc Open Source Team
+ Copyright (C) 2005-2006 by TextEditor.mcc Open Source Team
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,6 @@
 #include <exec/memory.h>
 #include <proto/exec.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 struct Buffer
@@ -48,6 +47,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
   STRPTR result, startx;
   struct InstData *data = emsg->data;
   LONG expand;
+  ULONG hookType = (ULONG)hook->h_Data;
 
   ENTER();
 
@@ -98,15 +98,14 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
       FreeVec(oldbuf);
   }
 
-  // if h_Data is TRUE then this is an EMailHook call
-  if(emsg->Highlight && !hook->h_Data)
+  // if this hook is of plain type we have consider highlighting as well.
+  if(emsg->Highlight && hookType == MUIV_TextEditor_ExportHook_Plain)
   {
     *buf->pointer++ = '\033';
     *buf->pointer++ = 'h';
   }
 
-  // if h_Data is TRUE then this is an EMailHook call
-  if(!hook->h_Data && emsg->Flow != buf->flow)
+  if(hookType == MUIV_TextEditor_ExportHook_Plain && emsg->Flow != buf->flow)
   {
     *buf->pointer++ = '\033';
 
@@ -130,8 +129,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
 
   if(emsg->Separator)
   {
-    // if h_Data is TRUE then this is an EMailHook call
-    if(!hook->h_Data)
+    if(hookType == MUIV_TextEditor_ExportHook_Plain)
       snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033[s:%ld]", (LONG)emsg->Separator);
     else
       strlcpy(buf->pointer, ((emsg->Separator & LNSF_Thick) ? "<tsb>" : "<sb>"), buf->size-(buf->pointer-buf->buffer));
@@ -168,8 +166,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
       memcpy(buf->pointer, emsg->Contents+lastpos, pos-lastpos);
       buf->pointer += pos-lastpos;
 
-      // if h_Data is TRUE then this is an EMailHook call
-      if(hook->h_Data)
+      if(hookType == MUIV_TextEditor_ExportHook_EMail)
       {
         if(color)
         {
@@ -206,7 +203,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
           }
         }
       }
-      else
+      else if(hookType == MUIV_TextEditor_ExportHook_Plain)
       {
         if(color)
         {
@@ -332,5 +329,6 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
   RETURN(result);
   return(result);
 }
-MakeHookWithData(ExportHookPlain, ExportHookFunc, FALSE);
-MakeHookWithData(ExportHookEMail, ExportHookFunc, TRUE);
+MakeHookWithData(ExportHookPlain, ExportHookFunc, MUIV_TextEditor_ExportHook_Plain);
+MakeHookWithData(ExportHookEMail, ExportHookFunc, MUIV_TextEditor_ExportHook_EMail);
+MakeHookWithData(ExportHookNoStyle, ExportHookFunc, MUIV_TextEditor_ExportHook_NoStyle);

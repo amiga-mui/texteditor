@@ -4,6 +4,13 @@ MUI TextEditor MCC class - ChangeLog
 
 $Id$
 
+2006-10-07 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcc/TextEditor_mcc.h: removed and merge content into a public header
+     file located in the 'includes' directory instead.
+   * mcc/ExportHook.c: added new MUIV_TextEditor_ExportHook_NoStyle which will
+     export all text, but strip all ESC sequences.
+
 2006-10-06 Jens Langner <Jens.Langner@light-speed.de>
 
    * includes/SDI_hook.h, misc: updated to latest version and adapted our whole

@@ -30,7 +30,6 @@
 #include <libraries/mui.h>
 #include <proto/muimaster.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 #include "rev.h"
@@ -540,15 +539,15 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
         switch(ti_Data)
         {
           case MUIV_TextEditor_ExportHook_Plain:
-          {
             data->ExportHook = &ExportHookPlain;
-          }
           break;
           
           case MUIV_TextEditor_ExportHook_EMail:
-          {
             data->ExportHook = &ExportHookEMail;
-          }
+          break;
+
+          case MUIV_TextEditor_ExportHook_NoStyle:
+            data->ExportHook = &ExportHookNoStyle;
           break;
 
           default:

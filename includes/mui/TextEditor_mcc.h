@@ -1,3 +1,6 @@
+#ifndef TEXTEDITOR_MCC_H
+#define TEXTEDITOR_MCC_H
+
 /***************************************************************************
 
  TextEditor.mcc - Textediting MUI Custom Class
@@ -16,12 +19,9 @@
 
  TextEditor class Support Site:  http://www.sf.net/projects/texteditor-mcc
 
- $Id$
+ $Id: $
 
 ***************************************************************************/
-
-#ifndef TEXTEDITOR_MCC_H
-#define TEXTEDITOR_MCC_H
 
 #ifndef EXEC_TYPES_H
 #include <exec/types.h>
@@ -42,7 +42,7 @@ extern "C" {
 #define MUIC_TextEditor     "TextEditor.mcc"
 #define TextEditorObject    MUI_NewObject(MUIC_TextEditor
 
-#define TextEditor_Dummy   (0xad000000) // MUI
+#define TextEditor_Dummy   (0xad000000)
 
 #define MUIA_TextEditor_AreaMarked        (TextEditor_Dummy + 0x14)
 #define MUIA_TextEditor_ColorMap          (TextEditor_Dummy + 0x2f)
@@ -55,7 +55,6 @@ extern "C" {
 #define MUIA_TextEditor_FixedFont         (TextEditor_Dummy + 0x0a)
 #define MUIA_TextEditor_Flow              (TextEditor_Dummy + 0x0b)
 #define MUIA_TextEditor_HasChanged        (TextEditor_Dummy + 0x0c)
-#define MUIA_TextEditor_HorizontalScroll  (TextEditor_Dummy + 0x2d) /* Private and experimental! */
 #define MUIA_TextEditor_ImportHook        (TextEditor_Dummy + 0x0e)
 #define MUIA_TextEditor_ImportWrap        (TextEditor_Dummy + 0x10)
 #define MUIA_TextEditor_InsertMode        (TextEditor_Dummy + 0x0f)
@@ -64,11 +63,9 @@ extern "C" {
 #define MUIA_TextEditor_MultiColorQuoting (TextEditor_Dummy + 0x31)
 #define MUIA_TextEditor_NumLock           (TextEditor_Dummy + 0x18)
 #define MUIA_TextEditor_Pen               (TextEditor_Dummy + 0x2e)
-#define MUIA_TextEditor_PopWindow_Open    (TextEditor_Dummy + 0x03) /* Private!!! */
 #define MUIA_TextEditor_Prop_DeltaFactor  (TextEditor_Dummy + 0x0d)
 #define MUIA_TextEditor_Prop_Entries      (TextEditor_Dummy + 0x15)
 #define MUIA_TextEditor_Prop_First        (TextEditor_Dummy + 0x20)
-#define MUIA_TextEditor_Prop_Release      (TextEditor_Dummy + 0x01) /* Private!!! */
 #define MUIA_TextEditor_Prop_Visible      (TextEditor_Dummy + 0x16)
 #define MUIA_TextEditor_Quiet             (TextEditor_Dummy + 0x17)
 #define MUIA_TextEditor_ReadOnly          (TextEditor_Dummy + 0x19)
@@ -111,14 +108,9 @@ struct MUIP_TextEditor_MarkText          { ULONG MethodID; ULONG start_crsr_x; U
 struct MUIP_TextEditor_Search            { ULONG MethodID; STRPTR SearchString; ULONG Flags; };
 struct MUIP_TextEditor_Replace           { ULONG MethodID; STRPTR NewString; ULONG Flags; };
 
-#define MUIF_TextEditor_Search_FromTop       (1 << 0)
-#define MUIF_TextEditor_Search_Next          (1 << 1)
-#define MUIF_TextEditor_Search_CaseSensitive (1 << 2)
-#define MUIF_TextEditor_Search_DOSPattern    (1 << 3)
-#define MUIF_TextEditor_Search_Backwards     (1 << 4)
-
 #define MUIV_TextEditor_ExportHook_Plain       0x00000000
 #define MUIV_TextEditor_ExportHook_EMail       0x00000001
+#define MUIV_TextEditor_ExportHook_NoStyle     0x00000002
 
 #define MUIV_TextEditor_Flow_Left              0x00000000
 #define MUIV_TextEditor_Flow_Center            0x00000001
@@ -134,10 +126,12 @@ struct MUIP_TextEditor_Replace           { ULONG MethodID; STRPTR NewString; ULO
 #define MUIV_TextEditor_InsertText_Top         0x00000001
 #define MUIV_TextEditor_InsertText_Bottom      0x00000002
 
-#define MUIV_TextEditor_LengthHook_Plain       0x00000000
-#define MUIV_TextEditor_LengthHook_ANSI        0x00000001
-#define MUIV_TextEditor_LengthHook_HTML        0x00000002
-#define MUIV_TextEditor_LengthHook_MAIL        0x00000003
+/* Flags for MUIM_TextEditor_Search */
+#define MUIF_TextEditor_Search_FromTop       (1 << 0)
+#define MUIF_TextEditor_Search_Next          (1 << 1)
+#define MUIF_TextEditor_Search_CaseSensitive (1 << 2)
+#define MUIF_TextEditor_Search_DOSPattern    (1 << 3)
+#define MUIF_TextEditor_Search_Backwards     (1 << 4)
 
 /* Error codes given as argument to MUIM_TextEditor_HandleError */
 #define Error_ClipboardIsEmpty         0x01
@@ -157,41 +151,6 @@ struct ClickMessage
 {
   STRPTR  LineContents;  /* This field is ReadOnly!!! */
   ULONG   ClickPosition;
-};
-
-struct ExportMessage
-{
-  APTR     UserData;     /* This is set to what your hook returns (NULL the first time) */
-  STRPTR   Contents;     /* Pointer to the current line */
-  ULONG    Length;       /* Length of Contents, including the '\n' character */
-  UWORD    *Styles;      /* Pointer to array of words */
-  UWORD    *Colors;
-  BOOL   Highlight;
-  UWORD    Flow;         /* Current lines flow */
-  UWORD    Separator;    /* Se definitions bellow */
-  ULONG    ExportWrap;   /* For your use only (reflects MUIA_TextEditor_ExportWrap) */
-  BOOL     Last;         /* Set to TRUE if this is the last line */
-  APTR   data;           /* Private! */
-};
-
-struct ImportMessage
-{
-  STRPTR  Data;               /* The first time the hook is called, then this will be either the value of MUIA_TextEditor_Contents, or the argument given to MUIM_TextEditor_Insert. */
-  struct  LineNode *linenode; /* Pointer to a linenode, which you should fill out */
-  APTR    PoolHandle;         /* A poolhandle, all allocations done for styles or contents must be made from this pool, and the size of the allocation must be stored in the first LONG */
-  ULONG   ImportWrap;         /* For your use only (reflects MUIA_TextEditor_ImportWrap) */
-};
-
-struct LineNode
-{
-  STRPTR   Contents;      /* Set this to the linecontents (allocated via the poolhandle) */
-  ULONG    Length;        /* The length of the line (including the '\n') */
-  UWORD    *Styles;       /* Set this to the styles used for this line (allocated via the poolhandle) the format is: pos,style,pos,style,...,-1,0*/
-  UWORD    *Colors;       /* The colors to use (allocated via the poolhandle) the format is: pos,color,pos,color,...,-1,-0 */
-  BOOL     Color;         /* Set this to TRUE if you want the line to be highlighted */
-  UWORD    Flow;          /* Use the MUIV_TextEditor_Flow_xxx values... */
-  UWORD    Separator;     /* See definitions below */
-  BOOL     clearFlow;     /* if the flow definition should be cleared on the next line */
 };
 
 /* Definitions for Separator type */

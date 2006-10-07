@@ -24,7 +24,6 @@
 
 #include <proto/utility.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 void *ExportText(struct line_node *node, struct Hook *exportHook, LONG wraplen)

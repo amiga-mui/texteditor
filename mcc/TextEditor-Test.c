@@ -34,7 +34,6 @@
 #include <proto/intuition.h>
 #include <proto/iffparse.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 #include "SDI_hook.h"

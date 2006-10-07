@@ -22,7 +22,6 @@
 
 #include <proto/intuition.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 void  UpdateStyles (struct InstData *data)

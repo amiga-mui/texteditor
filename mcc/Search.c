@@ -25,7 +25,6 @@
 #include <clib/alib_protos.h>
 #include <proto/utility.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 VOID SimpleMarkText (UWORD startx, struct line_node *startline, UWORD stopx, struct line_node *stopline, struct InstData *data)

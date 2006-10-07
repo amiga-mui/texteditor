@@ -30,7 +30,6 @@
 #include <proto/exec.h>
 #include <proto/dos.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 //#define get(obj,attr,store) GetAttr(attr,obj,(ULONG *)store)

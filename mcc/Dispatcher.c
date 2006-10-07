@@ -38,7 +38,6 @@
 #include <proto/muimaster.h>
 #include <libraries/mui.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 DISPATCHERPROTO(_Dispatcher);
