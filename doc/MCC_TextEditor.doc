@@ -51,12 +51,24 @@ TextEditor.mcc/MUIM_TextEditor_Replace
 TextEditor.mcc/MUIM_TextEditor_Search
 TextEditor.mcc/TextEditor.mcc
 
-TextEditor.mcc is a multiline string gadget which holds most of the functions
-of a normal text editor.
+    *******************************************************************
+    Copyright (C) 2005-2006 by TextEditor.mcc Open Source Team
+    $Id$
 
-The gadget was originally written in 1997, and is Copyright (C) 1997-2000
-by Allan Odgaard.  As of version 15.10, released in April 2005, the gadget
-is maintained and Copyright (C) 2005 by the TextEditor.mcc Open Source team.
+    TextEditor.mcc is a multiline string gadget which holds most of the
+    functions of a normal text editor including some special function-
+    ality for importing/exporting text from/to special formats.
+
+    The gadget was originally written in 1997 by Allan Odgaard. As of
+    version 15.10, released in April 2005, the gadget is maintained by
+    the TextEditor.mcc Open Source team.
+
+    It is released and distributed under the terms of the GNU Lesser
+    General Public License (LGPL) and available free of charge.
+
+    Please visit http://www.sf.net/projects/texteditor-mcc/ for
+    the very latest version and information regarding TextEditor.mcc.
+    *******************************************************************
 
 TextEditor.mcc/MUIA_TextEditor_AreaMarked
 
@@ -191,7 +203,8 @@ is maintained and Copyright (C) 2005 by the TextEditor.mcc Open Source team.
         can set this to anything you like, e.g. a filehandle.
 
     SEE ALSO
-        MUIA_TextEditor_ImportHook, MUIM_TextEditor_InsertText
+        MUIA_TextEditor_ImportHook
+        MUIM_TextEditor_InsertText
 
 TextEditor.mcc/MUIA_TextEditor_CursorPosition
 
@@ -291,19 +304,47 @@ is maintained and Copyright (C) 2005 by the TextEditor.mcc Open Source team.
         MUIA_TextEditor_ExportHook -- [IS.], struct Hook *
 
     SPECIAL INPUTS
-        MUIV_TextEditor_ExportHook_EMail
         MUIV_TextEditor_ExportHook_Plain (default)
+        MUIV_TextEditor_ExportHook_EMail
+        MUIV_TextEditor_ExportHook_NoStyle
 
     FUNCTION
-        The EMail export hook will convert a bold word to *bold*, italic
-        words to /italic/ and underlined words to _underline_.
-        It also export separators such as <sb> and <tsb>.
+        Depending on the inputs a different exporthook will be fired as soon
+        as MUIM_TextEditor_ExportText is used. The default is to export the
+        currently showed data as is. That means, that all text, including the
+        escape sequences for showing soft styles will be exported.
+
+          MUIV_TextEditor_ExportHook_Plain
+            Export all text as displayed, including ESC (\033) sequences
+
+          MUIV_TextEditor_ExportHook_EMail
+            Export all text, but convert the soft-style escape sequences into
+            the pseudo-standard text sequences like:
+
+              *bold*      : for bold text
+              /italic/    : for italic text
+              _underline_ : for underlined text
+              #colored#   : for colored/highlighted text
+              <tsb>       : for a thick separator bar
+              <sb>        : for a thin separator bar
+
+          MUIV_TextEditor_ExportHook_NoStyle
+            Export all text like the 'Plain' variant, but strip off all style
+            relevant ESC (\033) sequences. Also converts the escape sequences
+            for the thick and thin separator bar into <tsb> and <sb> like the
+            'EMail' hook.
 
         See MUIA_TextEditor_ImportHook for more information.
 
+    NOTE
+        Even if this MUIA value seems to allow that you may specify your own
+        private export hook implementation, this is currently NOT supported
+        and should be considered highly experimental.
+
     SEE ALSO
-        MUIA_TextEditor_ExportWrap, MUIA_TextEditor_ImportHook
+        MUIA_TextEditor_ExportWrap
         MUIM_TextEditor_ExportText
+        MUIA_TextEditor_ImportHook
 
 TextEditor.mcc/MUIA_TextEditor_ExportWrap
 
@@ -374,10 +415,10 @@ is maintained and Copyright (C) 2005 by the TextEditor.mcc Open Source team.
         MUIA_TextEditor_ImportHook -- [IS.], struct Hook *
 
     SPECIAL INPUTS
+        MUIV_TextEditor_ImportHook_Plain (default)
         MUIV_TextEditor_ImportHook_EMail
         MUIV_TextEditor_ImportHook_MIME
         MUIV_TextEditor_ImportHook_MIMEQuoted
-        MUIV_TextEditor_ImportHook_Plain (default)
 
     FUNCTION                                                
         Since this gadget allows different text styles, you can supply an
@@ -443,10 +484,14 @@ is maintained and Copyright (C) 2005 by the TextEditor.mcc Open Source team.
         You can of course create your own import hook - there is an external
         file which describes the procedure.
 
-      *** PLEASE DON'T CREATE YOUR OWN HOOKS WHILE THE GADGET IS STILL BETA ***
+    NOTE
+        Even if this MUIA value seems to allow that you may specify your own
+        private import hook implementation, this is currently NOT supported
+        and should be considered highly experimental.
 
     SEE ALSO
-        MUIA_TextEditor_ColorMap, MUIA_TextEditor_ExportHook
+        MUIA_TextEditor_ColorMap,
+        MUIA_TextEditor_ExportHook
         MUIA_TextEditor_ImportWrap
 
     EXAMPLE

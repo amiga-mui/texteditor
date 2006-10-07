@@ -151,10 +151,7 @@ $(TESTTARGET): $(TESTOBJS)
 	@$(STRIP) -R .comment -o $@ $@.debug
 
 $(OBJDIR)/library.o: library.c ../includes/mccheader.c \
-  TextEditor_mcc.h private.h rev.h
-
-$(OBJDIR)/library.o: library.c ../includes/mccheader.c TextEditor_mcc.h \
-  private.h rev.h
+  ../includes/mui/TextEditor_mcc.h private.h rev.h
 
 #
 

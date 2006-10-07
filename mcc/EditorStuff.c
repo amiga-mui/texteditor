@@ -31,7 +31,6 @@
 #include <proto/exec.h>
 #include <proto/iffparse.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 #include "Debug.h"
 

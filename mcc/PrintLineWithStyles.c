@@ -24,7 +24,6 @@
 #include <clib/alib_protos.h>
 #include <proto/graphics.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 ULONG convert(ULONG style)

@@ -24,7 +24,6 @@
 #include <proto/utility.h>
 #include <proto/exec.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 /***********************************************************************

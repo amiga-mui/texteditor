@@ -33,7 +33,6 @@
 #include <proto/exec.h>
 #include <proto/dos.h>
 
-#include "TextEditor_mcc.h"
 #include "TextEditor_mcp.h"
 #include "private.h"
 

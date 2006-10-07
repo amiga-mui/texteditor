@@ -39,7 +39,6 @@
 #include <proto/dos.h>
 #include <proto/wb.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 #if !defined(__amigaos4__) || (INCLUDE_VERSION < 50)

@@ -29,7 +29,6 @@
 #include <proto/locale.h>
 #include <proto/utility.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 #if !defined(__amigaos4__)

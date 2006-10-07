@@ -31,7 +31,8 @@
 
 #include <mcc_common.h>
 
-#include "TextEditor_mcc.h"
+#include <mui/TextEditor_mcc.h>
+
 #include "Debug.h"
 
 #define EOS        (unsigned short)-1
@@ -51,6 +52,12 @@
                          ((data)->blockinfo.startx != (data)->blockinfo.stopx || \
                           (data)->blockinfo.startline != (data)->blockinfo.stopline || \
                           (data)->selectmode == 3))
+
+
+// private/expermental attribute definitions
+#define MUIA_TextEditor_HorizontalScroll  (TextEditor_Dummy + 0x2d)
+#define MUIA_TextEditor_Prop_Release      (TextEditor_Dummy + 0x01)
+#define MUIA_TextEditor_PopWindow_Open    (TextEditor_Dummy + 0x03)
 
 struct bookmark
 {
@@ -96,6 +103,41 @@ struct UserAction
   } blk;
 
   UWORD x, y;
+};
+
+struct ExportMessage
+{
+  APTR     UserData;     /* This is set to what your hook returns (NULL the first time) */
+  STRPTR   Contents;     /* Pointer to the current line */
+  ULONG    Length;       /* Length of Contents, including the '\n' character */
+  UWORD    *Styles;      /* Pointer to array of words */
+  UWORD    *Colors;
+  BOOL   Highlight;
+  UWORD    Flow;         /* Current lines flow */
+  UWORD    Separator;    /* Se definitions bellow */
+  ULONG    ExportWrap;   /* For your use only (reflects MUIA_TextEditor_ExportWrap) */
+  BOOL     Last;         /* Set to TRUE if this is the last line */
+  APTR   data;           /* Private! */
+};
+
+struct ImportMessage
+{
+  STRPTR  Data;               /* The first time the hook is called, then this will be either the value of MUIA_TextEditor_Contents, or the argument given to MUIM_TextEditor_Insert. */
+  struct  LineNode *linenode; /* Pointer to a linenode, which you should fill out */
+  APTR    PoolHandle;         /* A poolhandle, all allocations done for styles or contents must be made from this pool, and the size of the allocation must be stored in the first LONG */
+  ULONG   ImportWrap;         /* For your use only (reflects MUIA_TextEditor_ImportWrap) */
+};
+
+struct LineNode
+{
+  STRPTR   Contents;      /* Set this to the linecontents (allocated via the poolhandle) */
+  ULONG    Length;        /* The length of the line (including the '\n') */
+  UWORD    *Styles;       /* Set this to the styles used for this line (allocated via the poolhandle) the format is: pos,style,pos,style,...,-1,0*/
+  UWORD    *Colors;       /* The colors to use (allocated via the poolhandle) the format is: pos,color,pos,color,...,-1,-0 */
+  BOOL     Color;         /* Set this to TRUE if you want the line to be highlighted */
+  UWORD    Flow;          /* Use the MUIV_TextEditor_Flow_xxx values... */
+  UWORD    Separator;     /* See definitions below */
+  BOOL     clearFlow;     /* if the flow definition should be cleared on the next line */
 };
 
 struct InstData
@@ -353,6 +395,7 @@ extern struct Hook ImMIMEQuoteHook;
 
 extern struct Hook ExportHookPlain;
 extern struct Hook ExportHookEMail;
+extern struct Hook ExportHookNoStyle;
 
   enum
   {

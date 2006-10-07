@@ -27,7 +27,6 @@
 #include <proto/exec.h>
 #include <proto/intuition.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 unsigned short LineNr (struct line_node *line, struct InstData *data)

@@ -47,7 +47,6 @@
 
 /*************************************************************************/
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 VOID DrawSeparator (struct RastPort *rp, WORD X, WORD Y, WORD Width, WORD Height, struct InstData *data);

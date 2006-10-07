@@ -24,7 +24,6 @@
 
 #include <proto/dos.h>
 
-#include "TextEditor_mcc.h"
 #include "private.h"
 
 /*************************************************************************/
