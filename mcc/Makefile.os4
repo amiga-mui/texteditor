@@ -39,9 +39,9 @@ CPUFLAGS = -mmultiple
 CDEFS    = -D__TE_VERDATE=\"`date +%d.%m.%Y`\" -D__TE_VERDAYS="`expr \`date +%s\` / 86400 - 2922`"
 WARN     = -W -Wall -Wwrite-strings
 OPTFLAGS = -O3 -fomit-frame-pointer -funroll-loops
-DEBUG    = -DDEBUG -g -O0
+DEBUG    = -DDEBUG -O0
 REDEFINE =
-CFLAGS   = -mcrt=$(CRT) -I. -I../mcp -I../includes $(CPU) $(CPUFLAGS) $(WARN) $(OPTFLAGS)\
+CFLAGS   = -mcrt=$(CRT) -g -I. -I../mcp -I../includes $(CPU) $(CPUFLAGS) $(WARN) $(OPTFLAGS)\
            $(DEBUG) -D__USE_INLINE__ $(REDEFINE) -c
 LDFLAGS  = $(CPU) -mcrt=$(CRT) -nostartfiles
 LDLIBS   =
@@ -145,12 +145,12 @@ $(OBJDIR)/mccclass_68k.o: ../includes/mccclass_68k.c
 $(MCCTARGET): $(M68KSTUBS) $(MCCOBJS)
 	@printf '\033[32mLinking \033[1m$@\033[0m\n'
 	@$(CC) $(LDFLAGS) -o $@.debug $(MCCOBJS) $(M68KSTUBS) $(LDLIBS)
-	@$(STRIP) -R .comment -o $@ $@.debug
+	@$(STRIP) -R .comment -S -o $@ $@.debug
 
 $(TESTTARGET): $(TESTOBJS)
 	@printf '\033[32mLinking \033[1m$@\033[0m\n'
 	@$(CC) -o $@.debug $(TESTOBJS) $(LDLIBS)
-	@$(STRIP) -R .comment -o $@ $@.debug
+	@$(STRIP) -R .comment -S -o $@ $@.debug
 
 $(OBJDIR)/library.o: library.c ../includes/mccheader.c \
   ../includes/mui/TextEditor_mcc.h private.h rev.h

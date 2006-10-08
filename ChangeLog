@@ -6,6 +6,8 @@ $Id$
 
 2006-10-08 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcp/Makefile.os4, mcc/Makefile.os4: modified to always keep function
+     symbols in the binary, even in release mode.
    * mcc/ExportBlock.c, misc: implemented new MUIM_TextEditor_ExportBlock
      method which will export only the currently marked text instead of the
      whole text like it's ExportText variant. Implemented an additional
