@@ -39,7 +39,7 @@ CDEFS    = -D__NLV_VERDATE=\"`date +%d.%m.%Y`\" -D__NLV_VERDAYS="`expr \`date +%
 WARN     = -W -Wall
 OPTFLAGS = -O3 -fomit-frame-pointer -funroll-loops
 DEBUG    = -DDEBUG -g -O0
-CFLAGS   = -noixemul -I. -I../mcc -I../includes -c $(CPU) $(WARN) $(OPTFLAGS) $(DEBUG)
+CFLAGS   = -noixemul -I. -I../includes -c $(CPU) $(WARN) $(OPTFLAGS) $(DEBUG)
 LDFLAGS  = -noixemul -nostartfiles $(CPU)
 LDLIBS   = -lmui -ldebug -lamiga
 
@@ -110,10 +110,7 @@ $(PREFTARGET): $(PREFOBJS) $(OBJDIR)/Preference.o
 	@$(CC) -s -o $@ $(PREFOBJS) $(LDLIBS)
 
 $(OBJDIR)/library.o: library.c ../includes/mccheader.c \
-  ../mcc/TextEditor_mcc.h private.h rev.h
-
-$(OBJDIR)/library.o: library.c ../includes/mccheader.c TextEditor_mcp.h \
-  private.h icon.bh rev.h
+  ../includes/mui/TextEditor_mcc.h private.h icon.bh rev.h TextEditor_mcp.h
 
 locale.h: locale.c
 locale.c: locale/TextEditor_mcp.cd C_h.sd C_c.sd

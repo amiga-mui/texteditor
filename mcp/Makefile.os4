@@ -43,7 +43,7 @@ WARN     = -W -Wall
 OPTFLAGS = -O3 -finline-functions -fomit-frame-pointer -funroll-loops
 DEBUG    = -DDEBUG -g -O0
 REDEFINE =
-CFLAGS   = -mcrt=$(CRT) -I. -I../mcc -I../includes $(CPU) $(CPUFLAGS) $(WARN) $(OPTFLAGS)\
+CFLAGS   = -mcrt=$(CRT) -I. -I../includes $(CPU) $(CPUFLAGS) $(WARN) $(OPTFLAGS)\
            $(DEBUG) -D__USE_INLINE__ $(REDEFINE) -c
 LDFLAGS  = $(CPU) -mcrt=$(CRT) -nostartfiles
 LDLIBS   =
@@ -121,10 +121,7 @@ $(PREFTARGET): $(PREFOBJS) $(OBJDIR)/Preference.o
 	@$(STRIP) -R .comment -o $@ $@.debug
 
 $(OBJDIR)/library.o: library.c ../includes/mccheader.c \
-  ../mcc/TextEditor_mcc.h private.h rev.h
-
-$(OBJDIR)/library.o: library.c ../includes/mccheader.c TextEditor_mcp.h \
-  private.h icon.bh rev.h
+  ../includes/mui/TextEditor_mcc.h private.h icon.bh TextEditor_mcp.h rev.h
 
 locale.h: locale.c
 locale.c: locale/TextEditor_mcp.cd C_h.sd C_c.sd

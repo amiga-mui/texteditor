@@ -30,11 +30,11 @@
 #include <proto/intuition.h>
 #include <proto/muimaster.h>
 
+#include <mui/TextEditor_mcc.h>
+
 #include "locale.h"
 #include "private.h"
 #include "muiextra.h"
-
-#include "TextEditor_mcc.h"
 
 char *FunctionName (UWORD func)
 {
