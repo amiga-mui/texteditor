@@ -19,7 +19,7 @@
 
  TextEditor class Support Site:  http://www.sf.net/projects/texteditor-mcc
 
- $Id: $
+ $Id$
 
 ***************************************************************************/
 
@@ -88,6 +88,7 @@ extern "C" {
 #define MUIM_TextEditor_ARexxCmd          (TextEditor_Dummy + 0x23)
 #define MUIM_TextEditor_BlockInfo         (TextEditor_Dummy + 0x30)
 #define MUIM_TextEditor_ClearText         (TextEditor_Dummy + 0x24)
+#define MUIM_TextEditor_ExportBlock       (TextEditor_Dummy + 0x37)
 #define MUIM_TextEditor_ExportText        (TextEditor_Dummy + 0x25)
 #define MUIM_TextEditor_HandleError       (TextEditor_Dummy + 0x1f)
 #define MUIM_TextEditor_InsertText        (TextEditor_Dummy + 0x26)
@@ -101,6 +102,7 @@ extern "C" {
 struct MUIP_TextEditor_ARexxCmd          { ULONG MethodID; STRPTR command; };
 struct MUIP_TextEditor_BlockInfo         { ULONG MethodID; ULONG *startx; ULONG *starty; ULONG *stopx; ULONG *stopy; };
 struct MUIP_TextEditor_ClearText         { ULONG MethodID; };
+struct MUIP_TextEditor_ExportBlock       { ULONG MethodID; ULONG flags; };
 struct MUIP_TextEditor_ExportText        { ULONG MethodID; };
 struct MUIP_TextEditor_HandleError       { ULONG MethodID; ULONG errorcode; }; /* See below for error codes */
 struct MUIP_TextEditor_InsertText        { ULONG MethodID; STRPTR text; LONG pos; }; /* See below for positions */
@@ -127,11 +129,14 @@ struct MUIP_TextEditor_Replace           { ULONG MethodID; STRPTR NewString; ULO
 #define MUIV_TextEditor_InsertText_Bottom      0x00000002
 
 /* Flags for MUIM_TextEditor_Search */
-#define MUIF_TextEditor_Search_FromTop       (1 << 0)
-#define MUIF_TextEditor_Search_Next          (1 << 1)
-#define MUIF_TextEditor_Search_CaseSensitive (1 << 2)
-#define MUIF_TextEditor_Search_DOSPattern    (1 << 3)
-#define MUIF_TextEditor_Search_Backwards     (1 << 4)
+#define MUIF_TextEditor_Search_FromTop         (1 << 0)
+#define MUIF_TextEditor_Search_Next            (1 << 1)
+#define MUIF_TextEditor_Search_CaseSensitive   (1 << 2)
+#define MUIF_TextEditor_Search_DOSPattern      (1 << 3)
+#define MUIF_TextEditor_Search_Backwards       (1 << 4)
+
+/* Flags for MUIM_TextEditor_ExportBlock */
+#define MUIF_TextEditor_ExportBlock_FullLines  (1 << 0)
 
 /* Error codes given as argument to MUIM_TextEditor_HandleError */
 #define Error_ClipboardIsEmpty         0x01

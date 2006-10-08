@@ -59,6 +59,14 @@
 #define MUIA_TextEditor_Prop_Release      (TextEditor_Dummy + 0x01)
 #define MUIA_TextEditor_PopWindow_Open    (TextEditor_Dummy + 0x03)
 
+// special flagging macros
+#define isFlagSet(v,f)      (((v) & (f)) == (f))  // return TRUE if the flag is set
+#define hasFlag(v,f)        (((v) & (f)) != 0)    // return TRUE if one of the flags in f is set in v
+#define isFlagClear(v,f)    (((v) & (f)) == 0)    // return TRUE if flag f is not set in v
+#define SET_FLAG(v,f)       ((v) |= (f))          // set the flag f in v
+#define CLEAR_FLAG(v,f)     ((v) &= ~(f))         // clear the flag f in v
+#define MASK_FLAG(v,f)      ((v) &= (f))          // mask the variable v with flag f bitwise
+
 struct bookmark
 {
   struct  line_node *line;
@@ -107,17 +115,19 @@ struct UserAction
 
 struct ExportMessage
 {
-  APTR     UserData;     /* This is set to what your hook returns (NULL the first time) */
-  STRPTR   Contents;     /* Pointer to the current line */
-  ULONG    Length;       /* Length of Contents, including the '\n' character */
-  UWORD    *Styles;      /* Pointer to array of words */
-  UWORD    *Colors;
-  BOOL   Highlight;
-  UWORD    Flow;         /* Current lines flow */
-  UWORD    Separator;    /* Se definitions bellow */
-  ULONG    ExportWrap;   /* For your use only (reflects MUIA_TextEditor_ExportWrap) */
-  BOOL     Last;         /* Set to TRUE if this is the last line */
-  APTR   data;           /* Private! */
+  APTR   UserData;     // This is set to what your hook returns (NULL the first time)
+  STRPTR Contents;     // Pointer to the current line
+  ULONG  Length;       // Length of Contents, including the '\n' character
+  ULONG  SkipFront;    // amount of chars to skip at the front of the current line
+  ULONG  SkipBack;     // amount of chars to skip at the back of the current line
+  UWORD  *Styles;      // Pointer to array of words with style definition
+  UWORD  *Colors;      // pointer to array of words with color definitions
+  BOOL   Highlight;    // is the current line highlighted?
+  UWORD  Flow;         // Current lines textflow
+  UWORD  Separator;    // Current line contains a separator bar? see below
+  ULONG  ExportWrap;   // For your use only (reflects MUIA_TextEditor_ExportWrap)
+  BOOL   Last;         // Set to TRUE if this is the last line
+  APTR   data;         // pointer to the instance data of TextEditor.mcc (PRIVATE)
 };
 
 struct ImportMessage
@@ -334,7 +344,8 @@ void  FreeConfig(struct InstData *, struct MUI_RenderInfo *);
 BOOL HandleARexx(struct InstData *, STRPTR command);
 
 struct line_node *ImportText(char *, struct InstData *, struct Hook *, LONG);
-void *ExportText(struct line_node *, struct Hook *, LONG);
+void *ExportText(struct MUIP_TextEditor_ExportText *msg, struct InstData *data);
+void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data);
 
 struct  line_node *loadtext (void);
 unsigned short  *CheckStyles      (char *);
@@ -506,5 +517,14 @@ extern struct Hook ExportHookNoStyle;
 
 #define  MUIM_TextEditor_InputTrigger     0xad000101
 #define  MUIM_TextEditor_ToggleCursor     0xad000102
+
+// for iffparse clipboard management
+#define ID_FTXT    MAKE_ID('F','T','X','T')
+#define ID_CHRS    MAKE_ID('C','H','R','S')
+#define ID_FLOW    MAKE_ID('F','L','O','W')
+#define ID_HIGH    MAKE_ID('H','I','G','H')
+#define ID_SBAR    MAKE_ID('S','B','A','R')
+#define ID_COLS    MAKE_ID('C','O','L','S')
+#define ID_STYL    MAKE_ID('S','T','Y','L')
 
 #endif /* TEXTEDITOR_MCC_PRIV_H */

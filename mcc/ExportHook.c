@@ -44,7 +44,8 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
   UWORD *colors = emsg->Colors;
   UWORD lastpos = 0;
   UWORD currentstyle = 0;
-  STRPTR result, startx;
+  STRPTR result = NULL;
+  STRPTR startx;
   struct InstData *data = emsg->data;
   LONG expand;
   ULONG hookType = (ULONG)hook->h_Data;
@@ -137,18 +138,23 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
     buf->pointer += strlen(buf->pointer);
   }
 
+  // define some start values.
   startx = buf->pointer;
-  length = emsg->Length;
-  if(styles || colors)
+  length = emsg->Length-emsg->SkipFront-emsg->SkipBack;
+  lastpos = emsg->SkipFront;
+
+  if((styles || colors) &&
+     (hookType == MUIV_TextEditor_ExportHook_EMail || hookType == MUIV_TextEditor_ExportHook_Plain))
   {
     UWORD pos;
     WORD style;
     BOOL coloured = FALSE;
     UWORD colour_state = 7;
 
-    while((styles && *styles != 0xffff) || (colors && *colors != 0xffff))
+    while(length > 0 && ((styles && *styles != 0xffff) || (colors && *colors != 0xffff)))
     {
       BOOL color;
+      LONG len;
 
       if(colors == NULL || (styles && (coloured ? *styles < *colors : *styles <= *colors)))
       {
@@ -163,123 +169,148 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
         color = TRUE;
       }
 
-      memcpy(buf->pointer, emsg->Contents+lastpos, pos-lastpos);
-      buf->pointer += pos-lastpos;
+      // skip styles&colors which below lastpos
+      if(pos < lastpos)
+        continue;
 
-      if(hookType == MUIV_TextEditor_ExportHook_EMail)
+      // depending on how much we export
+      // we have to fire up the style convert routines.
+      if(pos-lastpos <= length)
       {
-        if(color)
+        len = pos-lastpos;
+        memcpy(buf->pointer, emsg->Contents+lastpos, len);
+        buf->pointer += len;
+
+        if(hookType == MUIV_TextEditor_ExportHook_EMail)
         {
-          if((coloured = (style == colour_state ? TRUE : FALSE)))
+          if(color)
           {
-            *buf->pointer++ = '#';
-            colour_state ^= 7;
+            if((coloured = (style == colour_state ? TRUE : FALSE)))
+            {
+              *buf->pointer++ = '#';
+              colour_state ^= 7;
+            }
+          }
+          else
+          {
+            switch(style)
+            {
+              case UNDERLINE:
+              case ~UNDERLINE:
+              {
+                *buf->pointer++ = '_';
+              }
+              break;
+
+              case BOLD:
+              case ~BOLD:
+              {
+                *buf->pointer++ = '*';
+              }
+              break;
+
+              case ITALIC:
+              case ~ITALIC:
+              {
+                *buf->pointer++ = '/';
+              }
+              break;
+            }
           }
         }
-        else
+        else if(hookType == MUIV_TextEditor_ExportHook_Plain)
         {
-          switch(style)
+          if(color)
           {
-            case UNDERLINE:
-            case ~UNDERLINE:
-            {
-              *buf->pointer++ = '_';
-            }
-            break;
-
-            case BOLD:
-            case ~BOLD:
-            {
-              *buf->pointer++ = '*';
-            }
-            break;
-
-            case ITALIC:
-            case ~ITALIC:
-            {
-              *buf->pointer++ = '/';
-            }
-            break;
+            snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033p[%ld]", (LONG)style);
+            buf->pointer += strlen(buf->pointer);
           }
-        }
-      }
-      else if(hookType == MUIV_TextEditor_ExportHook_Plain)
-      {
-        if(color)
-        {
-          snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033p[%ld]", (LONG)style);
-          buf->pointer += strlen(buf->pointer);
-        }
-        else
-        {
-          switch(style)
+          else
           {
-            case UNDERLINE:
+            switch(style)
             {
-              *buf->pointer++ = '\033';
-              *buf->pointer++ = 'u';
-              currentstyle |= UNDERLINE;
-            }
-            break;
-
-            case BOLD:
-            {
-              *buf->pointer++ = '\033';
-              *buf->pointer++ = 'b';
-              currentstyle |= BOLD;
-            }
-            break;
-
-            case ITALIC:
-            {
-              *buf->pointer++ = '\033';
-              *buf->pointer++ = 'i';
-              currentstyle |= ITALIC;
-            }
-            break;
-
-            case ~UNDERLINE:
-            case ~BOLD:
-            case ~ITALIC:
-            {
-              currentstyle &= style;
-
-              if(pos+1 != *styles || *(styles+1) < 0x8000)
+              case UNDERLINE:
               {
                 *buf->pointer++ = '\033';
-                *buf->pointer++ = 'n';
-                if(currentstyle & UNDERLINE)
+                *buf->pointer++ = 'u';
+                currentstyle |= UNDERLINE;
+              }
+              break;
+
+              case BOLD:
+              {
+                *buf->pointer++ = '\033';
+                *buf->pointer++ = 'b';
+                currentstyle |= BOLD;
+              }
+              break;
+
+              case ITALIC:
+              {
+                *buf->pointer++ = '\033';
+                *buf->pointer++ = 'i';
+                currentstyle |= ITALIC;
+              }
+              break;
+
+              case ~UNDERLINE:
+              case ~BOLD:
+              case ~ITALIC:
+              {
+                currentstyle &= style;
+
+                if(pos+1 != *styles || *(styles+1) < 0x8000)
                 {
                   *buf->pointer++ = '\033';
-                  *buf->pointer++ = 'u';
-                }
-                if(currentstyle & BOLD)
-                {
-                  *buf->pointer++ = '\033';
-                  *buf->pointer++ = 'b';
-                }
-                if(currentstyle & ITALIC)
-                {
-                  *buf->pointer++ = '\033';
-                  *buf->pointer++ = 'i';
+                  *buf->pointer++ = 'n';
+
+                  if(currentstyle & UNDERLINE)
+                  {
+                    *buf->pointer++ = '\033';
+                    *buf->pointer++ = 'u';
+                  }
+
+                  if(currentstyle & BOLD)
+                  {
+                    *buf->pointer++ = '\033';
+                    *buf->pointer++ = 'b';
+                  }
+
+                  if(currentstyle & ITALIC)
+                  {
+                    *buf->pointer++ = '\033';
+                    *buf->pointer++ = 'i';
+                  }
                 }
               }
+              break;
             }
-            break;
           }
         }
       }
+      else
+      {
+        len = length;
+        memcpy(buf->pointer, emsg->Contents+lastpos, len);
+        buf->pointer += len;
+      }
 
-      length -= pos-lastpos;
+      length -= len;
       
       if(length == -1)
         length = 0;
+
       lastpos = pos;
     }
   }
 
-  memcpy(buf->pointer, emsg->Contents+lastpos, length);
-  buf->pointer += length;
+  if(length > 0)
+  {
+    memcpy(buf->pointer, emsg->Contents+lastpos, length);
+    buf->pointer += length;
+  }
+
+  // NUL terminate our buffer string
   *buf->pointer = '\0';
 
   while(emsg->ExportWrap && buf->pointer-startx > (LONG)emsg->ExportWrap)

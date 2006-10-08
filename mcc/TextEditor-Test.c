@@ -23,21 +23,28 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <clib/alib_protos.h>
+
 #include <exec/tasks.h>
 #include <libraries/mui.h>
 #include <devices/clipboard.h>
 #include <libraries/iffparse.h>
-#include <clib/alib_protos.h>
+
 #include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/muimaster.h>
 #include <proto/intuition.h>
 #include <proto/iffparse.h>
+#include <proto/utility.h>
 
 #include "private.h"
 
 #include "SDI_hook.h"
 
+// global data
+Object *editorgad;
+
+// static hooks
 HOOKPROTONHNO(URLHookCode, LONG, struct ClickMessage *cm)
 {
   ULONG pos = cm->ClickPosition;
@@ -56,8 +63,6 @@ HOOKPROTONHNO(URLHookCode, LONG, struct ClickMessage *cm)
 }
 MakeStaticHook(URLHook, URLHookCode);
 
-Object *editorgad;
-
 HOOKPROTONHNONP(PosHookCode, void)
 {
   ULONG x, y, sx, sy;
@@ -71,6 +76,21 @@ HOOKPROTONHNONP(PosHookCode, void)
     printf("Cursor: (%d, %d) - (%d, %d)\n", crsr->MinX, crsr->MinY, crsr->MaxX, crsr->MaxY);
 }
 MakeStaticHook(PosHook, PosHookCode);
+
+HOOKPROTONHNONP(ExportBlockCode, void)
+{
+  STRPTR text;
+
+  CallHookPkt(&PosHook, NULL, NULL);
+
+  if((text = (STRPTR)DoMethod(editorgad, MUIM_TextEditor_ExportBlock, 0)))
+  {
+    printf("[%s]\n", text);
+
+    FreeVec(text);
+  }
+}
+MakeStaticHook(ExportBlockHook, ExportBlockCode);
 
 #if defined(__amigaos4__)
 struct Library *DiskfontBase = NULL;
@@ -307,7 +327,7 @@ int main(void)
 /*                                MUIA_TextEditor_ImportWrap, 1023,
                                   MUIA_TextEditor_WrapBorder, 80,
                                   MUIA_TextEditor_ExportWrap, 80,*/
-//                                MUIA_TextEditor_ExportHook, MUIV_TextEditor_ExportHook_EMail,
+                                MUIA_TextEditor_ExportHook, MUIV_TextEditor_ExportHook_NoStyle,
 //                                MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_EMail,
                                   MUIA_CycleChain,    TRUE,
 //                                MUIA_TextEditor_WrapBorder, 80,
@@ -450,7 +470,8 @@ int main(void)
           DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_HasChanged, MUIV_EveryTime, ischanged, 3, MUIM_NoNotifySet, MUIA_Image_State, MUIV_TriggerValue);
           DoMethod(ischanged, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_HasChanged, MUIV_TriggerValue);
 
-          DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_CallHook, &PosHook); //MUIM_TextEditor_ARexxCmd, "Clear");
+//          DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "Clear");
+          DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_CallHook, &ExportBlockHook);
 //          DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_HasChanged, FALSE);
 
           DoMethod(cut,   MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "Cut");

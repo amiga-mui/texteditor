@@ -70,6 +70,7 @@ MCCOBJS = $(OBJDIR)/library.o \
           $(OBJDIR)/Dispatcher.o \
           $(OBJDIR)/EditorStuff.o \
           $(OBJDIR)/ExportHook.o \
+          $(OBJDIR)/ExportBlock.o \
           $(OBJDIR)/ExportText.o \
           $(OBJDIR)/GetSetAttrs.o \
           $(OBJDIR)/HandleARexx.o \
@@ -97,6 +98,7 @@ TESTOBJS= $(OBJDIR)/TextEditor-Test.o \
           $(OBJDIR)/Dispatcher.o \
           $(OBJDIR)/EditorStuff.o \
           $(OBJDIR)/ExportHook.o \
+          $(OBJDIR)/ExportBlock.o \
           $(OBJDIR)/ExportText.o \
           $(OBJDIR)/GetSetAttrs.o \
           $(OBJDIR)/HandleARexx.o \
