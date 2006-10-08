@@ -39,7 +39,7 @@ TextEditor.mcc/MUIA_TextEditor_WrapBorder
 TextEditor.mcc/MUIM_TextEditor_ARexxCmd
 TextEditor.mcc/MUIM_TextEditor_BlockInfo
 TextEditor.mcc/MUIM_TextEditor_ClearText
-TextEditor.mcc/MUIM_TextEditor_ExportBlock        (not yet implemented...)
+TextEditor.mcc/MUIM_TextEditor_ExportBlock
 TextEditor.mcc/MUIM_TextEditor_ExportText
 TextEditor.mcc/MUIM_TextEditor_HandleError
 TextEditor.mcc/MUIM_TextEditor_InsertText
@@ -949,16 +949,34 @@ TextEditor.mcc/MUIM_TextEditor_Search
         MUIM_TextEditor_ExportBlock
 
     SYNOPSIS
-        DoMethod(obj, MUIM_TextEditor_ExportBlock);
+        DoMethod(obj, MUIM_TextEditor_ExportBlock, ULONG flags);
 
     FUNCTION
-        Not yet implemented...
+        This method exports portions of the current text via the active
+        export hook and returns it in an AllocVec() allocated string.
+        Depending on the supplied flags the method acts a bit different
+        in what text it should export and which it should skip:
+
+          Default (no flags):
+            Exports the currently marked text. If no text is marked, it
+            will return an empty, but allocated string.
+            (see MUIM_TextEditor_BlockInfo)
+
+          MUIF_TextEditor_ExportBlock_FullLines:
+            All complete lines with marked text will be exported, including
+            non-marked characters as well. If no text is marked, then the
+            line where the current cursor is on will be exported.
 
     RESULT
-        
+        Depends on the export hook.  The built-in hooks will return
+        a pointer to a NUL-terminated buffer containing all the text.
+        You must free this buffer with FreeVec() when you are done using it.
+        Returns a NULL pointer if something went wrong.
 
     SEE ALSO
-        MUIM_TextEditor_InsertText, MUIM_TextEditor_ExportText
+        MUIA_TextEditor_ExportHook
+        MUIM_TextEditor_InsertText
+        MUIM_TextEditor_ExportText
 
 TextEditor.mcc/MUIM_TextEditor_ExportText
 
@@ -973,11 +991,14 @@ TextEditor.mcc/MUIM_TextEditor_Search
 
     RESULT
         Depends on the export hook.  The built-in hooks will return
-        a pointer to a NULL terminated buffer containing all the text.
+        a pointer to a NUL-terminated buffer containing all the text.
         You must free this buffer with FreeVec() when you are done using it.
+        Returns a NULL pointer if something went wrong.
 
     SEE ALSO
-        MUIM_TextEditor_InsertText, MUIM_TextEditor_ExportBlock
+        MUIA_TextEditor_ExportHook
+        MUIM_TextEditor_InsertText
+        MUIM_TextEditor_ExportBlock
 
 TextEditor.mcc/MUIM_TextEditor_HandleError
 

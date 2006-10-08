@@ -33,14 +33,6 @@
 
 #include "private.h"
 
-#define ID_FTXT    MAKE_ID('F','T','X','T')
-#define ID_CHRS    MAKE_ID('C','H','R','S')
-#define ID_FLOW    MAKE_ID('F','L','O','W')
-#define ID_HIGH    MAKE_ID('H','I','G','H')
-#define ID_SBAR    MAKE_ID('S','B','A','R')
-#define ID_COLS    MAKE_ID('C','O','L','S')
-#define ID_STYL    MAKE_ID('S','T','Y','L')
-
 VOID RedrawArea(UWORD startx, struct line_node *startline, UWORD stopx, struct line_node *stopline, struct InstData *data)
 {
   struct pos_info pos1, pos2;

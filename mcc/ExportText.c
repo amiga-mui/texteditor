@@ -2,7 +2,7 @@
 
  TextEditor.mcc - Textediting MUI Custom Class
  Copyright (C) 1997-2000 Allan Odgaard
- Copyright (C) 2005 by TextEditor.mcc Open Source Team
+ Copyright (C) 2005-2006 by TextEditor.mcc Open Source Team
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -26,8 +26,11 @@
 
 #include "private.h"
 
-void *ExportText(struct line_node *node, struct Hook *exportHook, LONG wraplen)
+void *ExportText(UNUSED struct MUIP_TextEditor_ExportText *msg, struct InstData *data)
 {
+  struct line_node *node = data->firstline;
+  struct Hook *exportHook = data->ExportHook;
+  ULONG wraplen = data->ExportWrap;
 	struct ExportMessage emsg;
 	void *user_data = NULL;
 
@@ -55,7 +58,9 @@ void *ExportText(struct line_node *node, struct Hook *exportHook, LONG wraplen)
 		if(next_node == NULL && emsg.Contents[node->line.Length-1] == '\n')
 		  emsg.Length--;
 
-		user_data = (void*)CallHookPkt(exportHook, NULL, &emsg);
+    // call the ExportHook and exit immediately if it returns NULL
+		if((user_data = (void*)CallHookPkt(exportHook, NULL, &emsg)) == NULL)
+      break;
 
 		node = next_node;
 	}

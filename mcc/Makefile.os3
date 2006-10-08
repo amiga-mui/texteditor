@@ -64,6 +64,7 @@ MCCOBJS = $(OBJDIR)/library.o \
           $(OBJDIR)/Dispatcher.o \
           $(OBJDIR)/EditorStuff.o \
           $(OBJDIR)/ExportHook.o \
+          $(OBJDIR)/ExportBlock.o \
           $(OBJDIR)/ExportText.o \
           $(OBJDIR)/GetSetAttrs.o \
           $(OBJDIR)/HandleARexx.o \
@@ -91,6 +92,7 @@ TESTOBJS= $(OBJDIR)/TextEditor-Test.o \
           $(OBJDIR)/Dispatcher.o \
           $(OBJDIR)/EditorStuff.o \
           $(OBJDIR)/ExportHook.o \
+          $(OBJDIR)/ExportBlock.o \
           $(OBJDIR)/ExportText.o \
           $(OBJDIR)/GetSetAttrs.o \
           $(OBJDIR)/HandleARexx.o \
@@ -141,10 +143,7 @@ $(TESTTARGET): $(TESTOBJS)
 	@$(CC) -s -o $@ $(TESTOBJS) $(LDLIBS)
 
 $(OBJDIR)/library.o: library.c ../includes/mccheader.c \
-  TextEditor_mcc.h private.h rev.h
-
-$(OBJDIR)/library.o: library.c ../includes/mccheader.c TextEditor_mcc.h \
-  private.h rev.h
+  ../includes/mui/TextEditor_mcc.h private.h rev.h
 
 #
 

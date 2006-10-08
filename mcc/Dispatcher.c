@@ -670,7 +670,8 @@ DISPATCHER(_Dispatcher)
     }
     break;
 
-    case MUIM_TextEditor_ExportText:  result = (ULONG)ExportText(data->firstline, data->ExportHook, data->ExportWrap); RETURN(result); return(result); break;
+    case MUIM_TextEditor_ExportBlock: result = (ULONG)ExportBlock((struct MUIP_TextEditor_ExportBlock *)msg, data); RETURN(result); return(result); break;
+    case MUIM_TextEditor_ExportText:  result = (ULONG)ExportText((struct MUIP_TextEditor_ExportText *)msg, data); RETURN(result); return(result); break;
     case MUIM_TextEditor_ARexxCmd:    result = HandleARexx(data, ((struct MUIP_TextEditor_ARexxCmd *)msg)->command); break;
     case MUIM_TextEditor_MarkText:    result = OM_MarkText((struct MUIP_TextEditor_MarkText *)msg, data); break;
     case MUIM_TextEditor_BlockInfo:   result = OM_BlockInfo((struct MUIP_TextEditor_BlockInfo *)msg, data); break;
