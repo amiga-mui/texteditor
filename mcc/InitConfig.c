@@ -316,7 +316,7 @@ void InitConfig(Object *obj, struct InstData *data)
   }
 
   data->SuggestSpawn = 1;
-  data->SuggestCmd  = "\"Open('f', 'T:Matches', 'W');WriteLn('f', '%s');Close('f')";
+  data->SuggestCmd  = "\"Open('f', 'T:Matches', 'W');WriteLn('f', '%s');Close('f')\"";
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_SuggestCmd, &setting))
   {
     data->SuggestSpawn = (short) *(ULONG *)setting;
