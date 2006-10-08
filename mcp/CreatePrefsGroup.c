@@ -28,6 +28,7 @@
 #include <libraries/mui.h>
 #include <mui/BetterString_mcc.h>
 #include <mui/HotkeyString_mcc.h>
+#include <mui/TextEditor_mcc.h>
 #include <proto/exec.h>
 #include <proto/intuition.h>
 #include <proto/muimaster.h>
@@ -35,7 +36,6 @@
 #include "private.h"
 #include "locale.h"
 #include "muiextra.h"
-#include "TextEditor_mcc.h"
 #include "rev.h"
 
 #include "SDI_hook.h"
