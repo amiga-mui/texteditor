@@ -29,9 +29,7 @@
 #include <proto/layers.h>
 #include <proto/exec.h>
 
-#ifndef CLASSACT
 #include <proto/muimaster.h>
-#endif
 
 /*************************************************************************/
 
@@ -56,12 +54,10 @@ void  AddClipping (struct InstData *data)
 {
   ENTER();
 
-#ifndef ClassAct
   if(data->clipcount++ == 0)
   {
     data->cliphandle = MUI_AddClipping(muiRenderInfo(data->object), data->xpos, data->realypos, data->innerwidth, muiAreaData(data->object)->mad_Box.Height - muiAreaData(data->object)->mad_subheight);
   }
-#endif
 
   LEAVE();
 }
@@ -70,10 +66,8 @@ void  RemoveClipping (struct InstData *data)
 {
   ENTER();
 
-#ifndef ClassAct
   if(--data->clipcount == 0)
     MUI_RemoveClipping(muiRenderInfo(data->object), data->cliphandle);
-#endif
 
   LEAVE();
 }
@@ -655,11 +649,7 @@ void  DumpText(LONG visual_y, LONG line_nr, LONG lines, BOOL doublebuffer, struc
 
   ENTER();
 
-#ifdef ClassAct
-  if((visual_y <= data->totallines) && data->update && (data->shown == TRUE) && !(data->flags & FLG_Quiet))
-#else
   if(data->update && (data->shown == TRUE) && !(data->flags & FLG_Quiet))
-#endif
   {
     GetLine(visual_y, &pos, data);
     line = pos.line;
@@ -706,11 +696,7 @@ void  DumpText(LONG visual_y, LONG line_nr, LONG lines, BOOL doublebuffer, struc
             newPattern[1] = 0x1111;
         }
         SetDrMd(data->rport, JAM1);
-#ifndef ClassAct
         SetAPen(data->rport, *(_pens(data->object)+MPEN_SHADOW));
-#else
-        SetAPen(data->rport, data->separatorshadow);
-#endif
         data->rport->AreaPtrn = newPattern;
         data->rport->AreaPtSz = 1;
         RectFill(data->rport,
@@ -763,7 +749,6 @@ void  ScrollUp(LONG line_nr, LONG lines, struct InstData *data)
                     data->xpos + data->innerwidth - 1, (data->ypos + data->maxlines * data->height) - 1);
       InstallLayerHook(data->rport->Layer, oldhook);
 
-#ifndef ClassAct
       {
           struct Layer *layer = data->rport->Layer;
 
@@ -776,7 +761,6 @@ void  ScrollUp(LONG line_nr, LONG lines, struct InstData *data)
           }
         }
       }
-#endif
 
       if(lines == 1)
       {
@@ -838,7 +822,6 @@ void  ScrollDown(LONG line_nr, LONG lines, struct InstData *data)
                     data->xpos + data->innerwidth - 1, data->ypos + (data->maxlines * data->height) - 1);
       InstallLayerHook(data->rport->Layer, oldhook);
 
-#ifndef ClassAct
       {
           struct Layer *layer = data->rport->Layer;
 
@@ -851,7 +834,6 @@ void  ScrollDown(LONG line_nr, LONG lines, struct InstData *data)
           }
         }
       }
-#endif
 
       if(line_nr == 0)
       {
