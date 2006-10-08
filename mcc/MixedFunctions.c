@@ -187,39 +187,47 @@ LONG LineCharsWidth(char *text, struct InstData *data)
   LONG c;
   LONG w = data->innerwidth;
   LONG textlen;
-  struct TextExtent tExtend;
 
   ENTER();
 
   textlen = strlen(text)-1; // the last char is always a "\n"
 
-  // see how many chars of our text fits to the current innerwidth of the
-  // texteditor
-  c = TextFit(&data->tmprp, text, textlen, &tExtend, NULL, 1, w, data->font->tf_YSize);
-  if(c >= textlen)
+  // check the innerwidth as well.
+  if(w > 0)
   {
-    // if all text fits, then we have to do the calculations once more and
-    // see if also the ending cursor might fit on the line
-    w -= (data->CursorWidth == 6) ? TextLength(&data->tmprp, " ", 1) : data->CursorWidth;
-    c = TextFit(&data->tmprp, text, textlen, &tExtend, NULL, 1, w, data->font->tf_YSize);
-  }
+    struct TextExtent tExtend;
+    ULONG fontheight = data->font ? data->font->tf_YSize : 0;
 
-  // now we check wheter all chars fit on the current innerwidth
-  // or if we have to do word wrapping by searching for the last
-  // occurance of a linear white space character
-  if(c < textlen)
-  {
-    LONG tc = c-1;
+    // see how many chars of our text fits to the current innerwidth of the
+    // texteditor
+    c = TextFit(&data->tmprp, text, textlen, &tExtend, NULL, 1, w, fontheight);
+    if(c >= textlen)
+    {
+      // if all text fits, then we have to do the calculations once more and
+      // see if also the ending cursor might fit on the line
+      w -= (data->CursorWidth == 6) ? TextLength(&data->tmprp, " ", 1) : data->CursorWidth;
+      c = TextFit(&data->tmprp, text, textlen, &tExtend, NULL, 1, w, fontheight);
+    }
 
-    // search backwards for a LWSP
-    while(text[tc] != ' ' && tc)
-      tc--;
+    // now we check wheter all chars fit on the current innerwidth
+    // or if we have to do word wrapping by searching for the last
+    // occurance of a linear white space character
+    if(c < textlen)
+    {
+      LONG tc = c-1;
 
-    if(tc)
-      c = tc+1;
+      // search backwards for a LWSP
+      while(text[tc] != ' ' && tc)
+        tc--;
+
+      if(tc)
+        c = tc+1;
+    }
+    else
+      c++; // otherwise always +1 because an ending line should always contain the cursor
   }
   else
-    c++; // otherwise always +1 because an ending line should always contain the cursor
+    c = textlen+1;
 
   RETURN(c);
   return c;
@@ -227,7 +235,7 @@ LONG LineCharsWidth(char *text, struct InstData *data)
 /*-------------------------------------------------------*
  * Return the number of visual lines that the line fills *
  *-------------------------------------------------------*/
-short VisualHeight  (struct line_node *line, struct InstData *data)
+short VisualHeight(struct line_node *line, struct InstData *data)
 {
   LONG c = 0, lines = 0, length;
 

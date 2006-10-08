@@ -6,6 +6,9 @@ $Id$
 
 2006-10-08 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcc/MixedFunctions.c: fixed bug #1385277 where on a fresh object where
+     the MUIM_Setup method never was used, the LineCharsWidth() function
+     caused a crash if the InsertText method was used.
    * mcp/Makefile.os4, mcc/Makefile.os4: modified to always keep function
      symbols in the binary, even in release mode.
    * mcc/ExportBlock.c, misc: implemented new MUIM_TextEditor_ExportBlock

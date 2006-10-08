@@ -149,6 +149,9 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
             if(FindTagItem(MUIA_Frame, msg->ops_AttrList))
               data->flags |= FLG_OwnFrame;
 
+            // initialize our temporary rastport
+            InitRastPort(&data->tmprp);
+
             Set(cl, obj, (struct opSet *)msg);
             data->visual_y = 1;
 
