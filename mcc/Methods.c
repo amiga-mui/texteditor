@@ -344,14 +344,16 @@ ULONG InsertText (struct InstData *data, STRPTR text, BOOL movecursor)
     long  newline = FALSE;
     struct line_node *startline = line;
 
-    line->visual    = VisualHeight(line, data);
+    line->visual = VisualHeight(line, data);
     data->totallines += line->visual;
+
     while(line->next)
     {
       line = line->next;
-      line->visual    = VisualHeight(line, data);
+      line->visual = VisualHeight(line, data);
       data->totallines += line->visual;
     }
+
     if(*(line->line.Contents+line->line.Length) == '\n')
       newline = TRUE;
 
