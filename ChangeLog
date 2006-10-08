@@ -6,6 +6,10 @@ $Id$
 
 2006-10-08 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcc/SpellChecker.c: fixed bug #1545493 where the spellchecker routines
+     didn't correctly supply the whole word under the cursor and always stripped
+     one char at the end. That rendered the spellchecker functionality kinda
+     useless.
    * mcc/MixedFunctions.c: fixed bug #1385277 where on a fresh object where
      the MUIM_Setup method never was used, the LineCharsWidth() function
      caused a crash if the InsertText method was used.

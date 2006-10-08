@@ -302,8 +302,8 @@ void *SuggestWindow (struct InstData *data)
 
 BOOL LookupWord(STRPTR word, struct InstData *data)
 {
-    char buf[4];
-    LONG res;
+  char buf[4];
+  LONG res;
 
   if(data->LookupSpawn)
     res = SendRexx(word, data->LookupCmd, data);
@@ -377,7 +377,7 @@ void SuggestWord (struct InstData *data)
     {
       char word[256];
 
-      strlcpy(word, line->line.Contents+data->blockinfo.startx, data->blockinfo.stopx-data->blockinfo.startx);
+      strlcpy(word, line->line.Contents+data->blockinfo.startx, data->blockinfo.stopx-data->blockinfo.startx+1);
 
       set(_win(data->object), MUIA_Window_Sleep, TRUE);
 
@@ -395,11 +395,13 @@ void SuggestWord (struct InstData *data)
       }
       else
       {
-          LONG res;
+        LONG res;
 
         if(data->SuggestSpawn)
-            res = SendRexx(word, data->SuggestCmd, data);
-        else  res = SendCLI(word, data->SuggestCmd, data);
+          res = SendRexx(word, data->SuggestCmd, data);
+        else
+          res = SendCLI(word, data->SuggestCmd, data);
+
         if(res)
         {
             BPTR  fh;
@@ -440,22 +442,24 @@ void CheckWord (struct InstData *data)
 {
   if(data->TypeAndSpell && data->CPos_X && IsAlpha(data->mylocale, *(data->actualline->line.Contents+data->CPos_X-1)))
   {
-      char word[256];
-      LONG  start, end = data->CPos_X;
-      struct line_node *line = data->actualline;
+    LONG  start, end = data->CPos_X;
+    struct line_node *line = data->actualline;
 
-    do {
-
+    do
+    {
       GoPreviousWord(data);
-
-    } while(data->CPos_X && data->actualline == line && (*(data->actualline->line.Contents+data->CPos_X-1) == '-' || *(data->actualline->line.Contents+data->CPos_X-1) == '\''));
+    }
+    while(data->CPos_X && data->actualline == line && (*(data->actualline->line.Contents+data->CPos_X-1) == '-' ||
+          *(data->actualline->line.Contents+data->CPos_X-1) == '\''));
 
     start = data->CPos_X;
     data->CPos_X = end;
 
     if(start-end < 256 && data->actualline == line)
     {
-      strlcpy(word, data->actualline->line.Contents+start, end-start);
+      char word[256];
+
+      strlcpy(word, data->actualline->line.Contents+start, end-start+1);
 
       if(!LookupWord(word, data))
         DisplayBeep(NULL);
