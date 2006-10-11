@@ -471,6 +471,10 @@ void _DPRINTF(unsigned long dclass, unsigned long dflags, const char *file, int 
 }
 #endif
 
+#if !defined(__amigaos4__)
+void abort(void) { }
+#endif
+
 /****************************************************************************/
 
 #endif /* DEBUG */
