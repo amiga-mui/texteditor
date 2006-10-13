@@ -640,6 +640,61 @@ LONG CutBlock(struct InstData *data, long Clipboard, long NoCut, BOOL update)
   return(result);
 }
 
+#if defined(__MORPHOS__)
+/*
+ * Workaround to serious bug in iffparse.library supplied with MorphOS.
+ * Library barfs when the same chunk is pushed again. While this bug is
+ * fixed in V51 version of iffparse.library we must settle for this solution
+ * for now. In order to keep MorphOS specific code short style and color
+ * information is not stored.
+ */
+static void copytoclip(struct InstData *data, struct marking *newblock)
+{
+  LONG  startx, stopx, error;
+  struct  line_node *startline, *stopline, *c_startline;
+
+  ENTER();
+
+  startx    = newblock->startx;
+  stopx     = newblock->stopx;
+  startline = newblock->startline;
+  stopline  = newblock->stopline;
+
+  D(DBF_CLIPBOARD, "copytoclip()");
+  D(DBF_CLIPBOARD, "writing FORM");
+  error = PushChunk(data->iff, ID_FTXT, ID_FORM, IFFSIZE_UNKNOWN);
+  SHOWVALUE(DBF_CLIPBOARD, error);
+
+  D(DBF_CLIPBOARD, "writing CHRS");
+  error = PushChunk(data->iff, 0, ID_CHRS, IFFSIZE_UNKNOWN);
+
+  error = WriteChunkBytes(data->iff, startline->line.Contents + startx, startline->line.Length-startx);
+  SHOWVALUE(DBF_CLIPBOARD, error);
+
+  c_startline = startline->next;
+
+  while(c_startline != stopline)
+  {
+    error = WriteChunkBytes(data->iff, c_startline->line.Contents, c_startline->line.Length);
+    SHOWVALUE(DBF_CLIPBOARD, error);
+    c_startline = c_startline->next;
+  }
+
+  if (stopx)
+  {
+    error = WriteChunkBytes(data->iff, stopline->line.Contents, stopx);
+    SHOWVALUE(DBF_CLIPBOARD, error);
+  }
+
+  error = PopChunk(data->iff);
+  SHOWVALUE(DBF_CLIPBOARD, error);
+
+  error = PopChunk(data->iff);
+  SHOWVALUE(DBF_CLIPBOARD, error);
+  LEAVE();
+}
+#endif
+
 LONG CutBlock2(struct InstData *data, long Clipboard, long NoCut, struct marking *newblock, BOOL update)
 {
   LONG  tvisual_y;
@@ -658,11 +713,16 @@ LONG CutBlock2(struct InstData *data, long Clipboard, long NoCut, struct marking
     struct  line_node *c_startline = startline->next;
 
     data->update = FALSE;
+
     if(Clipboard)
     {
       if(InitClipboard(data, IFFF_WRITE))
       {
+        #if defined(__MORPHOS__)
+        copytoclip(data, newblock);
+        #else
         ClipChars(startx, startline, startline->line.Length-startx, data);
+        #endif
       }
       else
       {
@@ -674,7 +734,9 @@ LONG CutBlock2(struct InstData *data, long Clipboard, long NoCut, struct marking
     {
       if(Clipboard)
       {
+        #if !defined(__MORPHOS__)
         ClipLine(c_startline, data);
+        #endif
       }
 
       if(!NoCut)
@@ -694,8 +756,10 @@ LONG CutBlock2(struct InstData *data, long Clipboard, long NoCut, struct marking
 
     if(Clipboard)
     {
+      #if !defined(__MORPHOS__)
       if(stopx)
         ClipChars(0, stopline, stopx, data);
+      #endif
 
       EndClipSession(data);
     }
