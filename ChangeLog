@@ -4,6 +4,14 @@ MUI TextEditor MCC class - ChangeLog
 
 $Id$
 
+2006-10-13 Ilkka Lehtoranta <ilkleht@isoveli.org>
+
+   * mcc/BlockOperators.c: Added workaround to serious bug in iffparse.library
+     supplied with MorphOS. Library barfs when the same chunk is pushed again.
+     While this bug is fixed in V51 version of iffparse.library we must settle
+     for this solution for now. In order to keep MorphOS specific code short
+     style and color information is not stored.
+
 2006-10-11 Ilkka Lehtoranta <ilkleht@isoveli.org>
 
    * mcc/Debug.c: added a dummy abort() function to fix non-OS4 debug builds.
