@@ -8,6 +8,8 @@ $Id$
 
    * mcc/EditorStuff.c: Fixed Wipeout hit in PasteClip() where NULL termination
      could accidentally trash innocent memory.
+   * mcc/BlockOperators.c: Removed MorphOS workaround and adjusted code to work
+     on all flavours.
 
 2006-10-13 Ilkka Lehtoranta <ilkleht@isoveli.org>
 
