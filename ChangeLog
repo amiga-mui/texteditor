@@ -4,6 +4,11 @@ MUI TextEditor MCC class - ChangeLog
 
 $Id$
 
+2006-10-17 Ilkka Lehtoranta <ilkleht@isoveli.org>
+
+   * mcc/EditorStuff.c: Fixed Wipeout hit in PasteClip() where NULL termination
+     could accidentally trash innocent memory.
+
 2006-10-13 Ilkka Lehtoranta <ilkleht@isoveli.org>
 
    * mcc/BlockOperators.c: Added workaround to serious bug in iffparse.library
