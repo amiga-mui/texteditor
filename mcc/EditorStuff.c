@@ -200,7 +200,7 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
               {
                 ULONG length = cn->cn_Size;
 
-                if(length > 0 && (textline = (char *)MyAllocPooled(data->mypool, length + 1)) != NULL)
+                if(length > 0 && (textline = (char *)MyAllocPooled(data->mypool, length + 2)) != NULL)
                 {
                   error = ReadChunkBytes(data->iff, textline, length);
                   SHOWVALUE(DBF_CLIPBOARD, error);
