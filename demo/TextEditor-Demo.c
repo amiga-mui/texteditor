@@ -98,7 +98,7 @@ HOOKPROTONH(ARexxHookCode, LONG, Object *app, struct RexxMsg *rexxmsg)
 }
 MakeStaticHook(ARexxHook, ARexxHookCode);
 
-DISPATCHERPROTO(TextEditor_Dispatcher)
+DISPATCHER(TextEditor_Dispatcher)
 {
   switch(msg->MethodID)
   {
