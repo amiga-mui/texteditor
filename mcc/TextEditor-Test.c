@@ -83,7 +83,7 @@ HOOKPROTONHNONP(ExportBlockCode, void)
 
   CallHookPkt(&PosHook, NULL, NULL);
 
-  if((text = (STRPTR)DoMethod(editorgad, MUIM_TextEditor_ExportBlock, 0)))
+  if((text = (STRPTR)DoMethod(editorgad, MUIM_TextEditor_ExportBlock, MUIF_TextEditor_ExportBlock_FullLines)))
   {
     printf("[%s]\n", text);
 
