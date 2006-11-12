@@ -4,6 +4,8 @@ MUI TextEditor MCC class - ChangeLog
 
 $Id$
 
+#### v15.19 RELEASE ############################################################
+
 2006-11-12 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcc/BlockOperators.c: fixed a bug where not the whole ExportMessage

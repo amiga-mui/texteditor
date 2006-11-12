@@ -1,5 +1,5 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.18 (18.08.2006)
+@$VER: TextEditor.Guide 15.19 (12.11.2006)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
@@ -339,6 +339,19 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.19 (12.11.2006)
+
+- fixed certain SpellChecker related issues.
+- fixed certain crash conditions on properly initialized TextEditor objects.
+- added new 'MUIM_TextEditor_ExportBlock' method which will export only the currently
+  marked text instead of the whole text like it's ExportText variant.
+- added new 'MUIV_TextEditor_ExportHook_NoStyle' ExportHook type which will export
+  all text, but strip all ESC style sequences.
+- all formerly handcrafted IFF writing functions are now being directly handled by
+  iffparse.library. This simplifies the clipboard handling and should automatically
+  fix several clipboard related issues. (e.g. pasting from PageStream)
+- fixed partly broken ARexx support.
 
 15.18 (18.08.2006)
 
