@@ -52,7 +52,7 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
   node = newblock.startline;
 
   // clear the export message
-	memset(&emsg,0,sizeof(emsg));
+	memset(&emsg, 0, sizeof(struct ExportMessage));
 
   // now we export all selected/marked lines with
   // the currently active export hook
