@@ -39,7 +39,16 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
 	ENTER();
 
   // get information about marked text
-  NiceBlock(&data->blockinfo, &newblock);
+  if(data->blockinfo.enabled)
+    NiceBlock(&data->blockinfo, &newblock);
+  else
+  {
+    newblock.startline = data->actualline;
+    newblock.startx    = data->CPos_X;
+    newblock.stopline  = data->actualline;
+    newblock.stopx     = data->CPos_X;
+  }
+
   node = newblock.startline;
 
   // clear the export message

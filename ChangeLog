@@ -4,6 +4,11 @@ MUI TextEditor MCC class - ChangeLog
 
 $Id$
 
+2006-11-12 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcc/ExportBlock.c: fixed a minor issue with the new ExportBlock functionality
+     where unmarked text wasn't exported correctly due to an old marking structure.
+
 2006-10-17 Ilkka Lehtoranta <ilkleht@isoveli.org>
 
    * mcc/EditorStuff.c: Fixed Wipeout hit in PasteClip() where NULL termination
