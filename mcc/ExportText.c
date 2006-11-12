@@ -36,9 +36,10 @@ void *ExportText(UNUSED struct MUIP_TextEditor_ExportText *msg, struct InstData 
 
 	ENTER();
 
-	memset(&emsg,0,sizeof(emsg));
+  // clear the export message
+	memset(&emsg, 0, sizeof(struct ExportMessage));
 
-	while (node)
+	while(node)
 	{
 		struct line_node *next_node = node->next;
 
