@@ -6,6 +6,11 @@ $Id$
 
 2006-11-27 Thore Böckelmann <tboeckel@gmx.de>
 
+   * mcc/EditorStuff.c: when pasting a clip which contained some colors or
+     styles we trashed memory because the allocation was always 2 bytes too
+     small. This happend because TextEditor.mcc terminates the color and style
+     arrays with special values which are not included in its own clipboard
+     files and hence their length isn't contained in the IFF header length.
    * Debug.c: added correct copyright header and fixed some typos
 
 #### v15.19 RELEASE ############################################################

@@ -126,7 +126,8 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
                 MyFreePooled(data->mypool, colors);
                 colors = NULL;
               }
-              if(cn->cn_Size > 0 && (colors = (UWORD *)MyAllocPooled(data->mypool, cn->cn_Size)) != NULL)
+              // allocate one word more than the chunk tell us, because we terminate the array with an additional value
+              if(cn->cn_Size > 0 && (colors = (UWORD *)MyAllocPooled(data->mypool, cn->cn_Size + sizeof(UWORD))) != NULL)
               {
                 error = ReadChunkBytes(data->iff, colors, cn->cn_Size);
                 SHOWVALUE(DBF_CLIPBOARD, error);
@@ -143,7 +144,8 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
                 MyFreePooled(data->mypool, styles);
                 styles = NULL;
               }
-              if(cn->cn_Size > 0 && (styles = (UWORD *)MyAllocPooled(data->mypool, cn->cn_Size)) != NULL)
+              // allocate one word more than the chunk tell us, because we terminate the array with an additional value
+              if(cn->cn_Size > 0 && (styles = (UWORD *)MyAllocPooled(data->mypool, cn->cn_Size + sizeof(UWORD))) != NULL)
               {
                 error = ReadChunkBytes(data->iff, styles, cn->cn_Size);
                 SHOWVALUE(DBF_CLIPBOARD, error);
@@ -384,12 +386,17 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
 
       if((styles = MyAllocPooled(data->mypool, length)))
       {
-          unsigned short* t_styles = styles;
-          unsigned short  style = 0;
+        unsigned short* t_styles = styles;
+        unsigned short  style = 0;
+
+        SHOWVALUE(DBF_CLIPBOARD, length);
+        SHOWVALUE(DBF_CLIPBOARD, styles);
+        SHOWVALUE(DBF_CLIPBOARD, styles1);
+        SHOWVALUE(DBF_CLIPBOARD, styles2);
 
         if(styles2)
         {
-            unsigned short* t_styles2 = styles2;
+          unsigned short* t_styles2 = styles2;
 
           while(*t_styles2++ == 1)
           {
@@ -415,6 +422,7 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
               *styles++ = *styles1++;
             }
           }
+          SHOWVALUE(DBF_CLIPBOARD, line->line.Styles);
           MyFreePooled(data->mypool, line->line.Styles);
         }
 
@@ -432,6 +440,7 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
               *styles++ = *styles2++;
             }
           }
+          SHOWVALUE(DBF_CLIPBOARD, line->next->line.Styles);
           MyFreePooled(data->mypool, line->next->line.Styles);
         }
         *styles = EOS;
@@ -447,8 +456,13 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
 
       if((colors = MyAllocPooled(data->mypool, length)))
       {
-          UWORD *t_colors = colors;
-          UWORD end_color = 0;
+        UWORD *t_colors = colors;
+        UWORD end_color = 0;
+
+        SHOWVALUE(DBF_CLIPBOARD, length);
+        SHOWVALUE(DBF_CLIPBOARD, colors);
+        SHOWVALUE(DBF_CLIPBOARD, colors1);
+        SHOWVALUE(DBF_CLIPBOARD, colors2);
 
         if(colors1)
         {
@@ -458,6 +472,7 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
             end_color = *colors1;
             *colors++ = *colors1++;
           }
+          SHOWVALUE(DBF_CLIPBOARD, line->line.Colors);
           MyFreePooled(data->mypool, line->line.Colors);
         }
 
@@ -477,6 +492,7 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
             *colors++ = *colors2++ + line->line.Length - 1;
             *colors++ = *colors2++;
           }
+          SHOWVALUE(DBF_CLIPBOARD, line->next->line.Colors);
           MyFreePooled(data->mypool, line->next->line.Colors);
         }
         *colors = 0xffff;
