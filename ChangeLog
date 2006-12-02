@@ -4,6 +4,12 @@ MUI TextEditor MCC class - ChangeLog
 
 $Id$
 
+2006-12-02 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcc/private.h: minor code restructuring to prepare for a larger debug
+	  session so that we finally can hunt down that "crashes on YAM startup" with
+     TextEditor.mcc involved.
+
 2006-11-27 Thore Böckelmann <tboeckel@gmx.de>
 
    * mcc/EditorStuff.c: when pasting a clip which contained some colors or

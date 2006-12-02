@@ -67,6 +67,29 @@
 #define CLEAR_FLAG(v,f)     ((v) &= ~(f))         // clear the flag f in v
 #define MASK_FLAG(v,f)      ((v) &= (f))          // mask the variable v with flag f bitwise
 
+struct LineNode
+{
+  STRPTR   Contents;      // Set this to the linecontents (allocated via the poolhandle)
+  ULONG    Length;        // The length of the line (including the '\n')
+  UWORD    *Styles;       // Set this to the styles used for this line (allocated via the poolhandle) the format is: pos,style,pos,style,...,-1,0
+  UWORD    *Colors;       // The colors to use (allocated via the poolhandle) the format is: pos,color,pos,color,...,-1,-0
+  BOOL     Color;         // Set this to TRUE if you want the line to be highlighted
+  UWORD    Flow;          // Use the MUIV_TextEditor_Flow_xxx values...
+  UWORD    Separator;     // See definitions below
+  BOOL     clearFlow;     // if the flow definition should be cleared on the next line
+};
+
+struct line_node
+{
+  struct line_node *next;     // Pointer to next line
+  struct line_node *previous; // Pointer to previous line
+
+	struct LineNode line;
+
+  UWORD visual;               // How many lines are this line wrapped over
+  UWORD flags;                // Different flags...
+};
+
 struct bookmark
 {
   struct  line_node *line;
@@ -75,20 +98,20 @@ struct bookmark
 
 struct marking
 {
-  BOOL    enabled;          /* Boolean that indicates wether block is on/off */
-  struct  line_node *startline; /* Line where blockings starts */
-  UWORD   startx;           /* X place of start */
-  struct  line_node *stopline;  /* Line where marking ends */
-  UWORD   stopx;            /* X place of stop */
+  BOOL    enabled;              // Boolean that indicates wether block is on/off
+  struct  line_node *startline; // Line where blockings starts
+  UWORD   startx;               // X place of start
+  struct  line_node *stopline;  // Line where marking ends
+  UWORD   stopx;                // X place of stop
 };
 
 struct pos_info
 {
   struct  line_node *line;      // Pointer to actual line
-  UWORD   lines;              // Lines down
-  UWORD   x;                // Chars in
-  UWORD   bytes;              // Lines in bytes
-  UWORD   extra;              // Lines+1 in bytes
+  UWORD   lines;                // Lines down
+  UWORD   x;                    // Chars in
+  UWORD   bytes;                // Lines in bytes
+  UWORD   extra;                // Lines+1 in bytes
 };
 
 struct UserAction
@@ -136,18 +159,6 @@ struct ImportMessage
   struct  LineNode *linenode; /* Pointer to a linenode, which you should fill out */
   APTR    PoolHandle;         /* A poolhandle, all allocations done for styles or contents must be made from this pool, and the size of the allocation must be stored in the first LONG */
   ULONG   ImportWrap;         /* For your use only (reflects MUIA_TextEditor_ImportWrap) */
-};
-
-struct LineNode
-{
-  STRPTR   Contents;      /* Set this to the linecontents (allocated via the poolhandle) */
-  ULONG    Length;        /* The length of the line (including the '\n') */
-  UWORD    *Styles;       /* Set this to the styles used for this line (allocated via the poolhandle) the format is: pos,style,pos,style,...,-1,0*/
-  UWORD    *Colors;       /* The colors to use (allocated via the poolhandle) the format is: pos,color,pos,color,...,-1,-0 */
-  BOOL     Color;         /* Set this to TRUE if you want the line to be highlighted */
-  UWORD    Flow;          /* Use the MUIV_TextEditor_Flow_xxx values... */
-  UWORD    Separator;     /* See definitions below */
-  BOOL     clearFlow;     /* if the flow definition should be cleared on the next line */
 };
 
 struct InstData
@@ -453,66 +464,39 @@ extern struct Hook ExportHookNoStyle;
 #define IEQUALIFIER_ALT     0x0400
 #define IEQUALIFIER_COMMAND 0x0800
 
-  struct KeyAction
-  {
-    BOOL  vanilla;
-    UWORD key;
-    ULONG qualifier;
-    UWORD action;
-  };
+struct KeyAction
+{
+  BOOL  vanilla;
+  UWORD key;
+  ULONG qualifier;
+  UWORD action;
+};
 
-#include "amiga-align.h"
+enum
+{
+  FLG_HScroll     = 1L << 0,
+  FLG_NumLock     = 1L << 1,
+  FLG_ReadOnly    = 1L << 2,
+  FLG_FastCursor  = 1L << 3,
+  FLG_CheckWords  = 1L << 4,
+  FLG_InsertMode  = 1L << 5,
+  FLG_Quiet       = 1L << 6,
+  FLG_PopWindow   = 1L << 7,
+  FLG_UndoLost    = 1L << 8,
+  FLG_Draw        = 1L << 9,
+  FLG_InVGrp      = 1L << 10,
+  FLG_Ghosted     = 1L << 11,
+  FLG_OwnBkgn     = 1L << 12,
+  FLG_FreezeCrsr  = 1L << 13,
+  FLG_Active      = 1L << 14,
+  FLG_OwnFrame    = 1L << 15,
+  FLG_ARexxMark   = 1L << 16,
+  FLG_FirstInit   = 1L << 17,
+  FLG_AutoClip    = 1L << 18,
+  FLG_Activated   = 1L << 19, // the gadget was activated by MUIM_GoActive()
 
-  struct te_key
-  {
-    UWORD code;
-    ULONG qual;
-    UWORD act;
-  };
-
-  struct keybindings
-  {
-    struct  te_key  keydata;
-  };
-
-#include "default-align.h"
-
-  struct line_node
-  {
-    struct  line_node *next;        /* Pointer to next line */
-    struct  line_node *previous;    /* Pointer to previous line */
-
-		struct LineNode line;
-
-    UWORD   visual;             /* How many lines are this line wrapped over */
-//  UWORD   flags;              /* Different flags... */
-  };
-
-  enum
-  {
-    FLG_HScroll     = 1L << 0,
-    FLG_NumLock     = 1L << 1,
-    FLG_ReadOnly    = 1L << 2,
-    FLG_FastCursor  = 1L << 3,
-    FLG_CheckWords  = 1L << 4,
-    FLG_InsertMode  = 1L << 5,
-    FLG_Quiet       = 1L << 6,
-    FLG_PopWindow   = 1L << 7,
-    FLG_UndoLost    = 1L << 8,
-    FLG_Draw        = 1L << 9,
-    FLG_InVGrp      = 1L << 10,
-    FLG_Ghosted     = 1L << 11,
-    FLG_OwnBkgn     = 1L << 12,
-    FLG_FreezeCrsr  = 1L << 13,
-    FLG_Active      = 1L << 14,
-    FLG_OwnFrame    = 1L << 15,
-    FLG_ARexxMark   = 1L << 16,
-    FLG_FirstInit   = 1L << 17,
-    FLG_AutoClip    = 1L << 18,
-    FLG_Activated   = 1L << 19, // the gadget was activated by MUIM_GoActive()
-
-    FLG_NumberOf
-  };
+  FLG_NumberOf
+};
 
 
 #define  MUIM_TextEditor_InputTrigger     0xad000101
@@ -526,5 +510,19 @@ extern struct Hook ExportHookNoStyle;
 #define ID_SBAR    MAKE_ID('S','B','A','R')
 #define ID_COLS    MAKE_ID('C','O','L','S')
 #define ID_STYL    MAKE_ID('S','T','Y','L')
+
+#include "amiga-align.h"
+struct te_key
+{
+  UWORD code;
+  ULONG qual;
+  UWORD act;
+};
+
+struct keybindings
+{
+  struct  te_key  keydata;
+};
+#include "default-align.h"
 
 #endif /* TEXTEDITOR_MCC_PRIV_H */
