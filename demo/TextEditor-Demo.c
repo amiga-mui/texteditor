@@ -2,7 +2,7 @@
 
  TextEditor-Demo - Textediting MUI Custom Class Demonstration Program
  Copyright (C) 1997-2000 Allan Odgaard
- Copyright (C) 2005 by TextEditor.mcc Open Source Team
+ Copyright (C) 2005-2007 by TextEditor.mcc Open Source Team
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -281,7 +281,7 @@ int main(VOID)
         app = ApplicationObject,
                 MUIA_Application_Author,      "TextEditor.mcc Open Source Team",
                 MUIA_Application_Base,        "TextEditor-Demo",
-                MUIA_Application_Copyright,   "(c) 2005 by TextEditor.mcc Open Source Team",
+                MUIA_Application_Copyright,   "(c) 2005-2007 by TextEditor.mcc Open Source Team",
                 MUIA_Application_Description, "TextEditor.mcc demonstration program",
                 MUIA_Application_RexxHook,    &ARexxHook,
                 MUIA_Application_Title,       "TextEditor-Demo",
