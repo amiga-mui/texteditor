@@ -3,6 +3,13 @@ MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
 $Id$
+$URL$
+
+2007-01-02 Jens Langner <Jens.Langner@light-speed.de>
+
+   * misc: updated all copyright notices to 2007.
+   * mcp/locale/french.ct: added french mcp catalog translation kindly
+     provided by Philippe Bovier.
 
 2006-12-02 Jens Langner <Jens.Langner@light-speed.de>
 
