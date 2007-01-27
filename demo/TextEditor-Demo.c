@@ -76,7 +76,7 @@ struct RexxSysIFace *IRexxSys;
 long __stack = 16384;
 
 Object *app, *window, *editorgad;
-STRPTR StdEntries[] = { "Kind regards ", "Yours ", "Mvh ", NULL };
+const char *StdEntries[] = { "Kind regards ", "Yours ", "Mvh ", NULL };
 LONG cmap[8];
 
 HOOKPROTONH(ARexxHookCode, LONG, Object *app, struct RexxMsg *rexxmsg)
@@ -147,7 +147,7 @@ DISPATCHER(TextEditor_Dispatcher)
 
     case MUIM_TextEditor_HandleError:
     {
-      char *errortxt = NULL;
+      const char *errortxt = NULL;
       struct MUIP_TextEditor_HandleError *msgerr;
 
       msgerr = (struct MUIP_TextEditor_HandleError *)msg;
@@ -202,7 +202,7 @@ DISPATCHER(TextEditor_Dispatcher)
   return DoSuperMethodA(cl, obj, (Msg)msg);
 }
 
-Object *ImageGad(STRPTR text, UBYTE key)
+static Object *ImageGad(const char *text, UBYTE key)
 {
   return(TextObject,
         MUIA_Background,     MUII_ButtonBack,
@@ -219,7 +219,7 @@ Object *ImageGad(STRPTR text, UBYTE key)
         End);
 }
 
-ULONG OpenLibs(void)
+static ULONG OpenLibs(void)
 {
   GfxBase = (APTR)OpenLibrary("graphics.library", 39);
   IntuitionBase = (APTR)OpenLibrary("intuition.library", 39);
@@ -272,9 +272,9 @@ int main(VOID)
       Object *clear, *cut, *copy, *paste, *erase,
              *bold, *italic, *underline, *ischanged, *undo, *redo,
              *flow, *separator, *color, *config;
-      STRPTR flow_text[] = { "Left", "Center", "Right", NULL };
-      STRPTR colors[] = { "Normal", "Black", "White", "Red", "Green", "Cyan", "Yellow", "Blue", "Magenta", NULL };
-      STRPTR classes[] = { "TextEditor.mcc" };
+      const char *flow_text[] = { "Left", "Center", "Right", NULL };
+      const char *colors[] = { "Normal", "Black", "White", "Red", "Green", "Cyan", "Yellow", "Blue", "Magenta", NULL };
+      const char *classes[] = { "TextEditor.mcc" };
 
       if((editor_mcc = MUI_CreateCustomClass(NULL, "TextEditor.mcc", NULL, 0, ENTRY(TextEditor_Dispatcher))))
       {
@@ -285,7 +285,7 @@ int main(VOID)
                 MUIA_Application_Description, "TextEditor.mcc demonstration program",
                 MUIA_Application_RexxHook,    &ARexxHook,
                 MUIA_Application_Title,       "TextEditor-Demo",
-                MUIA_Application_Version,     "$VER: TextEditor-Demo V1.1 (14.08.2006)",
+                MUIA_Application_Version,     "$VER: TextEditor-Demo (" __DATE__ ")",
                 MUIA_Application_UsedClasses, classes,
                 SubWindow, window = WindowObject,
                   MUIA_Window_Title,      "TextEditor-Demo",
@@ -476,7 +476,7 @@ int main(VOID)
                   if(ReturnID == MUIV_RunARexxScript && !myport)
                   {
                     struct MsgPort *rexxport;
-                    STRPTR script = "Rexx:TextEditor/Demo.Rexx";
+                    const char *script = "Rexx:TextEditor/Demo.Rexx";
 
                     if((rexxport = FindPort("REXX")) && (myport = CreateMsgPort()))
                     {
@@ -487,7 +487,7 @@ int main(VOID)
                       rxmsg->rm_Action = RXCOMM;
                       rxmsg->rm_Stdin = rxstdout;
                       rxmsg->rm_Stdout = rxstdout;
-                      rxmsg->rm_Args[0] = CreateArgstring(script, strlen(script));
+                      rxmsg->rm_Args[0] = CreateArgstring((STRPTR)script, strlen(script));
                       PutMsg(rexxport, (struct Message *)rxmsg);
                     }
                   }
