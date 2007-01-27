@@ -5,6 +5,15 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-01-27 Jens Langner <Jens.Langner@light-speed.de>
+
+   * Makefile: removed all target specific (os4,os3,mos) makefiles and replaced
+     them with a single 'Makefile' for all our sub-projects. This new makefile
+     includes methods to automatically identify the HOST and TARGET opererating
+     system and compiles the sources for the found target OS. In addition, that
+     Makefile can be used to also compile for all supported targets via
+     'make OS=XXX' where XXX is the abbreviation for the operating system.
+
 2007-01-02 Jens Langner <Jens.Langner@light-speed.de>
 
    * misc: updated all copyright notices to 2007.
