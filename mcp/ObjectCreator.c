@@ -36,9 +36,9 @@
 #include "private.h"
 #include "muiextra.h"
 
-char *FunctionName (UWORD func)
+const char *FunctionName (UWORD func)
 {
-  char *name;
+  const char *name;
 
   switch(func)
   {

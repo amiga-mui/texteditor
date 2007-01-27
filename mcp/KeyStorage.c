@@ -112,7 +112,7 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
   struct RDArgs *myrdargs;
   enum Keys count = key_lshift;
 
-  static const STRPTR ratemplate =
+  static const char * const ratemplate =
     "LSHIFT/S,RSHIFT/S,CAPSLOCK/S,CONTROL=CTRL/S,LALT/S,RALT/S,LAMIGA=LCOMMAND/S,RAMIGA=RCOMMAND/S,NUMPAD=NUMERICPAD/S,SHIFT/S,ALT/S,AMIGA=COMMAND/S,"
     "f1/S,f2/S,f3/S,f4/S,f5/S,f6/S,f7/S,f8/S,f9/S,f10/S,f11/S,f12/S,"
     "help/S,"

@@ -7,6 +7,7 @@ $URL$
 
 2007-01-27 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcp: fixed several non-critical compiler warnings.
    * Makefile: removed all target specific (os4,os3,mos) makefiles and replaced
      them with a single 'Makefile' for all our sub-projects. This new makefile
      includes methods to automatically identify the HOST and TARGET opererating
