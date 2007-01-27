@@ -56,7 +56,7 @@ void SetupDebug(void)
 {
   char var[256];
 
-  kprintf("** TextEditor.mcc v" LIB_REV_STRING " startup ***********************\n");
+  kprintf("** TextEditor.mcp v" LIB_REV_STRING " startup ***********************\n");
   kprintf("Initializing runtime debugging:\n");
 
 	if(GetVar("texteditor.mcp.debug", var, sizeof(var), 0) > 0)
@@ -66,7 +66,7 @@ void SetupDebug(void)
 
     // static list of our debugging classes tokens.
     // in the yamdebug variable these classes always start with a @
-    static struct { char *token; unsigned long flag; } dbclasses[] =
+    static struct { const char *token; unsigned long flag; } dbclasses[] =
 		{
 			{ "ctrace",  DBC_CTRACE   },
 			{ "report",  DBC_REPORT   },
@@ -79,7 +79,7 @@ void SetupDebug(void)
 			{ NULL,      0            }
 		};
 
-		static struct { char *token; unsigned long flag; } dbflags[] =
+		static struct { const char *token; unsigned long flag; } dbflags[] =
 		{
 			{ "always",   DBF_ALWAYS  },
 			{ "startup",  DBF_STARTUP },
@@ -262,7 +262,7 @@ void _SHOWVALUE(unsigned long dclass, unsigned long dflags, unsigned long value,
 	if(isFlagSet(debug_classes, dclass) &&
      isFlagSet(debug_flags, dflags))
 	{
-		char *fmt;
+		const char *fmt;
 
 		switch(size)
 		{
@@ -308,7 +308,7 @@ void _SHOWPOINTER(unsigned long dclass, unsigned long dflags, const void *p, con
 	if(isFlagSet(debug_classes, dclass) &&
      isFlagSet(debug_flags, dflags))
 	{
-		char *fmt;
+		const char *fmt;
 
 		_INDENT();
 
@@ -379,7 +379,7 @@ void _DPRINTF(unsigned long dclass, unsigned long dflags, const char *file, int 
 
     if(ansi_output)
     {
-      char *highlight = ANSI_ESC_FG_GREEN;
+      const char *highlight = ANSI_ESC_FG_GREEN;
 
       switch(dclass)
       {
@@ -416,7 +416,7 @@ void _DPRINTF(unsigned long dclass, unsigned long dflags, const char *file, int 
 
     if(ansi_output)
     {
-      char *highlight = ANSI_ESC_FG_GREEN;
+      const char *highlight = ANSI_ESC_FG_GREEN;
 
       switch(dclass)
       {

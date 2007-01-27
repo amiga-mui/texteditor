@@ -63,13 +63,13 @@ HOOKPROTONH(ListDisplayFunc, void, char **array, struct te_key *entry)
     KeyToString(buffer, sizeof(buffer), &ka);
 
     *array++ = buffer;
-    *array++ = "=";
-    *array = FunctionName(entry->act);
+    *array++ = (STRPTR)"=";
+    *array = (STRPTR)FunctionName(entry->act);
   }
   else
   {
     *array++ = GetStr(MSG_LVLabel_Key);
-    *array++ = "";
+    *array++ = (STRPTR)"";
     *array = GetStr(MSG_LVLabel_Action);
   }
 
