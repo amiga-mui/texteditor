@@ -263,12 +263,12 @@ static Object *PrefsObject(struct InstData_MCP *data)
 
   _ASSERT( ARRAY_SIZE(data->gTitles) == (ARRAY_SIZE(titles)+1) );
   for(i=0; i<ARRAY_SIZE(titles); i++)
-    data->gTitles[i] = tr((APTR)titles[i]);
+    data->gTitles[i] = tr(titles[i]);
   data->gTitles[ARRAY_SIZE(titles)] = NULL;
 
   _ASSERT( ARRAY_SIZE(data->functions) == (ARRAY_SIZE(functions)+1) );
   for(i=0; i<ARRAY_SIZE(functions); i++)
-    data->functions[i] = tr((APTR)functions[i]);
+    data->functions[i] = tr(functions[i]);
   data->functions[ARRAY_SIZE(functions)] = NULL;
 
   _ASSERT( ARRAY_SIZE(data->execution) == 3 );
