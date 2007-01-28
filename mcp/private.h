@@ -158,10 +158,10 @@ struct InstData_MCP
   Object *separatorshadow;
   Object *CfgObj;
 
-  char *gTitles[5];
-  char *functions[39];
-  char *execution[3];
-  char *cycleentries[5];
+  const char *gTitles[5];
+  const char *functions[39];
+  const char *execution[3];
+  const char *cycleentries[5];
 
   struct Catalog *catalog;
 };

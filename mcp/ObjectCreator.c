@@ -43,155 +43,155 @@ const char *FunctionName (UWORD func)
   switch(func)
   {
     case mUp:
-      name = GetStr(MSG_Function_Up);
+      name = tr(MSG_Function_Up);
       break;
 
     case mDown:
-      name = GetStr(MSG_Function_Down);
+      name = tr(MSG_Function_Down);
       break;
 
     case mLeft:
-      name = GetStr(MSG_Function_Left);
+      name = tr(MSG_Function_Left);
       break;
 
     case mRight:
-      name = GetStr(MSG_Function_Right);
+      name = tr(MSG_Function_Right);
       break;
 
     case mPreviousPage:
-      name = GetStr(MSG_Function_PrvPage);
+      name = tr(MSG_Function_PrvPage);
       break;
 
     case mNextPage:
-      name = GetStr(MSG_Function_NxtPage);
+      name = tr(MSG_Function_NxtPage);
       break;
 
     case mStartOfLine:
-      name = GetStr(MSG_Function_BOL);
+      name = tr(MSG_Function_BOL);
       break;
 
     case mEndOfLine:
-      name = GetStr(MSG_Function_EOL);
+      name = tr(MSG_Function_EOL);
       break;
 
     case mTop:
-      name = GetStr(MSG_Function_Top);
+      name = tr(MSG_Function_Top);
       break;
 
     case mBottom:
-      name = GetStr(MSG_Function_Bottom);
+      name = tr(MSG_Function_Bottom);
       break;
 
     case mPreviousWord:
-      name = GetStr(MSG_Function_PrvWord);
+      name = tr(MSG_Function_PrvWord);
       break;
 
     case mNextWord:
-      name = GetStr(MSG_Function_NxtWord);
+      name = tr(MSG_Function_NxtWord);
       break;
 
     case mPreviousLine:
-      name = GetStr(MSG_Function_PrvPara);
+      name = tr(MSG_Function_PrvPara);
       break;
 
     case mNextLine:
-      name = GetStr(MSG_Function_NxtPara);
+      name = tr(MSG_Function_NxtPara);
       break;
 
     case mPreviousSentence:
-      name = GetStr(MSG_Function_PrvSent);
+      name = tr(MSG_Function_PrvSent);
       break;
 
     case mNextSentence:
-      name = GetStr(MSG_Function_NxtSent);
+      name = tr(MSG_Function_NxtSent);
       break;
 
     case kSuggestWord:
-      name = GetStr(MSG_Function_SuggestSpelling);
+      name = tr(MSG_Function_SuggestSpelling);
       break;
 
     case kBackspace:
-      name = GetStr(MSG_Function_Backspace);
+      name = tr(MSG_Function_Backspace);
       break;
 
     case kDelete:
-      name = GetStr(MSG_Function_Delete);
+      name = tr(MSG_Function_Delete);
       break;
 
     case kReturn:
-      name = GetStr(MSG_Function_Return);
+      name = tr(MSG_Function_Return);
       break;
 
     case kTab:
-      name = GetStr(MSG_Function_Tab);
+      name = tr(MSG_Function_Tab);
       break;
 
     case kCut:
-      name = GetStr(MSG_Function_Cut);
+      name = tr(MSG_Function_Cut);
       break;
 
     case kCopy:
-      name = GetStr(MSG_Function_Copy);
+      name = tr(MSG_Function_Copy);
       break;
 
     case kPaste:
-      name = GetStr(MSG_Function_Paste);
+      name = tr(MSG_Function_Paste);
       break;
 
     case kUndo:
-      name = GetStr(MSG_Function_Undo);
+      name = tr(MSG_Function_Undo);
       break;
     
     case kRedo:
-      name = GetStr(MSG_Function_Redo);
+      name = tr(MSG_Function_Redo);
       break;
     
     case kDelEOL:
-      name = GetStr(MSG_Function_DelEOL);
+      name = tr(MSG_Function_DelEOL);
       break;
     
     case kDelBOL:
-      name = GetStr(MSG_Function_DelBOL);
+      name = tr(MSG_Function_DelBOL);
       break;
     
     case kDelEOW:
-      name = GetStr(MSG_Function_DelEOW);
+      name = tr(MSG_Function_DelEOW);
       break;
     
     case kDelBOW:
-      name = GetStr(MSG_Function_DelBOW);
+      name = tr(MSG_Function_DelBOW);
       break;
     
     case kDelLine:
-      name = GetStr(MSG_Function_DelLine);
+      name = tr(MSG_Function_DelLine);
       break;
     
     case kNextGadget:
-      name = GetStr(MSG_Function_NextGadget);
+      name = tr(MSG_Function_NextGadget);
       break;
     
     case kGotoBookmark1:
-      name = GetStr(MSG_Function_GotoBookmark1);
+      name = tr(MSG_Function_GotoBookmark1);
       break;
     
     case kGotoBookmark2:
-      name = GetStr(MSG_Function_GotoBookmark2);
+      name = tr(MSG_Function_GotoBookmark2);
       break;
     
     case kGotoBookmark3:
-      name = GetStr(MSG_Function_GotoBookmark3);
+      name = tr(MSG_Function_GotoBookmark3);
       break;
     
     case kSetBookmark1:
-      name = GetStr(MSG_Function_SetBookmark1);
+      name = tr(MSG_Function_SetBookmark1);
       break;
     
     case kSetBookmark2:
-      name = GetStr(MSG_Function_SetBookmark2);
+      name = tr(MSG_Function_SetBookmark2);
       break;
     
     case kSetBookmark3:
-      name = GetStr(MSG_Function_SetBookmark3);
+      name = tr(MSG_Function_SetBookmark3);
       break;
     
     default:
@@ -263,22 +263,22 @@ static Object *PrefsObject(struct InstData_MCP *data)
 
   _ASSERT( ARRAY_SIZE(data->gTitles) == (ARRAY_SIZE(titles)+1) );
   for(i=0; i<ARRAY_SIZE(titles); i++)
-    data->gTitles[i] = GetStr((APTR)titles[i]);
+    data->gTitles[i] = tr((APTR)titles[i]);
   data->gTitles[ARRAY_SIZE(titles)] = NULL;
 
   _ASSERT( ARRAY_SIZE(data->functions) == (ARRAY_SIZE(functions)+1) );
   for(i=0; i<ARRAY_SIZE(functions); i++)
-    data->functions[i] = GetStr((APTR)functions[i]);
+    data->functions[i] = tr((APTR)functions[i]);
   data->functions[ARRAY_SIZE(functions)] = NULL;
 
   _ASSERT( ARRAY_SIZE(data->execution) == 3 );
-  data->execution[0] = GetStr(MSG_Execution_CLI);
-  data->execution[1] = GetStr(MSG_Execution_ARexx);
+  data->execution[0] = tr(MSG_Execution_CLI);
+  data->execution[1] = tr(MSG_Execution_ARexx);
   data->execution[2] = NULL;
 
   _ASSERT( ARRAY_SIZE(data->cycleentries) == (ARRAY_SIZE(cycleentries)+1) );
   for(i=0; i<ARRAY_SIZE(cycleentries); i++)
-    data->cycleentries[i] = GetStr((APTR)cycleentries[i]);
+    data->cycleentries[i] = tr(cycleentries[i]);
   data->cycleentries[ARRAY_SIZE(cycleentries)] = NULL;
 
   data->obj = CreatePrefsGroup(data);
@@ -316,29 +316,29 @@ ULONG New(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct opSet
 
       if(MUIMasterBase->lib_Version >= 20)
       {
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->LookupExeType, MUICFG_TextEditor_LookupCmd, 1, GetStr(MSG_Label_LookupCmd));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->lookupcmd, MUICFG_TextEditor_LookupCmd, 1, GetStr(MSG_Label_LookupCmd));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->SuggestExeType, MUICFG_TextEditor_SuggestCmd, 1, GetStr(MSG_Label_SuggestCmd));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->suggestcmd, MUICFG_TextEditor_SuggestCmd, 1, GetStr(MSG_Label_SuggestCmd));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->keybindings, MUICFG_TextEditor_Keybindings, 1, GetStr(MSG_Page_Keybindings));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->frame, MUICFG_TextEditor_Frame, 1, GetStr(MSG_Label_Frame));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->background, MUICFG_TextEditor_Background, 1, GetStr(MSG_Label_Background));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->blinkspeed, MUICFG_TextEditor_BlinkSpeed, 1, GetStr(MSG_Label_BlinkSpeed));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->blockqual, MUICFG_TextEditor_BlockQual, 1, GetStr(MSG_Label_BlkQual));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->cursorcolor, MUICFG_TextEditor_CursorColor, 1, GetStr(MSG_Label_Cursor));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->cursorwidth, MUICFG_TextEditor_CursorWidth, 1, GetStr(MSG_Label_Width));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->fixedfont, MUICFG_TextEditor_FixedFont, 1, GetStr(MSG_Label_Fixed));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->highlightcolor, MUICFG_TextEditor_HighlightColor, 1, GetStr(MSG_Label_Highlight));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->markedcolor, MUICFG_TextEditor_MarkedColor, 1, GetStr(MSG_Label_Selected));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->normalfont, MUICFG_TextEditor_NormalFont, 1, GetStr(MSG_Label_Normal));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->smooth, MUICFG_TextEditor_Smooth, 1, GetStr(MSG_Label_Smooth));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->typenspell, MUICFG_TextEditor_TypeNSpell, 1, GetStr(MSG_ConfigMenu_TypeNSpell));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->CheckWord, MUICFG_TextEditor_CheckWord, 1, GetStr(MSG_ConfigMenu_CheckWord));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->tabsize, MUICFG_TextEditor_TabSize, 1, GetStr(MSG_Label_TabSize));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->undosize, MUICFG_TextEditor_UndoSize, 1, GetStr(MSG_Label_UndoLevel));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->textcolor, MUICFG_TextEditor_TextColor, 1, GetStr(MSG_Label_Text));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->separatorshine, MUICFG_TextEditor_SeparatorShine, 1, GetStr(MSG_Label_SeparatorShine));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->separatorshadow, MUICFG_TextEditor_SeparatorShadow, 1, GetStr(MSG_Label_SeparatorShadow));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->LookupExeType, MUICFG_TextEditor_LookupCmd, 1, tr(MSG_Label_LookupCmd));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->lookupcmd, MUICFG_TextEditor_LookupCmd, 1, tr(MSG_Label_LookupCmd));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->SuggestExeType, MUICFG_TextEditor_SuggestCmd, 1, tr(MSG_Label_SuggestCmd));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->suggestcmd, MUICFG_TextEditor_SuggestCmd, 1, tr(MSG_Label_SuggestCmd));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->keybindings, MUICFG_TextEditor_Keybindings, 1, tr(MSG_Page_Keybindings));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->frame, MUICFG_TextEditor_Frame, 1, tr(MSG_Label_Frame));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->background, MUICFG_TextEditor_Background, 1, tr(MSG_Label_Background));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->blinkspeed, MUICFG_TextEditor_BlinkSpeed, 1, tr(MSG_Label_BlinkSpeed));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->blockqual, MUICFG_TextEditor_BlockQual, 1, tr(MSG_Label_BlkQual));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->cursorcolor, MUICFG_TextEditor_CursorColor, 1, tr(MSG_Label_Cursor));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->cursorwidth, MUICFG_TextEditor_CursorWidth, 1, tr(MSG_Label_Width));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->fixedfont, MUICFG_TextEditor_FixedFont, 1, tr(MSG_Label_Fixed));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->highlightcolor, MUICFG_TextEditor_HighlightColor, 1, tr(MSG_Label_Highlight));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->markedcolor, MUICFG_TextEditor_MarkedColor, 1, tr(MSG_Label_Selected));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->normalfont, MUICFG_TextEditor_NormalFont, 1, tr(MSG_Label_Normal));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->smooth, MUICFG_TextEditor_Smooth, 1, tr(MSG_Label_Smooth));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->typenspell, MUICFG_TextEditor_TypeNSpell, 1, tr(MSG_ConfigMenu_TypeNSpell));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->CheckWord, MUICFG_TextEditor_CheckWord, 1, tr(MSG_ConfigMenu_CheckWord));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->tabsize, MUICFG_TextEditor_TabSize, 1, tr(MSG_Label_TabSize));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->undosize, MUICFG_TextEditor_UndoSize, 1, tr(MSG_Label_UndoLevel));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->textcolor, MUICFG_TextEditor_TextColor, 1, tr(MSG_Label_Text));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->separatorshine, MUICFG_TextEditor_SeparatorShine, 1, tr(MSG_Label_SeparatorShine));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->separatorshadow, MUICFG_TextEditor_SeparatorShadow, 1, tr(MSG_Label_SeparatorShadow));
       }
       else
         set(data->frame, MUIA_Disabled, TRUE);
