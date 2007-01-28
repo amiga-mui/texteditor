@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-01-28 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcp: renamed the GetStr() locale translation function to the much shorter
+     tr() naming and adapted all files to it.
+
 2007-01-27 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcp: fixed several non-critical compiler warnings.

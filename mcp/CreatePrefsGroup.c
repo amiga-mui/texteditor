@@ -68,9 +68,9 @@ HOOKPROTONH(ListDisplayFunc, void, char **array, struct te_key *entry)
   }
   else
   {
-    *array++ = GetStr(MSG_LVLabel_Key);
+    *array++ = (STRPTR)tr(MSG_LVLabel_Key);
     *array++ = (STRPTR)"";
-    *array = GetStr(MSG_LVLabel_Action);
+    *array   = (STRPTR)tr(MSG_LVLabel_Action);
   }
 
   LEAVE();
@@ -245,27 +245,18 @@ HOOKPROTONHNO(UpdateCode, void, APTR **array)
 }
 MakeStaticHook(UpdateHook, UpdateCode);
 
-static APTR TxtLabel (STRPTR text, ULONG weight)
+static Object *TxtLabel(const char *text, ULONG weight)
 {
-/*    APTR result = TextEditorObject,
-        MUIA_Background, MUII_GroupBack,
-        MUIA_TextEditor_ReadOnly, TRUE,
-        MUIA_TextEditor_Contents, text,
-        MUIA_Weight, weight,
-        End;
-*/
-    APTR result = TextObject,
-        MUIA_FramePhantomHoriz, TRUE,
-        MUIA_Frame, MUIV_Frame_ImageButton,
-        MUIA_Text_PreParse, "\33r",
-        MUIA_Text_SetVMax, FALSE,
-        MUIA_Text_Contents, text,
-        MUIA_Weight, weight,
-        End;
+  Object *obj = TextObject,
+                  MUIA_FramePhantomHoriz, TRUE,
+                  MUIA_Frame,             MUIV_Frame_ImageButton,
+                  MUIA_Text_PreParse,     "\33r",
+                  MUIA_Text_SetVMax,      FALSE,
+                  MUIA_Text_Contents,     text,
+                  MUIA_Weight,            weight,
+                End;
 
-//    APTR result = MUI_MakeObject(MUIO_Label, text, 0);
-
-  return(result);
+  return(obj);
 }
 
 Object *CreatePrefsGroup(struct InstData_MCP *data)
@@ -274,47 +265,41 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
          *editor, *keylist, *defaultkeys, *functionname,
          *plist, *popbutton;
 
-  struct NewMenu *nm, editpopupdata[] =
+  struct NewMenu editpopupdata[] =
   {
-    { NM_TITLE, MSG_MenuTitle_Edit,    0, 0, 0, (APTR)0 },
-    { NM_ITEM,  MSG_MenuItem_Cut,       NULL, NM_COMMANDSTRING, 0, (APTR)1 },
-    { NM_ITEM,  MSG_MenuItem_Copy,     NULL, NM_COMMANDSTRING, 0, (APTR)2 },
-    { NM_ITEM,  MSG_MenuItem_Paste,   NULL, NM_COMMANDSTRING, 0, (APTR)3 },
-    { NM_ITEM,  MSG_MenuItem_Delete, NULL, NM_COMMANDSTRING, 0, (APTR)4 },
+    { NM_TITLE, (STRPTR)tr(MSG_MenuTitle_Edit),         0, 0, 0, (APTR)0 },
+    { NM_ITEM,  (STRPTR)tr(MSG_MenuItem_Cut),           NULL, NM_COMMANDSTRING, 0, (APTR)1 },
+    { NM_ITEM,  (STRPTR)tr(MSG_MenuItem_Copy),          NULL, NM_COMMANDSTRING, 0, (APTR)2 },
+    { NM_ITEM,  (STRPTR)tr(MSG_MenuItem_Paste),         NULL, NM_COMMANDSTRING, 0, (APTR)3 },
+    { NM_ITEM,  (STRPTR)tr(MSG_MenuItem_Delete),        NULL, NM_COMMANDSTRING, 0, (APTR)4 },
     { NM_ITEM,  NM_BARLABEL, 0, 0, 0, (APTR)0 },
-    { NM_ITEM,  MSG_MenuItem_Undo, NULL, NM_COMMANDSTRING, 0, (APTR)5 },
-    { NM_ITEM,  MSG_MenuItem_Redo, NULL, NM_COMMANDSTRING, 0, (APTR)6 },
+    { NM_ITEM,  (STRPTR)tr(MSG_MenuItem_Undo),          NULL, NM_COMMANDSTRING, 0, (APTR)5 },
+    { NM_ITEM,  (STRPTR)tr(MSG_MenuItem_Redo),          NULL, NM_COMMANDSTRING, 0, (APTR)6 },
     { NM_ITEM,  NM_BARLABEL, 0, 0, 0, (APTR)0 },
-    { NM_ITEM,  MSG_MenuItem_Bold, NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)7 },
-    { NM_ITEM,  MSG_MenuItem_Italic, NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)8 },
-    { NM_ITEM,  MSG_MenuItem_Underline, NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)9 },
+    { NM_ITEM,  (STRPTR)tr(MSG_MenuItem_Bold),          NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)7 },
+    { NM_ITEM,  (STRPTR)tr(MSG_MenuItem_Italic),        NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)8 },
+    { NM_ITEM,  (STRPTR)tr(MSG_MenuItem_Underline),     NULL, NM_COMMANDSTRING | CHECKIT|MENUTOGGLE, 0, (APTR)9 },
     { NM_ITEM,  NM_BARLABEL, 0, 0, 0, (APTR)0 },
-    { NM_ITEM,  MSG_MenuSubTitle_Alignment, 0, 0, 0, (APTR)0 },
-    { NM_SUB,   MSG_MenuItem_Left, NULL, NM_COMMANDSTRING | CHECKIT|CHECKED, ~1, (APTR)10 },
-    { NM_SUB,   MSG_MenuItem_Center, NULL, NM_COMMANDSTRING | CHECKIT, ~2, (APTR)11 },
-    { NM_SUB,   MSG_MenuItem_Right, NULL, NM_COMMANDSTRING | CHECKIT, ~4, (APTR)12 },
+    { NM_ITEM,  (STRPTR)tr(MSG_MenuSubTitle_Alignment), 0, 0, 0, (APTR)0 },
+    { NM_SUB,   (STRPTR)tr(MSG_MenuItem_Left),          NULL, NM_COMMANDSTRING | CHECKIT|CHECKED, ~1, (APTR)10 },
+    { NM_SUB,   (STRPTR)tr(MSG_MenuItem_Center),        NULL, NM_COMMANDSTRING | CHECKIT, ~2, (APTR)11 },
+    { NM_SUB,   (STRPTR)tr(MSG_MenuItem_Right),         NULL, NM_COMMANDSTRING | CHECKIT, ~4, (APTR)12 },
 
-    { NM_ITEM,  MSG_MenuSubTitle_Color, 0, 0, 0, (APTR)0 },
-    { NM_SUB,   MSG_MenuItem_Normal, NULL, NM_COMMANDSTRING | CHECKIT|CHECKED, ~1, (APTR)13 },
-    { NM_SUB,   MSG_MenuItem_Shine, NULL, NM_COMMANDSTRING | CHECKIT, ~2, (APTR)14 },
-    { NM_SUB,   MSG_MenuItem_Halfshine, NULL, NM_COMMANDSTRING | CHECKIT, ~4, (APTR)15 },
-    { NM_SUB,   MSG_MenuItem_Background, NULL, NM_COMMANDSTRING | CHECKIT, ~8, (APTR)16 },
-    { NM_SUB,   MSG_MenuItem_Halfshadow, NULL, NM_COMMANDSTRING | CHECKIT, ~16, (APTR)17 },
-    { NM_SUB,   MSG_MenuItem_Shadow, NULL, NM_COMMANDSTRING | CHECKIT, ~32, (APTR)18 },
-    { NM_SUB,   MSG_MenuItem_Text, NULL, NM_COMMANDSTRING | CHECKIT, ~64, (APTR)19 },
-    { NM_SUB,   MSG_MenuItem_Fill, NULL, NM_COMMANDSTRING | CHECKIT, ~128, (APTR)20 },
-    { NM_SUB,   MSG_MenuItem_Mark, NULL, NM_COMMANDSTRING | CHECKIT, ~256, (APTR)21 },
+    { NM_ITEM,  (STRPTR)tr(MSG_MenuSubTitle_Color),     0, 0, 0, (APTR)0 },
+    { NM_SUB,   (STRPTR)tr(MSG_MenuItem_Normal),        NULL, NM_COMMANDSTRING | CHECKIT|CHECKED, ~1, (APTR)13 },
+    { NM_SUB,   (STRPTR)tr(MSG_MenuItem_Shine),         NULL, NM_COMMANDSTRING | CHECKIT, ~2, (APTR)14 },
+    { NM_SUB,   (STRPTR)tr(MSG_MenuItem_Halfshine),     NULL, NM_COMMANDSTRING | CHECKIT, ~4, (APTR)15 },
+    { NM_SUB,   (STRPTR)tr(MSG_MenuItem_Background),    NULL, NM_COMMANDSTRING | CHECKIT, ~8, (APTR)16 },
+    { NM_SUB,   (STRPTR)tr(MSG_MenuItem_Halfshadow),    NULL, NM_COMMANDSTRING | CHECKIT, ~16, (APTR)17 },
+    { NM_SUB,   (STRPTR)tr(MSG_MenuItem_Shadow),        NULL, NM_COMMANDSTRING | CHECKIT, ~32, (APTR)18 },
+    { NM_SUB,   (STRPTR)tr(MSG_MenuItem_Text),          NULL, NM_COMMANDSTRING | CHECKIT, ~64, (APTR)19 },
+    { NM_SUB,   (STRPTR)tr(MSG_MenuItem_Fill),          NULL, NM_COMMANDSTRING | CHECKIT, ~128, (APTR)20 },
+    { NM_SUB,   (STRPTR)tr(MSG_MenuItem_Mark),          NULL, NM_COMMANDSTRING | CHECKIT, ~256, (APTR)21 },
 
     { NM_END,   NULL, 0, 0, 0, (APTR)0 }
   };
 
   ENTER();
-
-  nm = editpopupdata;
-  do {
-    if (nm->nm_Label != NM_BARLABEL)
-      nm->nm_Label = GetStr(nm->nm_Label);
-  } while (++nm,nm->nm_Type != NM_END);
 
   data->editpopup = MUI_MakeObject(MUIO_MenustripNM, editpopupdata, NULL);
 
@@ -328,26 +313,26 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
             MUIA_VertWeight, 0,
             MUIA_Background, MUII_GroupBack,
             MUIA_Frame, MUIV_Frame_Group,
-            MUIA_FrameTitle, GetStr(MSG_GroupTitle_Control),
+            MUIA_FrameTitle, tr(MSG_GroupTitle_Control),
             Child, RectangleObject,
             End,
             Child, ColGroup(2),
-              Child, TxtLabel(GetStr(MSG_Label_UndoLevel), 0),
+              Child, TxtLabel(tr(MSG_Label_UndoLevel), 0),
               Child, data->undosize = SliderObject,
-                MUIA_ShortHelp, GetStr(HelpBubble_UndoLevel),
+                MUIA_ShortHelp, tr(HelpBubble_UndoLevel),
                 MUIA_Numeric_Min, 20,
                 MUIA_Numeric_Max, 2000,
                 MUIA_Numeric_Format, "%ld (± 5)",
               End,
-              Child, TxtLabel(GetStr(MSG_Label_TabSize), 0),
+              Child, TxtLabel(tr(MSG_Label_TabSize), 0),
               Child, data->tabsize = SliderObject,
                 MUIA_Numeric_Min, 2,
                 MUIA_Numeric_Max, 12,
-                MUIA_Numeric_Format, GetStr(MSG_SliderText_TabSize),
+                MUIA_Numeric_Format, tr(MSG_SliderText_TabSize),
               End,
-              Child, TxtLabel(GetStr(MSG_Label_Smooth), 0),
+              Child, TxtLabel(tr(MSG_Label_Smooth), 0),
               Child, HGroup,
-                MUIA_ShortHelp, GetStr(HelpBubble_Smooth),
+                MUIA_ShortHelp, tr(HelpBubble_Smooth),
                 Child, data->smooth = MUI_MakeObject(MUIO_Checkmark, NULL),
                 Child, RectangleObject,
                 End,
@@ -362,24 +347,24 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
             MUIA_Group_SameHeight, FALSE,
             MUIA_Background, MUII_GroupBack,
             MUIA_Frame, MUIV_Frame_Group,
-            MUIA_FrameTitle, GetStr(MSG_GroupTitle_Design),
+            MUIA_FrameTitle, tr(MSG_GroupTitle_Design),
 
-            Child, TxtLabel(GetStr(MSG_Label_Frame), 0),
+            Child, TxtLabel(tr(MSG_Label_Frame), 0),
             Child, data->frame = MUI_NewObject("Popframe.mui",
-              MUIA_Window_Title, GetStr(MSG_PopWinTitle_Frame),
+              MUIA_Window_Title, tr(MSG_PopWinTitle_Frame),
             End,
-            Child, TxtLabel(GetStr(MSG_Label_Background), 0),
+            Child, TxtLabel(tr(MSG_Label_Background), 0),
             Child, data->background = MUI_NewObject("Popimage.mui",
-              MUIA_Window_Title, GetStr(MSG_PopWinTitle_Background),
+              MUIA_Window_Title, tr(MSG_PopWinTitle_Background),
               MUIA_Imageadjust_Type, 2,
             End,
-            Child, TxtLabel(GetStr(MSG_Label_Text), 0),
+            Child, TxtLabel(tr(MSG_Label_Text), 0),
             Child, data->textcolor = PoppenObject,
-              MUIA_Window_Title, GetStr(MSG_PopWinTitle_Text),
+              MUIA_Window_Title, tr(MSG_PopWinTitle_Text),
             End,
-            Child, TxtLabel(GetStr(MSG_Label_Highlight), 0),
+            Child, TxtLabel(tr(MSG_Label_Highlight), 0),
             Child, data->highlightcolor = PoppenObject,
-              MUIA_Window_Title, GetStr(MSG_PopWinTitle_Highlight),
+              MUIA_Window_Title, tr(MSG_PopWinTitle_Highlight),
             End,
           End,
 
@@ -387,14 +372,14 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
             MUIA_VertWeight, 60,
             MUIA_Background, MUII_GroupBack,
             MUIA_Frame, MUIV_Frame_Group,
-            MUIA_FrameTitle, GetStr(MSG_GroupTitle_Separator),
-            Child, TxtLabel(GetStr(MSG_Label_SeparatorShine), 0),
+            MUIA_FrameTitle, tr(MSG_GroupTitle_Separator),
+            Child, TxtLabel(tr(MSG_Label_SeparatorShine), 0),
             Child, data->separatorshine = PoppenObject,
-              MUIA_Window_Title, GetStr(MSG_PopWinTitle_SeparatorShine),
+              MUIA_Window_Title, tr(MSG_PopWinTitle_SeparatorShine),
             End,
-            Child, TxtLabel(GetStr(MSG_Label_SeparatorShadow), 0),
+            Child, TxtLabel(tr(MSG_Label_SeparatorShadow), 0),
             Child, data->separatorshadow = PoppenObject,
-              MUIA_Window_Title, GetStr(MSG_PopWinTitle_SeparatorShadow),
+              MUIA_Window_Title, tr(MSG_PopWinTitle_SeparatorShadow),
             End,
           End,
         End,
@@ -404,17 +389,17 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 //            MUIA_VertWeight, 0,
             MUIA_Background, MUII_GroupBack,
             MUIA_Frame, MUIV_Frame_Group,
-            MUIA_FrameTitle, GetStr(MSG_GroupTitle_Fonts),
+            MUIA_FrameTitle, tr(MSG_GroupTitle_Fonts),
             Child, RectangleObject,
             End,
             Child, ColGroup(2),
-              Child, TxtLabel(GetStr(MSG_Label_Normal), 0),
+              Child, TxtLabel(tr(MSG_Label_Normal), 0),
               Child, PopaslObject,
                 MUIA_Popstring_String,  data->normalfont = BetterStringObject, StringFrame, End,
                 MUIA_Popstring_Button,  MUI_MakeObject(MUIO_PopButton, MUII_PopUp),
                 MUIA_Popasl_Type,     ASL_FontRequest,
               End,
-              Child, TxtLabel(GetStr(MSG_Label_Fixed), 0),
+              Child, TxtLabel(tr(MSG_Label_Fixed), 0),
               Child, PopaslObject,
                 MUIA_Popstring_String,  data->fixedfont = BetterStringObject, StringFrame, End,
                 MUIA_Popstring_Button,  MUI_MakeObject(MUIO_PopButton, MUII_PopUp),
@@ -430,27 +415,27 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 //            MUIA_VertWeight, 0,
             MUIA_Background, MUII_GroupBack,
             MUIA_Frame, MUIV_Frame_Group,
-            MUIA_FrameTitle, GetStr(MSG_GroupTitle_Cursor),
+            MUIA_FrameTitle, tr(MSG_GroupTitle_Cursor),
             MUIA_Group_Columns, 2,
-            Child, TxtLabel(GetStr(MSG_Label_Cursor), 0),
+            Child, TxtLabel(tr(MSG_Label_Cursor), 0),
             Child, data->cursorcolor = PoppenObject,
-              MUIA_Window_Title, GetStr(MSG_PopWinTitle_Cursor),
+              MUIA_Window_Title, tr(MSG_PopWinTitle_Cursor),
             End,
-            Child, TxtLabel(GetStr(MSG_Label_Selected), 0),
+            Child, TxtLabel(tr(MSG_Label_Selected), 0),
             Child, data->markedcolor = PoppenObject,
-              MUIA_Window_Title, GetStr(MSG_PopWinTitle_Selected),
+              MUIA_Window_Title, tr(MSG_PopWinTitle_Selected),
             End,
-            Child, TxtLabel(GetStr(MSG_Label_Width), 0),
+            Child, TxtLabel(tr(MSG_Label_Width), 0),
             Child, data->cursorwidth = NewObject(widthslider_mcc->mcc_Class, NULL,
               MUIA_Numeric_Min, 1,
               MUIA_Numeric_Max, 6,
-              MUIA_Numeric_Format, GetStr(MSG_SliderText_StdWidth),
+              MUIA_Numeric_Format, tr(MSG_SliderText_StdWidth),
             End,
-            Child, TxtLabel(GetStr(MSG_Label_BlinkSpeed), 0),
+            Child, TxtLabel(tr(MSG_Label_BlinkSpeed), 0),
             Child, data->blinkspeed = NewObject(speedslider_mcc->mcc_Class, NULL,
               MUIA_Numeric_Min, 0,
               MUIA_Numeric_Max, 20,
-              MUIA_Numeric_Format, GetStr(MSG_SliderText_StdSpeed),
+              MUIA_Numeric_Format, tr(MSG_SliderText_StdSpeed),
             End,
           End,
 
@@ -460,8 +445,8 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 
       Child, VGroup,
         Child, HGroup,
-          Child, defaultkeys = SimpleButton(GetStr(MSG_Button_DefaultKeys)),
-          Child, TxtLabel(GetStr(MSG_Label_BlkQual), 1000),
+          Child, defaultkeys = SimpleButton(tr(MSG_Button_DefaultKeys)),
+          Child, TxtLabel(tr(MSG_Label_BlkQual), 1000),
           Child, data->blockqual = MUI_MakeObject(MUIO_Cycle, NULL, data->cycleentries),
         End,
         Child, data->keybindings = ListviewObject,
@@ -493,7 +478,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
             Child, button = TextObject, ButtonFrame,
               MUIA_CycleChain, TRUE,
               MUIA_Background, MUII_ButtonBack,
-              MUIA_Text_Contents, GetStr(MSG_Button_Snoop),
+              MUIA_Text_Contents, tr(MSG_Button_Snoop),
               MUIA_Text_SetMax, TRUE,
               MUIA_InputMode, MUIV_InputMode_Toggle,
             End,
@@ -524,8 +509,8 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 
           End,
           Child, HGroup,
-            Child, data->insertkey = SimpleButton(GetStr(MSG_Button_Insert)),
-            Child, data->deletekey = SimpleButton(GetStr(MSG_Button_Delete)),
+            Child, data->insertkey = SimpleButton(tr(MSG_Button_Insert)),
+            Child, data->deletekey = SimpleButton(tr(MSG_Button_Delete)),
           End,
         End,
       End,
@@ -538,7 +523,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
             ReadListFrame,
             MUIA_CycleChain, TRUE,
             MUIA_TextEditor_ReadOnly, TRUE,
-            MUIA_TextEditor_Contents, GetStr(MSG_HelpTxt_SpellChecker),
+            MUIA_TextEditor_Contents, tr(MSG_HelpTxt_SpellChecker),
           End,
           Child, slider2 = ScrollbarObject,
           End,
@@ -547,13 +532,13 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
         Child, BalanceObject, End,
 
         Child, ColGroup(3),
-          Child, TxtLabel(GetStr(MSG_Label_LookupCmd), 0),
+          Child, TxtLabel(tr(MSG_Label_LookupCmd), 0),
           Child, data->LookupExeType = CycleObject,
             MUIA_Cycle_Entries, data->execution,
             MUIA_Weight, 0,
           End,
           Child, data->lookupcmd = BetterStringObject, StringFrame, End,
-          Child, TxtLabel(GetStr(MSG_Label_SuggestCmd), 0),
+          Child, TxtLabel(tr(MSG_Label_SuggestCmd), 0),
           Child, data->SuggestExeType = CycleObject,
             MUIA_Cycle_Entries, data->execution,
             MUIA_Weight, 0,
@@ -561,9 +546,9 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
           Child, data->suggestcmd = BetterStringObject, StringFrame, MUIA_String_AdvanceOnCR, TRUE, End,
         End,
         Child, ColGroup(2),
-          Child, TxtLabel(GetStr(MSG_Label_SpellNType), 1000),
+          Child, TxtLabel(tr(MSG_Label_SpellNType), 1000),
           Child, data->typenspell = MUI_MakeObject(MUIO_Checkmark, NULL),
-          Child, TxtLabel(GetStr(MSG_Label_LookupWords), 1000),
+          Child, TxtLabel(tr(MSG_Label_LookupWords), 1000),
           Child, data->CheckWord = MUI_MakeObject(MUIO_Checkmark, NULL),
           MUIA_Weight, 0,
         End,
@@ -621,9 +606,9 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
     set(readview, MUIA_TextEditor_Slider, slider2);
     set(editor, MUIA_TextEditor_Slider, slider);
 
-    set(data->blockqual, MUIA_ShortHelp, GetStr(HelpBubble_BlockQual));
-    set(data->typenspell, MUIA_ShortHelp, GetStr(HelpBubble_TypeNSpell));
-    set(data->CheckWord, MUIA_ShortHelp, GetStr(HelpBubble_CheckWord));
+    set(data->blockqual, MUIA_ShortHelp, tr(HelpBubble_BlockQual));
+    set(data->typenspell, MUIA_ShortHelp, tr(HelpBubble_TypeNSpell));
+    set(data->CheckWord, MUIA_ShortHelp, tr(HelpBubble_CheckWord));
 
     set(data->hotkey, MUIA_String_AttachedList, data->keybindings);
     set(popbutton, MUIA_CycleChain, TRUE);
