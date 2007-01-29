@@ -501,7 +501,18 @@ DISPATCHER(_Dispatcher)
   //kprintf("Method: 0x%lx\n", msg->MethodID);
 //  D(DBF_STARTUP, "Stack usage: %ld %lx", (ULONG)FindTask(NULL)->tc_SPUpper - (ULONG)FindTask(NULL)->tc_SPReg, data);
 
-  // get the instance data
+  // this one must be catched before we try to obtain the instance data, because nobody
+  // will guarantee that the pointer returned by INST_DATA() is valid if no object has
+  // been created yet!!
+  if(msg->MethodID == OM_NEW)
+  {
+    result = New(cl, obj, (struct opSet *)msg);
+
+    RETURN(result);
+    return(result);
+  }
+
+  // now get the instance data
   if((data = INST_DATA(cl, obj)) == NULL)
   {
     ASSERT(data != NULL);
@@ -546,7 +557,6 @@ DISPATCHER(_Dispatcher)
 
   switch(msg->MethodID)
   {
-    case OM_NEW:          result = New(cl, obj, (struct opSet *)msg);                 RETURN(result); return(result); break;
     case MUIM_Setup:      result = Setup(cl, obj, (struct MUI_RenderInfo *)msg);      RETURN(result); return(result); break;
     case MUIM_Show:       result = Show(cl, obj, msg);                                RETURN(result); return(result); break;
     case MUIM_AskMinMax:  result = AskMinMax(cl, obj, (struct MUIP_AskMinMax *)msg);  RETURN(result); return(result); break;

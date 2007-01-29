@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-01-29 Thore Böckelmann <tboeckel@gmx.de>
+
+   * mcc/Dispatcher.c: the OM_NEW method must be handled before the instance
+     data are retrieved, because nobody can predict what INST_DATA() will return
+     if it is invoked on a not yet created object. This can explain the random
+     crashes on OS4 when TextEditor.mcc tried to access unallocated memory.
+
 2007-01-28 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcp: renamed the GetStr() locale translation function to the much shorter
