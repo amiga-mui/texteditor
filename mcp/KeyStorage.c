@@ -133,15 +133,14 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
   storage->action = action;
 
   // clear all args
-  while(count < key_count)
-    args[count++] = 0L;
+  memset(args, 0, sizeof(args));
 
-  if((myrdargs = AllocDosObject(DOS_RDARGS, NULL)))
+  if((myrdargs = AllocDosObject(DOS_RDARGS, NULL)) != NULL)
   {
     ULONG length = strlen(keystring);
     char *buffer;
 
-    if((buffer = AllocMem(length+2, MEMF_ANY)))
+    if((buffer = AllocVec(length + 2, MEMF_ANY)) != NULL)
     {
       strlcpy(buffer, keystring, length + 1);
       buffer[length] = '\n';
@@ -169,7 +168,7 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
         for(count = key_f1; count <= key_f10; count++)
         {
           if(args[count])
-            storage->key = count+0x44;
+            storage->key = RAWKEY_F1 + count - key_f1;
         }
 
         // Scan for the 2 extended f-keys (f11,f12)
@@ -186,7 +185,7 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
         for(count = key_up; count <= key_left; count++)
         {
           if(args[count])
-            storage->key = count+0x35;
+            storage->key = RAWKEY_CRSRUP + count - key_up;
         }
 
         // scan for the other extended (non-standard) keys
@@ -280,7 +279,7 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
         }
         FreeArgs(ra_result);
       }
-      FreeMem(buffer, length+2);
+      FreeVec(buffer);
     }
     FreeDosObject(DOS_RDARGS, myrdargs);
   }

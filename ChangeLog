@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-02-18 Thore Böckelmann <tboeckel@gmx.de>
+
+   * mcp/KeyStorage.c: key combinations like "shift up" were always converted
+     to "shift right" because of a wrong index calculation.
+
 2007-01-29 Thore Böckelmann <tboeckel@gmx.de>
 
    * mcc/Dispatcher.c: the OM_NEW method must be handled before the instance
