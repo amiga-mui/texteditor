@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-02-25 Thore Böckelmann <tboeckel@gmx.de>
+
+   * mcc/Methods.c: added an UNUSED attribute to the class parameter to suppress
+     an "unused variable" warning.
+
 2007-02-25 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcc/HandleArexx.c: added new "SELECTALL"and "SELECTNONE" Arexx commands
