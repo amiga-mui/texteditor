@@ -944,7 +944,33 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
           case MUIV_TextEditor_KeyAction_NextGadget:
             set(_win(data->object), MUIA_Window_ActiveObject, MUIV_Window_ActiveObject_Next);
             break;
+
+          case MUIV_TextEditor_KeyAction_SelectAll:
+          {
+            struct line_node *actual = data->firstline;
+
+            data->blockinfo.startline = actual;
+            data->blockinfo.startx = 0;
+
+            while(actual->next)
+              actual = actual->next;
+
+            data->blockinfo.stopline = actual;
+            data->blockinfo.stopx = data->blockinfo.stopline->line.Length-1;
+            data->blockinfo.enabled = TRUE;
+            MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+          }
+          break;
+
+          case MUIV_TextEditor_KeyAction_SelectNone:
+          {
+            data->blockinfo.enabled = FALSE;
+            MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+          }
+          break;
+
         }
+
         if(new_y != data->visual_y-1)
         {
           if(new_y > data->totallines-data->maxlines)
@@ -1139,6 +1165,30 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
           case MUIV_TextEditor_KeyAction_SetBookmark3:
             SetBookmark(2, data);
             break;
+
+          case MUIV_TextEditor_KeyAction_SelectAll:
+          {
+            struct line_node *actual = data->firstline;
+
+            data->blockinfo.startline = actual;
+            data->blockinfo.startx = 0;
+
+            while(actual->next)
+              actual = actual->next;
+
+            data->blockinfo.stopline = actual;
+            data->blockinfo.stopx = data->blockinfo.stopline->line.Length-1;
+            data->blockinfo.enabled = TRUE;
+            MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+          }
+          break;
+
+          case MUIV_TextEditor_KeyAction_SelectNone:
+          {
+            data->blockinfo.enabled = FALSE;
+            MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+          }
+          break;
         }
 
         RETURN(3);
