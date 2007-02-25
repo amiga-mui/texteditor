@@ -7,6 +7,9 @@ $URL$
 
 2007-02-25 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcc/Methods.c: modified MUIM_TextEditor_MarkText method to allow to select
+     ALL and NO text of the texteditor according to the new SelectAll and
+     SelectNone actions.
    * mcc/HandleInput.c: the 'SelectAll' and 'SelectNone' key actions should
      work now as expected.
    * mcc/mcp: synced the internals how the default keybindings are managed and

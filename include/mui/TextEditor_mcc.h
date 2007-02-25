@@ -128,6 +128,10 @@ struct MUIP_TextEditor_Replace           { ULONG MethodID; STRPTR NewString; ULO
 #define MUIV_TextEditor_InsertText_Top         0x00000001
 #define MUIV_TextEditor_InsertText_Bottom      0x00000002
 
+/* Values for MUIM_TextEditor_MarkText */
+#define MUIV_TextEditor_MarkText_All           -1
+#define MUIV_TextEditor_MarkText_None          -1
+
 /* Flags for MUIM_TextEditor_Search */
 #define MUIF_TextEditor_Search_FromTop         (1 << 0)
 #define MUIF_TextEditor_Search_Next            (1 << 1)
