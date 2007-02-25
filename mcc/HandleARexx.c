@@ -68,6 +68,8 @@ static const struct RexxCommand Commands[] =
   { "KILLLINE",     NULL },
   { "TOUPPER",      NULL },
   { "TOLOWER",      NULL },
+  { "SELECTALL",    NULL },
+  { "SELECTNONE",   NULL },
   { NULL,           NULL }
 };
 
@@ -76,7 +78,7 @@ enum
   CLEAR = 0, CUT, COPY, PASTE, ERASE, GOTOLINE, GOTOCOLUMN, CURSOR,
   LINE, COLUMN, NEXT, PREVIOUS, POSITION, SETBOOKMARK, GOTOBOOKMARK,
   InsTEXT, UNDO, REDO, GETLINE, GETCURSOR, MARK, DELETE, BACKSPACE,
-  KILLLINE, TOUPPER, TOLOWER
+  KILLLINE, TOUPPER, TOLOWER, SELECTALL, SELECTNONE
 };
 #define MaxArgs 8
 
@@ -330,6 +332,30 @@ static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struc
       case TOLOWER:
         Key_ToLower(data);
         break;
+
+      case SELECTALL:
+      {
+        struct line_node *actual = data->firstline;
+
+        data->blockinfo.startline = actual;
+        data->blockinfo.startx = 0;
+
+        while(actual->next)
+          actual = actual->next;
+
+        data->blockinfo.stopline = actual;
+        data->blockinfo.stopx = data->blockinfo.stopline->line.Length-1;
+        data->blockinfo.enabled = TRUE;
+        MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+      }
+      break;
+
+      case SELECTNONE:
+      {
+        data->blockinfo.enabled = FALSE;
+        MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+      }
+      break;
     }
 
     if(data->CPos_X != oldCPos_X || oldactualline != data->actualline)
