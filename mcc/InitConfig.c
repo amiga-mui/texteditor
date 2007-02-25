@@ -36,8 +36,6 @@
 #include "TextEditor_mcp.h"
 #include "private.h"
 
-extern struct keybindings keys[];
-
 struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
 {
   char *setting;
@@ -326,54 +324,60 @@ void InitConfig(Object *obj, struct InstData *data)
   if(!iswarned && DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_ConfigVersion, &setting))
   {
     iswarned = TRUE;
-    if(*(ULONG *)setting < 2)
-      MUI_Request(_app(obj), NULL, 0L, "TextEditor.mcc", "Continue", "\33cThe keybindings page has been updated\nsince your last visit to MUIPrefs.");
+    if(*(ULONG *)setting != CONFIG_VERSION)
+    {
+      MUI_Request(_app(obj), NULL, 0L, "TextEditor.mcc Warning", "Ok|Abort",
+                                       "Your current keybindings setup of TextEditor.mcc\n"
+                                       "was found to be incompatible with this version of\n"
+                                       "TextEditor.mcc.\n"
+                                       "\n"
+                                       "The keybindings of this object will be temporarly\n"
+                                       "set to the default. Please visit the MUI preferences\n"
+                                       "of TextEditor.mcc to permanently update the keybindings.");
+    }
   }
 
   {
-      struct keybindings *userkeys;
-      ULONG  c = 0;
+    struct te_key *userkeys;
+    ULONG count = 0;
+    ULONG size;
 
-    if(!DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_Keybindings, &setting))
+    setting = 0;
+    if(!DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_Keybindings, &setting) || setting == 0)
+      userkeys = (struct te_key *)default_keybindings;
+    else
+      userkeys = (struct te_key *)setting;
+
+    while((WORD)userkeys[count].code != -1)
+      count++;
+
+    // now we calculate the memory size
+    size = (count+1)*sizeof(struct te_key);
+
+    if((data->RawkeyBindings = MyAllocPooled(data->mypool, size)))
     {
-      setting = (long)keys;
-    }
-    userkeys = (struct keybindings *)setting;
+      ULONG i;
+      struct te_key *mykeys = data->RawkeyBindings;
 
-    while(userkeys->keydata.code != (UWORD)-1)
-    {
-      userkeys++;
-      c++;
-    }
+      memcpy(mykeys, (void *)userkeys, size);
 
-    if((data->RawkeyBindings = MyAllocPooled(data->mypool, (c+2)*sizeof(struct te_key))))
-    {
-      unsigned long count;
-      struct keybindings *mykeys = data->RawkeyBindings;
-
-      memcpy(data->RawkeyBindings, (void *)setting, c*sizeof(struct te_key));
-      (mykeys+c)->keydata.code = (UWORD)-1;
-
-      for(count = 0;count != c;count++)
+      for(i = 0; i < count && (WORD)mykeys[i].code != -1; i++)
       {
-        if((mykeys+count)->keydata.code >= 500)
+        struct te_key *curKey = &mykeys[i];
+
+        if(curKey->code >= 500)
         {
           char RAW[4];
-          char code = (mykeys+count)->keydata.code-500;
+          char code = curKey->code-500;
 
           MapANSI(&code, 1, RAW, 1, NULL);
 
-          (mykeys+count)->keydata.code = RAW[0];
-          (mykeys+count)->keydata.qual |= RAW[1];
+          curKey->code = RAW[0];
+          curKey->qual |= RAW[1];
 
-/*          if((mykeys+count)->keydata.qual & IEQUALIFIER_NUMERICPAD)
+          if(RAW[0] == 67 && !(curKey->qual & IEQUALIFIER_NUMERICPAD))
           {
-            printf("0x%lx, %d (*)\n", (mykeys+count)->keydata.qual, (mykeys+count)->keydata.code);
-          }
-*/
-          if(RAW[0] == 67 && !((mykeys+count)->keydata.qual & IEQUALIFIER_NUMERICPAD))
-          {
-            (mykeys+count)->keydata.code = 68;
+            curKey->code = 68;
           }
         }
       }

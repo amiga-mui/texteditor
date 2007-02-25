@@ -42,161 +42,170 @@ const char *FunctionName (UWORD func)
 
   switch(func)
   {
-    case mUp:
+    case MUIV_TextEditor_KeyAction_Up:
       name = tr(MSG_Function_Up);
       break;
 
-    case mDown:
+    case MUIV_TextEditor_KeyAction_Down:
       name = tr(MSG_Function_Down);
       break;
 
-    case mLeft:
+    case MUIV_TextEditor_KeyAction_Left:
       name = tr(MSG_Function_Left);
       break;
 
-    case mRight:
+    case MUIV_TextEditor_KeyAction_Right:
       name = tr(MSG_Function_Right);
       break;
 
-    case mPreviousPage:
+    case MUIV_TextEditor_KeyAction_PageUp:
       name = tr(MSG_Function_PrvPage);
       break;
 
-    case mNextPage:
+    case MUIV_TextEditor_KeyAction_PageDown:
       name = tr(MSG_Function_NxtPage);
       break;
 
-    case mStartOfLine:
+    case MUIV_TextEditor_KeyAction_StartOfLine:
       name = tr(MSG_Function_BOL);
       break;
 
-    case mEndOfLine:
+    case MUIV_TextEditor_KeyAction_EndOfLine:
       name = tr(MSG_Function_EOL);
       break;
 
-    case mTop:
+    case MUIV_TextEditor_KeyAction_Top:
       name = tr(MSG_Function_Top);
       break;
 
-    case mBottom:
+    case MUIV_TextEditor_KeyAction_Bottom:
       name = tr(MSG_Function_Bottom);
       break;
 
-    case mPreviousWord:
+    case MUIV_TextEditor_KeyAction_PrevWord:
       name = tr(MSG_Function_PrvWord);
       break;
 
-    case mNextWord:
+    case MUIV_TextEditor_KeyAction_NextWord:
       name = tr(MSG_Function_NxtWord);
       break;
 
-    case mPreviousLine:
+    case MUIV_TextEditor_KeyAction_PrevLine:
       name = tr(MSG_Function_PrvPara);
       break;
 
-    case mNextLine:
+    case MUIV_TextEditor_KeyAction_NextLine:
       name = tr(MSG_Function_NxtPara);
       break;
 
-    case mPreviousSentence:
+    case MUIV_TextEditor_KeyAction_PrevSentence:
       name = tr(MSG_Function_PrvSent);
       break;
 
-    case mNextSentence:
+    case MUIV_TextEditor_KeyAction_NextSentence:
       name = tr(MSG_Function_NxtSent);
       break;
 
-    case kSuggestWord:
+    case MUIV_TextEditor_KeyAction_SuggestWord:
       name = tr(MSG_Function_SuggestSpelling);
       break;
 
-    case kBackspace:
+    case MUIV_TextEditor_KeyAction_Backspace:
       name = tr(MSG_Function_Backspace);
       break;
 
-    case kDelete:
+    case MUIV_TextEditor_KeyAction_Delete:
       name = tr(MSG_Function_Delete);
       break;
 
-    case kReturn:
+    case MUIV_TextEditor_KeyAction_Return:
       name = tr(MSG_Function_Return);
       break;
 
-    case kTab:
+    case MUIV_TextEditor_KeyAction_Tab:
       name = tr(MSG_Function_Tab);
       break;
 
-    case kCut:
+    case MUIV_TextEditor_KeyAction_Cut:
       name = tr(MSG_Function_Cut);
       break;
 
-    case kCopy:
+    case MUIV_TextEditor_KeyAction_Copy:
       name = tr(MSG_Function_Copy);
       break;
 
-    case kPaste:
+    case MUIV_TextEditor_KeyAction_Paste:
       name = tr(MSG_Function_Paste);
       break;
 
-    case kUndo:
+    case MUIV_TextEditor_KeyAction_Undo:
       name = tr(MSG_Function_Undo);
       break;
     
-    case kRedo:
+    case MUIV_TextEditor_KeyAction_Redo:
       name = tr(MSG_Function_Redo);
       break;
     
-    case kDelEOL:
+    case MUIV_TextEditor_KeyAction_DelEOL:
       name = tr(MSG_Function_DelEOL);
       break;
     
-    case kDelBOL:
+    case MUIV_TextEditor_KeyAction_DelBOL:
       name = tr(MSG_Function_DelBOL);
       break;
     
-    case kDelEOW:
+    case MUIV_TextEditor_KeyAction_DelEOW:
       name = tr(MSG_Function_DelEOW);
       break;
     
-    case kDelBOW:
+    case MUIV_TextEditor_KeyAction_DelBOW:
       name = tr(MSG_Function_DelBOW);
       break;
     
-    case kDelLine:
+    case MUIV_TextEditor_KeyAction_DelLine:
       name = tr(MSG_Function_DelLine);
       break;
     
-    case kNextGadget:
+    case MUIV_TextEditor_KeyAction_NextGadget:
       name = tr(MSG_Function_NextGadget);
       break;
     
-    case kGotoBookmark1:
+    case MUIV_TextEditor_KeyAction_GotoBookmark1:
       name = tr(MSG_Function_GotoBookmark1);
       break;
     
-    case kGotoBookmark2:
+    case MUIV_TextEditor_KeyAction_GotoBookmark2:
       name = tr(MSG_Function_GotoBookmark2);
       break;
     
-    case kGotoBookmark3:
+    case MUIV_TextEditor_KeyAction_GotoBookmark3:
       name = tr(MSG_Function_GotoBookmark3);
       break;
     
-    case kSetBookmark1:
+    case MUIV_TextEditor_KeyAction_SetBookmark1:
       name = tr(MSG_Function_SetBookmark1);
       break;
     
-    case kSetBookmark2:
+    case MUIV_TextEditor_KeyAction_SetBookmark2:
       name = tr(MSG_Function_SetBookmark2);
       break;
     
-    case kSetBookmark3:
+    case MUIV_TextEditor_KeyAction_SetBookmark3:
       name = tr(MSG_Function_SetBookmark3);
+      break;
+
+    case MUIV_TextEditor_KeyAction_SelectAll:
+      name = tr(MSG_Function_SelectAll);
+      break;
+
+    case MUIV_TextEditor_KeyAction_SelectNone:
+      name = tr(MSG_Function_SelectNone);
       break;
     
     default:
       name = "";
   }
+
   return(name);
 }
 
@@ -251,7 +260,9 @@ static Object *PrefsObject(struct InstData_MCP *data)
     MSG_Function_SetBookmark1,
     MSG_Function_SetBookmark2,
     MSG_Function_SetBookmark3,
-    MSG_Function_DelLine
+    MSG_Function_DelLine,
+    MSG_Function_SelectAll,
+    MSG_Function_SelectNone
   };
   static const void *cycleentries[] = {
     MSG_CycleItem_Shift,
@@ -371,9 +382,10 @@ ULONG Dispose(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, Msg msg)
 ULONG GadgetsToConfig(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct MUIP_Settingsgroup_GadgetsToConfig *msg))
 {
   struct InstData_MCP *data = INST_DATA(cl, obj);
-  LONG cfg_data = 2;
+  LONG cfg_data;
 
   // first save the config version
+  cfg_data = CONFIG_VERSION;
   DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(LONG), MUICFG_TextEditor_ConfigVersion);
 
   ExportKeys(msg->configdata, data);
@@ -455,13 +467,24 @@ ULONG GadgetsToConfig(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, 
 ULONG ConfigToGadgets(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct MUIP_Settingsgroup_ConfigToGadgets *msg))
 {
   struct InstData_MCP *data = INST_DATA(cl, obj);
-  APTR  cfg_data;
+  APTR cfg_data;
+  BOOL importKeys = TRUE;
 
-/*  if(cfg_data = (APTR)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_ConfigVersion))
-      kprintf("Config version: %ld\n", *((ULONG *)cfg_data));
-  else  kprintf("Obsolete config\n");
-*/
-  ImportKeys(msg->configdata, data);
+  if((cfg_data = (APTR)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_ConfigVersion)))
+  {
+    if(*((ULONG *)cfg_data) != CONFIG_VERSION)
+    {
+      if(MUI_Request(NULL, NULL, 0L, tr(MSG_WarnConfigVersion_Title), tr(MSG_ResetAbort), tr(MSG_WarnConfigVersion)) == 1)
+      {
+        // reset the keybindings to their default values.
+        ImportKeys(NULL, data);
+        importKeys = FALSE;
+      }
+    }
+  }
+
+  if(importKeys)
+    ImportKeys(msg->configdata, data);
 
   if((cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_LookupCmd)))
   {

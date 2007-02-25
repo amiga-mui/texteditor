@@ -5,7 +5,7 @@
 
  TextEditor.mcc - Textediting MUI Custom Class
  Copyright (C) 1997-2000 Allan Odgaard
- Copyright (C) 2005 by TextEditor.mcc Open Source Team
+ Copyright (C) 2005-2007 by TextEditor.mcc Open Source Team
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -159,7 +159,6 @@ struct ClickMessage
 };
 
 /* Definitions for Separator type */
-
 #define LNSB_Top             0 /* Mutual exclude: */
 #define LNSB_Middle          1 /* Placement of    */
 #define LNSB_Bottom          2 /*  the separator  */
@@ -171,6 +170,48 @@ struct ClickMessage
 #define LNSF_Bottom          (1<<LNSB_Bottom)
 #define LNSF_StrikeThru      (1<<LNSB_StrikeThru)
 #define LNSF_Thick           (1<<LNSB_Thick)
+
+/* Keyaction definitions */
+#define MUIV_TextEditor_KeyAction_Up              0x01
+#define MUIV_TextEditor_KeyAction_Down            0x02
+#define MUIV_TextEditor_KeyAction_Left            0x03
+#define MUIV_TextEditor_KeyAction_Right           0x04
+#define MUIV_TextEditor_KeyAction_PageUp          0x05
+#define MUIV_TextEditor_KeyAction_PageDown        0x06
+#define MUIV_TextEditor_KeyAction_StartOfLine     0x07
+#define MUIV_TextEditor_KeyAction_EndOfLine       0x08
+#define MUIV_TextEditor_KeyAction_Top             0x09
+#define MUIV_TextEditor_KeyAction_Bottom          0x0a
+#define MUIV_TextEditor_KeyAction_PrevWord        0x0b
+#define MUIV_TextEditor_KeyAction_NextWord        0x0c
+#define MUIV_TextEditor_KeyAction_PrevLine        0x0d
+#define MUIV_TextEditor_KeyAction_NextLine        0x0e
+#define MUIV_TextEditor_KeyAction_PrevSentence    0x0f
+#define MUIV_TextEditor_KeyAction_NextSentence    0x10
+#define MUIV_TextEditor_KeyAction_SuggestWord     0x11
+#define MUIV_TextEditor_KeyAction_Backspace       0x12
+#define MUIV_TextEditor_KeyAction_Delete          0x13
+#define MUIV_TextEditor_KeyAction_Return          0x14
+#define MUIV_TextEditor_KeyAction_Tab             0x15
+#define MUIV_TextEditor_KeyAction_Cut             0x16
+#define MUIV_TextEditor_KeyAction_Copy            0x17
+#define MUIV_TextEditor_KeyAction_Paste           0x18
+#define MUIV_TextEditor_KeyAction_Undo            0x19
+#define MUIV_TextEditor_KeyAction_Redo            0x1a
+#define MUIV_TextEditor_KeyAction_DelBOL          0x1b
+#define MUIV_TextEditor_KeyAction_DelEOL          0x1c
+#define MUIV_TextEditor_KeyAction_DelBOW          0x1d
+#define MUIV_TextEditor_KeyAction_DelEOW          0x1e
+#define MUIV_TextEditor_KeyAction_NextGadget      0x1f
+#define MUIV_TextEditor_KeyAction_GotoBookmark1   0x20
+#define MUIV_TextEditor_KeyAction_GotoBookmark2   0x21
+#define MUIV_TextEditor_KeyAction_GotoBookmark3   0x22
+#define MUIV_TextEditor_KeyAction_SetBookmark1    0x23
+#define MUIV_TextEditor_KeyAction_SetBookmark2    0x24
+#define MUIV_TextEditor_KeyAction_SetBookmark3    0x25
+#define MUIV_TextEditor_KeyAction_DelLine         0x26
+#define MUIV_TextEditor_KeyAction_SelectAll       0x27
+#define MUIV_TextEditor_KeyAction_SelectNone      0x28
 
 #ifdef __GNUC__
   #ifdef __PPC__

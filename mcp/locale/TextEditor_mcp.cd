@@ -418,3 +418,22 @@ Snoop
 MSG_Function_DelLine (124//)
 Delete line
 ;
+MSG_Function_SelectAll (125//)
+Select All
+;
+MSG_Function_SelectNone (126//)
+Select None
+;
+MSG_WarnConfigVersion_Title (127//)
+TextEditor.mcp Warning
+;
+MSG_WarnConfigVersion (128//)
+Your currently saved keybindings setup is incompatible\n\
+with the version of TextEditor.mcc you have installed.\n\
+\n\
+It is suggested that you reset the current keybindings\n\
+to their defaults and edit them manually afterwards.
+;
+MSG_ResetAbort (129//)
+Reset|Abort
+;

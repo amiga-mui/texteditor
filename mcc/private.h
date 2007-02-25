@@ -35,12 +35,81 @@
 
 #include "Debug.h"
 
+// if something in our configuration setup (keybindings, etc)
+// has changed we can increase the config version so that TextEditor
+// will popup a warning about and obsolete configuration.
+#define CONFIG_VERSION 3
+
 #define EOS        (unsigned short)-1
 
 #define UNDERLINE 0x01
 #define BOLD      0x02
 #define ITALIC    0x04
 #define COLOURED  0x08
+
+// proper RAWKEY_ defines were first introduced in OS4 and MorphOS
+// and unfortunately they are also a bit different, so lets
+// prepare an alternate table for it
+#if defined(__amigaos4__)
+#include <proto/keymap.h>
+
+#define RAWKEY_NUMLOCK    0x79
+
+#elif defined(__MORPHOS__)
+#include <devices/rawkeycodes.h>
+
+#define RAWKEY_CRSRUP     RAWKEY_UP
+#define RAWKEY_CRSRDOWN   RAWKEY_DOWN
+#define RAWKEY_CRSRRIGHT  RAWKEY_RIGHT
+#define RAWKEY_CRSRLEFT   RAWKEY_LEFT
+#define RAWKEY_PRINTSCR   RAWKEY_PRTSCREEN
+#define RAWKEY_BREAK      RAWKEY_PAUSE
+
+#define RAWKEY_AUD_STOP       RAWKEY_CDTV_STOP
+#define RAWKEY_AUD_PLAY_PAUSE RAWKEY_CDTV_PLAY
+#define RAWKEY_AUD_PREV_TRACK RAWKEY_CDTV_PREV
+#define RAWKEY_AUD_NEXT_TRACK RAWKEY_CDTV_NEXT
+#define RAWKEY_AUD_SHUFFLE    RAWKEY_CDTV_REW
+#define RAWKEY_AUD_REPEAT     RAWKEY_CDTV_FF
+
+#else
+
+#define RAWKEY_INSERT    0x47 /* Not on classic keyboards */
+#define RAWKEY_PAGEUP    0x48 /* Not on classic keyboards */
+#define RAWKEY_PAGEDOWN  0x49 /* Not on classic keyboards */
+#define RAWKEY_F11       0x4B /* Not on classic keyboards */
+#define RAWKEY_CRSRUP    0x4C
+#define RAWKEY_CRSRDOWN  0x4D
+#define RAWKEY_CRSRRIGHT 0x4E
+#define RAWKEY_CRSRLEFT  0x4F
+#define RAWKEY_F1        0x50
+#define RAWKEY_F2        0x51
+#define RAWKEY_F3        0x52
+#define RAWKEY_F4        0x53
+#define RAWKEY_F5        0x54
+#define RAWKEY_F6        0x55
+#define RAWKEY_F7        0x56
+#define RAWKEY_F8        0x57
+#define RAWKEY_F9        0x58
+#define RAWKEY_F10       0x59
+#define RAWKEY_HELP      0x5F
+#define RAWKEY_SCRLOCK   0x6B /* Not on classic keyboards */
+#define RAWKEY_PRINTSCR  0x6D /* Not on classic keyboards */
+#define RAWKEY_BREAK     0x6E /* Not on classic keyboards */
+#define RAWKEY_F12       0x6F /* Not on classic keyboards */
+#define RAWKEY_HOME      0x70 /* Not on classic keyboards */
+#define RAWKEY_END       0x71 /* Not on classic keyboards */
+
+#define RAWKEY_AUD_STOP       0x72
+#define RAWKEY_AUD_PLAY_PAUSE 0x73
+#define RAWKEY_AUD_PREV_TRACK 0x74
+#define RAWKEY_AUD_NEXT_TRACK 0x75
+#define RAWKEY_AUD_SHUFFLE    0x76
+#define RAWKEY_AUD_REPEAT     0x77
+
+#define RAWKEY_NUMLOCK   0x79
+
+#endif
 
 // some own usefull MUI-style macros to check mouse positions in objects
 #define _between(a,x,b) 					((x)>=(a) && (x)<=(b))
@@ -211,7 +280,7 @@ struct InstData
 
   ULONG   Rows, Columns;  // The value of the rows/columns tags
 
-  APTR    RawkeyBindings;
+  struct te_key *RawkeyBindings;
   ULONG   blockqual;
 
   ULONG   textcolor;
@@ -419,46 +488,33 @@ extern struct Hook ExportHookPlain;
 extern struct Hook ExportHookEMail;
 extern struct Hook ExportHookNoStyle;
 
-  enum
-  {
-    mUp, mDown, mLeft, mRight, mPreviousPage, mNextPage,
-    mStartOfLine, mEndOfLine, mTop, mBottom, mPreviousWord,
-    mNextWord, mPreviousLine, mNextLine, mPreviousSentence,
-    mNextSentence, kSuggestWord, kBackspace, kDelete, kReturn,
-    kTab, kCut, kCopy, kPaste, kUndo, kRedo,
-    kDelBOL, kDelEOL, kDelBOW, kDelEOW,
-    kNextGadget, kGotoBookmark1, kGotoBookmark2, kGotoBookmark3,
-    kSetBookmark1, kSetBookmark2, kSetBookmark3, kDelLine,
-    mKey_LAST
-  };
+enum
+{
+  pastechar = 0,
+  backspacechar,
+  deletechar,
+  splitline,
+  mergelines,
+  backspacemerge,
+  pasteblock,
+  deleteblock,
+  deleteblock_nomove,
+  stylebold,
+  styleunbold,
+  styleitalic,
+  styleunitalic,
+  styleunderline,
+  styleununderline
+};
 
-  enum
-  {
-    pastechar = 0,
-    backspacechar,
-    deletechar,
-    splitline,
-    mergelines,
-    backspacemerge,
-    pasteblock,
-    deleteblock,
-    deleteblock_nomove,
-    stylebold,
-    styleunbold,
-    styleitalic,
-    styleunitalic,
-    styleunderline,
-    styleununderline
-  };
-
-  struct UpdateData
-  {
-    UWORD type;
-    UWORD x;
-    struct line_node *line;
-    UWORD length;
-    STRPTR characters;
-  };
+struct UpdateData
+{
+  UWORD type;
+  UWORD x;
+  struct line_node *line;
+  UWORD length;
+  STRPTR characters;
+};
 
 #define IEQUALIFIER_SHIFT   0x0200
 #define IEQUALIFIER_ALT     0x0400
@@ -518,11 +574,8 @@ struct te_key
   ULONG qual;
   UWORD act;
 };
-
-struct keybindings
-{
-  struct  te_key  keydata;
-};
 #include "default-align.h"
+
+extern const struct te_key default_keybindings[];
 
 #endif /* TEXTEDITOR_MCC_PRIV_H */

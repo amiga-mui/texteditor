@@ -115,7 +115,7 @@ HOOKPROTONH(Popstring_OpenCode, BOOL, Object *pop, Object *text)
   ENTER();
 
   get(text, MUIA_UserData, &active);
-  set(pop, MUIA_List_Active, active);
+  set(pop, MUIA_List_Active, active-1);
   
   RETURN(TRUE);
   return(TRUE);
@@ -128,11 +128,31 @@ HOOKPROTONH(Popstring_CloseCode, void, Object *pop, Object *text)
   ENTER();
 
   get(pop, MUIA_List_Active, &active);
-  set(text, MUIA_UserData, active);
+  set(text, MUIA_UserData, active+1);
 
   LEAVE();
 }
 MakeStaticHook(Popstring_CloseHook, Popstring_CloseCode);
+
+HOOKPROTONHNO(SetDefaultKeysCode, void, APTR **array)
+{
+  Object *keylist = (Object *)*array;
+  int i;
+
+  ENTER();
+
+  DoMethod(keylist, MUIM_List_Clear);
+
+  set(keylist, MUIA_List_Quiet, TRUE);
+
+  for(i=0; (WORD)default_keybindings[i].code != -1; i++)
+    DoMethod(keylist, MUIM_List_InsertSingle, default_keybindings[i], MUIV_List_Insert_Bottom);
+
+  set(keylist, MUIA_List_Quiet, FALSE);
+
+  LEAVE();
+}
+MakeStaticHook(SetDefaultKeysHook, SetDefaultKeysCode);
 
 HOOKPROTONHNO(InsertCode, void, APTR **array)
 {
@@ -624,10 +644,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 
     DoMethod(defaultkeys, MUIM_Notify,
         MUIA_Pressed, FALSE,
-        keylist, 1, MUIM_List_Clear);
-    DoMethod(defaultkeys, MUIM_Notify,
-        MUIA_Pressed, FALSE,
-        keylist, 4, MUIM_List_Insert, keybindings, -1, MUIV_List_Insert_Bottom);
+        MUIV_Notify_Self, 3, MUIM_CallHook, &SetDefaultKeysHook, keylist);
 
     DoMethod(data->insertkey, MUIM_Notify,
         MUIA_Pressed, FALSE,
