@@ -23,12 +23,20 @@
 #ifndef TEXTEDITOR_MCP_PRIV_H
 #define TEXTEDITOR_MCP_PRIV_H
 
+#include <mui/TextEditor_mcc.h>
+
 #include "TextEditor_mcp.h"
 
 #include <mcc_common.h>
 
 #include "Debug.h"
 
+// if something in our configuration setup (keybindings, etc)
+// has changed we can increase the config version so that TextEditor
+// will popup a warning about and obsolete configuration.
+#define CONFIG_VERSION 3
+
+// our PREFSIMAGE macro
 #define PREFSIMAGEOBJECT \
   BitmapObject,\
     MUIA_Bitmap_Bitmap,       (UBYTE *)&image_bitmap,\
@@ -111,19 +119,6 @@
 
 #endif
 
-enum
-{
-  mUp, mDown, mLeft, mRight, mPreviousPage, mNextPage,
-  mStartOfLine, mEndOfLine, mTop, mBottom, mPreviousWord,
-  mNextWord, mPreviousLine, mNextLine, mPreviousSentence,
-  mNextSentence, kSuggestWord, kBackspace, kDelete, kReturn,
-  kTab, kCut, kCopy, kPaste, kUndo, kRedo,
-  kDelBOL, kDelEOL, kDelBOW, kDelEOW,
-  kNextGadget, kGotoBookmark1, kGotoBookmark2, kGotoBookmark3,
-  kSetBookmark1, kSetBookmark2, kSetBookmark3, kDelLine,
-  mKey_LAST
-};
-
 struct InstData_MCP
 {
   Object *editpopup;
@@ -159,7 +154,7 @@ struct InstData_MCP
   Object *CfgObj;
 
   const char *gTitles[5];
-  const char *functions[39];
+  const char *functions[41];
   const char *execution[3];
   const char *cycleentries[5];
 
@@ -189,7 +184,7 @@ extern struct MUI_CustomClass *widthslider_mcc;
 extern struct MUI_CustomClass *speedslider_mcc;
 extern struct MUI_CustomClass *text_mcc;
 
-extern const struct te_key *keybindings[];
+extern const struct te_key default_keybindings[];
 
 Object *CreatePrefsGroup(struct InstData_MCP *data);
 void ImportKeys(void *, struct InstData_MCP *data);

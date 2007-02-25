@@ -403,37 +403,23 @@ void KeyToString(STRPTR buffer, ULONG buffer_len, struct KeyAction *ka)
 
 void ImportKeys(void *config, struct InstData_MCP *data)
 {
-    void *cfg_data;
+  void *cfg_data;
+  struct te_key *userkeys;
+  int i;
+
+  if(config != NULL && (cfg_data = (void *)DoMethod(config, MUIM_Dataspace_Find, MUICFG_TextEditor_Keybindings)))
+    userkeys = cfg_data;
+  else
+    userkeys = (struct te_key *)default_keybindings;
 
   DoMethod(data->keybindings, MUIM_List_Clear);
+
   set(data->keybindings, MUIA_List_Quiet, TRUE);
-  if((cfg_data = (void *)DoMethod(config, MUIM_Dataspace_Find, MUICFG_TextEditor_Keybindings)))
-  {
-      struct te_key *entries = cfg_data;
 
-    while(entries->code != (UWORD)-1)
-    {
-      DoMethod(data->keybindings, MUIM_List_InsertSingle, entries++, MUIV_List_Insert_Bottom);
-    }
-  }
-  else
-  {
-    DoMethod(data->keybindings, MUIM_List_Insert, keybindings, (ULONG)-1, MUIV_List_Insert_Bottom);
-  }
+  for(i=0; (WORD)userkeys[i].code != -1; i++)
+    DoMethod(data->keybindings, MUIM_List_InsertSingle, userkeys[i], MUIV_List_Insert_Bottom);
+
   set(data->keybindings, MUIA_List_Quiet, FALSE);
-
-/*  if(cfg_data = (void *)DoMethod(config, MUIM_Dataspace_Find, MUICFG_TextEditor_SuggestKey))
-  {
-      UBYTE   buffer[100];
-      struct  KeyAction *ka = cfg_data;
-
-    KeyToString(buffer, ka);
-    set(data->suggestkey, MUIA_Hotkey_Hotkey, buffer);
-  }
-  else
-  {
-    set(data->suggestkey, MUIA_Hotkey_Hotkey, "help");
-  }*/
 }
 
 void ExportKeys(void *config, struct InstData_MCP *data)

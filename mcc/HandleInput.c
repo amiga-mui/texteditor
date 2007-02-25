@@ -35,8 +35,6 @@
 #include "newmouse.h"
 #endif
 
-extern struct keybindings keys[];
-
 static LONG ReactOnRawKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data);
 
 static ULONG RAWToANSI(struct IntuiMessage *imsg)
@@ -823,6 +821,7 @@ static LONG ConvertKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, st
 
 static BOOL MatchQual(ULONG input, ULONG match, UWORD action, struct InstData *data)
 {
+  BOOL result = FALSE;
   ENTER();
 
   if((match & IEQUALIFIER_SHIFT) && (input & (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT)))
@@ -841,8 +840,33 @@ static BOOL MatchQual(ULONG input, ULONG match, UWORD action, struct InstData *d
     input &= ~(IEQUALIFIER_LCOMMAND | IEQUALIFIER_RCOMMAND);
   }
 
-  LEAVE();
-  return(input == match || (((input & ~data->blockqual) == match) && action < kSuggestWord));
+  result = (input == match);
+
+  if(result == FALSE && ((input & ~data->blockqual) == match))
+  {
+    if(action == MUIV_TextEditor_KeyAction_Up           ||
+       action == MUIV_TextEditor_KeyAction_Down         ||
+       action == MUIV_TextEditor_KeyAction_Left         ||
+       action == MUIV_TextEditor_KeyAction_Right        ||
+       action == MUIV_TextEditor_KeyAction_PageUp       ||
+       action == MUIV_TextEditor_KeyAction_PageDown     ||
+       action == MUIV_TextEditor_KeyAction_StartOfLine  ||
+       action == MUIV_TextEditor_KeyAction_EndOfLine    ||
+       action == MUIV_TextEditor_KeyAction_Top          ||
+       action == MUIV_TextEditor_KeyAction_Bottom       ||
+       action == MUIV_TextEditor_KeyAction_PrevWord     ||
+       action == MUIV_TextEditor_KeyAction_NextWord     ||
+       action == MUIV_TextEditor_KeyAction_PrevLine     ||
+       action == MUIV_TextEditor_KeyAction_NextLine     ||
+       action == MUIV_TextEditor_KeyAction_PrevSentence ||
+       action == MUIV_TextEditor_KeyAction_NextSentence)
+    {
+      result = TRUE;
+    }
+  }
+
+  RETURN(result);
+  return result;
 }
 
 
@@ -851,13 +875,14 @@ static BOOL MatchQual(ULONG input, ULONG match, UWORD action, struct InstData *d
  *---------------------------------*/
 static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
 {
-  struct keybindings *t_keys = data->RawkeyBindings;
+  struct te_key *t_keys = data->RawkeyBindings;
   BOOL speed = FALSE;
+  int i;
 
   ENTER();
 
-  if(t_keys == 0)
-    t_keys = keys;
+  if(t_keys == NULL)
+    t_keys = (struct te_key *)default_keybindings;
 
 #ifdef FAST_SCROLL
   if(qualifier & IEQUALIFIER_REPEAT)
@@ -872,42 +897,51 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
 #endif
 
   qualifier &= ~(IEQUALIFIER_RELATIVEMOUSE | IEQUALIFIER_REPEAT | IEQUALIFIER_CAPSLOCK);
-  while(t_keys->keydata.code != (unsigned short)-1)
+  for(i=0; (WORD)t_keys[i].code != -1; i++)
   {
-    if((key == t_keys->keydata.code) && MatchQual(qualifier, t_keys->keydata.qual, t_keys->keydata.act, data))
+    struct te_key *curKey = &t_keys[i];
+
+    if((key == curKey->code) && MatchQual(qualifier, curKey->qual, curKey->act, data))
     {
       if(data->flags & FLG_ReadOnly)
       {
-          LONG new_y = data->visual_y-1;
+        LONG new_y = data->visual_y-1;
 
-        switch(t_keys->keydata.act)
+        switch(curKey->act)
         {
-          case mTop:
+          case MUIV_TextEditor_KeyAction_Top:
             new_y = 0;
             break;
-          case mPreviousPage:
+
+          case MUIV_TextEditor_KeyAction_PageUp:
             new_y -= data->maxlines;
             break;
-          case mUp:
+
+          case MUIV_TextEditor_KeyAction_Up:
             new_y -= 1;
             if(speed)
               new_y -= 1;
             break;
-          case mBottom:
+
+          case MUIV_TextEditor_KeyAction_Bottom:
             new_y = data->totallines-data->maxlines;
             break;
-          case mNextPage:
+
+          case MUIV_TextEditor_KeyAction_PageDown:
             new_y += data->maxlines;
             break;
-          case mDown:
+
+          case MUIV_TextEditor_KeyAction_Down:
             new_y += 1;
             if(speed)
               new_y += 1;
             break;
-          case kCopy:
+
+          case MUIV_TextEditor_KeyAction_Copy:
             Key_Copy(data);
             break;
-          case kNextGadget:
+
+          case MUIV_TextEditor_KeyAction_NextGadget:
             set(_win(data->object), MUIA_Window_ActiveObject, MUIV_Window_ActiveObject_Next);
             break;
         }
@@ -925,147 +959,184 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
       }
       else
       {
-        switch(t_keys->keydata.act)
+        switch(curKey->act)
         {
-          case mTop:
+          case MUIV_TextEditor_KeyAction_Top:
             GoTop(data);
             RETURN(TRUE);
             return(TRUE);
-          case mPreviousLine:
+
+          case MUIV_TextEditor_KeyAction_PrevLine:
             GoPreviousLine(data);
             RETURN(TRUE);
             return(TRUE);
-          case mPreviousPage:
+
+          case MUIV_TextEditor_KeyAction_PageUp:
             GoPreviousPage(data);
             RETURN(FALSE);
             return(FALSE);
-          case mUp:
+
+          case MUIV_TextEditor_KeyAction_Up:
             GoUp(data);
             if(speed)
               GoUp(data);
             RETURN(FALSE);
             return(FALSE);
-          case mBottom:
+
+          case MUIV_TextEditor_KeyAction_Bottom:
             GoBottom(data);
             RETURN(TRUE);
             return(TRUE);
-          case mNextLine:
+
+          case MUIV_TextEditor_KeyAction_NextLine:
             GoNextLine(data);
             RETURN(TRUE);
             return(TRUE);
-          case mNextPage:
+
+          case MUIV_TextEditor_KeyAction_PageDown:
             GoNextPage(data);
             RETURN(FALSE);
             return(FALSE);
-          case mDown:
+
+          case MUIV_TextEditor_KeyAction_Down:
             GoDown(data);
             if(speed)
               GoDown(data);
             RETURN(FALSE);
             return(FALSE);
-          case mNextWord:
+
+          case MUIV_TextEditor_KeyAction_NextWord:
             GoNextWord(data);
             RETURN(TRUE);
             return(TRUE);
-          case mNextSentence:
+
+          case MUIV_TextEditor_KeyAction_NextSentence:
             GoNextSentence(data);
             RETURN(TRUE);
             return(TRUE);
-          case mEndOfLine:
+
+          case MUIV_TextEditor_KeyAction_EndOfLine:
             GoEndOfLine(data);
             RETURN(TRUE);
             return(TRUE);
-          case mRight:
+
+          case MUIV_TextEditor_KeyAction_Right:
             GoRight(data);
             if(speed)
               GoRight(data);
             RETURN(TRUE);
             return(TRUE);
-          case mPreviousWord:
+
+          case MUIV_TextEditor_KeyAction_PrevWord:
             GoPreviousWord(data);
             RETURN(TRUE);
             return(TRUE);
-          case mPreviousSentence:
+
+          case MUIV_TextEditor_KeyAction_PrevSentence:
             GoPreviousSentence(data);
             RETURN(TRUE);
             return(TRUE);
-          case mStartOfLine:
+
+          case MUIV_TextEditor_KeyAction_StartOfLine:
             GoStartOfLine(data);
             RETURN(TRUE);
             return(TRUE);
-          case mLeft:
+
+          case MUIV_TextEditor_KeyAction_Left:
             GoLeft(data);
             if(speed)
               GoLeft(data);
             RETURN(TRUE);
             return(TRUE);
-          case kSuggestWord:
+
+          case MUIV_TextEditor_KeyAction_SuggestWord:
             SuggestWord(data);
             break;
-          case kBackspace:
+
+          case MUIV_TextEditor_KeyAction_Backspace:
             Key_Backspace(data);
             break;
-          case kDelete:
+
+          case MUIV_TextEditor_KeyAction_Delete:
             Key_Delete(data);
             break;
-          case kReturn:
+
+          case MUIV_TextEditor_KeyAction_Return:
             Key_Return(data);
             break;
-          case kTab:
+
+          case MUIV_TextEditor_KeyAction_Tab:
             Key_Tab(data);
             break;
-          case kUndo:
+
+          case MUIV_TextEditor_KeyAction_Undo:
             Undo(data);
             break;
-          case kRedo:
+
+          case MUIV_TextEditor_KeyAction_Redo:
             Redo(data);
             break;
-          case kCut:
+
+          case MUIV_TextEditor_KeyAction_Cut:
             Key_Cut(data);
             break;
-          case kCopy:
+
+          case MUIV_TextEditor_KeyAction_Copy:
             Key_Copy(data);
             break;
-          case kPaste:
+
+          case MUIV_TextEditor_KeyAction_Paste:
             Key_Paste(data);
             break;
-          case kDelEOL:
+
+          case MUIV_TextEditor_KeyAction_DelEOL:
             Key_DelSomething(Del_EOL, data);
             break;
-          case kDelBOL:
+
+          case MUIV_TextEditor_KeyAction_DelBOL:
             Key_DelSomething(Del_BOL, data);
             break;
-          case kDelEOW:
+
+          case MUIV_TextEditor_KeyAction_DelEOW:
             Key_DelSomething(Del_EOW, data);
             break;
-          case kDelBOW:
+
+          case MUIV_TextEditor_KeyAction_DelBOW:
             Key_DelSomething(Del_BOW, data);
             break;
-          case kDelLine:
+
+          case MUIV_TextEditor_KeyAction_DelLine:
             Key_DelLine(data);
             break;
-          case kNextGadget:
+
+          case MUIV_TextEditor_KeyAction_NextGadget:
             set(_win(data->object), MUIA_Window_ActiveObject, MUIV_Window_ActiveObject_Next);
             break;
-          case kGotoBookmark1:
+
+          case MUIV_TextEditor_KeyAction_GotoBookmark1:
             GotoBookmark(0, data);
             RETURN(TRUE);
             return(TRUE);
-          case kGotoBookmark2:
+
+          case MUIV_TextEditor_KeyAction_GotoBookmark2:
             GotoBookmark(1, data);
             RETURN(TRUE);
             return(TRUE);
-          case kGotoBookmark3:
+
+          case MUIV_TextEditor_KeyAction_GotoBookmark3:
             GotoBookmark(2, data);
             RETURN(TRUE);
             return(TRUE);
-          case kSetBookmark1:
+
+          case MUIV_TextEditor_KeyAction_SetBookmark1:
             SetBookmark(0, data);
             break;
-          case kSetBookmark2:
+
+          case MUIV_TextEditor_KeyAction_SetBookmark2:
             SetBookmark(1, data);
             break;
-          case kSetBookmark3:
+
+          case MUIV_TextEditor_KeyAction_SetBookmark3:
             SetBookmark(2, data);
             break;
         }
@@ -1074,7 +1145,6 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
         return(3);
       }
     }
-    t_keys++;
   }
 
   RETURN(2);
