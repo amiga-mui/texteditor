@@ -7,6 +7,8 @@ $URL$
 
 2007-02-25 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcc/HandleInput.c: the 'SelectAll' and 'SelectNone' key actions should
+     work now as expected.
    * mcc/mcp: synced the internals how the default keybindings are managed and
      exported the key action value to the _mcc.h file. This should allow to
      provide a method in future to query the keybinding of a keyaction for
