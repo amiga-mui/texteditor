@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-02-25 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcc/HandleInput.c: changed the automatic word wrapping mechanism to find
+     the wrap position around the user-specified WrapBorder value instead of
+     always word wrapping at the cursor position only. This should make the word
+     wrapping behaviour more consistent.
+
 2007-02-18 Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/KeyStorage.c: key combinations like "shift up" were always converted

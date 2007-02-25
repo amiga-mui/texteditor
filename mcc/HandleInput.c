@@ -725,23 +725,43 @@ void Key_Normal(UBYTE key, struct InstData *data)
   ENTER();
 
   if(Enabled(data))
-  {
     Key_Clear(data);
-  }
 
-  if((!IsAlpha(data->mylocale, key)) && key != '-')
+  // check if the user wants to do a direct spell checking while
+  // writing some text.
+  if(data->TypeAndSpell && (!IsAlpha(data->mylocale, key)) && key != '-')
     CheckWord(data);
 
+  // add the pastechar to the undobuffer and paste the current
+  // key immediatly.
   AddToUndoBuffer(pastechar, NULL, data);
   PasteChars(data->CPos_X++, data->actualline, 1, (char *)&key, NULL, data);
-  if(data->WrapBorder && (data->CPos_X > data->WrapBorder) && (key != ' '))
-  {
-    ULONG xpos = data->CPos_X;
 
-    while(--xpos && *(data->actualline->line.Contents+xpos) != ' ');
-    if(xpos)
+  // check if the user selected the texteditor to do an automatic word
+  // wrapping during writing text and if so we go and perform the word
+  // wrapping at the correct border.
+  if(data->WrapBorder > 0 && (data->CPos_X > data->WrapBorder) && (key != ' '))
+  {
+    ULONG xpos = data->WrapBorder+1;
+
+    // now we make sure to wrap *exactly* at the WrapBorder the user
+    // specified instead of wrapping right where we are.
+    while(xpos > 0 && *(data->actualline->line.Contents+xpos) != ' ')
+      xpos--;
+
+    // if we reached the end we go and find a wrap position after
+    // the wrap border
+    if(xpos == 0)
     {
-        ULONG length = data->CPos_X-xpos;
+      xpos = data->WrapBorder;
+      while(xpos < data->CPos_X && *(data->actualline->line.Contents+xpos) != ' ')
+        xpos++;
+    }
+
+    // now we do the line split operation at the xpos we found
+    if(xpos && xpos < data->CPos_X)
+    {
+      ULONG length = data->CPos_X-xpos;
 
       data->CPos_X = xpos;
       AddToUndoBuffer(splitline, NULL, data);
