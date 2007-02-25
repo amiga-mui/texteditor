@@ -7,6 +7,10 @@ $URL$
 
 2007-02-25 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcc: introduced a new MUIM_TextEditor_QueryKeyAction method that allows
+     to retrieve the key code and qualifier information for a specified action.
+     Please note, that this method normally returns the direct RAWKEY value
+     and that for a vanilla key identification an offset of 500 is added.
    * mcc/Methods.c: modified MUIM_TextEditor_MarkText method to allow to select
      ALL and NO text of the texteditor according to the new SelectAll and
      SelectNone actions.

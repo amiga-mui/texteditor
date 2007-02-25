@@ -95,9 +95,10 @@ extern "C" {
 #define MUIM_TextEditor_MacroBegin        (TextEditor_Dummy + 0x27)
 #define MUIM_TextEditor_MacroEnd          (TextEditor_Dummy + 0x28)
 #define MUIM_TextEditor_MacroExecute      (TextEditor_Dummy + 0x29)
-#define MUIM_TextEditor_MarkText          (TextEditor_Dummy + 0x2c)
 #define MUIM_TextEditor_Replace           (TextEditor_Dummy + 0x2a)
 #define MUIM_TextEditor_Search            (TextEditor_Dummy + 0x2b)
+#define MUIM_TextEditor_MarkText          (TextEditor_Dummy + 0x2c)
+#define MUIM_TextEditor_QueryKeyAction    (TextEditor_Dummy + 0x2d)
 
 struct MUIP_TextEditor_ARexxCmd          { ULONG MethodID; STRPTR command; };
 struct MUIP_TextEditor_BlockInfo         { ULONG MethodID; ULONG *startx; ULONG *starty; ULONG *stopx; ULONG *stopy; };
@@ -106,9 +107,10 @@ struct MUIP_TextEditor_ExportBlock       { ULONG MethodID; ULONG flags; };
 struct MUIP_TextEditor_ExportText        { ULONG MethodID; };
 struct MUIP_TextEditor_HandleError       { ULONG MethodID; ULONG errorcode; }; /* See below for error codes */
 struct MUIP_TextEditor_InsertText        { ULONG MethodID; STRPTR text; LONG pos; }; /* See below for positions */
-struct MUIP_TextEditor_MarkText          { ULONG MethodID; ULONG start_crsr_x; ULONG start_crsr_y; ULONG stop_crsr_x; ULONG stop_crsr_y; };
-struct MUIP_TextEditor_Search            { ULONG MethodID; STRPTR SearchString; ULONG Flags; };
 struct MUIP_TextEditor_Replace           { ULONG MethodID; STRPTR NewString; ULONG Flags; };
+struct MUIP_TextEditor_Search            { ULONG MethodID; STRPTR SearchString; ULONG Flags; };
+struct MUIP_TextEditor_MarkText          { ULONG MethodID; ULONG start_crsr_x; ULONG start_crsr_y; ULONG stop_crsr_x; ULONG stop_crsr_y; };
+struct MUIP_TextEditor_QueryKeyAction    { ULONG MethodID; ULONG keyAction; };
 
 #define MUIV_TextEditor_ExportHook_Plain       0x00000000
 #define MUIV_TextEditor_ExportHook_EMail       0x00000001
@@ -216,6 +218,14 @@ struct ClickMessage
 #define MUIV_TextEditor_KeyAction_DelLine         0x25
 #define MUIV_TextEditor_KeyAction_SelectAll       0x26
 #define MUIV_TextEditor_KeyAction_SelectNone      0x27
+
+/* result structure for MUIM_TextEditor_QueryKeyAction */
+struct MUIP_TextEditor_Keybinding
+{
+  const UWORD code;       // the RAWKEY code      read only
+  const ULONG qualifier;  // the Qualifier flags  read only
+  const UWORD action;     // the keyaction        read only
+};
 
 #ifdef __GNUC__
   #ifdef __PPC__
