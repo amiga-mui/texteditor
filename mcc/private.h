@@ -478,6 +478,7 @@ ULONG OM_MarkText   (struct MUIP_TextEditor_MarkText *, struct InstData *);
 ULONG OM_BlockInfo  (struct MUIP_TextEditor_BlockInfo *, struct InstData *);
 ULONG OM_Search   (struct MUIP_TextEditor_Search *, struct InstData *);
 ULONG OM_Replace    (Object *obj, struct MUIP_TextEditor_Replace *msg, struct InstData *data);
+ULONG OM_QueryKeyAction(struct IClass *cl, Object *obj, struct MUIP_TextEditor_QueryKeyAction *msg);
 
 extern struct Hook ImPlainHook;
 extern struct Hook ImEMailHook;

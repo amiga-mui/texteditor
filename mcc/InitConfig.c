@@ -106,12 +106,11 @@ void SetCol (struct InstData *data, void *obj, long item, ULONG *storage, long b
   LEAVE();
 }
 
-BOOL iswarned = FALSE;
-
 void InitConfig(Object *obj, struct InstData *data)
 {
   ULONG setting = 0;
   UWORD *muipens = _pens(obj);
+  BOOL loadDefaultKeys = FALSE;
 
   ENTER();
 
@@ -321,19 +320,21 @@ void InitConfig(Object *obj, struct InstData *data)
     data->SuggestCmd = (char *)setting+4;
   }
 
-  if(!iswarned && DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_ConfigVersion, &setting))
+  if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_ConfigVersion, &setting))
   {
-    iswarned = TRUE;
-    if(*(ULONG *)setting != CONFIG_VERSION)
+    if(*(ULONG *)setting != CONFIG_VERSION+1)
     {
-      MUI_Request(_app(obj), NULL, 0L, "TextEditor.mcc Warning", "Ok|Abort",
-                                       "Your current keybindings setup of TextEditor.mcc\n"
-                                       "was found to be incompatible with this version of\n"
-                                       "TextEditor.mcc.\n"
-                                       "\n"
-                                       "The keybindings of this object will be temporarly\n"
-                                       "set to the default. Please visit the MUI preferences\n"
-                                       "of TextEditor.mcc to permanently update the keybindings.");
+      if(MUI_Request(_app(obj), NULL, 0L, "TextEditor.mcc Warning", "Ok|Abort",
+                                          "Your current keybindings setup of TextEditor.mcc\n"
+                                          "was found to be incompatible with this version of\n"
+                                          "TextEditor.mcc.\n"
+                                          "\n"
+                                          "The keybindings of this object will be temporarly\n"
+                                          "set to the default. Please visit the MUI preferences\n"
+                                          "of TextEditor.mcc to permanently update the keybindings.") == 1)
+      {
+        loadDefaultKeys = TRUE;
+      }
     }
   }
 
@@ -343,7 +344,7 @@ void InitConfig(Object *obj, struct InstData *data)
     ULONG size;
 
     setting = 0;
-    if(!DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_Keybindings, &setting) || setting == 0)
+    if(loadDefaultKeys || !DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_Keybindings, &setting) || setting == 0)
       userkeys = (struct te_key *)default_keybindings;
     else
       userkeys = (struct te_key *)setting;

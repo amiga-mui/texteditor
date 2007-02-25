@@ -27,6 +27,9 @@
 
 #include "private.h"
 
+#include "TextEditor_mcp.h"
+
+
 ULONG FlowSpace(UWORD, STRPTR, struct InstData *);
 
 ULONG OM_BlockInfo(struct MUIP_TextEditor_BlockInfo *msg, struct InstData *data)
@@ -49,6 +52,38 @@ ULONG OM_BlockInfo(struct MUIP_TextEditor_BlockInfo *msg, struct InstData *data)
 
   RETURN(result);
   return(result);
+}
+
+
+ULONG OM_QueryKeyAction(struct IClass *cl, Object *obj, struct MUIP_TextEditor_QueryKeyAction *msg)
+{
+  struct te_key *userkeys;
+  struct te_key *foundKey = NULL;
+  ULONG setting = 0;
+  int i;
+
+  ENTER();
+
+  // now we try to retrieve the currently active
+  // key bindings, or we take the default ones
+  if(!DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_Keybindings, &setting) || setting == 0)
+    userkeys = (struct te_key *)default_keybindings;
+  else
+    userkeys = (struct te_key *)setting;
+
+  for(i=0; (WORD)userkeys[i].code != -1; i++)
+  {
+    struct te_key *curKey = &userkeys[i];
+
+    if(curKey->act == msg->keyAction)
+    {
+      foundKey = curKey;
+      break;
+    }
+  }
+
+  RETURN((ULONG)foundKey);
+  return (ULONG)foundKey;
 }
 
 ULONG OM_MarkText (struct MUIP_TextEditor_MarkText *msg, struct InstData *data)

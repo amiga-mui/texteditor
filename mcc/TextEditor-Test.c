@@ -487,6 +487,15 @@ int main(void)
             printf("Delta: %d\n", delta);
           }
 */
+
+/*          {
+            struct MUIP_TextEditor_Keybinding *key;
+
+            key = (struct MUIP_TextEditor_Keybinding *)DoMethod(editorgad, MUIM_TextEditor_QueryKeyAction, MUIV_TextEditor_KeyAction_Copy);
+
+            printf("code: %d, qualifier: %ld, action: %d\n", key->code, key->qualifier, key->action);
+          }
+*/
 //          DoMethod(editorgad, MUIM_TextEditor_MarkText, 0x000a000f, 0x0030000f);
           do  {
               long  changed;

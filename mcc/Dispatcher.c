@@ -690,6 +690,7 @@ DISPATCHER(_Dispatcher)
     case MUIM_TextEditor_BlockInfo:   result = OM_BlockInfo((struct MUIP_TextEditor_BlockInfo *)msg, data); break;
     case MUIM_TextEditor_Search:      result = OM_Search((struct MUIP_TextEditor_Search *)msg, data); break;
     case MUIM_TextEditor_Replace:     result = OM_Replace(obj, (struct MUIP_TextEditor_Replace *)msg, data); break;
+    case MUIM_TextEditor_QueryKeyAction: result = OM_QueryKeyAction(cl, obj, (struct MUIP_TextEditor_QueryKeyAction *)msg); break;
 
     case MUIM_Export:
     {
