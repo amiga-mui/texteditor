@@ -7,6 +7,8 @@ $URL$
 
 2007-02-25 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcc/HandleArexx.c: added new "SELECTALL"and "SELECTNONE" Arexx commands
+     to be able to also perform the same actions via the ARexx interface.
    * mcc: introduced a new MUIM_TextEditor_QueryKeyAction method that allows
      to retrieve the key code and qualifier information for a specified action.
      Please note, that this method normally returns the direct RAWKEY value

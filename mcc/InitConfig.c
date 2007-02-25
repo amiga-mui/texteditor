@@ -322,7 +322,7 @@ void InitConfig(Object *obj, struct InstData *data)
 
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_ConfigVersion, &setting))
   {
-    if(*(ULONG *)setting != CONFIG_VERSION+1)
+    if(*(ULONG *)setting != CONFIG_VERSION)
     {
       if(MUI_Request(_app(obj), NULL, 0L, "TextEditor.mcc Warning", "Ok|Abort",
                                           "Your current keybindings setup of TextEditor.mcc\n"
