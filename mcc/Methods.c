@@ -65,16 +65,40 @@ ULONG OM_MarkText (struct MUIP_TextEditor_MarkText *msg, struct InstData *data)
     SetCursor(data->CPos_X, data->actualline, FALSE, data);
   }
 
-  data->blockinfo.startline = LineNode(msg->start_crsr_y+1, data);
-  data->blockinfo.startx = (data->blockinfo.startline->line.Length > msg->start_crsr_x) ? msg->start_crsr_x : data->blockinfo.startline->line.Length-1;
-  data->blockinfo.stopline = LineNode(msg->stop_crsr_y+1, data);
-  data->blockinfo.stopx = (data->blockinfo.stopline->line.Length > msg->stop_crsr_x) ? msg->stop_crsr_x : data->blockinfo.stopline->line.Length-1;
-  data->blockinfo.enabled = TRUE;
+  // check if anything at all should be marked or not
+  if((LONG)msg->start_crsr_y != MUIV_TextEditor_MarkText_None)
+  {
+    // check if only the specified area should be marked/selected
+    if((LONG)msg->stop_crsr_y != MUIV_TextEditor_MarkText_All)
+    {
+      data->blockinfo.startline = LineNode(msg->start_crsr_y+1, data);
+      data->blockinfo.startx = (data->blockinfo.startline->line.Length > msg->start_crsr_x) ? msg->start_crsr_x : data->blockinfo.startline->line.Length-1;
+      data->blockinfo.stopline = LineNode(msg->stop_crsr_y+1, data);
+      data->blockinfo.stopx = (data->blockinfo.stopline->line.Length > msg->stop_crsr_x) ? msg->stop_crsr_x : data->blockinfo.stopline->line.Length-1;
+      data->blockinfo.enabled = TRUE;
 
-  data->actualline = data->blockinfo.stopline;
-  data->CPos_X = data->blockinfo.stopx;
-  ScrollIntoDisplay(data);
-  MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+      data->actualline = data->blockinfo.stopline;
+      data->CPos_X = data->blockinfo.stopx;
+      ScrollIntoDisplay(data);
+    }
+    else
+    {
+      // the user selected to mark all available text
+      struct line_node *actual = data->firstline;
+
+      data->blockinfo.startline = actual;
+      data->blockinfo.startx = 0;
+
+      while(actual->next)
+        actual = actual->next;
+
+      data->blockinfo.stopline = actual;
+      data->blockinfo.stopx = data->blockinfo.stopline->line.Length-1;
+      data->blockinfo.enabled = TRUE;
+    }
+
+    MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+  }
 
   RETURN(TRUE);
   return(TRUE);

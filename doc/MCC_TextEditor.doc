@@ -1112,10 +1112,21 @@ TextEditor.mcc/MUIM_TextEditor_Search
         MUIM_TextEditor_MarkText
 
     SYNOPSIS
-        DoMethod(obj, MUIM_TextEditor_MarkText, ULONG start_x, ULONG start_y, ULONG stop_x, ULONG stop_y);
+        DoMethod(obj, MUIM_TextEditor_MarkText, ULONG start_x,
+                                                ULONG start_y,
+                                                ULONG stop_x,
+                                                ULONG stop_y);
 
     FUNCTION
-        This method will mark the given area.
+        This method will mark (select) the given area specified by the
+        start_x/stop_x,start_y/stop_y rectangular.
+
+    NOTE
+        - If start_y is set to MUIV_TextEditor_MarkText_None,
+          then all previously marked text will be unmarked (Select None)
+
+        - If stop_y is set to MUIV_TextEditor_MarkText_All,
+          then all available text will be marked. (Select All)
 
     RESULT
         Not defined.
