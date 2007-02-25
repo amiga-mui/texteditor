@@ -1,5 +1,5 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.19 (12.11.2006)
+@$VER: TextEditor.Guide 15.20 (25.02.2007)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
@@ -339,6 +339,23 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.20 (25.02.2007)
+
+- added new MUIM_TextEditor_QueryKeyAction method to query a texteditor object
+  for a specified key action and receive the corresponding key binding.
+- MUIM_TextEditor_MarkText will now allow to also select all available text as well
+  as unselecting all text.
+- added new 'SELECTALL' and 'SELECTNONE' arexx command names.
+- added new 'SelectAll' and 'SelectNone' key actions and associated them with the
+  RCOMMAND+A and RCOMMAND+RSHIFT+A hotkeys.
+- enhanced the word wrapping mechanism to wrap a line exactly at where the wrap
+  border was specified and not at the cursor position.
+- fixed the key storage for "shift up" event where always converted to "shift right"
+- fixed invalid memory access to the instance data during OM_NEW. This have
+  been the cause for possible crashes during initialization of a TextEditor object.
+- fixed memory trashing during the paste operating which cause have ended up in
+  a crash.
 
 15.19 (12.11.2006)
 
