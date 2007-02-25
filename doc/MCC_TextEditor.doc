@@ -900,6 +900,8 @@ TextEditor.mcc/MUIM_TextEditor_Search
            KILLLINE
            TOUPPER
            TOLOWER
+           SELECTALL
+           SELECTNONE
 
     RESULT
         The method will return FALSE if it couldn't use the command.
