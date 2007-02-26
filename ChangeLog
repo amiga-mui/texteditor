@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-02-26 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcp/CreatePrefsGroup.c: fixed bug in the Popobject popup hooks which
+     contained a wrong indexing and therefore did select the wrong item in the
+     poplist of the keybindings.
+
 2007-02-26 Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/Keybindings.c: changed all occurences of IEQUALIFIER_RSHIFT to

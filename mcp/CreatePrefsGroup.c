@@ -115,7 +115,7 @@ HOOKPROTONH(Popstring_OpenCode, BOOL, Object *pop, Object *text)
   ENTER();
 
   get(text, MUIA_UserData, &active);
-  set(pop, MUIA_List_Active, active-1);
+  set(pop, MUIA_List_Active, active);
   
   RETURN(TRUE);
   return(TRUE);
@@ -128,7 +128,7 @@ HOOKPROTONH(Popstring_CloseCode, void, Object *pop, Object *text)
   ENTER();
 
   get(pop, MUIA_List_Active, &active);
-  set(text, MUIA_UserData, active+1);
+  set(text, MUIA_UserData, active);
 
   LEAVE();
 }
