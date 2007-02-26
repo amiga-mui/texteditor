@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-02-26 Thore Böckelmann <tboeckel@gmx.de>
+
+   * mcp/Keybindings.c: changed all occurences of IEQUALIFIER_RSHIFT to
+     IEQUALIFIER_SHIFT as it unnecessary to force the user to use a specific
+     shift key.
+
 #### v15.20 RELEASE ############################################################
 
 2007-02-25 Jens Langner <Jens.Langner@light-speed.de>

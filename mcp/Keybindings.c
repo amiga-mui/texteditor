@@ -53,7 +53,7 @@ const struct te_key default_keybindings[] =
   { 'c'+500, IEQUALIFIER_RCOMMAND, MUIV_TextEditor_KeyAction_Copy },
   { 'v'+500, IEQUALIFIER_RCOMMAND, MUIV_TextEditor_KeyAction_Paste },
   { 'z'+500, IEQUALIFIER_RCOMMAND, MUIV_TextEditor_KeyAction_Undo },
-  { 'z'+500, IEQUALIFIER_RCOMMAND | IEQUALIFIER_RSHIFT, MUIV_TextEditor_KeyAction_Redo },
+  { 'z'+500, IEQUALIFIER_RCOMMAND | IEQUALIFIER_SHIFT, MUIV_TextEditor_KeyAction_Redo },
   { RAWKEY_HELP, IEQUALIFIER_COMMAND, MUIV_TextEditor_KeyAction_SuggestWord },
 
   { 8+500, IEQUALIFIER_CONTROL, MUIV_TextEditor_KeyAction_DelBOL },
@@ -65,9 +65,9 @@ const struct te_key default_keybindings[] =
   { 'x'+500, IEQUALIFIER_CONTROL, MUIV_TextEditor_KeyAction_DelLine },
   { 0x9+500, IEQUALIFIER_ALT, MUIV_TextEditor_KeyAction_NextGadget },
 
-  { '1'+500, IEQUALIFIER_RCOMMAND | IEQUALIFIER_RSHIFT, MUIV_TextEditor_KeyAction_SetBookmark1 },
-  { '2'+500, IEQUALIFIER_RCOMMAND | IEQUALIFIER_RSHIFT, MUIV_TextEditor_KeyAction_SetBookmark2 },
-  { '3'+500, IEQUALIFIER_RCOMMAND | IEQUALIFIER_RSHIFT, MUIV_TextEditor_KeyAction_SetBookmark3 },
+  { '1'+500, IEQUALIFIER_RCOMMAND | IEQUALIFIER_SHIFT, MUIV_TextEditor_KeyAction_SetBookmark1 },
+  { '2'+500, IEQUALIFIER_RCOMMAND | IEQUALIFIER_SHIFT, MUIV_TextEditor_KeyAction_SetBookmark2 },
+  { '3'+500, IEQUALIFIER_RCOMMAND | IEQUALIFIER_SHIFT, MUIV_TextEditor_KeyAction_SetBookmark3 },
 
   { '1'+500, IEQUALIFIER_RCOMMAND, MUIV_TextEditor_KeyAction_GotoBookmark1 },
   { '2'+500, IEQUALIFIER_RCOMMAND, MUIV_TextEditor_KeyAction_GotoBookmark2 },
@@ -79,6 +79,6 @@ const struct te_key default_keybindings[] =
   { RAWKEY_END,      0, MUIV_TextEditor_KeyAction_Bottom },
 
   { 'a'+500, IEQUALIFIER_RCOMMAND, MUIV_TextEditor_KeyAction_SelectAll },
-  { 'a'+500, IEQUALIFIER_RCOMMAND | IEQUALIFIER_RSHIFT, MUIV_TextEditor_KeyAction_SelectNone },
+  { 'a'+500, IEQUALIFIER_RCOMMAND | IEQUALIFIER_SHIFT, MUIV_TextEditor_KeyAction_SelectNone },
   { -1, 0, 0 }
 };
