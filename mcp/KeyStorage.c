@@ -110,7 +110,6 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
   LONG args[key_count];
   struct RDArgs *ra_result;
   struct RDArgs *myrdargs;
-  enum Keys count = key_lshift;
 
   static const char * const ratemplate =
     "LSHIFT/S,RSHIFT/S,CAPSLOCK/S,CONTROL=CTRL/S,LALT/S,RALT/S,LAMIGA=LCOMMAND/S,RAMIGA=RCOMMAND/S,NUMPAD=NUMERICPAD/S,SHIFT/S,ALT/S,AMIGA=COMMAND/S,"
@@ -150,26 +149,55 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
       myrdargs->RDA_Source.CS_CurChr = 0;
       myrdargs->RDA_Flags |= RDAF_NOPROMPT;
 
-      if((ra_result = ReadArgs(ratemplate, args, myrdargs)))
+      if((ra_result = ReadArgs(ratemplate, args, myrdargs)) != NULL)
       {
-        ULONG qual = 1;
-
         // Scan for 12 qualifier keys
-        for(count = key_lshift; count <= key_amiga; count++)
-        {
-          if(args[count])
-          {
-            storage->qualifier |= qual;
-          }
-          qual = qual << 1;
-        }
+        if(args[key_lshift])
+          storage->qualifier |= IEQUALIFIER_LSHIFT;
+        if(args[key_rshift])
+          storage->qualifier |= IEQUALIFIER_RSHIFT;
+        if(args[key_capslock])
+          storage->qualifier |= IEQUALIFIER_CAPSLOCK;
+        if(args[key_control])
+          storage->qualifier |= IEQUALIFIER_CONTROL;
+        if(args[key_lalt])
+          storage->qualifier |= IEQUALIFIER_LALT;
+        if(args[key_ralt])
+          storage->qualifier |= IEQUALIFIER_RALT;
+        if(args[key_lamiga])
+          storage->qualifier |= IEQUALIFIER_LCOMMAND;
+        if(args[key_ramiga])
+          storage->qualifier |= IEQUALIFIER_RCOMMAND;
+        if(args[key_numpad])
+          storage->qualifier |= IEQUALIFIER_NUMERICPAD;
+        if(args[key_shift])
+          storage->qualifier |= IEQUALIFIER_SHIFT;
+        if(args[key_alt])
+          storage->qualifier |= IEQUALIFIER_ALT;
+        if(args[key_amiga])
+          storage->qualifier |= IEQUALIFIER_COMMAND;
 
         // Scan for the 10 standard F-keys (f1-f10)
-        for(count = key_f1; count <= key_f10; count++)
-        {
-          if(args[count])
-            storage->key = RAWKEY_F1 + count - key_f1;
-        }
+        if(args[key_f1])
+          storage->key = RAWKEY_F1;
+        if(args[key_f2])
+          storage->key = RAWKEY_F2;
+        if(args[key_f3])
+          storage->key = RAWKEY_F3;
+        if(args[key_f4])
+          storage->key = RAWKEY_F4;
+        if(args[key_f5])
+          storage->key = RAWKEY_F5;
+        if(args[key_f6])
+          storage->key = RAWKEY_F6;
+        if(args[key_f7])
+          storage->key = RAWKEY_F7;
+        if(args[key_f8])
+          storage->key = RAWKEY_F8;
+        if(args[key_f9])
+          storage->key = RAWKEY_F9;
+        if(args[key_f10])
+          storage->key = RAWKEY_F10;
 
         // Scan for the 2 extended f-keys (f11,f12)
         if(args[key_f11])
@@ -182,11 +210,14 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
           storage->key = RAWKEY_HELP;
 
         // Scan for cursor-keys
-        for(count = key_up; count <= key_left; count++)
-        {
-          if(args[count])
-            storage->key = RAWKEY_CRSRUP + count - key_up;
-        }
+        if(args[key_up])
+          storage->key = RAWKEY_CRSRUP;
+        if(args[key_down])
+          storage->key = RAWKEY_CRSRDOWN;
+        if(args[key_right])
+          storage->key = RAWKEY_CRSRRIGHT;
+        if(args[key_left])
+          storage->key = RAWKEY_CRSRLEFT;
 
         // scan for the other extended (non-standard) keys
         if(args[key_home])
@@ -256,23 +287,23 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
         if(args[key_wheel_button])
           storage->key = NM_BUTTON_FOURTH;
 
-        if(!storage->key)
+        if(storage->key == 0)
         {
           storage->vanilla = TRUE;
           if(args[key_escape])
-            storage->key = 27;  /* Esc */
+            storage->key = 0x1b;  /* Esc */
           if(args[key_tab])
-            storage->key = 9;   /* Tab */
+            storage->key = 0x09;  /* Tab */
           if(args[key_return])
-            storage->key = 13;  /* CR */
+            storage->key = 0x0d;  /* CR */
           if(args[key_space])
-            storage->key = ' '; /* Space */
+            storage->key = 0x20;  /* Space */
           if(args[key_backspace])
-            storage->key = 8;   /* Backspace */
+            storage->key = 0x08;  /* Backspace */
           if(args[key_delete])
             storage->key = 0x7f;  /* Delete */
 
-          if(!storage->key)
+          if(storage->key == 0)
           {
             storage->key = (UWORD)*(STRPTR)args[key_key];
           }
@@ -320,19 +351,18 @@ void KeyToString(STRPTR buffer, ULONG buffer_len, struct KeyAction *ka)
   {
     switch(ka->key)
     {
-      case 8:   strlcat(buffer, "backspace", buffer_len); break;
-      case 9:   strlcat(buffer, "tab", buffer_len); break;
-      case 13:  strlcat(buffer, ((ka->qualifier & IEQUALIFIER_NUMERICPAD) ? "enter" : "return"), buffer_len); break;
-      case 27:  strlcat(buffer, "esc", buffer_len); break;
-      case 32:  strlcat(buffer, "space", buffer_len); break;
-      case 0x7f:strlcat(buffer, "del", buffer_len); break;
+      case 0x08: strlcat(buffer, "backspace", buffer_len); break;
+      case 0x09: strlcat(buffer, "tab", buffer_len); break;
+      case 0x0d: strlcat(buffer, ((ka->qualifier & IEQUALIFIER_NUMERICPAD) ? "enter" : "return"), buffer_len); break;
+      case 0x1b: strlcat(buffer, "esc", buffer_len); break;
+      case 0x29: strlcat(buffer, "space", buffer_len); break;
+      case 0x7f: strlcat(buffer, "del", buffer_len); break;
 
       default:
       {
         char *p = &buffer[strlen(buffer)];
 
-        *p = ka->key;
-        p++;
+        *p++ = ka->key;
         *p = '\0';
       }
     }
@@ -374,29 +404,30 @@ void KeyToString(STRPTR buffer, ULONG buffer_len, struct KeyAction *ka)
       #endif
 
       #if defined(__amigaos4__)
-			case RAWKEY_MEDIA_STOP:       strlcat(buffer, "media_stop", buffer_len); break;
-			case RAWKEY_MEDIA_PLAY_PAUSE: strlcat(buffer, "media_play", buffer_len); break;
-			case RAWKEY_MEDIA_PREV_TRACK: strlcat(buffer, "media_prev", buffer_len); break;
-			case RAWKEY_MEDIA_NEXT_TRACK: strlcat(buffer, "media_next", buffer_len); break;
-			case RAWKEY_MEDIA_SHUFFLE:    strlcat(buffer, "media_rewind", buffer_len); break;
-			case RAWKEY_MEDIA_REPEAT:     strlcat(buffer, "media_forward", buffer_len); break;
+      case RAWKEY_MEDIA_STOP:       strlcat(buffer, "media_stop", buffer_len); break;
+      case RAWKEY_MEDIA_PLAY_PAUSE: strlcat(buffer, "media_play", buffer_len); break;
+      case RAWKEY_MEDIA_PREV_TRACK: strlcat(buffer, "media_prev", buffer_len); break;
+      case RAWKEY_MEDIA_NEXT_TRACK: strlcat(buffer, "media_next", buffer_len); break;
+      case RAWKEY_MEDIA_SHUFFLE:    strlcat(buffer, "media_rewind", buffer_len); break;
+      case RAWKEY_MEDIA_REPEAT:     strlcat(buffer, "media_forward", buffer_len); break;
       #else
-			case RAWKEY_AUD_STOP:       strlcat(buffer, "media_stop", buffer_len); break;
-			case RAWKEY_AUD_PLAY_PAUSE: strlcat(buffer, "media_play", buffer_len); break;
-			case RAWKEY_AUD_PREV_TRACK: strlcat(buffer, "media_prev", buffer_len); break;
-			case RAWKEY_AUD_NEXT_TRACK: strlcat(buffer, "media_next", buffer_len); break;
-			case RAWKEY_AUD_SHUFFLE:    strlcat(buffer, "media_rewind", buffer_len); break;
-			case RAWKEY_AUD_REPEAT:     strlcat(buffer, "media_forward", buffer_len); break;
+      case RAWKEY_AUD_STOP:       strlcat(buffer, "media_stop", buffer_len); break;
+      case RAWKEY_AUD_PLAY_PAUSE: strlcat(buffer, "media_play", buffer_len); break;
+      case RAWKEY_AUD_PREV_TRACK: strlcat(buffer, "media_prev", buffer_len); break;
+      case RAWKEY_AUD_NEXT_TRACK: strlcat(buffer, "media_next", buffer_len); break;
+      case RAWKEY_AUD_SHUFFLE:    strlcat(buffer, "media_rewind", buffer_len); break;
+      case RAWKEY_AUD_REPEAT:     strlcat(buffer, "media_forward", buffer_len); break;
       #endif
 
-			case NM_WHEEL_UP:           strlcat(buffer, "nm_wheel_up", buffer_len); break;
-			case NM_WHEEL_DOWN:         strlcat(buffer, "nm_wheel_down", buffer_len); break;
-			case NM_WHEEL_LEFT:         strlcat(buffer, "nm_wheel_left", buffer_len); break;
-  		case NM_WHEEL_RIGHT:        strlcat(buffer, "nm_wheel_right", buffer_len); break;
-			case NM_BUTTON_FOURTH:      strlcat(buffer, "nm_wheel_button", buffer_len); break;
+      case NM_WHEEL_UP:           strlcat(buffer, "nm_wheel_up", buffer_len); break;
+      case NM_WHEEL_DOWN:         strlcat(buffer, "nm_wheel_down", buffer_len); break;
+      case NM_WHEEL_LEFT:         strlcat(buffer, "nm_wheel_left", buffer_len); break;
+      case NM_WHEEL_RIGHT:        strlcat(buffer, "nm_wheel_right", buffer_len); break;
+      case NM_BUTTON_FOURTH:      strlcat(buffer, "nm_wheel_button", buffer_len); break;
 
       default:
         strlcat(buffer, "???", buffer_len);
+        break;
     }
   }
 }
@@ -448,3 +479,4 @@ void ExportKeys(void *config, struct InstData_MCP *data)
     FreeMem((APTR)entries, size);
   }
 }
+
