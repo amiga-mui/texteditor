@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-02-27 Thore Böckelmann <tboeckel@gmx.de>
+
+   * doc/MCC_TextEditor.doc: the new MUIM_TextEditor_QueryKeyAction method was
+     missing in the table of contents and was not properly sorted in the range
+     of all methods.
+
 2007-02-26 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcc/Keybindings.c: updated the default keybinding in the MCC according
