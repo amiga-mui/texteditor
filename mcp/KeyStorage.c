@@ -303,9 +303,11 @@ void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage
           if(args[key_delete])
             storage->key = 0x7f;  /* Delete */
 
-          if(storage->key == 0)
+          if(storage->key == 0 && args[key_key])
           {
-            storage->key = (UWORD)*(STRPTR)args[key_key];
+            STRPTR str = (STRPTR)args[key_key];
+
+            storage->key = str[0];
           }
         }
         FreeArgs(ra_result);

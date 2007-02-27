@@ -8,7 +8,8 @@ $URL$
 2007-02-27 Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/KeyStorage.c: hotkey parsing doesn't use loops anymore to prevent un-
-     predictable side effects.
+     predictable side effects. Also added some safety check before accessing
+     the KEY argument to prevent possible NULL pointer accesses.
    * doc/MCC_TextEditor.doc: the new MUIM_TextEditor_QueryKeyAction method was
      missing in the table of contents and was not properly sorted in the range
      of all methods.
