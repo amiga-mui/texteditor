@@ -47,6 +47,7 @@ TextEditor.mcc/MUIM_TextEditor_MacroBegin         (not yet implemented...)
 TextEditor.mcc/MUIM_TextEditor_MacroEnd           (not yet implemented...)
 TextEditor.mcc/MUIM_TextEditor_MacroExecute       (not yet implemented...)
 TextEditor.mcc/MUIM_TextEditor_MarkText
+TextEditor.mcc/MUIM_TextEditor_QueryKeyAction
 TextEditor.mcc/MUIM_TextEditor_Replace
 TextEditor.mcc/MUIM_TextEditor_Search
 TextEditor.mcc/TextEditor.mcc
@@ -1133,6 +1134,36 @@ TextEditor.mcc/MUIM_TextEditor_Search
     RESULT
         Not defined.
 
+TextEditor.mcc/MUIM_TextEditor_QueryKeyAction
+
+    NAME
+        MUIM_TextEditor_QueryKeyAction
+
+    SYNOPSIS
+        DoMethod(obj, MUIM_TextEditor_QueryKeyAction, ULONG keyAction);
+
+    FUNCTION
+        Searches through the internal key binding list of the texteditor
+        object and returns the first found keybinding that satisfies the
+        specified keyAction code.
+
+    INPUT
+        ULONG keyAction
+          The action code (one of MUIV_TextEditor_KeyAction_#?) for which
+          we search in the internal key bindings list.
+
+    RESULT
+        A pointer to a struct MUIP_TextEditor_KeyBinding which should NOT
+        be modified and is for read-only purposes only.
+
+    NOTE
+        The 'code' member of the MUIP_TextEditor_KeyBinding structure
+        is normally a direct RAWKEY value. However, to identify vanilla
+        keys, an offset is added. This means that if the returned code
+        value > 500, then the specified code is actually a vanilla key
+        code and you have to substract 500 from the actual value to get
+        the ASCII code of the character.
+
 TextEditor.mcc/MUIM_TextEditor_Replace
 
     NAME
@@ -1177,35 +1208,5 @@ TextEditor.mcc/MUIM_TextEditor_Search
         If the string is found, it will be automatically marked.  Thus,
         in case you want to replace it, simply clear the marked string and
         insert the new one.
-
-TextEditor.mcc/MUIM_TextEditor_QueryKeyAction
-
-    NAME
-        MUIM_TextEditor_QueryKeyAction
-
-    SYNOPSIS
-        DoMethod(obj, MUIM_TextEditor_QueryKeyAction, ULONG keyAction);
-
-    FUNCTION
-        Searches through the internal key binding list of the texteditor
-        object and returns the first found keybinding that satisfies the
-        specified keyAction code.
-
-    INPUT
-        ULONG keyAction
-          The action code (one of MUIV_TextEditor_KeyAction_#?) for which
-          we search in the internal key bindings list.
-
-    RESULT
-        A pointer to a struct MUIP_TextEditor_KeyBinding which should NOT
-        be modified and is for read-only purposes only.
-
-    NOTE
-        The 'code' member of the MUIP_TextEditor_KeyBinding structure
-        is normally a direct RAWKEY value. However, to identify vanilla
-        keys, an offset is added. This means that if the returned code
-        value > 500, then the specified code is actually a vanilla key
-        code and you have to substract 500 from the actual value to get
-        the ASCII code of the character.
 
 
