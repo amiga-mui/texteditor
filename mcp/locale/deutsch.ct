@@ -584,15 +584,15 @@ Nichts markieren
 ; Select None
 ;
 MSG_WarnConfigVersion_Title
+TextEditor.mcp Warnung
+; TextEditor.mcp Warning
+;
+MSG_WarnConfigVersion
 Ihre aktuelle gespeicherte Tastenbelegung ist inkompatibel\n\
 mit der installierten Version von TextEditor.mcc.\n\
 \n\
 Es wird empfohlen die aktuelle Tastenbelegung auf Standard-\n\
 werte zurückzusetzen und sie anschließend von Hand zu ändern.
-; TextEditor.mcp Warning
-;
-MSG_WarnConfigVersion
-WarnConfigVersion
 ; Your currently saved keybindings setup is incompatible\n\
 ; with the version of TextEditor.mcc you have installed.\n\
 ; \n\
