@@ -636,9 +636,9 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
     DoMethod(data->lookupcmd, MUIM_Notify, MUIA_String_Acknowledge, MUIV_EveryTime, MUIV_Notify_Window, 3, MUIM_Set, MUIA_Window_ActiveObject, data->suggestcmd);
 
     DoMethod(button, MUIM_Notify, MUIA_Selected, TRUE, MUIV_Notify_Window, 3, MUIM_Set, MUIA_Window_ActiveObject, data->hotkey);
-//    DoMethod(button, MUIM_Notify, MUIA_Selected, FALSE, data->hotkey, 3, MUIM_Set, MUIA_String_Acknowledge, TRUE);
+    DoMethod(button, MUIM_Notify, MUIA_Selected, FALSE, data->hotkey, 3, MUIM_Set, MUIA_String_Acknowledge, TRUE);
     DoMethod(button, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, data->hotkey, 3, MUIM_Set, MUIA_HotkeyString_Snoop, MUIV_TriggerValue);
-    DoMethod(data->hotkey, MUIM_Notify, MUIA_String_Contents, MUIV_EveryTime, button, 3, MUIM_Set, MUIA_Selected, FALSE);
+//    DoMethod(data->hotkey, MUIM_Notify, MUIA_String_Contents, MUIV_EveryTime, button, 3, MUIM_Set, MUIA_Selected, FALSE);
 
     DoMethod(plist, MUIM_Notify, MUIA_Listview_DoubleClick, TRUE, data->keyfunctions, 2, MUIM_Popstring_Close, TRUE);
 

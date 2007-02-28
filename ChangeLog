@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-02-28 Thore Böckelmann <tboeckel@gmx.de>
+
+   * mcp/CreatePrefsGroup.c: the Snoop button is no longer deactivated auto-
+     matically but must be deactivated manually. Before it was not really
+     possible to enter combinations of qualifiers and keys, because as soon as
+     a qualifier was pressed the snopping was deactivated.
+
 2007-02-27 Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/KeyStorage.c: hotkey parsing doesn't use loops anymore to prevent un-
