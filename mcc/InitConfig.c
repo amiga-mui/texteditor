@@ -360,11 +360,13 @@ void InitConfig(Object *obj, struct InstData *data)
       ULONG i;
       struct te_key *mykeys = data->RawkeyBindings;
 
-      memcpy(mykeys, (void *)userkeys, size);
+      memcpy(mykeys, userkeys, size);
 
-      for(i = 0; i < count && (WORD)mykeys[i].code != -1; i++)
+      for(i=0; i < count && (WORD)mykeys[i].code != -1; i++)
       {
         struct te_key *curKey = &mykeys[i];
+
+        D(DBF_STARTUP, "checking curKey[%d]: %08lx", i, curKey);
 
         if(curKey->code >= 500)
         {
