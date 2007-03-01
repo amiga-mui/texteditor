@@ -7,6 +7,8 @@ $URL$
 
 2007-03-01 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcp/CreatePrefsGroup.c: added a check if the required Hotkeystring.mcc
+	  class could be found and if it is the minimum required version we need.
    * mcp/CreatePrefsGroup.c: replaced compile time _ASSERT() with our new
      runtime ASSERT() in Debug.c,h.
 
