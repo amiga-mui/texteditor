@@ -40,6 +40,8 @@
 
 #include "SDI_hook.h"
 
+#include "Debug.h"
+
 HOOKPROTONH(ListDisplayFunc, void, char **array, struct te_key *entry)
 {
   static char buffer[256];
@@ -321,6 +323,26 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 
   ENTER();
 
+  // check that HotkeyString.mcc exists and is
+  // uptodate
+  data->hotkey = HotkeyStringObject,
+                   MUIA_CycleChain,         TRUE,
+                   MUIA_Frame,              MUIV_Frame_String,
+                   MUIA_HotkeyString_Snoop, FALSE,
+                   MUIA_Weight, 500,
+                 End;
+
+  // request a specific minimum version. Here 12.5 because other versions
+  // may contain known bugs.
+  if(data->hotkey == NULL ||
+     xget(data->hotkey, MUIA_Version) < 12 || xget(data->hotkey, MUIA_Revision) < 5)
+  {
+    MUI_Request(NULL, NULL, 0L, tr(MSG_WarnHotkeyString_Title), tr(MSG_Ok), tr(MSG_WarnHotkeyString));
+
+    RETURN(NULL);
+    return NULL;
+  }
+
   data->editpopup = MUI_MakeObject(MUIO_MenustripNM, editpopupdata, NULL);
 
   group = VGroup,
@@ -489,12 +511,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
         End,
         Child, VGroup,
           Child, HGroup,
-            Child, data->hotkey = HotkeyStringObject,
-              MUIA_CycleChain, TRUE,
-              MUIA_Frame, MUIV_Frame_String,
-              MUIA_HotkeyString_Snoop, FALSE,
-              MUIA_Weight, 500,
-            End,
+            Child, data->hotkey,
             Child, button = TextObject, ButtonFrame,
               MUIA_CycleChain, TRUE,
               MUIA_Background, MUII_ButtonBack,
@@ -621,7 +638,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
     End,
   End;
 
-  if(group)
+  if(group && data->editpopup)
   {
     set(readview, MUIA_TextEditor_Slider, slider2);
     set(editor, MUIA_TextEditor_Slider, slider);
