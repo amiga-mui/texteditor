@@ -41,6 +41,8 @@
 
 #if defined(DEBUG)
 
+#include <stdlib.h>
+
 #ifndef EXEC_TYPES_H
 #include <exec/types.h>
 #endif

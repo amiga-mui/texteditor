@@ -210,9 +210,6 @@ const char *FunctionName (UWORD func)
 }
 
 #define ARRAY_SIZE(X) (sizeof(X)/sizeof(X[0]))
-/* compile time assert to cause a linker error. DO NOT CHANGE! */
-void __FAIL_ON_ME(void);
-#define _ASSERT(EXP) ((void) ((EXP) ? 0 : __FAIL_ON_ME()))
 
 static Object *PrefsObject(struct InstData_MCP *data)
 {
@@ -272,22 +269,22 @@ static Object *PrefsObject(struct InstData_MCP *data)
   };
   unsigned int i;
 
-  _ASSERT( ARRAY_SIZE(data->gTitles) == (ARRAY_SIZE(titles)+1) );
+  ASSERT( ARRAY_SIZE(data->gTitles) == (ARRAY_SIZE(titles)+1) );
   for(i=0; i<ARRAY_SIZE(titles); i++)
     data->gTitles[i] = tr(titles[i]);
   data->gTitles[ARRAY_SIZE(titles)] = NULL;
 
-  _ASSERT( ARRAY_SIZE(data->functions) == (ARRAY_SIZE(functions)+1) );
+  ASSERT( ARRAY_SIZE(data->functions) == (ARRAY_SIZE(functions)+1) );
   for(i=0; i<ARRAY_SIZE(functions); i++)
     data->functions[i] = tr(functions[i]);
   data->functions[ARRAY_SIZE(functions)] = NULL;
 
-  _ASSERT( ARRAY_SIZE(data->execution) == 3 );
+  ASSERT( ARRAY_SIZE(data->execution) == 3 );
   data->execution[0] = tr(MSG_Execution_CLI);
   data->execution[1] = tr(MSG_Execution_ARexx);
   data->execution[2] = NULL;
 
-  _ASSERT( ARRAY_SIZE(data->cycleentries) == (ARRAY_SIZE(cycleentries)+1) );
+  ASSERT( ARRAY_SIZE(data->cycleentries) == (ARRAY_SIZE(cycleentries)+1) );
   for(i=0; i<ARRAY_SIZE(cycleentries); i++)
     data->cycleentries[i] = tr(cycleentries[i]);
   data->cycleentries[ARRAY_SIZE(cycleentries)] = NULL;

@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-03-01 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcp/CreatePrefsGroup.c: replaced compile time _ASSERT() with our new
+     runtime ASSERT() in Debug.c,h.
+
 2007-02-28 Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/locale/deutsch.ct: fixed wrong warning text.
