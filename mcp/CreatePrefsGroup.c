@@ -245,7 +245,7 @@ HOOKPROTONHNO(UpdateCode, void, APTR **array)
 
     if(result)
     {
-        struct KeyAction keyaction;
+      struct KeyAction keyaction;
 
       ConvertKeyString((STRPTR)result, entry.act, &keyaction);
       entry.code = keyaction.key;
@@ -341,8 +341,19 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 
   	version = xget(data->hotkey, MUIA_Version);
   	revision = xget(data->hotkey, MUIA_Revision);
+    D(DBF_STARTUP, "found HotkeyString.mcc V%d.%d", version, revision);
+
   	if(version > 12 || (version == 12 && revision >= 5))
+    {
+      // everything is fine
   	  hotkeystringOk = TRUE;
+    }
+    else
+    {
+      // get rid of the too old object
+      MUI_DisposeObject(data->hotkey);
+      data->hotkey = NULL;
+    }
   }
 
   if(!hotkeystringOk)
