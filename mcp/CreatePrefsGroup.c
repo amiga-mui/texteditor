@@ -52,7 +52,7 @@ HOOKPROTONH(ListDisplayFunc, void, char **array, struct te_key *entry)
   if(entry)
   {
     ka.key = entry->code;
-    
+
     if(ka.key >= 500)
     {
       ka.vanilla = TRUE;
@@ -60,7 +60,7 @@ HOOKPROTONH(ListDisplayFunc, void, char **array, struct te_key *entry)
     }
     else
       ka.vanilla = FALSE;
-    
+
     ka.qualifier = entry->qual;
     KeyToString(buffer, sizeof(buffer), &ka);
 
@@ -118,7 +118,7 @@ HOOKPROTONH(Popstring_OpenCode, BOOL, Object *pop, Object *text)
 
   get(text, MUIA_UserData, &active);
   set(pop, MUIA_List_Active, active);
-  
+
   RETURN(TRUE);
   return(TRUE);
 }
@@ -187,7 +187,7 @@ HOOKPROTONHNO(SelectCode, void, APTR **array)
   ENTER();
 
   DoMethod(keylist, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &entry);
-  
+
   if(entry)
   {
     char buffer[256];
@@ -198,15 +198,15 @@ HOOKPROTONHNO(SelectCode, void, APTR **array)
     nnset((Object *)result, MUIA_UserData, entry->act);
 
     ka.key = entry->code;
-    
+
     if(ka.key >= 500)
     {
       ka.vanilla = TRUE;
       ka.key -= 500;
-    } 
+    }
     else
       ka.vanilla = FALSE;
-    
+
     ka.qualifier = entry->qual;
     KeyToString(buffer, sizeof(buffer), &ka);
     nnset(data->hotkey, MUIA_String_Contents, buffer);
@@ -227,7 +227,7 @@ HOOKPROTONHNO(UpdateCode, void, APTR **array)
   ENTER();
 
   get(keylist, MUIA_List_Active, &active);
-  
+
   if((LONG)active != MUIV_List_Active_Off)
   {
     SetAttrs(keylist, MUIA_List_Quiet,  TRUE,
@@ -283,6 +283,7 @@ static Object *TxtLabel(const char *text, ULONG weight)
 
 Object *CreatePrefsGroup(struct InstData_MCP *data)
 {
+  BOOL hotkeystringOk = FALSE;
   Object *slider, *slider2, *readview, *button, *group,
          *editor, *keylist, *defaultkeys, *functionname,
          *plist, *popbutton;
@@ -334,8 +335,17 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 
   // request a specific minimum version. Here 12.5 because other versions
   // may contain known bugs.
-  if(data->hotkey == NULL ||
-     xget(data->hotkey, MUIA_Version) < 12 || xget(data->hotkey, MUIA_Revision) < 5)
+  if(data->hotkey != NULL)
+  {
+  	ULONG version, revision;
+
+  	version = xget(data->hotkey, MUIA_Version);
+  	revision = xget(data->hotkey, MUIA_Revision);
+  	if(version > 12 || (version == 12 && revision >= 5))
+  	  hotkeystringOk = TRUE;
+  }
+
+  if(!hotkeystringOk)
   {
     MUI_Request(NULL, NULL, 0L, tr(MSG_WarnHotkeyString_Title), tr(MSG_Ok), tr(MSG_WarnHotkeyString));
 
