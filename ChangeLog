@@ -10,7 +10,9 @@ $URL$
    * mcp/locale/deutsch.ct: updated the german translation according to the
      latest changes.
    * mcp/CreatePrefsGroup.c: the version check for Hotkeystring.mcc didn't
-     handle future versions correctly (i.e. 13.0).
+     handle future versions correctly (i.e. 13.0). A too old object is also
+     disposed before the creation fails to let the user install a new version
+     without the need to reboot.
 
 2007-03-01 Jens Langner <Jens.Langner@light-speed.de>
 
