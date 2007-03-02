@@ -7,6 +7,8 @@ $URL$
 
 2007-03-02 Thore Böckelmann <tboeckel@gmx.de>
 
+   * mcp/locale/deutsch.ct: updated the german translation according to the
+     latest changes.
    * mcp/CreatePrefsGroup.c: the version check for Hotkeystring.mcc didn't
      handle future versions correctly (i.e. 13.0).
 

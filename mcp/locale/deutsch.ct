@@ -603,3 +603,28 @@ MSG_ResetAbort
 Zurücksetzen|Abbruch
 ; Reset|Abort
 ;
+MSG_WarnHotkeyString_Title
+TextEditor.mcp Warnung
+; TextEditor.mcp Warning
+;
+MSG_WarnHotkeyString
+TextEditor.mcp konnte the mindestens benötigte\n\
+Version der Klasse HotkeyString.mcc nicht öffnen!\n\
+Dadurch konnte TextEditor.mcp nicht initialisiert\n\
+werden!\n\
+\n\
+Bitte stellen Sie sicher, dass Sie die neueste Version\n\
+von HotkeyString.mcc von http://www.sf.net/projects/bstring-mcc/\n\
+installiert haben.
+; TextEditor.mcp couldn't open the minimum required\n\
+; version of the HotkeyString.mcc custom class and\n\
+; therefore failed during initialization.\n\
+; \n\
+; Please make sure you have the latest Hotkeystring.mcc\n\
+; class from http://www.sf.net/projects/bstring-mcc/\n\
+; installed and try again.
+;
+MSG_Ok
+Ok
+; Ok
+;
