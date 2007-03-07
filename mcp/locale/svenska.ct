@@ -1,6 +1,6 @@
 ## chunk AUTH Pär Boberg
 ## language svenska
-## version $VER: TextEditor_mcp.ct 2.0 (28.07.05)
+## version $VER: TextEditor_mcp.ct 2.0 (07.03.07)
 HelpBubble_BlockQual
 Håll nere tangenten som du har valt här\noch flytta markören för att markera text.
 ;#DEF Move the cursor key and hold down the qualifier\nthat you set here to mark text.
@@ -271,7 +271,7 @@ Skugga
 ;#DEF Shadow
 ;#SET (66//)
 MSG_Label_SeparatorShine
-Ljus
+Sken
 ;#DEF Shine
 ;#SET (67//)
 MSG_Label_Smooth
@@ -335,7 +335,7 @@ Halvskugga
 ;#DEF Halfshadow
 ;#SET (82//)
 MSG_MenuItem_Halfshine
-Halvljus
+Halvsken
 ;#DEF Halfshine
 ;#SET (83//)
 MSG_MenuItem_Italic
@@ -371,7 +371,7 @@ Skugga
 ;#DEF Shadow
 ;#SET (91//)
 MSG_MenuItem_Shine
-Ljus
+Sken
 ;#DEF Shine
 ;#SET (92//)
 MSG_MenuItem_Text
@@ -439,7 +439,7 @@ Välj skiljelinjens skuggfärg
 ;#DEF Select separators shadow color
 ;#SET (108//)
 MSG_PopWinTitle_SeparatorShine
-Välj skiljelinjens ljusfärg
+Välj skiljelinjens skenfärg
 ;#DEF Select separators shine color
 ;#SET (109//)
 MSG_PopWinTitle_Text
@@ -502,3 +502,23 @@ MSG_Function_DelLine
 Radera rad
 ;#DEF Delete line
 ;#SET (124//)
+MSG_Function_SelectAll
+Välj alla
+;#DEF Select All
+;#SET (125//)
+MSG_Function_SelectNone
+Välj inga
+;#DEF Select None
+;#SET (126//)
+MSG_WarnConfigVersion_Title
+TextEditor.mcp Varning
+;#DEF TextEditor.mcp Warning
+;#SET (127//)
+MSG_WarnConfigVersion
+Din nuvarande sparade tangent-uppsättning är inkompatibel\nmed den version av TextEditor.mcc du har installerad.\n\nDet är rekommenderat att du återställer tangent-uppsättningen\ntill dess förval och redigerar dem manuellt efteråt.
+;#DEF Your currently saved keybindings setup is incompatible\nwith the version of TextEditor.mcc you have installed.\n\nIt is suggested that you reset the current keybindings\nto their defaults and edit them manually afterwards.
+;#SET (128//)
+MSG_ResetAbort
+Återställ|Avbryt
+;#DEF Reset|Abort
+;#SET (129//)
