@@ -1,5 +1,5 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.20 (25.02.2007)
+@$VER: TextEditor.Guide 15.21 (07.03.2007)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
@@ -339,6 +339,19 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.21 (07.03.2007)
+
+- updated certian catalog translations.
+- fixed incorrect iterations through the default keybindings structures.
+- fixed a crash bug where the "GETCURSOR" arexx command ended up in an illegal
+  memory access.
+- the .mcp will now check if the correct HotkeyString.mcc class could be found
+  and raise a warning requester instead.
+- the "Snoop" button the preferences is now a toggle button instead.
+- fixed wrong indexing of the key action popup object.
+- all default keybindings which previously contained explicit RSHIFT/LSHIFT
+  definitions now contain plain SHIFT ones.
 
 15.20 (25.02.2007)
 
