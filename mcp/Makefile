@@ -236,6 +236,12 @@ PREFOBJS= $(OBJDIR)/locale.o \
           $(OBJDIR)/ObjectCreator.o \
           $(OBJDIR)/Preference.o
 
+# available catalog translations
+CATALOGS = $(LOCALE)/deutsch.catalog \
+           $(LOCALE)/french.catalog \
+           $(LOCALE)/svenska.catalog \
+           $(LOCALE)/russian.catalog
+
 #
 
 all: $(BINDIR) $(OBJDIR) locale.c $(MCPTARGET) $(PREFTARGET)
@@ -283,6 +289,17 @@ locale.h: locale.c
 locale.c: locale/TextEditor_mcp.cd C_h.sd C_c.sd
 	@printf '\033[33mGenerating locale file $@...\033[0m\n'
 	@$(FC) locale/TextEditor_mcp.cd locale.h=C_h.sd locale.c=C_c.sd
+
+## CATALOG GENERATION #################
+
+$(LOCALE)/%.catalog: $(LOCALE)/%.ct
+	@printf '\033[33mGenerating $@\033[0m\n'
+	@$(FC) $(LOCALE)/TextEditor_mcp.cd $< CATALOG $@
+
+.IGNORE: $(CATALOGS)
+
+catalogs: $(CATALOGS)
+
 
 #
 
