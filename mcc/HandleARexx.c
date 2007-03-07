@@ -177,9 +177,9 @@ static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struc
       case LINE:
         if(*args)
         {
-            LONG line;
+          LONG line;
 
-          get(data->object, MUIA_TextEditor_CursorY, &line);
+          line = xget(data->object, MUIA_TextEditor_CursorY);
           line += *(LONG *)*args;
           set(data->object, MUIA_TextEditor_CursorY, (line < 0) ? 0 : line);
         }
@@ -188,9 +188,9 @@ static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struc
       case COLUMN:
         if(*args)
         {
-            LONG column;
+          LONG column;
 
-          get(data->object, MUIA_TextEditor_CursorX, &column);
+          column = xget(data->object, MUIA_TextEditor_CursorX);
           column += *(LONG *)*args;
           set(data->object, MUIA_TextEditor_CursorX, (column < 0) ? 0 : column);
         }

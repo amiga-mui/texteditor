@@ -242,9 +242,7 @@ ULONG InputTrigger(UNUSED struct IClass *cl, struct InstData *data)
       struct line_node *oldactualline = data->actualline;
       BOOL  Scroll = TRUE;
 
-    ULONG active;
-    get(_win(data->object), MUIA_Window_Activate, &active);
-    if(!active)
+    if(xget(_win(data->object), MUIA_Window_Activate) == FALSE)
     {
       data->mousemove = FALSE;
       RejectInput(data);

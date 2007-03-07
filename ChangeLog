@@ -7,6 +7,7 @@ $URL$
 
 2007-03-07 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcc: replaced all get() uses with the more save xget().
    * mcc/HandleArexx.c: the HandleArexx() function was returning a 'BOOL'
      which wasn't entirely correct as it might also return a string on commands
      like 'GETCURSOR'. In that case it might have happend that the result

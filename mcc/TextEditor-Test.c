@@ -507,8 +507,7 @@ int main(void)
           set(window, MUIA_Window_Open, TRUE);
 
 /*          {
-            ULONG delta;
-            get(editorgad, MUIA_TextEditor_Prop_DeltaFactor, &delta);
+            ULONG delta = xget(editorgad, MUIA_TextEditor_Prop_DeltaFactor);
             printf("Delta: %d\n", delta);
           }
 */
@@ -522,8 +521,9 @@ int main(void)
           }
 */
 //          DoMethod(editorgad, MUIM_TextEditor_MarkText, 0x000a000f, 0x0030000f);
-          do  {
-              long  changed;
+          do
+          {
+            ULONG changed;
 
             while((LONG)DoMethod(app, MUIM_Application_NewInput, &sigs) != MUIV_Application_ReturnID_Quit)
             {
@@ -535,7 +535,7 @@ int main(void)
               }
             }
 
-            get(editorgad, MUIA_TextEditor_HasChanged, &changed);
+            changed = xget(editorgad, MUIA_TextEditor_HasChanged);
             if(argarray[0] && changed && !(sigs & SIGBREAKF_CTRL_C))
               running = MUI_Request(app, window, 0L, "Warning", "*_Proceed|_Save|_Cancel", "\33cText '%s'\n is modified. Save it?", argarray[0]);
 
