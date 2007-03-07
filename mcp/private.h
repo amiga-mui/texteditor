@@ -34,7 +34,7 @@
 // if something in our configuration setup (keybindings, etc)
 // has changed we can increase the config version so that TextEditor
 // will popup a warning about and obsolete configuration.
-#define CONFIG_VERSION 3
+#define CONFIG_VERSION 4
 
 // our PREFSIMAGE macro
 #define PREFSIMAGEOBJECT \
