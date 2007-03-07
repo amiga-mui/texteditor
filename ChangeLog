@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-03-07 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcp/Makefile: added 'catalogs' target to Makefile so that catalogs can
+     be generated on-the-fly more easily.
+
 2007-03-02 Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/locale/deutsch.ct: updated the german translation according to the
