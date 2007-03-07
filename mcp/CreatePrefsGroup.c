@@ -139,7 +139,8 @@ MakeStaticHook(Popstring_CloseHook, Popstring_CloseCode);
 HOOKPROTONHNO(SetDefaultKeysCode, void, APTR **array)
 {
   Object *keylist = (Object *)*array;
-  int i;
+  struct te_key *key = (struct te_key *)default_keybindings;
+
 
   ENTER();
 
@@ -147,8 +148,12 @@ HOOKPROTONHNO(SetDefaultKeysCode, void, APTR **array)
 
   set(keylist, MUIA_List_Quiet, TRUE);
 
-  for(i=0; (WORD)default_keybindings[i].code != -1; i++)
-    DoMethod(keylist, MUIM_List_InsertSingle, default_keybindings[i], MUIV_List_Insert_Bottom);
+  while((WORD)key->code != -1)
+  {
+    DoMethod(keylist, MUIM_List_InsertSingle, key, MUIV_List_Insert_Bottom);
+
+    key++;
+  }
 
   set(keylist, MUIA_List_Quiet, FALSE);
 
@@ -341,7 +346,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 
   	version = xget(data->hotkey, MUIA_Version);
   	revision = xget(data->hotkey, MUIA_Revision);
-    D(DBF_STARTUP, "found HotkeyString.mcc V%d.%d", version, revision);
+    D(DBF_STARTUP, "found HotkeyString.mcc V%ld.%ld", version, revision);
 
   	if(version > 12 || (version == 12 && revision >= 5))
     {

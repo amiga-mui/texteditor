@@ -7,6 +7,9 @@ $URL$
 
 2007-03-07 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcp/KeyStorage.c, mcp/CreatePrefsGroup.c: fixed bug #1669685 where due to
+     an incorrect iteration through the keybindings structure, TextEditor.mcp
+     crashed on OS3/m68k setups.
    * mcc: replaced all get() uses with the more save xget().
    * mcc/HandleArexx.c: the HandleArexx() function was returning a 'BOOL'
      which wasn't entirely correct as it might also return a string on commands

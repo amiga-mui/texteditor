@@ -41,7 +41,8 @@
 #include "newmouse.h"
 #include "Debug.h"
 
-enum Keys {
+enum Keys
+{
     key_lshift = 0,
     key_rshift,
     key_capslock,
@@ -438,32 +439,26 @@ void ImportKeys(void *config, struct InstData_MCP *data)
 {
   void *cfg_data;
   struct te_key *userkeys;
-  int i;
 
   ENTER();
-
-  D(DBF_STARTUP, "importing keybindings... %08lx", config);
 
   if(config != NULL && (cfg_data = (void *)DoMethod(config, MUIM_Dataspace_Find, MUICFG_TextEditor_Keybindings)))
     userkeys = cfg_data;
   else
     userkeys = (struct te_key *)default_keybindings;
 
-  D(DBF_STARTUP, "importing keybindings... %08lx", userkeys);
-
   DoMethod(data->keybindings, MUIM_List_Clear);
 
   set(data->keybindings, MUIA_List_Quiet, TRUE);
 
-  for(i=0; (WORD)userkeys[i].code != -1; i++)
+  while((WORD)userkeys->code != -1)
   {
-    D(DBF_STARTUP, "insert %08lx in list", userkeys[i]);
-    DoMethod(data->keybindings, MUIM_List_InsertSingle, userkeys[i], MUIV_List_Insert_Bottom);
+    DoMethod(data->keybindings, MUIM_List_InsertSingle, userkeys, MUIV_List_Insert_Bottom);
+
+    userkeys++;
   }
 
   set(data->keybindings, MUIA_List_Quiet, FALSE);
-
-  D(DBF_STARTUP, "finished import of keybindings");
 
   LEAVE();
 }
