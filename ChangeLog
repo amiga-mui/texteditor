@@ -7,6 +7,10 @@ $URL$
 
 2007-03-07 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcc/HandleArexx.c: the HandleArexx() function was returning a 'BOOL'
+     which wasn't entirely correct as it might also return a string on commands
+     like 'GETCURSOR'. In that case it might have happend that the result
+     variable was truncated and caused and unexpected crash.
    * mcp/Makefile: added 'catalogs' target to Makefile so that catalogs can
      be generated on-the-fly more easily.
 

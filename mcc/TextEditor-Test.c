@@ -42,7 +42,7 @@
 #include "SDI_hook.h"
 
 // global data
-Object *editorgad;
+Object *editorgad = NULL;
 
 // static hooks
 HOOKPROTONHNO(URLHookCode, LONG, struct ClickMessage *cm)
@@ -91,6 +91,30 @@ HOOKPROTONHNONP(ExportBlockCode, void)
   }
 }
 MakeStaticHook(ExportBlockHook, ExportBlockCode);
+
+HOOKPROTONH(ARexxHookCode, LONG, Object *app, struct RexxMsg *rexxmsg)
+{
+  ULONG result;
+
+  result = DoMethod(editorgad, MUIM_TextEditor_ARexxCmd, rexxmsg->rm_Args[0]);
+
+  if(result != 0)
+  {
+    if(result != TRUE)
+    {
+      printf("rexx result: '%s'\n", (char *)result);
+
+      set(app, MUIA_Application_RexxString, result);
+
+      // if the ARexxCmd returns a string we have to free
+      // the memory here.
+      FreeVec((APTR)result);
+    }
+  }
+
+  return(0);
+}
+MakeStaticHook(ARexxHook, ARexxHookCode);
 
 #if defined(__amigaos4__)
 struct Library *DiskfontBase = NULL;
@@ -203,16 +227,17 @@ int main(void)
         
         app = MUI_NewObject("Application.mui",
               MUIA_Application_Author,      "TextEditor.mcc Open Source Team",
-              MUIA_Application_Base,        "Editor-Demo",
+              MUIA_Application_Base,        "TextEditor-Test",
               MUIA_Application_Copyright,   "(c) 2000-2007 TextEditor.mcc Open Source Team",
-              MUIA_Application_Description, "Editor.mcc demonstration program",
-              MUIA_Application_Title,       "Editor-Demo",
-              MUIA_Application_Version,     "$VER: Editor-Demo V1.0 (28.01.2007)",
+              MUIA_Application_Description, "TextEditor.mcc test program",
+              MUIA_Application_Title,       "TextEditor-Test",
+              MUIA_Application_Version,     "$VER: TextEditor-Test (" __DATE__ ")",
+              MUIA_Application_RexxHook,    &ARexxHook,
               MUIA_Application_UsedClasses, classes,
 
               MUIA_Application_Window,
-                window = MUI_NewObject("Window.mui",
-                MUIA_Window_Title,    "Editor-Demo",
+                window = WindowObject,
+                MUIA_Window_Title,    "TextEditor-Test",
                 MUIA_Window_ID,       MAKE_ID('M','A','I','N'),
                 MUIA_Window_RootObject, VGroup,
                   Child, VGroup,
@@ -232,7 +257,7 @@ int main(void)
 
                     Child, HGroup,
 
-                      Child, bold = MUI_NewObject("Text.mui",
+                      Child, bold = TextObject,
                         MUIA_Background,    MUII_ButtonBack,
                         MUIA_Frame,         MUIV_Frame_Button,
                         MUIA_Text_PreParse, "\33c",
@@ -242,7 +267,7 @@ int main(void)
                         MUIA_InputMode,     MUIV_InputMode_Toggle,
                         End,
 
-                      Child, italic = MUI_NewObject("Text.mui",
+                      Child, italic = TextObject,
                         MUIA_Background,    MUII_ButtonBack,
                         MUIA_Frame,         MUIV_Frame_Button,
                         MUIA_Text_PreParse, "\33c",
@@ -252,7 +277,7 @@ int main(void)
                         MUIA_InputMode,     MUIV_InputMode_Toggle,
                       End,
 
-                      Child, underline = MUI_NewObject("Text.mui",
+                      Child, underline = TextObject,
                         MUIA_Background,    MUII_ButtonBack,
                         MUIA_Frame,         MUIV_Frame_Button,
                         MUIA_Text_PreParse, "\33c",
