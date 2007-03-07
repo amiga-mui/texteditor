@@ -421,7 +421,7 @@ void FreeLine(struct line_node *line, struct InstData *data);
 void  InitConfig(Object *, struct InstData *);
 void  FreeConfig(struct InstData *, struct MUI_RenderInfo *);
 
-BOOL HandleARexx(struct InstData *, STRPTR command);
+ULONG HandleARexx(struct InstData *, STRPTR command);
 
 struct line_node *ImportText(char *, struct InstData *, struct Hook *, LONG);
 void *ExportText(struct MUIP_TextEditor_ExportText *msg, struct InstData *data);
@@ -578,5 +578,17 @@ struct te_key
 #include "default-align.h"
 
 extern const struct te_key default_keybindings[];
+
+/// xget()
+//  Gets an attribute value from a MUI object
+ULONG xget(Object *obj, const ULONG attr);
+#if defined(__GNUC__)
+  // please note that we do not evaluate the return value of GetAttr()
+  // as some attributes (e.g. MUIA_Selected) always return FALSE, even
+  // when they are supported by the object. But setting b=0 right before
+  // the GetAttr() should catch the case when attr doesn't exist at all
+  #define xget(OBJ, ATTR) ({ULONG b=0; GetAttr(ATTR, OBJ, &b); b;})
+#endif
+///
 
 #endif /* TEXTEDITOR_MCC_PRIV_H */

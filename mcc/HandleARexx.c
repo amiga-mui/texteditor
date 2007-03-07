@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include <dos/rdargs.h>
 #include <exec/memory.h>
@@ -31,8 +32,6 @@
 #include <proto/dos.h>
 
 #include "private.h"
-
-//#define get(obj,attr,store) GetAttr(attr,obj,(ULONG *)store)
 
 struct RexxCommand
 {
@@ -259,12 +258,14 @@ static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struc
 
       case GETLINE:
       {
-          STRPTR buffer;
+        STRPTR buffer;
 
         if((buffer = AllocVec(data->actualline->line.Length+1, MEMF_ANY)))
         {
           memcpy(buffer, data->actualline->line.Contents, data->actualline->line.Length);
+
           buffer[data->actualline->line.Length] = '\0';
+
           result = (ULONG)buffer;
         }
         break;
@@ -272,16 +273,19 @@ static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struc
 
       case GETCURSOR:
       {
-        STRPTR buffer = AllocVec(6, MEMF_ANY);
-        LONG pos = 0;
+        STRPTR buffer;
 
-        if(buffer)
+        if((buffer = AllocVec(6, MEMF_ANY)))
         {
+          LONG pos = 0;
+
           if(*args)
-              get(data->object, MUIA_TextEditor_CursorY, &pos);
-          else  get(data->object, MUIA_TextEditor_CursorX, &pos);
+            pos = xget(data->object, MUIA_TextEditor_CursorY);
+          else
+            pos = xget(data->object, MUIA_TextEditor_CursorX);
 
           snprintf(buffer, 6, "%ld", pos);
+
           result = (ULONG)buffer;
         }
         break;
@@ -395,9 +399,9 @@ static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struc
   return(result);
 }
 
-BOOL HandleARexx(struct InstData *data, STRPTR command)
+ULONG HandleARexx(struct InstData *data, STRPTR command)
 {
-  BOOL result = FALSE;
+  ULONG result = 0;
 
   ENTER();
 
@@ -431,7 +435,7 @@ BOOL HandleARexx(struct InstData *data, STRPTR command)
       memset(Args, 0, sizeof(Args));
 
       // skip leading spaces
-      while(*txtargs == ' ')
+      while(isspace(*txtargs))
         txtargs++;
 
       if(*txtargs != '\0' && function != InsTEXT)
@@ -459,6 +463,7 @@ BOOL HandleARexx(struct InstData *data, STRPTR command)
             if((ra_result = ReadArgs(Commands[function].Template, Args, myrdargs)))
             {
               result = CallFunction(function, Args, NULL, data);
+
               FreeArgs(ra_result);
             }
             MyFreePooled(data->mypool, buffer);
