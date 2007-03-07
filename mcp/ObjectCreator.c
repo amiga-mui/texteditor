@@ -381,83 +381,86 @@ ULONG GadgetsToConfig(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, 
   struct InstData_MCP *data = INST_DATA(cl, obj);
   LONG cfg_data;
 
+  ENTER();
+
   // first save the config version
   cfg_data = CONFIG_VERSION;
   DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(LONG), MUICFG_TextEditor_ConfigVersion);
 
   ExportKeys(msg->configdata, data);
 
-  get(data->frame, MUIA_Framedisplay_Spec, &cfg_data);
+  cfg_data = xget(data->frame, MUIA_Framedisplay_Spec);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, sizeof(struct MUI_FrameSpec), MUICFG_TextEditor_Frame);
 
-  get(data->background, MUIA_Imagedisplay_Spec, &cfg_data);
+  cfg_data = xget(data->background, MUIA_Imagedisplay_Spec);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, sizeof(struct MUI_ImageSpec), MUICFG_TextEditor_Background);
 
-  get(data->blinkspeed, MUIA_Numeric_Value, &cfg_data);
+  cfg_data = xget(data->blinkspeed, MUIA_Numeric_Value);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(LONG), MUICFG_TextEditor_BlinkSpeed);
 
-  get(data->blockqual, MUIA_Cycle_Active, &cfg_data);
+  cfg_data = xget(data->blockqual, MUIA_Cycle_Active);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(LONG), MUICFG_TextEditor_BlockQual);
 
-  get(data->cursorcolor, MUIA_Pendisplay_Spec, &cfg_data);
+  cfg_data = xget(data->cursorcolor, MUIA_Pendisplay_Spec);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, sizeof(struct MUI_PenSpec), MUICFG_TextEditor_CursorColor);
 
-  get(data->cursorwidth, MUIA_Numeric_Value, &cfg_data);
+  cfg_data = xget(data->cursorwidth, MUIA_Numeric_Value);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(LONG), MUICFG_TextEditor_CursorWidth);
 
-  get(data->fixedfont, MUIA_String_Contents, &cfg_data);
+  cfg_data = xget(data->fixedfont, MUIA_String_Contents);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, strlen((char *)cfg_data)+1, MUICFG_TextEditor_FixedFont);
 
-  get(data->frame, MUIA_Framedisplay_Spec, &cfg_data);
+  cfg_data = xget(data->frame, MUIA_Framedisplay_Spec);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, sizeof(struct MUI_FrameSpec), MUICFG_TextEditor_Frame);
 
-  get(data->highlightcolor, MUIA_Pendisplay_Spec, &cfg_data);
+  cfg_data = xget(data->highlightcolor, MUIA_Pendisplay_Spec);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, sizeof(struct MUI_PenSpec), MUICFG_TextEditor_HighlightColor);
 
-  get(data->markedcolor, MUIA_Pendisplay_Spec, &cfg_data);
+  cfg_data = xget(data->markedcolor, MUIA_Pendisplay_Spec);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, sizeof(struct MUI_PenSpec), MUICFG_TextEditor_MarkedColor);
 
-  get(data->normalfont, MUIA_String_Contents, &cfg_data);
+  cfg_data = xget(data->normalfont, MUIA_String_Contents);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, strlen((char *)cfg_data)+1, MUICFG_TextEditor_NormalFont);
 
   {
     ULONG buffer[260/4];
 
     get(data->LookupExeType, MUIA_Cycle_Active, buffer);
-    get(data->lookupcmd, MUIA_String_Contents, &cfg_data);
+    cfg_data = xget(data->lookupcmd, MUIA_String_Contents);
     CopyMem((APTR)cfg_data, &buffer[1], 256);
     DoMethod(msg->configdata, MUIM_Dataspace_Add, buffer, strlen((char *)cfg_data)+5, MUICFG_TextEditor_LookupCmd);
 
     get(data->SuggestExeType, MUIA_Cycle_Active, buffer);
-    get(data->suggestcmd, MUIA_String_Contents, &cfg_data);
+    cfg_data = xget(data->suggestcmd, MUIA_String_Contents);
     CopyMem((APTR)cfg_data, &buffer[1], 256);
     DoMethod(msg->configdata, MUIM_Dataspace_Add, buffer, strlen((char *)cfg_data)+5, MUICFG_TextEditor_SuggestCmd);
   }
 
-  get(data->smooth, MUIA_Selected, &cfg_data);
+  cfg_data = xget(data->smooth, MUIA_Selected);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(LONG), MUICFG_TextEditor_Smooth);
 
-  get(data->typenspell, MUIA_Selected, &cfg_data);
+  cfg_data = xget(data->typenspell, MUIA_Selected);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(LONG), MUICFG_TextEditor_TypeNSpell);
 
-  get(data->CheckWord, MUIA_Selected, &cfg_data);
+  cfg_data = xget(data->CheckWord, MUIA_Selected);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(LONG), MUICFG_TextEditor_CheckWord);
 
-  get(data->tabsize, MUIA_Numeric_Value, &cfg_data);
+  cfg_data = xget(data->tabsize, MUIA_Numeric_Value);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(LONG), MUICFG_TextEditor_TabSize);
 
-  get(data->undosize, MUIA_Numeric_Value, &cfg_data);
+  cfg_data = xget(data->undosize, MUIA_Numeric_Value);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(LONG), MUICFG_TextEditor_UndoSize);
 
-  get(data->textcolor, MUIA_Pendisplay_Spec, &cfg_data);
+  cfg_data = xget(data->textcolor, MUIA_Pendisplay_Spec);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, sizeof(struct MUI_PenSpec), MUICFG_TextEditor_TextColor);
 
-  get(data->separatorshine, MUIA_Pendisplay_Spec, &cfg_data);
+  cfg_data = xget(data->separatorshine, MUIA_Pendisplay_Spec);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, sizeof(struct MUI_PenSpec), MUICFG_TextEditor_SeparatorShine);
 
-  get(data->separatorshadow, MUIA_Pendisplay_Spec, &cfg_data);
+  cfg_data = xget(data->separatorshadow, MUIA_Pendisplay_Spec);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, sizeof(struct MUI_PenSpec), MUICFG_TextEditor_SeparatorShadow);
 
+  RETURN(0);
   return(0);
 }
 

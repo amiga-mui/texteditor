@@ -85,8 +85,8 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
     Object *defaultobj;
     struct IntuiMessage *imsg = msg->imsg;
 
-    get(_win(obj), MUIA_Window_ActiveObject, (APTR)&activeobj);
-    get(_win(obj), MUIA_Window_DefaultObject, (APTR)&defaultobj);
+    activeobj = (Object *)xget(_win(obj), MUIA_Window_ActiveObject);
+    defaultobj = (Object *)xget(_win(obj), MUIA_Window_DefaultObject);
 
     if(data->CtrlChar && activeobj != obj && defaultobj != obj && RAWToANSI(imsg) == data->CtrlChar)
     {
@@ -139,9 +139,8 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
             if(imsg->Code == NM_WHEEL_UP   || imsg->Code == NM_WHEEL_LEFT ||
                imsg->Code == NM_WHEEL_DOWN || imsg->Code == NM_WHEEL_RIGHT)
             {
-              LONG visible;
+              LONG visible = xget(obj, MUIA_TextEditor_Prop_Visible);
 
-              get(obj, MUIA_TextEditor_Prop_Visible, &visible);
               if(visible > 0)
               {
                 // we scroll about 1/6 of the displayed text by default
@@ -179,9 +178,8 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
           if(data->slider &&
              _isinwholeobject(obj, imsg->MouseX, imsg->MouseY))
           {
-            LONG visible;
+            LONG visible = xget(obj, MUIA_TextEditor_Prop_Visible);
 
-            get(obj, MUIA_TextEditor_Prop_Visible, &visible);
             if(visible > 0)
             {
           		struct IntuiWheelData *iwd = (struct IntuiWheelData *)imsg->IAddress;

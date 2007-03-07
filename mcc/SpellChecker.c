@@ -352,8 +352,8 @@ void SuggestWord (struct InstData *data)
 
     line_nr = LineToVisual(line, data) - 1;
     OffsetToLines(data->CPos_X, line, &pos, data);
-    get(_win(data->object), MUIA_Window_LeftEdge, &left);
-    get(_win(data->object), MUIA_Window_TopEdge, &top);
+    left = xget(_win(data->object), MUIA_Window_LeftEdge);
+    top = xget(_win(data->object), MUIA_Window_TopEdge);
     left  += data->xpos + FlowSpace(line->line.Flow, line->line.Contents+(data->CPos_X-pos.x), data) + TextLength(&data->tmprp, line->line.Contents+(data->CPos_X-pos.x), pos.x);
     top += data->ypos + (data->height * (line_nr + pos.lines));
 
@@ -383,10 +383,10 @@ void SuggestWord (struct InstData *data)
 
       if((data->flags & FLG_CheckWords) && LookupWord(word, data))
       {
-        Object *group;
+        Object *group = (Object *)xget(data->SuggestWindow, MUIA_Window_RootObject);
 
-        get(data->SuggestWindow, MUIA_Window_RootObject, (APTR)&group);
         set(group, MUIA_Group_ActivePage, MUIV_Group_ActivePage_First);
+
         SetAttrs(data->SuggestWindow,
               MUIA_Window_Activate, TRUE,
               MUIA_Window_DefaultObject, NULL,
@@ -419,7 +419,7 @@ void SuggestWord (struct InstData *data)
             }
             Close(fh);
 
-            get(data->SuggestWindow, MUIA_Window_RootObject, (APTR)&group);
+            group = (Object *)xget(data->SuggestWindow, MUIA_Window_RootObject);
             set(group, MUIA_Group_ActivePage, MUIV_Group_ActivePage_Last);
             SetAttrs(data->SuggestWindow,
                   MUIA_Window_Activate, TRUE,

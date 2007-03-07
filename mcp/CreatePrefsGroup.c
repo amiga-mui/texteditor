@@ -116,7 +116,7 @@ HOOKPROTONH(Popstring_OpenCode, BOOL, Object *pop, Object *text)
   LONG active;
   ENTER();
 
-  get(text, MUIA_UserData, &active);
+  active = xget(text, MUIA_UserData);
   set(pop, MUIA_List_Active, active);
 
   RETURN(TRUE);
@@ -129,7 +129,7 @@ HOOKPROTONH(Popstring_CloseCode, void, Object *pop, Object *text)
   LONG active;
   ENTER();
 
-  get(pop, MUIA_List_Active, &active);
+  active = xget(pop, MUIA_List_Active);
   set(text, MUIA_UserData, active);
 
   LEAVE();
@@ -164,7 +164,7 @@ HOOKPROTONHNO(InsertCode, void, APTR **array)
 
   ENTER();
 
-  get(keylist, MUIA_List_Active, &entry);
+  entry = xget(keylist, MUIA_List_Active);
 
   if((LONG)entry != MUIV_List_Active_Off)
     nnset(keylist, MUIA_List_Active, MUIV_List_Active_Off);
@@ -194,7 +194,7 @@ HOOKPROTONHNO(SelectCode, void, APTR **array)
     struct KeyAction ka;
     ULONG result;
 
-    get(data->keyfunctions, MUIA_Popstring_String, &result);
+    result = xget(data->keyfunctions, MUIA_Popstring_String);
     nnset((Object *)result, MUIA_UserData, entry->act);
 
     ka.key = entry->code;
@@ -226,7 +226,7 @@ HOOKPROTONHNO(UpdateCode, void, APTR **array)
 
   ENTER();
 
-  get(keylist, MUIA_List_Active, &active);
+  active = xget(keylist, MUIA_List_Active);
 
   if((LONG)active != MUIV_List_Active_Off)
   {
@@ -236,12 +236,12 @@ HOOKPROTONHNO(UpdateCode, void, APTR **array)
                 TAG_DONE);
     DoMethod(keylist, MUIM_List_Remove, active);
 
-    get(data->keyfunctions, MUIA_Popstring_String, &result);
-    get((Object *)result, MUIA_UserData, &result);
+    result = xget(data->keyfunctions, MUIA_Popstring_String);
+    result = xget((Object *)result, MUIA_UserData);
 
     entry.act = result;
 
-    get(data->hotkey, MUIA_String_Contents, &result);
+    result = xget(data->hotkey, MUIA_String_Contents);
 
     if(result)
     {
@@ -330,7 +330,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
                    MUIA_CycleChain,         TRUE,
                    MUIA_Frame,              MUIV_Frame_String,
                    MUIA_HotkeyString_Snoop, FALSE,
-                   MUIA_Weight, 500,
+                   MUIA_Weight,             500,
                  End;
 
   // request a specific minimum version. Here 12.5 because other versions

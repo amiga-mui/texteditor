@@ -440,19 +440,32 @@ void ImportKeys(void *config, struct InstData_MCP *data)
   struct te_key *userkeys;
   int i;
 
+  ENTER();
+
+  D(DBF_STARTUP, "importing keybindings... %08lx", config);
+
   if(config != NULL && (cfg_data = (void *)DoMethod(config, MUIM_Dataspace_Find, MUICFG_TextEditor_Keybindings)))
     userkeys = cfg_data;
   else
     userkeys = (struct te_key *)default_keybindings;
+
+  D(DBF_STARTUP, "importing keybindings... %08lx", userkeys);
 
   DoMethod(data->keybindings, MUIM_List_Clear);
 
   set(data->keybindings, MUIA_List_Quiet, TRUE);
 
   for(i=0; (WORD)userkeys[i].code != -1; i++)
+  {
+    D(DBF_STARTUP, "insert %08lx in list", userkeys[i]);
     DoMethod(data->keybindings, MUIM_List_InsertSingle, userkeys[i], MUIV_List_Insert_Bottom);
+  }
 
   set(data->keybindings, MUIA_List_Quiet, FALSE);
+
+  D(DBF_STARTUP, "finished import of keybindings");
+
+  LEAVE();
 }
 
 void ExportKeys(void *config, struct InstData_MCP *data)
@@ -461,7 +474,7 @@ void ExportKeys(void *config, struct InstData_MCP *data)
     struct te_key *entry;
     struct te_key *entries;
 
-  get(data->keybindings, MUIA_List_Entries, &c);
+  c = xget(data->keybindings, MUIA_List_Entries);
   size = (c+1) * sizeof(struct te_key);
 
   if((entries = (struct te_key *)AllocMem(size, MEMF_ANY)))
