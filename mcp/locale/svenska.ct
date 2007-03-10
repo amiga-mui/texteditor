@@ -1,6 +1,6 @@
 ## chunk AUTH Pär Boberg
 ## language svenska
-## version $VER: TextEditor_mcp.ct 2.0 (07.03.07)
+## version $VER: TextEditor_mcp.ct 2.1 (08.03.07)
 HelpBubble_BlockQual
 Håll nere tangenten som du har valt här\noch flytta markören för att markera text.
 ;#DEF Move the cursor key and hold down the qualifier\nthat you set here to mark text.
@@ -522,3 +522,15 @@ MSG_ResetAbort
 Återställ|Avbryt
 ;#DEF Reset|Abort
 ;#SET (129//)
+MSG_WarnHotkeyString_Title
+TextEditor.mcp Varning
+;#DEF TextEditor.mcp Warning
+;#SET (130//)
+MSG_WarnHotkeyString
+TextEditor.mcp kunde inte öppna den minst krävda\nversionen av HotkeyString.mcc klassen och\nmisslyckades därför under uppstart.\n\nVar god kontrollera att du har den senaste HotkeyString.mcc\nklassen från http://www.sf.net/projects/bstring-mcc/\ninstallerad och pröva igen.
+;#DEF TextEditor.mcp couldn't open the minimum required\nversion of the HotkeyString.mcc custom class and\ntherefore failed during initialization.\n\nPlease make sure you have the latest Hotkeystring.mcc\nclass from http://www.sf.net/projects/bstring-mcc/\ninstalled and try again.
+;#SET (131//)
+MSG_Ok
+Ok
+;#DEF Ok
+;#SET (132//)

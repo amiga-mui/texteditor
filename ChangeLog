@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-03-10 Pär Boberg <pbobbenb@spray.se>
+
+   * mcp/locale/svenska.ct: Updated according to changes.
+
 #### v15.21 RELEASE ############################################################
 
 2007-03-07 Jens Langner <Jens.Langner@light-speed.de>
