@@ -5,10 +5,15 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-03-11 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcp/locale/russian.ct: applied patch to russian catalog description
+     updates, kindly provided by Vinny Vinogradov.
+
 2007-03-11 Thore Böckelmann <tboeckel@gmx.de>
 
-    * #?/Debug.c: disabling a debug flag was not possible due to a check for the
-      '!' at a wrong index.
+   * #?/Debug.c: disabling a debug flag was not possible due to a check for the
+     '!' at a wrong index.
 
 2007-03-10 Pär Boberg <pbobbenb@spray.se>
 
