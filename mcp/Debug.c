@@ -125,7 +125,7 @@ void SetupDebug(void)
       else
       {
         // check if this call is a negation or not
-        if(tok[1] == '!')
+        if(tok[0] == '!')
         {
     			for(i=0; dbflags[i].token; i++)
 	    		{
