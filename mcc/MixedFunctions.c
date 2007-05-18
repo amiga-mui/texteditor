@@ -187,7 +187,7 @@ LONG LineCharsWidth(char *text, struct InstData *data)
   textlen = strlen(text)-1; // the last char is always a "\n"
 
   // check the innerwidth as well.
-  if(w > 0)
+  if(w > 0 && textlen > 0)
   {
     struct TextExtent tExtend;
     ULONG fontheight = data->font ? data->font->tf_YSize : 0;
