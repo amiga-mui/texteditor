@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-05-18 Jens Langner <Jens.Langner@light-speed.de>
+
+   * MixedFucntions.c: minor twirks to the LineCharsWidth() function to catch
+     a possible issue when calculating the string length.
+
 2007-04-16 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcp/locale/dansk.ct: added new danish translation kindly provided by
