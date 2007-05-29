@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-05-29  Thore Böckelmann <tboeckel@gmx.de>
+
+  * include/mccheader.c: reworked the LibOpen() and LibClose() functions to
+    increment/decrement the lib_Open counter before obtaining the semaphore to
+    prevent a possible race condition with LibExpunge().
+
 2007-05-18 Jens Langner <Jens.Langner@light-speed.de>
 
    * MixedFucntions.c: minor twirks to the LineCharsWidth() function to catch
