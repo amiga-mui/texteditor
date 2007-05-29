@@ -42,7 +42,7 @@ preferences class reduces the need for a second file but increases the
 size and memory consuption of the class.
 
 (11) If your class requires other mcc custom classes, list them in the
-static array USEDCLASSES like this: 
+static array USEDCLASSES like this:
 #define USEDCLASSES used_classes
 const STRPTR used_classes[] = { "Busy.mcc", "Listtree.mcc", NULL };
 
@@ -51,8 +51,8 @@ the array USEDCLASSESP like this:
 #define USEDCLASSESP used_classesP
 const STRPTR used_classesP[] = { "Myclass.mcp", "Popxxx.mcp", NULL };
 
-(13) If you want MUI to display additional help text (besides name, 
-version and copyright) when the mouse pointer is over your mcp entry 
+(13) If you want MUI to display additional help text (besides name,
+version and copyright) when the mouse pointer is over your mcp entry
 in the prefs listview:
 #define SHORTHELP "ANSI display for terminal programs."
 
@@ -607,13 +607,26 @@ static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base
 
   D(DBF_STARTUP, "LibOpen()");
 
+  // !!! WARNING !!!
+  // LibOpen(), LibClose() and LibExpunge() are called while the system is in
+  // Forbid() state. That means that these functions should be quick and should
+  // not break this Forbid()!! Therefore the open counter should be increased
+  // as the very first instruction during LibOpen(), because a UserLibOpen()
+  // which breaks a Forbid() and another task calling LibExpunge() will cause
+  // to expunge this library while it is not yet fully initialized. A crash
+  // is unavoidable then. Even the semaphore does not guarantee 100% protection
+  // against such a race condition, because waiting for the semaphore to be
+  // obtained will effectively break the Forbid()!
+
+  // increase the open counter ahead of anything else
+  base->lh_Library.lib_OpenCnt++;
+  // delete the late expung flag
+  base->lh_Library.lib_Flags &= ~LIBF_DELEXP;
+
   ObtainSemaphore(&base->lh_Semaphore);
 
   if(UserLibOpen(&base->lh_Library))
   {
-    base->lh_Library.lib_Flags &= ~LIBF_DELEXP; // delete the late expung flag.
-    base->lh_Library.lib_OpenCnt++; // increase the open counter.
-
     #ifdef CLASS_VERSIONFAKE
     base->lh_Library.lib_Version  = MUIMasterBase->lib_Version;
     base->lh_Library.lib_Revision = MUIMasterBase->lib_Revision;
@@ -624,6 +637,8 @@ static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base
   else
   {
     D(DBF_STARTUP, "UserLibOpen() failed");
+    // decrease the open counter again
+    base->lh_Library.lib_OpenCnt--;
     res = NULL;
   }
 
@@ -651,12 +666,12 @@ static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
 
   D(DBF_STARTUP, "LibClose()");
 
+  // decrease the open counter
+  base->lh_Library.lib_OpenCnt--;
+
   ObtainSemaphore(&base->lh_Semaphore);
 
   UserLibClose(&base->lh_Library);
-
-  // descrease the open counter
-  base->lh_Library.lib_OpenCnt--;
 
   // in case the opern counter is <= 0 we can
   // make sure that we free everything
@@ -716,7 +731,7 @@ static BOOL UserLibOpen(struct Library *base)
     #ifdef PreClassInit
     if (!PreClassInitFunc())
     {
-    	return FALSE;
+      return FALSE;
     }
     #endif
 
