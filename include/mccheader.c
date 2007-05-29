@@ -666,12 +666,14 @@ static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
 
   D(DBF_STARTUP, "LibClose()");
 
-  // decrease the open counter
-  base->lh_Library.lib_OpenCnt--;
-
   ObtainSemaphore(&base->lh_Semaphore);
 
   UserLibClose(&base->lh_Library);
+
+  ReleaseSemaphore(&base->lh_Semaphore);
+
+  // decrease the open counter
+  base->lh_Library.lib_OpenCnt--;
 
   // in case the opern counter is <= 0 we can
   // make sure that we free everything
@@ -681,8 +683,6 @@ static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
     // expunge the library base right now
     if(base->lh_Library.lib_Flags & LIBF_DELEXP)
     {
-      ReleaseSemaphore(&base->lh_Semaphore);
-
       #if defined(__amigaos4__)
       rc = LibExpunge(Self);
       #elif defined(__MORPHOS__)
@@ -690,12 +690,8 @@ static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
       #else
       rc = LibExpunge(base);
       #endif
-
-      return rc;
     }
   }
-
-  ReleaseSemaphore(&base->lh_Semaphore);
 
   return rc;
 }
