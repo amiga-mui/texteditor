@@ -309,7 +309,7 @@ $(TESTTARGET): $(TESTOBJS)
 	@$(CC) $(LDFLAGS) -o $@.debug $(TESTOBJS) $(LDLIBS)
 	@$(STRIP) -R .comment -S -o $@ $@.debug
 
-$(OBJDIR)/library.o: library.c ../include/mccheader.c \
+$(OBJDIR)/library.o: library.c ../include/mccinit.c \
   ../include/mui/TextEditor_mcc.h private.h rev.h
 
 #

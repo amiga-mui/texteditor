@@ -283,7 +283,7 @@ $(PREFTARGET): $(PREFOBJS) $(OBJDIR)/Preference.o
 	@$(CC) $(LDFLAGS) -o $@.debug $(PREFOBJS) $(LDLIBS)
 	@$(STRIP) -R .comment -S -o $@ $@.debug
 
-$(OBJDIR)/library.o: library.c ../include/mccheader.c \
+$(OBJDIR)/library.o: library.c ../include/mccinit.c \
   ../include/mui/TextEditor_mcc.h private.h icon.bh TextEditor_mcp.h rev.h
 
 locale.h: locale.c

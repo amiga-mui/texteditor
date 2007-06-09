@@ -41,14 +41,14 @@
 
 #define INSTDATA      InstData
 
-#define UserLibID     "$VER: TextEditor.mcc " LIB_REV_STRING CPU " (" LIB_DATE ") " LIB_COPYRIGHT
+#define USERLIBID     CLASS " " LIB_REV_STRING CPU " (" LIB_DATE ") " LIB_COPYRIGHT
 #define MASTERVERSION 19
 
 #define USEDCLASSESP  used_classesP
 static const char * const used_classesP[] = { "TextEditor.mcp", NULL };
 
-#define ClassInit
-#define ClassExit
+#define CLASSINIT
+#define CLASSEXPUNGE
 
 struct Library *DiskfontBase = NULL;
 struct Library *KeymapBase = NULL;
@@ -68,7 +68,7 @@ struct IFFParseIFace *IIFFParse = NULL;
 struct Interface *IWorkbench = NULL;
 #endif
 
-BOOL ClassInitFunc(UNUSED struct Library *base)
+static BOOL ClassInit(UNUSED struct Library *base)
 {
   ENTER();
 
@@ -134,7 +134,7 @@ BOOL ClassInitFunc(UNUSED struct Library *base)
 }
 
 
-VOID ClassExitFunc(UNUSED struct Library *base)
+static VOID ClassExpunge(UNUSED struct Library *base)
 {
   ENTER();
 
@@ -196,5 +196,4 @@ VOID ClassExitFunc(UNUSED struct Library *base)
 /*                                                                            */
 /******************************************************************************/
 
-#define USE_UTILITYBASE
-#include "mccheader.c"
+#include "mccinit.c"

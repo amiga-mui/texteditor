@@ -5,6 +5,14 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-06-09 Jens Langner <Jens.Langner@light-speed.de>
+
+  * include/mccinit.c, mcc/library.c, mcp/library.c: replaced the old obsolete
+    mccheader.c by the new mccinit.c which should come with a much more clear
+    interface and documentation on how to use it for a basis of a MUI custom
+    class. This should significantly reduce the possibility of race conditions
+    in the mcc/library init code.
+
 2007-05-29  Thore Böckelmann <tboeckel@gmx.de>
 
   * include/mccheader.c: reworked the LibOpen() and LibClose() functions to

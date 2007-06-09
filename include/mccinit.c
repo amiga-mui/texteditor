@@ -1,160 +1,104 @@
-/*****************************************************************************
+/*******************************************************************************
 
-This code serves as a basis for writing a library-based MUI custom class
-(xyz.mcc) and its preferences editor (xyz.mcp).
+        Name:           mccinit.c
+        Versionstring:  $VER: mccinit.c 1.0 (09.06.2007)
+        Author:         Jens Langner <Jens.Langner@light-speed.de>
+        Distribution:   PD (public domain)
+        Description:    library init file for easy create of MUI
+                        custom classes (MCC)
+ History:
 
-You need to define a few things in your main source file, then include
-this file and then continue with your classes methods. The order is
-important, mccheader.c must be the first code-generating module.
+  1.0   09.06.2007 : created based on obsolete mccheader.c
 
-Things to be defined before mccheader.c is included:
+ About:
 
-(1)  UserLibID     - version string for your class. must follow normal $VER: string conventions.
-(2)  VERSION       - version number of the class. must match the one given in the $VER: string.
-(3)  REVISION      - revision number of the class. must match the one given in the $VER: string.
-(4)  CLASS         - Name of your class, ".mcc" or ".mcp" must always be appended.
+  The purpose of this source file is to provide a template for the library init
+  code for a creation of an own MUI custom class (mcc/mcp) for AmigaOS4,
+  AmigaOS3 and MorphOS. By directly including this file (#include "mccinit.c")
+  and defining certain preprocessor values, a MUI developer doesn't have to
+  care about library init stuff which is normally highly system dependent and
+  various between different Amiga operating systems.
 
-(5)  SUPERCLASS    - superclass of your class.
-(6)  struct Data   - instance data structure.
-(7)  _Dispatcher   - your dispatcher function.
+ Usage:
 
-(8)  SUPERCLASSP   - Superclass of the preferences class, must be MUIC_Mccprefs or a subclass.
-(9)  struct DataP  - instance data structure of preferences class.
-(10) _DispatcherP  - dispatcher for the preferences class.
+  This file should be included by another source file (e.g. 'library.c') in
+  your main development branch while certain preprocessor macros right before
+  the include statement can be defined to change the behaviour of mccinit.c.
+  These possible macros are:
 
-(11) USEDCLASSES   - Other custom classes required by this class (NULL terminated string array)
-(12) USEDCLASSESP  - Preferences classes (.mcp) required by this class (NULL terminated string array)
-(13) SHORTHELP     - .mcp help text for prefs program's listview.
+    USERLIBID     (char*)   - version string for the mcc/mcp (exluding $VER:)
+    VERSION       (int)     - version number (must match USERLIBID)
+    REVISION      (int)     - revision number (must match USERLIBID)
+    CLASS         (char*)   - class name (including .mcc/.mcp)
+    MASTERVERSION (int)     - the minimun required muimaster version
+                              (default: MUIMASTER_VMIN)
 
-Items (1) to (4) must always be defined. If you create a stand-alone
-custom class (*.mcc) without preferences editor, also define (5), (6)
-and (7). Name your class and the resulting ouptut file "Myclass.mcc".
+    MCC only:
+    --------
+    SUPERCLASS  (char*)   - superclass ID of MCC (e.g. MUIC_Area)
+    INSTDATA              - name of instance data structure of MCC (e.g. InstData)
+    USEDCLASSES           - name of NULL terminated string array which contains
+                            names of other required custom classes for MCC.
+    _Dispatcher           - name of Dispatcher function for MCC
 
-If you create a preferences class (*.mcp) for a custom class, define
-(8), (9) and (10) instead of (5), (6) and (7). Name your class and the
-resulting output file "Myclass.mcp".
+    MCP only:
+    -------
+    SUPERCLASSP (char*)   - superclass ID of MCP (e.g. MUIC_Mccprefs)
+    INSTDATAP             - name of instance data structure of MCP
+    USEDCLASSESP          - name of NULL terminated string array which contains
+                            names of other required custom classes for MCC.
+    SHORTHELP   (char*)   - alternative help text for prefs program's listview
+    PREFSIMAGEOBJECT      - pointer to the image object for the MCP
+    _DispatcherP          - name of Dispatcher function for MCP
 
-If you create a custom class with included preferences editor, define
-all the above. Note that in this case, the name of your class and the
-resulting output file is always "Myclass.mcc". MUI will automatically
-recognize that there's also a "Myclass.mcp" included. Having a builtin
-preferences class reduces the need for a second file but increases the
-size and memory consuption of the class.
+  In addition, the following defines and functions can be defined or are
+  required:
 
-(11) If your class requires other mcc custom classes, list them in the
-static array USEDCLASSES like this:
-#define USEDCLASSES used_classes
-const STRPTR used_classes[] = { "Busy.mcc", "Listtree.mcc", NULL };
+    CLASSINIT     - if defined, a "BOOL ClassInit(struct Library *base)"
+                    function can be defined in your own code and will be called
+                    right after the general library initialization are
+                    finished. This function should then open own libraries
+                    or do own library initialization tasks as it is only called
+                    once at the very first library/class open.
 
-(12) If your class has one (or more) preferences classes, list them in
-the array USEDCLASSESP like this:
-#define USEDCLASSESP used_classesP
-const STRPTR used_classesP[] = { "Myclass.mcp", "Popxxx.mcp", NULL };
+    CLASSEXPUNGE  - if defined a "VOID ClassExpunge(struct Library *base)"
+                    function can be defined in your own code and will be called
+                    as soon as the library will be freed/expunged by the
+                    operating system. In this function you should close/free
+                    stuff you normally opened/allocated in CLASSINIT.
 
-(13) If you want MUI to display additional help text (besides name,
-version and copyright) when the mouse pointer is over your mcp entry
-in the prefs listview:
-#define SHORTHELP "ANSI display for terminal programs."
+    CLASSOPEN     - if defined, a "BOOL ClassOpen(struct Library *base)"
+                    function can be defined in your own code and will be called
+                    right after each single application opens the custom class.
+                    In this function you can then set flags or do library open
+                    specific tasks.
 
-If your class needs custom initialization (e.g. opening other
-libraries), you can define
-  ClassInit
-  ClassExit
-to point to custom functions. These functions need to have the prototypes
-  BOOL ClassInitFunc(struct Library *base);
-  VOID ClassExitFunc(struct Library *base);
-and will be called right after the class has been created and right
-before the class is being deleted. If your init func returns FALSE,
-the custom class will be unloaded immediately.
+    CLASSCLOSE    - if defined a "VOID ClassClose(struct Library *base)"
+                    function can be defined in your own code and will be called
+                    right after the library was successfully flagged as closed
+                    by the CloseLibrary() call of an application.
 
-Define the minimum version of muimaster.libray in MASTERVERSION. If you
-don't define MASTERVERSION, it will default to MUIMASTER_VMIN from the
-mui.h include file.
 
----
-Items (1) to (4) must always be defined. If you create a stand-alone
-custom class (*.mcc) without preferences editor, also define (5), (6)
-and (7). Name your class and the resulting ouptut file "Myclass.mcc".
+    PRECLASSINIT      - if defined a "BOOL PreClassInit(struct Library *base)"
+                        function can be defined and will be called right _before_
+                        and library initialization takes place.
 
-If you create a preferences class (*.mcp) for a custom class, define
-(8), (9) and (10) instead of (5), (6) and (7). Name your class and the
-resulting output file "Myclass.mcp".
+    POSTCLASSEXPUNGE  - if defined a "BOOL PostClassExpunge(struct Library *base)"
+                        function can be defined and will be called right _after_
+                        the custom class was free via MUI_DeleteCustomClass() in
+                        the library expunge phase.
 
-If you create a custom class with included preferences editor, define
-all the above. Note that in this case, the name of your class and the
-resulting output file is always "Myclass.mcc". MUI will automatically
-recognize that there's also a "Myclass.mcp" included. Having a builtin
-preferences class reduces the need for a second file but increases the
-size and memory consuption of the class.
+   Warning:
+   -------
+   The above class functions are normally called by the operating system
+   in a Forbid()/Permit() state. That means you are supposed to make sure that
+   your operations doesn't break the Forbid() state or otherwise you may run
+   into a race condition. However, we have added semaphore locking to partly
+   protect you from that case - but you should still consider doing processor
+   intensitive tasks in a library's own function instead of using those
+   class initialization functions.
 
-If your class needs custom initialization (e.g. opening other
-libraries), you can define
-  PreClassInit
-  PostClassExit
-  ClassInit
-  ClassExit
-to point to custom functions. These functions need to have the prototypes
-  BOOL ClassInitFunc(struct Library *base);
-  VOID ClassExitFunc(struct Library *base);
-and will be called right after the class has been created and right
-before the class is being deleted. If your init func returns FALSE,
-the custom class will be unloaded immediately.
-
-  BOOL PreClassInitFunc(void);
-  VOID PostClassExitFunc(void);
-
-These functions will be called BEFORE the class is created and AFTER the
-class is deleted, if something depends on it for example. MUIMasterBase
-is open then.
-
-Define the minimum version of muimaster.libray in MASTERVERSION. If you
-don't define MASTERVERSION, it will default to MUIMASTER_VMIN from the
-mui.h include file.
-
-This code automatically defines and initializes the following variables:
-  struct Library *MUIMasterBase;
-  struct Library *SysBase;
-  struct Library *UtilityBase;
-  struct DosLibrary *DOSBase;
-  struct GfxBase *GfxBase;
-  struct IntuitionBase *IntuitionBase;
-  struct Library *MUIClassBase;       // your classes library base
-  struct MUI_CustomClass *ThisClass;  // your custom class
-  struct MUI_CustomClass *ThisClassP; // your preferences class
-
-Example: Myclass.c
-  #define CLASS      MUIC_Myclass // name of class, e.g. "Myclass.mcc"
-  #define SUPERCLASS MUIC_Area    // name of superclass
-  struct Data
-  {
-    LONG          MyData;
-    struct Foobar MyData2;
-    // ...
-  };
-  #define UserLibID "$VER: Myclass.mcc 17.53 (11.11.96)"
-  #define VERSION   17
-  #define REVISION  53
-  #include "mccheader.c"
-  ULONG ASM SAVEDS _Dispatcher(REG(a0) struct IClass *cl GNUCREG(a0),
-                               REG(a2) Object *obj GNUCREG(a2),
-                               REG(a1) Msg msg GNUCREG(a1) )
-  {
-    // ...
-  }
-
-Compiling and linking with SAS-C can look like this:
-  Myclass.mcc: Myclass.c
-    sc $(CFLAGS) $*.c OBJNAME $*.o
-    slink to $@ from $*.o lib $(LINKERLIBS) $(LINKERFLAGS)
-
-Note well that we don't use SAS library creation feature here, it simply
-sucks too much. It's not much more complicated to do the library
-initialziation ourselves and we have better control over everything.
-
-Make sure to read the whole source to get some interesting comments
-and some understanding on how libraries are created!
-
-*****************************************************************************/
+*******************************************************************************/
 
 /******************************************************************************/
 /* Includes                                                                   */
@@ -183,10 +127,15 @@ and some understanding on how libraries are created!
 #include <proto/graphics.h>
 #include <proto/intuition.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* The name of the class will also become the name of the library. */
 /* We need a pointer to this string in our ROMTag (see below). */
 
 static const char UserLibName[] = CLASS;
+static const char UserLibID[]   = "$VER: " USERLIBID;
 
 /* Here's our global data, described above. */
 
@@ -205,7 +154,7 @@ struct GraphicsIFace *IGraphics   = NULL;
 struct IntuitionIFace *IIntuition = NULL;
 #if defined(__NEWLIB__)
 struct Library *NewlibBase = NULL;
-struct NewlibIFace* INewlib = NULL;
+struct Interface *INewlib = NULL;
 #endif
 #else
 struct Library        *MUIMasterBase = NULL;
@@ -218,14 +167,16 @@ struct IntuitionBase  *IntuitionBase = NULL;
 
 #ifdef SUPERCLASS
 static struct MUI_CustomClass *ThisClass = NULL;
+DISPATCHERPROTO(_Dispatcher);
 #endif
 
 #ifdef SUPERCLASSP
 static struct MUI_CustomClass *ThisClassP = NULL;
+DISPATCHERPROTO(_DispatcherP);
 #endif
 
 #ifdef __GNUC__
-  #if defined(USE_UTILITYBASE) && !defined(__NEWLIB__)
+  #if !defined(__NEWLIB__) && !defined(__MORPHOS__)
   struct Library *__UtilityBase = NULL; // required by libnix & clib2
   #endif
   #ifdef __libnix__
@@ -239,6 +190,13 @@ static struct MUI_CustomClass *ThisClassP = NULL;
   #endif
 #endif /* __GNUC__ */
 
+
+// in case the user didn't specify an own minimum
+// muimaster version we increase it here.
+#ifndef MASTERVERSION
+#define MASTERVERSION MUIMASTER_VMIN
+#endif
+
 /* Our library structure, consisting of a struct Library, a segment pointer */
 /* and a semaphore. We need the semaphore to protect init/exit stuff in our */
 /* open/close functions */
@@ -250,19 +208,7 @@ struct LibraryHeader
   BPTR                   lh_Segment;
   struct SignalSemaphore lh_Semaphore;
   UWORD                  lh_Pad2;
-  #if defined(CLASS_STACKSWAP)
-  struct StackSwapStruct *lh_Stack;
-  #endif
 };
-
-/******************************************************************************/
-/* External references                                                        */
-/******************************************************************************/
-
-//static BOOL LIBFUNC UserLibInit   (struct Library *base);
-//static BOOL LIBFUNC UserLibExpunge(struct Library *base);
-static BOOL LIBFUNC UserLibOpen   (struct Library *base);
-static BOOL LIBFUNC UserLibClose  (struct Library *base);
 
 /******************************************************************************/
 /* Local Structures & Prototypes                                              */
@@ -440,9 +386,9 @@ static const USED_VAR struct Resident ROMTag =
   NT_LIBRARY,
   0,
   (char *)UserLibName,
-  (char *)UserLibID+6,
+  (char *)UserLibID+6,          // +6 to skip '$VER: '
   #if defined(__amigaos4__)
-  (APTR)LibCreateTags,           // This table is for initializing the Library.
+  (APTR)LibCreateTags,          // This table is for initializing the Library.
   #else
   (APTR)LibInitTab,
   #endif
@@ -469,7 +415,7 @@ const USED_VAR ULONG __abox__ = 1;
 #if defined(__amigaos4__)
 static struct LibraryHeader * LibInit(struct LibraryHeader *base, BPTR librarySegment, struct ExecIFace *pIExec)
 {
-  struct ExecBase *sb = (struct ExecBase *)pIExec->Data.LibBase;
+  struct Library *sb = (struct Library *)pIExec->Data.LibBase;
   IExec = pIExec;
 #elif defined(__MORPHOS__)
 static struct LibraryHeader * LibInit(struct LibraryHeader *base, BPTR librarySegment, struct ExecBase *sb)
@@ -478,38 +424,20 @@ static struct LibraryHeader * LibInit(struct LibraryHeader *base, BPTR librarySe
 static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base), REG(a0, BPTR librarySegment), REG(a6, struct ExecBase *sb))
 {
 #endif
-  struct LibraryHeader *ret_base = NULL;
-  #if defined(CLASS_STACKSWAP)
-  static struct StackSwapStruct *stack;
-  #endif
 
-  SysBase = (APTR)sb;
+  SysBase = sb;
+
+  // make sure that this is really a 68020+ machine if optimized for 020+
+  #if _M68060 || _M68040 || _M68030 || _M68020 || __mc68020 || __mc68030 || __mc68040 || __mc68060
+  if(!(SysBase->AttnFlags & AFF_68020))
+    return(NULL);
+  #endif
 
   #if defined(__amigaos4__) && defined(__NEWLIB__)
   if((NewlibBase = OpenLibrary("newlib.library", 3)) &&
      GETINTERFACE(INewlib, NewlibBase))
   #endif
-  {
-    D(DBF_STARTUP, "LibInit()");
-
-    // make sure that this is really a 68020+ machine if optimized for 020+
-    #if _M68060 || _M68040 || _M68030 || _M68020 || __mc68020 || __mc68030 || __mc68040 || __mc68060
-    if(!(SysBase->AttnFlags & AFF_68020))
-      return(NULL);
-    #endif
-
-    #if defined(CLASS_STACKSWAP)
-    if(!(stack = AllocMem(sizeof(struct StackSwapStruct)+8192, MEMF_PUBLIC|MEMF_CLEAR)))
-      return( NULL );
-
-    stack->stk_Lower   = (APTR)((ULONG)stack + sizeof(struct StackSwapStruct));
-    stack->stk_Upper   = (ULONG)((ULONG)stack->stk_Lower+8192);
-    stack->stk_Pointer = (APTR)stack->stk_Upper;
-
-    D(DBF_STARTUP, "Before StackSwap()");
-    StackSwap( stack );
-    #endif
-
+  {       
     // cleanup the library header structure beginning with the
     // library base, even if that is done automcatically, we explicitly
     // do it here for consistency reasons.
@@ -517,25 +445,145 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
     base->lh_Library.lib_Node.ln_Pri  = 0;
     base->lh_Library.lib_Node.ln_Name = (char *)UserLibName;
     base->lh_Library.lib_Flags        = LIBF_CHANGED | LIBF_SUMUSED;
+    base->lh_Library.lib_IdString     = (char *)UserLibID; // here without +6 or otherwise MUI doesn't identify it.
     base->lh_Library.lib_Version      = VERSION;
     base->lh_Library.lib_Revision     = REVISION;
-    base->lh_Library.lib_IdString     = (char *)UserLibID; // here without +6 or otherwise MUI didn't identify it.
-
-    base->lh_Segment = librarySegment;
 
     InitSemaphore(&base->lh_Semaphore);
 
-    #if defined(CLASS_STACKSWAP)
-    base->lh_Stack = stack;
-    StackSwap(base->lh_Stack);
-    FreeMem(base->lh_Stack, sizeof(struct StackSwapStruct) + 8192);
-    D(DBF_STARTUP, "After second StackSwap()");
-    #endif
+    // now that this library/class is going to be initialized for the first time
+    // we go and open all necessary libraries on our own
+    if((DOSBase = (APTR)OpenLibrary("dos.library", 36)) &&
+       GETINTERFACE(IDOS, DOSBase))
+    if((GfxBase = (APTR)OpenLibrary("graphics.library", 36)) &&
+       GETINTERFACE(IGraphics, GfxBase))
+    if((IntuitionBase = (APTR)OpenLibrary("intuition.library", 36)) &&
+       GETINTERFACE(IIntuition, IntuitionBase))
+    if((UtilityBase = (APTR)OpenLibrary("utility.library", 36)) &&
+       GETINTERFACE(IUtility, UtilityBase))
+    if((MUIMasterBase = OpenLibrary(MUIMASTER_NAME, MASTERVERSION)) &&
+       GETINTERFACE(IMUIMaster, MUIMasterBase))
+    {
+      // required for libnix
+      #if !defined(__NEWLIB__) && !defined(__MORPHOS__)
+      __UtilityBase = (APTR)UtilityBase;
+      #endif
 
-    ret_base = base;
+      #if defined(DEBUG)
+      SetupDebug();
+      #endif
+
+      D(DBF_STARTUP, "LibInit(%s)", CLASS);
+
+      #ifdef PRECLASSINIT
+      if(PreClassInit())
+      #endif
+      {
+        #ifdef SUPERCLASS
+        ThisClass = MUI_CreateCustomClass(&base->lh_Library, SUPERCLASS, NULL, sizeof(struct INSTDATA), ENTRY(_Dispatcher));
+        if(ThisClass)
+        #endif
+        {
+          #ifdef SUPERCLASSP
+          if((ThisClassP = MUI_CreateCustomClass(&base->lh_Library, SUPERCLASSP, NULL, sizeof(struct INSTDATAP), ENTRY(_DispatcherP))))
+          #endif
+          {
+            #ifdef SUPERCLASS
+            #define THISCLASS ThisClass
+            #else
+            #define THISCLASS ThisClassP
+            #endif
+
+            // set the library base segment
+            base->lh_Segment = librarySegment;
+
+            // in case the user defined an own ClassInit()
+            // function we call it protected by a semaphore as
+            // this user may be stupid and break the Forbid() state
+            // of LibInit()
+            #if defined(CLASSINIT)
+            {
+              BOOL success;
+
+              ObtainSemaphore(&base->lh_Semaphore);
+              success = ClassInit(&base->lh_Library);
+              ReleaseSemaphore(&base->lh_Semaphore);
+
+              if(success)
+              {
+                // everything was successfully so lets
+                // return the library base
+                return(base);
+              }
+            }
+            #else
+              // everything was successfully so lets
+              // return the library base
+              return(base);
+            #endif
+
+            // if we pass this point than an error
+            // occurred and we have to cleanup
+            #if defined(SUPERCLASSP)
+            MUI_DeleteCustomClass(ThisClassP);
+            ThisClassP = NULL;
+            #endif
+          }
+
+          #if defined(SUPERCLASS)
+          MUI_DeleteCustomClass(ThisClass);
+          ThisClass = NULL;
+          #endif
+        }
+      }
+    }
+
+    if(MUIMasterBase)
+    {
+      DROPINTERFACE(IMUIMaster);
+      CloseLibrary(MUIMasterBase);
+      MUIMasterBase = NULL;
+    }
+
+    if(UtilityBase)
+    {
+      DROPINTERFACE(IUtility);
+      CloseLibrary(UtilityBase);
+      UtilityBase = NULL;
+    }
+
+    if(IntuitionBase)
+    {
+      DROPINTERFACE(IIntuition);
+      CloseLibrary((struct Library *)IntuitionBase);
+      IntuitionBase = NULL;
+    }
+
+    if(GfxBase)
+    {
+      DROPINTERFACE(IGraphics);
+      CloseLibrary((struct Library *)GfxBase);
+      GfxBase = NULL;
+    }
+
+    if(DOSBase)
+    {
+      DROPINTERFACE(IDOS);
+      CloseLibrary((struct Library *)DOSBase);
+      DOSBase = NULL;
+    }
+
+    #if defined(__amigaos4__) && defined(__NEWLIB__)
+    if(NewlibBase)
+    {
+      DROPINTERFACE(INewlib);
+      CloseLibrary(NewlibBase);
+      NewlibBase = NULL;
+    }
+    #endif
   }
 
-  return(ret_base);
+  return(NULL);
 }
 
 /*****************************************************************************************************/
@@ -560,7 +608,7 @@ static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
 #endif
   BPTR rc;
 
-  D(DBF_STARTUP, "LibExpunge()");
+  D(DBF_STARTUP, "LibExpunge(%s): %ld", CLASS, base->lh_Library.lib_OpenCnt);
 
   // in case our open counter is still > 0, we have
   // to set the late expunge flag and return immediately
@@ -571,6 +619,75 @@ static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
   }
   else
   {
+    // remove the library base from exec's lib list in advance
+    Remove((struct Node *)base);
+
+    // in case the user specified that he has an own class
+    // expeunge function we call it right here, not caring about
+    // and return value.
+    #if defined(CLASSEXPUNGE)
+    ClassExpunge(&base->lh_Library);
+    #endif
+
+    // now we remove our own stuff here step-by-step
+    #ifdef SUPERCLASSP
+    if(ThisClassP)
+    {
+      MUI_DeleteCustomClass(ThisClassP);
+      ThisClassP = NULL;
+    }
+    #endif
+
+    #ifdef SUPERCLASS
+    if(ThisClass)
+    {
+      MUI_DeleteCustomClass(ThisClass);
+      ThisClass = NULL;
+    }
+    #endif
+
+    // we inform the user that all main class expunge stuff
+    // is finished, if he want's to get informed.
+    #ifdef POSTCLASSEXPUNGE
+    PostClassExpunge();
+    #endif
+
+    // cleanup the various library bases and such
+    if(MUIMasterBase)
+    {
+      DROPINTERFACE(IMUIMaster);
+      CloseLibrary(MUIMasterBase);
+      MUIMasterBase = NULL;
+    }
+
+    if(UtilityBase)
+    {
+      DROPINTERFACE(IUtility);
+      CloseLibrary(UtilityBase);
+      UtilityBase = NULL;
+    }
+
+    if(IntuitionBase)
+    {
+      DROPINTERFACE(IIntuition);
+      CloseLibrary((struct Library *)IntuitionBase);
+      IntuitionBase = NULL;
+    }
+
+    if(GfxBase)
+    {
+      DROPINTERFACE(IGraphics);
+      CloseLibrary((struct Library *)GfxBase);
+      GfxBase = NULL;
+    }
+
+    if(DOSBase)
+    {
+      DROPINTERFACE(IDOS);
+      CloseLibrary((struct Library *)DOSBase);
+      DOSBase = NULL;
+    }
+
     #if defined(__amigaos4__) && defined(__NEWLIB__)
     if(NewlibBase)
     {
@@ -580,7 +697,8 @@ static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
     }
     #endif
 
-    Remove((struct Node *)base);
+    // make sure the system delete's the library
+    // as well.
     rc = base->lh_Segment;
     DeleteLibrary(&base->lh_Library);
   }
@@ -605,13 +723,12 @@ static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base
 #endif
   struct LibraryHeader *res;
 
-  D(DBF_STARTUP, "LibOpen()");
+  D(DBF_STARTUP, "LibOpen(%s): %ld", CLASS, base->lh_Library.lib_OpenCnt);
 
-  // !!! WARNING !!!
   // LibOpen(), LibClose() and LibExpunge() are called while the system is in
   // Forbid() state. That means that these functions should be quick and should
   // not break this Forbid()!! Therefore the open counter should be increased
-  // as the very first instruction during LibOpen(), because a UserLibOpen()
+  // as the very first instruction during LibOpen(), because a ClassOpen()
   // which breaks a Forbid() and another task calling LibExpunge() will cause
   // to expunge this library while it is not yet fully initialized. A crash
   // is unavoidable then. Even the semaphore does not guarantee 100% protection
@@ -620,29 +737,35 @@ static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base
 
   // increase the open counter ahead of anything else
   base->lh_Library.lib_OpenCnt++;
-  // delete the late expung flag
+
+  // delete the late expunge flag
   base->lh_Library.lib_Flags &= ~LIBF_DELEXP;
 
+  #if defined(CLASSOPEN)
+
+  // as something in the ClassOpen() may break the Forbid() state of
+  // the operating system, we use semaphores here to protect us from
+  // race conditions.
   ObtainSemaphore(&base->lh_Semaphore);
 
-  if(UserLibOpen(&base->lh_Library))
-  {
-    #ifdef CLASS_VERSIONFAKE
-    base->lh_Library.lib_Version  = MUIMasterBase->lib_Version;
-    base->lh_Library.lib_Revision = MUIMasterBase->lib_Revision;
-    #endif
-
+  // here we call the user-specific function for LibOpen() where
+  // he can do whatever he wants because of the semaphore protection.
+  if(ClassOpen(&base->lh_Library))
     res = base;
-  }
   else
   {
-    D(DBF_STARTUP, "UserLibOpen() failed");
+    D(DBF_STARTUP, "ClassOpen(%s) failed", CLASS);
+
     // decrease the open counter again
-    base->lh_Library.lib_OpenCnt--;
-    res = NULL;
+  	base->lh_Library.lib_OpenCnt--;
+	  res = NULL;
   }
 
   ReleaseSemaphore(&base->lh_Semaphore);
+
+  #else
+    res = base;
+  #endif
 
   return res;
 }
@@ -664,13 +787,13 @@ static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
 #endif
   BPTR rc = 0;
 
-  D(DBF_STARTUP, "LibClose()");
+  D(DBF_STARTUP, "LibClose(%s): %ld", CLASS, base->lh_Library.lib_OpenCnt);
 
+  #if defined(CLASSCLOSE)
   ObtainSemaphore(&base->lh_Semaphore);
-
-  UserLibClose(&base->lh_Library);
-
+  ClassClose(&base->lh_Library);
   ReleaseSemaphore(&base->lh_Semaphore);
+  #endif
 
   // decrease the open counter
   base->lh_Library.lib_OpenCnt--;
@@ -690,169 +813,12 @@ static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
       #else
       rc = LibExpunge(base);
       #endif
+
+      return rc;
     }
   }
 
   return rc;
-}
-
-/*****************************************************************************************************/
-/*****************************************************************************************************/
-
-#ifdef SUPERCLASS
-  DISPATCHERPROTO(_Dispatcher);
-#endif
-
-#ifdef SUPERCLASSP
-  DISPATCHERPROTO(_DispatcherP);
-#endif
-
-static BOOL UserLibOpen(struct Library *base)
-{
-  BOOL PreClassInitFunc(void);
-  BOOL ClassInitFunc(struct Library *base);
-
-  D(DBF_STARTUP, "OpenCount = %ld", base->lib_OpenCnt);
-
-  if(base->lib_OpenCnt != 0)
-    return(TRUE);
-
-  #ifndef MASTERVERSION
-  #define MASTERVERSION MUIMASTER_VMIN
-  #endif
-
-  if((MUIMasterBase = OpenLibrary(MUIMASTER_NAME, MASTERVERSION)) &&
-     GETINTERFACE(IMUIMaster, MUIMasterBase))
-  {
-    #ifdef PreClassInit
-    if (!PreClassInitFunc())
-    {
-      return FALSE;
-    }
-    #endif
-
-
-    #ifdef SUPERCLASS
-    ThisClass = MUI_CreateCustomClass(base, SUPERCLASS, NULL, sizeof(struct INSTDATA), ENTRY(_Dispatcher));
-    if(ThisClass)
-    #endif
-    {
-      #ifdef SUPERCLASSP
-      if((ThisClassP = MUI_CreateCustomClass(base, SUPERCLASSP, NULL, sizeof(struct INSTDATAP), ENTRY(_DispatcherP))))
-      #endif
-      {
-        #ifdef SUPERCLASS
-        #define THISCLASS ThisClass
-        #else
-        #define THISCLASS ThisClassP
-        #endif
-
-        UtilityBase   = (APTR)THISCLASS->mcc_UtilityBase;
-        DOSBase       = (APTR)THISCLASS->mcc_DOSBase;
-        GfxBase       = (APTR)THISCLASS->mcc_GfxBase;
-        IntuitionBase = (APTR)THISCLASS->mcc_IntuitionBase;
-
-        #if defined(USE_UTILITYBASE) && !defined(__NEWLIB__)
-        __UtilityBase = (APTR)UtilityBase;
-        #endif
-
-        if(UtilityBase && DOSBase && GfxBase && IntuitionBase &&
-           GETINTERFACE(IUtility, UtilityBase) &&
-           GETINTERFACE(IDOS, DOSBase) &&
-           GETINTERFACE(IGraphics, GfxBase) &&
-           GETINTERFACE(IIntuition, IntuitionBase))
-        {
-          #if defined(DEBUG)
-          SetupDebug();
-          #endif
-
-          #ifndef ClassInit
-          return(TRUE);
-          #else
-          if(ClassInitFunc(base))
-          {
-            return(TRUE);
-          }
-
-          #ifdef SUPERCLASSP
-          MUI_DeleteCustomClass(ThisClassP);
-          ThisClassP = NULL;
-          #endif
-          #endif
-        }
-
-        DROPINTERFACE(IIntuition);
-        DROPINTERFACE(IGraphics);
-        DROPINTERFACE(IDOS);
-        DROPINTERFACE(IUtility);
-      }
-
-      #if defined(SUPERCLASSP) && defined(SUPERCLASS)
-      MUI_DeleteCustomClass(ThisClass);
-      ThisClass = NULL;
-      #endif
-    }
-
-    DROPINTERFACE(IMUIMaster);
-    CloseLibrary(MUIMasterBase);
-    MUIMasterBase = NULL;
-  }
-
-  D(DBF_STARTUP, "fail.: %08lx %s",base,base->lib_Node.ln_Name);
-
-  return(FALSE);
-}
-
-/*****************************************************************************************************/
-/*****************************************************************************************************/
-
-static BOOL UserLibClose(struct Library *base)
-{
-  VOID PostClassExitFunc(void);
-  VOID ClassExitFunc(struct Library *base);
-
-  D(DBF_STARTUP, "OpenCount = %ld", base->lib_OpenCnt);
-
-  if(base->lib_OpenCnt == 1)
-  {
-    #ifdef ClassExit
-    ClassExitFunc(base);
-    #endif
-
-    #ifdef SUPERCLASSP
-    if (ThisClassP)
-    {
-      MUI_DeleteCustomClass(ThisClassP);
-      ThisClassP = NULL;
-    }
-    #endif
-
-    #ifdef SUPERCLASS
-    if (ThisClass)
-    {
-      MUI_DeleteCustomClass(ThisClass);
-      ThisClass = NULL;
-    }
-    #endif
-
-    #ifdef PostClassExit
-    PostClassExitFunc();
-    #endif
-
-    DROPINTERFACE(IIntuition);
-    DROPINTERFACE(IGraphics);
-    DROPINTERFACE(IDOS);
-    DROPINTERFACE(IUtility);
-
-    if (MUIMasterBase)
-    {
-      DROPINTERFACE(IMUIMaster);
-      CloseLibrary(MUIMasterBase);
-      MUIMasterBase = NULL;
-    }
-  }
-
-  return(TRUE);
 }
 
 /*****************************************************************************************************/
@@ -870,7 +836,7 @@ static ULONG LIBFUNC MCC_Query(REG(d0, LONG which))
 {
 #endif
 
-  D(DBF_STARTUP, "MCC_Query: %d", which);
+  D(DBF_STARTUP, "MCC_Query(%s): %ld", CLASS, which);
 
   switch (which)
   {
@@ -928,3 +894,7 @@ static ULONG LIBFUNC MCC_Query(REG(d0, LONG which))
 
   return(0);
 }
+
+#ifdef __cplusplus
+}
+#endif
