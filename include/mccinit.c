@@ -1,14 +1,17 @@
 /*******************************************************************************
 
         Name:           mccinit.c
-        Versionstring:  $VER: mccinit.c 1.0 (09.06.2007)
+        Versionstring:  $VER: mccinit.c 1.1 (10.06.2007)
         Author:         Jens Langner <Jens.Langner@light-speed.de>
         Distribution:   PD (public domain)
-        Description:    library init file for easy create of MUI
-                        custom classes (MCC)
+        Description:    library init file for easy generation of a MUI
+                        custom classes (MCC/MCP)
  History:
 
-  1.0   09.06.2007 : created based on obsolete mccheader.c
+  1.0   09.06.2007 : created based on obsolete mccheader.c (damato)
+  1.1   10.06.2007 : modified LibInit/LibOpen/LibExpunge to call the actual
+                     ClassOpen() in LibOpen() rather than in LibInit(). This
+                     should prevent stack issues common on e.g. OS3. (damato)
 
  About:
 
@@ -104,13 +107,10 @@
 /* Includes                                                                   */
 /******************************************************************************/
 
-/* MorphOS relevant includes... */
 #ifdef __MORPHOS__
 #include <emul/emulinterface.h>
 #include <emul/emulregs.h>
 #endif
-
-/* a few other includes... */
 
 #include <exec/types.h>
 #include <exec/memory.h>
@@ -126,18 +126,6 @@
 #include <proto/dos.h>
 #include <proto/graphics.h>
 #include <proto/intuition.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* The name of the class will also become the name of the library. */
-/* We need a pointer to this string in our ROMTag (see below). */
-
-static const char UserLibName[] = CLASS;
-static const char UserLibID[]   = "$VER: " USERLIBID;
-
-/* Here's our global data, described above. */
 
 #if defined(__amigaos4__)
 struct Library *MUIMasterBase = NULL;
@@ -165,6 +153,15 @@ struct GfxBase        *GfxBase       = NULL;
 struct IntuitionBase  *IntuitionBase = NULL;
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* The name of the class will also become the name of the library. */
+/* We need a pointer to this string in our ROMTag (see below). */
+static const char UserLibName[] = CLASS;
+static const char UserLibID[]   = "$VER: " USERLIBID;
+
 #ifdef SUPERCLASS
 static struct MUI_CustomClass *ThisClass = NULL;
 DISPATCHERPROTO(_Dispatcher);
@@ -176,11 +173,18 @@ DISPATCHERPROTO(_DispatcherP);
 #endif
 
 #ifdef __GNUC__
-  #if !defined(__NEWLIB__) && !defined(__MORPHOS__)
-  struct Library *__UtilityBase = NULL; // required by libnix & clib2
+
+  #if !defined(__NEWLIB__)
+    #if defined(__amigaos4__)
+    extern struct Library *__UtilityBase;   // clib2
+    extern struct UtilityIFace* __IUtility; // clib2
+    #else
+    struct Library *__UtilityBase = NULL; // required by libnix & clib2
+    #endif
   #endif
+
+  /* these one are needed copies for libnix.a */
   #ifdef __libnix__
-    /* these one are needed copies for libnix.a */
     #ifdef USE_MATHIEEEDOUBBASBASE
     struct Library *__MathIeeeDoubBasBase = NULL;
     #endif
@@ -188,6 +192,7 @@ DISPATCHERPROTO(_DispatcherP);
     struct Library *__MathIeeeDoubTransBase = NULL;
     #endif
   #endif
+
 #endif /* __GNUC__ */
 
 
@@ -200,7 +205,6 @@ DISPATCHERPROTO(_DispatcherP);
 /* Our library structure, consisting of a struct Library, a segment pointer */
 /* and a semaphore. We need the semaphore to protect init/exit stuff in our */
 /* open/close functions */
-
 struct LibraryHeader
 {
   struct Library         lh_Library;
@@ -208,6 +212,7 @@ struct LibraryHeader
   BPTR                   lh_Segment;
   struct SignalSemaphore lh_Semaphore;
   UWORD                  lh_Pad2;
+  BOOL                   lh_Initialized;
 };
 
 /******************************************************************************/
@@ -438,6 +443,8 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
      GETINTERFACE(INewlib, NewlibBase))
   #endif
   {       
+    D(DBF_STARTUP, "LibInit(%s)", CLASS);
+
     // cleanup the library header structure beginning with the
     // library base, even if that is done automcatically, we explicitly
     // do it here for consistency reasons.
@@ -449,8 +456,195 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
     base->lh_Library.lib_Version      = VERSION;
     base->lh_Library.lib_Revision     = REVISION;
 
+    // init our protecting semaphore and the
+    // initialized flag variable
     InitSemaphore(&base->lh_Semaphore);
+    base->lh_Initialized = FALSE;
 
+    // set the library base segment
+    base->lh_Segment = librarySegment;
+
+    return base;
+  }
+
+  return(NULL);
+}
+
+/*****************************************************************************************************/
+/*****************************************************************************************************/
+
+#ifndef __amigaos4__
+#define DeleteLibrary(LIB) \
+  FreeMem((STRPTR)(LIB)-(LIB)->lib_NegSize, (ULONG)((LIB)->lib_NegSize+(LIB)->lib_PosSize))
+#endif
+
+#if defined(__amigaos4__)
+static BPTR LibExpunge(struct LibraryManagerInterface *Self)
+{
+  struct LibraryHeader *base = (struct LibraryHeader *)Self->Data.LibBase;
+#elif defined(__MORPHOS__)
+static BPTR LibExpunge(void)
+{
+  struct LibraryHeader *base = (struct LibraryHeader *)REG_A6;
+#else
+static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
+{
+#endif
+  BPTR rc;
+
+  D(DBF_STARTUP, "LibExpunge(%s): %ld", CLASS, base->lh_Library.lib_OpenCnt);
+
+  // in case our open counter is still > 0, we have
+  // to set the late expunge flag and return immediately
+  if(base->lh_Library.lib_OpenCnt > 0)
+  {
+    base->lh_Library.lib_Flags |= LIBF_DELEXP;
+    rc = 0;
+  }
+  else
+  {
+    // remove the library base from exec's lib list in advance
+    Remove((struct Node *)base);
+
+    // protect access to lh_Initialized
+    ObtainSemaphore(&base->lh_Semaphore);
+
+    // check if the lib was already initialized
+    if(base->lh_Initialized)
+    {
+      // in case the user specified that he has an own class
+      // expunge function we call it right here, not caring about
+      // and return value.
+      #if defined(CLASSEXPUNGE)
+      ClassExpunge(&base->lh_Library);
+      #endif
+
+      // now we remove our own stuff here step-by-step
+      #ifdef SUPERCLASSP
+      if(ThisClassP)
+      {
+        MUI_DeleteCustomClass(ThisClassP);
+        ThisClassP = NULL;
+      }
+      #endif
+
+      #ifdef SUPERCLASS
+      if(ThisClass)
+      {
+        MUI_DeleteCustomClass(ThisClass);
+        ThisClass = NULL;
+      }
+      #endif
+
+      // we inform the user that all main class expunge stuff
+      // is finished, if he want's to get informed.
+      #if defined(POSTCLASSEXPUNGE)
+      PostClassExpunge();
+      #endif
+
+      // cleanup the various library bases and such
+      if(MUIMasterBase)
+      {
+        DROPINTERFACE(IMUIMaster);
+        CloseLibrary(MUIMasterBase);
+        MUIMasterBase = NULL;
+      }
+
+      if(UtilityBase)
+      {
+        DROPINTERFACE(IUtility);
+        CloseLibrary(UtilityBase);
+        UtilityBase = NULL;
+      }
+
+      if(IntuitionBase)
+      {
+        DROPINTERFACE(IIntuition);
+        CloseLibrary((struct Library *)IntuitionBase);
+        IntuitionBase = NULL;
+      }
+
+      if(GfxBase)
+      {
+        DROPINTERFACE(IGraphics);
+        CloseLibrary((struct Library *)GfxBase);
+        GfxBase = NULL;
+      }
+
+      if(DOSBase)
+      {
+        DROPINTERFACE(IDOS);
+        CloseLibrary((struct Library *)DOSBase);
+        DOSBase = NULL;
+      }
+
+      base->lh_Initialized = FALSE;
+    }
+
+    // release access to lh_Initialized
+    ReleaseSemaphore(&base->lh_Semaphore);
+
+    #if defined(__amigaos4__) && defined(__NEWLIB__)
+    if(NewlibBase)
+    {
+      DROPINTERFACE(INewlib);
+      CloseLibrary(NewlibBase);
+      NewlibBase = NULL;
+    }
+    #endif
+
+    // make sure the system delete's the library
+    // as well.
+    rc = base->lh_Segment;
+    DeleteLibrary(&base->lh_Library);
+  }
+
+  return(rc);
+}
+
+/*****************************************************************************************************/
+/*****************************************************************************************************/
+
+#if defined(__amigaos4__)
+static struct LibraryHeader *LibOpen(struct LibraryManagerInterface *Self, ULONG version UNUSED)
+{
+  struct LibraryHeader *base = (struct LibraryHeader *)Self->Data.LibBase;
+#elif defined(__MORPHOS__)
+static struct LibraryHeader *LibOpen(void)
+{
+  struct LibraryHeader *base = (struct LibraryHeader *)REG_A6;
+#else
+static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base))
+{
+#endif
+  struct LibraryHeader *res = NULL;
+
+  D(DBF_STARTUP, "LibOpen(%s): %ld", CLASS, base->lh_Library.lib_OpenCnt);
+
+  // LibOpen(), LibClose() and LibExpunge() are called while the system is in
+  // Forbid() state. That means that these functions should be quick and should
+  // not break this Forbid()!! Therefore the open counter should be increased
+  // as the very first instruction during LibOpen(), because a ClassOpen()
+  // which breaks a Forbid() and another task calling LibExpunge() will cause
+  // to expunge this library while it is not yet fully initialized. A crash
+  // is unavoidable then. Even the semaphore does not guarantee 100% protection
+  // against such a race condition, because waiting for the semaphore to be
+  // obtained will effectively break the Forbid()!
+
+  // increase the open counter ahead of anything else
+  base->lh_Library.lib_OpenCnt++;
+
+  // delete the late expunge flag
+  base->lh_Library.lib_Flags &= ~LIBF_DELEXP;
+
+  // protected initialized variable
+  ObtainSemaphore(&base->lh_Semaphore);
+
+  // in case this is the first call to LibOpen()
+  // we can do our main initialization here instead of doing it in LibInit()
+  // because of eventually occurring stack issues.
+  if(base->lh_Initialized == FALSE)
+  {
     // now that this library/class is going to be initialized for the first time
     // we go and open all necessary libraries on our own
     if((DOSBase = (APTR)OpenLibrary("dos.library", 36)) &&
@@ -464,18 +658,20 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
     if((MUIMasterBase = OpenLibrary(MUIMASTER_NAME, MASTERVERSION)) &&
        GETINTERFACE(IMUIMaster, MUIMasterBase))
     {
-      // required for libnix
-      #if !defined(__NEWLIB__) && !defined(__MORPHOS__)
-      __UtilityBase = (APTR)UtilityBase;
+      // we have to please the internal utilitybase
+      // pointers of libnix and clib2
+      #if !defined(__NEWLIB__)
+        __UtilityBase = (APTR)UtilityBase;
+        #if defined(__amigaos4__)
+        __IUtility = IUtility;
+        #endif
       #endif
 
       #if defined(DEBUG)
       SetupDebug();
       #endif
 
-      D(DBF_STARTUP, "LibInit(%s)", CLASS);
-
-      #ifdef PRECLASSINIT
+      #if defined(PRECLASSINIT)
       if(PreClassInit())
       #endif
       {
@@ -494,33 +690,20 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
             #define THISCLASS ThisClassP
             #endif
 
-            // set the library base segment
-            base->lh_Segment = librarySegment;
-
             // in case the user defined an own ClassInit()
             // function we call it protected by a semaphore as
             // this user may be stupid and break the Forbid() state
             // of LibInit()
             #if defined(CLASSINIT)
-            {
-              BOOL success;
-
-              ObtainSemaphore(&base->lh_Semaphore);
-              success = ClassInit(&base->lh_Library);
-              ReleaseSemaphore(&base->lh_Semaphore);
-
-              if(success)
-              {
-                // everything was successfully so lets
-                // return the library base
-                return(base);
-              }
-            }
-            #else
-              // everything was successfully so lets
-              // return the library base
-              return(base);
+            if(ClassInit(&base->lh_Library))
             #endif
+            {
+              // everything was successfully so lets
+              // set the initialized value and contiue
+              // with the class open phase
+              base->lh_Initialized = TRUE;
+              goto class_open;
+            }
 
             // if we pass this point than an error
             // occurred and we have to cleanup
@@ -573,199 +756,37 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
       DOSBase = NULL;
     }
 
-    #if defined(__amigaos4__) && defined(__NEWLIB__)
-    if(NewlibBase)
-    {
-      DROPINTERFACE(INewlib);
-      CloseLibrary(NewlibBase);
-      NewlibBase = NULL;
-    }
-    #endif
-  }
-
-  return(NULL);
-}
-
-/*****************************************************************************************************/
-/*****************************************************************************************************/
-
-#ifndef __amigaos4__
-#define DeleteLibrary(LIB) \
-  FreeMem((STRPTR)(LIB)-(LIB)->lib_NegSize, (ULONG)((LIB)->lib_NegSize+(LIB)->lib_PosSize))
-#endif
-
-#if defined(__amigaos4__)
-static BPTR LibExpunge(struct LibraryManagerInterface *Self)
-{
-  struct LibraryHeader *base = (struct LibraryHeader *)Self->Data.LibBase;
-#elif defined(__MORPHOS__)
-static BPTR LibExpunge(void)
-{
-  struct LibraryHeader *base = (struct LibraryHeader *)REG_A6;
-#else
-static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
-{
-#endif
-  BPTR rc;
-
-  D(DBF_STARTUP, "LibExpunge(%s): %ld", CLASS, base->lh_Library.lib_OpenCnt);
-
-  // in case our open counter is still > 0, we have
-  // to set the late expunge flag and return immediately
-  if(base->lh_Library.lib_OpenCnt > 0)
-  {
-    base->lh_Library.lib_Flags |= LIBF_DELEXP;
-    rc = 0;
-  }
-  else
-  {
-    // remove the library base from exec's lib list in advance
-    Remove((struct Node *)base);
-
-    // in case the user specified that he has an own class
-    // expeunge function we call it right here, not caring about
-    // and return value.
-    #if defined(CLASSEXPUNGE)
-    ClassExpunge(&base->lh_Library);
-    #endif
-
-    // now we remove our own stuff here step-by-step
-    #ifdef SUPERCLASSP
-    if(ThisClassP)
-    {
-      MUI_DeleteCustomClass(ThisClassP);
-      ThisClassP = NULL;
-    }
-    #endif
-
-    #ifdef SUPERCLASS
-    if(ThisClass)
-    {
-      MUI_DeleteCustomClass(ThisClass);
-      ThisClass = NULL;
-    }
-    #endif
-
-    // we inform the user that all main class expunge stuff
-    // is finished, if he want's to get informed.
-    #ifdef POSTCLASSEXPUNGE
-    PostClassExpunge();
-    #endif
-
-    // cleanup the various library bases and such
-    if(MUIMasterBase)
-    {
-      DROPINTERFACE(IMUIMaster);
-      CloseLibrary(MUIMasterBase);
-      MUIMasterBase = NULL;
-    }
-
-    if(UtilityBase)
-    {
-      DROPINTERFACE(IUtility);
-      CloseLibrary(UtilityBase);
-      UtilityBase = NULL;
-    }
-
-    if(IntuitionBase)
-    {
-      DROPINTERFACE(IIntuition);
-      CloseLibrary((struct Library *)IntuitionBase);
-      IntuitionBase = NULL;
-    }
-
-    if(GfxBase)
-    {
-      DROPINTERFACE(IGraphics);
-      CloseLibrary((struct Library *)GfxBase);
-      GfxBase = NULL;
-    }
-
-    if(DOSBase)
-    {
-      DROPINTERFACE(IDOS);
-      CloseLibrary((struct Library *)DOSBase);
-      DOSBase = NULL;
-    }
-
-    #if defined(__amigaos4__) && defined(__NEWLIB__)
-    if(NewlibBase)
-    {
-      DROPINTERFACE(INewlib);
-      CloseLibrary(NewlibBase);
-      NewlibBase = NULL;
-    }
-    #endif
-
-    // make sure the system delete's the library
-    // as well.
-    rc = base->lh_Segment;
-    DeleteLibrary(&base->lh_Library);
-  }
-
-  return(rc);
-}
-
-/*****************************************************************************************************/
-/*****************************************************************************************************/
-
-#if defined(__amigaos4__)
-static struct LibraryHeader *LibOpen(struct LibraryManagerInterface *Self, ULONG version UNUSED)
-{
-  struct LibraryHeader *base = (struct LibraryHeader *)Self->Data.LibBase;
-#elif defined(__MORPHOS__)
-static struct LibraryHeader *LibOpen(void)
-{
-  struct LibraryHeader *base = (struct LibraryHeader *)REG_A6;
-#else
-static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base))
-{
-#endif
-  struct LibraryHeader *res;
-
-  D(DBF_STARTUP, "LibOpen(%s): %ld", CLASS, base->lh_Library.lib_OpenCnt);
-
-  // LibOpen(), LibClose() and LibExpunge() are called while the system is in
-  // Forbid() state. That means that these functions should be quick and should
-  // not break this Forbid()!! Therefore the open counter should be increased
-  // as the very first instruction during LibOpen(), because a ClassOpen()
-  // which breaks a Forbid() and another task calling LibExpunge() will cause
-  // to expunge this library while it is not yet fully initialized. A crash
-  // is unavoidable then. Even the semaphore does not guarantee 100% protection
-  // against such a race condition, because waiting for the semaphore to be
-  // obtained will effectively break the Forbid()!
-
-  // increase the open counter ahead of anything else
-  base->lh_Library.lib_OpenCnt++;
-
-  // delete the late expunge flag
-  base->lh_Library.lib_Flags &= ~LIBF_DELEXP;
-
-  #if defined(CLASSOPEN)
-
-  // as something in the ClassOpen() may break the Forbid() state of
-  // the operating system, we use semaphores here to protect us from
-  // race conditions.
-  ObtainSemaphore(&base->lh_Semaphore);
-
-  // here we call the user-specific function for LibOpen() where
-  // he can do whatever he wants because of the semaphore protection.
-  if(ClassOpen(&base->lh_Library))
-    res = base;
-  else
-  {
-    D(DBF_STARTUP, "ClassOpen(%s) failed", CLASS);
+    E(DBF_STARTUP, "ClassInit(%s) failed", CLASS);
 
     // decrease the open counter again
   	base->lh_Library.lib_OpenCnt--;
-	  res = NULL;
+  }
+  else
+  {
+
+class_open:
+
+    #if defined(CLASSOPEN)
+
+    // here we call the user-specific function for LibOpen() where
+    // he can do whatever he wants because of the semaphore protection.
+    if(ClassOpen(&base->lh_Library))
+      res = base;
+    else
+    {
+      E(DBF_STARTUP, "ClassOpen(%s) failed", CLASS);
+
+      // decrease the open counter again
+    	base->lh_Library.lib_OpenCnt--;
+    }
+
+    #else
+      res = base;
+    #endif
   }
 
+  // release the semaphore
   ReleaseSemaphore(&base->lh_Semaphore);
-
-  #else
-    res = base;
-  #endif
 
   return res;
 }

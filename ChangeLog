@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-06-10 Jens Langner <Jens.Langner@light-speed.de>
+
+  * include/mccinit.c: updated to latest 1.1 version which should fix possible
+    stack issues during the LibInit() phase. Custom libraries will now be opened
+    during the LibOpen() phase instead while maintaining an own mutual exclusive
+    locking variable.
+
 2007-06-09 Jens Langner <Jens.Langner@light-speed.de>
 
   * include/mccinit.c, mcc/library.c, mcp/library.c: replaced the old obsolete
@@ -21,7 +28,7 @@ $URL$
 
 2007-05-18 Jens Langner <Jens.Langner@light-speed.de>
 
-   * MixedFucntions.c: minor twirks to the LineCharsWidth() function to catch
+   * MixedFunctions.c: minor twirks to the LineCharsWidth() function to catch
      a possible issue when calculating the string length.
 
 2007-04-16 Jens Langner <Jens.Langner@light-speed.de>
