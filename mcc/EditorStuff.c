@@ -904,9 +904,14 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
 
   while((skip + (width = LineCharsWidth(line->line.Contents+skip, data))) < x)
   {
-    lineabove_width = width;
-    skip += width;
-    line_nr++;
+    if(width > 0)
+    {
+      lineabove_width = width;
+      skip += width;
+      line_nr++;
+    }
+    else
+      break;
   }
 
   if(characters)

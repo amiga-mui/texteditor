@@ -229,22 +229,25 @@ LONG LineCharsWidth(char *text, struct InstData *data)
 /*-------------------------------------------------------*
  * Return the number of visual lines that the line fills *
  *-------------------------------------------------------*/
-short VisualHeight(struct line_node *line, struct InstData *data)
+ULONG VisualHeight(struct line_node *line, struct InstData *data)
 {
-  LONG c = 0, lines = 0, length;
+  ULONG lines = 0;
 
   ENTER();
 
   if(data->flags & FLG_HScroll)
-  {
     lines = 1;
-  }
   else
   {
-    length = strlen(line->line.Contents);
-    while (c < length)
+    ULONG c=0;
+    ULONG d;
+    ULONG length = strlen(line->line.Contents);
+
+    while(c < length &&
+          (d = LineCharsWidth(line->line.Contents+c, data)) > 0)
     {
-      c = c + LineCharsWidth(line->line.Contents+c, data);
+      c += d;
+
       lines++;
     }
   }
@@ -289,22 +292,31 @@ void  ClearLine   (char *text, int printed, int line_nr, struct InstData *data)
 /*-----------------------------------------*
  * Convert an xoffset to a number of lines *
  *-----------------------------------------*/
-void  OffsetToLines (LONG x, struct line_node *line, struct pos_info *pos, struct InstData *data)
+void OffsetToLines(LONG x, struct line_node *line, struct pos_info *pos, struct InstData *data)
 {
-  LONG c=0;
-  LONG d=0;
-  LONG lines = 0;
-
   ENTER();
 
   if(data->shown)
   {
-    while(c <= x)
+    ULONG c=0;
+    ULONG d=0;
+    ULONG lines=0;
+
+    while(c <= (ULONG)x)
     {
+      ULONG e;
+
       d = c;
-      c = c + LineCharsWidth(line->line.Contents+c, data);
-      lines++;
+
+      if((e = LineCharsWidth(line->line.Contents+c, data)) > 0)
+      {
+        c += e;
+        lines++;
+      }
+      else
+        break;
     }
+
     pos->lines  = lines;
     pos->x      = x - d;
     pos->bytes  = d;
@@ -851,7 +863,7 @@ void  ScrollDown(LONG line_nr, LONG lines, struct InstData *data)
 /*----------------------------------------------*
  * Find a line and fillout a pos_info structure *
  *----------------------------------------------*/
-void  GetLine     (LONG realline, struct pos_info *pos, struct InstData *data)
+void GetLine(LONG realline, struct pos_info *pos, struct InstData *data)
 {
   struct line_node *line = data->firstline;
   LONG x = 0;
@@ -873,7 +885,7 @@ void  GetLine     (LONG realline, struct pos_info *pos, struct InstData *data)
   }
   else
   {
-    while (--realline)
+    while(--realline)
     {
       x += LineCharsWidth(line->line.Contents+x, data);
     }

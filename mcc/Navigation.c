@@ -53,30 +53,33 @@ static ULONG CursorOffset(struct InstData *data)
 {
   struct line_node *line = data->actualline;
   STRPTR text = line->line.Contents+data->CPos_X;
-  ULONG res;
-  LONG offset = data->pixel_x-FlowSpace(line->line.Flow, text, data);
-  struct TextExtent tExtend;
+  ULONG res=0;
   ULONG lineCharsWidth;
 
   ENTER();
 
-  if(offset < 1)
-    offset = 1;
-
   // call TextFit() to find out how many chars would fit.
-  lineCharsWidth = LineCharsWidth(text, data);
-  res = TextFit(&data->tmprp, text, lineCharsWidth, &tExtend, NULL, 1, offset, data->font->tf_YSize);
-
-  // in case of a hard-wrapped line we have to deal with
-  // the possibility that the user tries to
-  // select the last char in a line which should normally by a white space
-  // due to soft-wrapping. So in this case we have to lower res by one so
-  // that it is not possible to select that last white space. However, for
-  // a hard wrapped line it still have to be possible to select that last char.
-  if(lineCharsWidth-res == 0 &&
-     text[lineCharsWidth-1] <= ' ')
+  if((lineCharsWidth = LineCharsWidth(text, data)) > 0)
   {
-    res--;
+    struct TextExtent tExtend;
+    LONG offset = data->pixel_x-FlowSpace(line->line.Flow, text, data);
+
+    if(offset < 1)
+      offset = 1;
+
+    res = TextFit(&data->tmprp, text, lineCharsWidth, &tExtend, NULL, 1, offset, data->font->tf_YSize);
+
+    // in case of a hard-wrapped line we have to deal with
+    // the possibility that the user tries to
+    // select the last char in a line which should normally by a white space
+    // due to soft-wrapping. So in this case we have to lower res by one so
+    // that it is not possible to select that last white space. However, for
+    // a hard wrapped line it still have to be possible to select that last char.
+    if(lineCharsWidth-res == 0 &&
+       text[lineCharsWidth-1] <= ' ')
+    {
+      res--;
+    }
   }
 
   RETURN(res);
@@ -382,8 +385,13 @@ void  GoEndOfLine (struct InstData *data)
 
   if(data->shown)
   {
+    LONG c;
     OffsetToLines(data->CPos_X, data->actualline, &pos, data);
-    data->CPos_X = pos.bytes + LineCharsWidth(data->actualline->line.Contents+pos.bytes, data) - 1;
+
+    if((c = LineCharsWidth(data->actualline->line.Contents+pos.bytes, data)) > 0)
+      data->CPos_X = pos.bytes + c - 1;
+    else
+      data->CPos_X = pos.bytes;
   }
 
   LEAVE();
