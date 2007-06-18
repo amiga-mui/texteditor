@@ -365,7 +365,7 @@ long  CompressLine  (struct line_node *, struct InstData *);
 void  OffsetToLines (LONG, struct line_node *, struct pos_info *, struct InstData *);
 void  DumpText    (LONG, LONG, LONG, BOOL, struct InstData *);
 BOOL Init_LineNode(struct line_node *, struct line_node *, const char *, struct InstData *);
-short VisualHeight  (struct line_node *, struct InstData *);
+ULONG VisualHeight  (struct line_node *, struct InstData *);
 void  GetLine     (LONG, struct pos_info *, struct InstData *);
 LONG  LineToVisual  (struct line_node *, struct InstData *);
 

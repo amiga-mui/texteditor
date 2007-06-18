@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-06-18 Jens Langner <Jens.Langner@light-speed.de>
+
+  * EditorStuff.c, MixedFunctions.c, Navigation.c, private.h: as the LineCharsWidth()
+    function can now return 0 all usage situations have to make sure that they can
+    handle a zero return value. This should e.g. fix an endless loop situation when
+    tripleclicking on a line.
+
 2007-06-13  Thore Böckelmann <tboeckel@gmx.de>
 
   * #?/Debug.c: unified the _DPRINTF() functions for all platforms.
