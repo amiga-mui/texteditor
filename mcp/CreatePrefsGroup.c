@@ -388,7 +388,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
               Child, TxtLabel(tr(MSG_Label_UndoLevel), 0),
               Child, data->undosize = SliderObject,
                 MUIA_ShortHelp, tr(HelpBubble_UndoLevel),
-                MUIA_Numeric_Min, 20,
+                MUIA_Numeric_Min, 0,
                 MUIA_Numeric_Max, 2000,
                 MUIA_Numeric_Format, "%ld (± 5)",
               End,

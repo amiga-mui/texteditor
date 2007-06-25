@@ -83,6 +83,7 @@ extern "C" {
 #define MUIA_TextEditor_AutoClip          (TextEditor_Dummy + 0x34)
 #define MUIA_TextEditor_CursorPosition    (TextEditor_Dummy + 0x35)
 #define MUIA_TextEditor_KeyUpFocus        (TextEditor_Dummy + 0x36)
+#define MUIA_TextEditor_UndoLevels        (TextEditor_Dummy + 0x38)
 
 #define MUIM_TextEditor_AddKeyBindings    (TextEditor_Dummy + 0x22)
 #define MUIM_TextEditor_ARexxCmd          (TextEditor_Dummy + 0x23)

@@ -174,12 +174,7 @@ ULONG Dispose(struct IClass *cl, Object *obj, Msg msg)
 
   ENTER();
 
-  if(data->undosize)
-  {
-    ResetUndoBuffer(data);
-    MyFreePooled(data->mypool, data->undobuffer);
-    data->undosize = 0;
-  }
+  ResizeUndoBuffer(data, 0);
   if(data->mylocale)
     CloseLocale(data->mylocale);
   if(data->mypool)
@@ -578,7 +573,7 @@ DISPATCHER(_Dispatcher)
       }
 
       data->NoNotify = TRUE;
-      
+
       if(data->CPos_X != oldx)
         set(obj, MUIA_TextEditor_CursorX, data->CPos_X);
 
@@ -586,7 +581,7 @@ DISPATCHER(_Dispatcher)
 
       if(oldy != newy)
         set(obj, MUIA_TextEditor_CursorY, newy);
-      
+
       data->NoNotify = FALSE;
     }
     break;
@@ -718,7 +713,7 @@ DISPATCHER(_Dispatcher)
       if((id = (muiNotifyData(obj)->mnd_ObjectID)))
       {
         STRPTR contents = (STRPTR)DoMethod(imp_msg->dataspace, MUIM_Dataspace_Find, id);
-        
+
         set(obj, MUIA_TextEditor_Contents, contents != NULL ? (ULONG)contents : (ULONG)"");
       }
       result = 0;
