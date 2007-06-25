@@ -29,7 +29,7 @@
 
 #include "private.h"
 
-unsigned short LineNr (struct line_node *line, struct InstData *data)
+unsigned short LineNr(struct line_node *line, struct InstData *data)
 {
   unsigned short result = 1;
   struct line_node *actual = data->firstline;
@@ -46,7 +46,7 @@ unsigned short LineNr (struct line_node *line, struct InstData *data)
   return(result);
 }
 
-struct line_node *LineNode (unsigned short linenr, struct InstData *data)
+struct line_node *LineNode(unsigned short linenr, struct InstData *data)
 {
   struct line_node *actual = data->firstline;
 
@@ -61,11 +61,11 @@ struct line_node *LineNode (unsigned short linenr, struct InstData *data)
   return(actual);
 }
 
-long Undo (struct InstData *data)
+long Undo(struct InstData *data)
 {
   ENTER();
 
-  if(data->undosize && data->undobuffer != data->undopointer)
+  if(data->undosize != 0 && data->undobuffer != data->undopointer)
   {
     struct UserAction *buffer;
     BOOL  crsr_move = TRUE;
@@ -199,13 +199,13 @@ long Undo (struct InstData *data)
   }
 }
 
-long Redo (struct InstData *data)
+long Redo(struct InstData *data)
 {
   ENTER();
 
-  if(data->undosize && *(short *)data->undopointer != 0xff)
+  if(data->undosize != 0 && *(short *)data->undopointer != 0xff)
   {
-      struct UserAction *buffer = (struct UserAction *)data->undopointer;
+    struct UserAction *buffer = (struct UserAction *)data->undopointer;
 
     if(data->undopointer == data->undobuffer)
       set(data->object, MUIA_TextEditor_UndoAvailable, TRUE);
@@ -218,7 +218,7 @@ long Redo (struct InstData *data)
 
     data->undopointer += sizeof(struct UserAction);
 //    if(data->actualline != LineNode(buffer->y, data) || data->CPos_X != buffer->x)
-      SetCursor(data->CPos_X, data->actualline, FALSE, data);
+    SetCursor(data->CPos_X, data->actualline, FALSE, data);
     data->CPos_X = buffer->x;
     data->actualline = LineNode(buffer->y, data);
     ScrollIntoDisplay(data);
@@ -241,7 +241,7 @@ long Redo (struct InstData *data)
         break;
       case pasteblock:
         {
-            struct Hook *oldhook = data->ImportHook;
+          struct Hook *oldhook = data->ImportHook;
 
           data->ImportHook = &ImPlainHook;
           InsertText(data, (char *)buffer->clip, TRUE);
@@ -292,7 +292,7 @@ void ResetUndoBuffer(struct InstData *data)
 {
   ENTER();
 
-  if(data->undosize)
+  if(data->undosize != 0)
   {
     struct UserAction *buffer = (struct UserAction *)data->undobuffer;
 
@@ -302,20 +302,20 @@ void ResetUndoBuffer(struct InstData *data)
       {
         MyFreePooled(data->mypool, buffer->clip);
       }
-      
+
       buffer++;
     }
-    
+
     while(buffer->type != 0xff)
     {
       if(buffer->type == pasteblock)
       {
         MyFreePooled(data->mypool, buffer->clip);
       }
-      
+
       buffer++;
     }
-    
+
     data->undopointer = data->undobuffer;
     *(short *)data->undopointer = 0xff;
   }
@@ -323,11 +323,11 @@ void ResetUndoBuffer(struct InstData *data)
   LEAVE();
 }
 
-long AddToUndoBuffer (long eventtype, char *eventdata, struct InstData *data)
+long AddToUndoBuffer(long eventtype, char *eventdata, struct InstData *data)
 {
   ENTER();
 
-  if(data->undosize)
+  if(data->undosize != 0)
   {
     struct UserAction *buffer;
 
@@ -347,9 +347,9 @@ long AddToUndoBuffer (long eventtype, char *eventdata, struct InstData *data)
       }
 
       memcpy(data->undobuffer, t_undobuffer, data->undosize-(t_undobuffer-(char *)data->undobuffer));
-      
+
       data->undopointer -= t_undobuffer-(char *)data->undobuffer;
-      
+
       data->flags |= FLG_UndoLost;
     }
     buffer = data->undopointer;
@@ -357,9 +357,9 @@ long AddToUndoBuffer (long eventtype, char *eventdata, struct InstData *data)
       set(data->object, MUIA_TextEditor_RedoAvailable, FALSE);
     if(data->undopointer == data->undobuffer)
       set(data->object, MUIA_TextEditor_UndoAvailable, TRUE);
-    
+
     data->undopointer += sizeof(struct UserAction);
-    
+
     *(short *)data->undopointer = 0xff;
     buffer->x  = data->CPos_X;
     buffer->y  = LineNr(data->actualline, data);
@@ -423,4 +423,46 @@ long AddToUndoBuffer (long eventtype, char *eventdata, struct InstData *data)
 
   RETURN(TRUE);
   return(TRUE);
+}
+
+void ResizeUndoBuffer(struct InstData *data, ULONG level)
+{
+  ULONG newSize;
+
+  ENTER();
+
+  // calculate number of bytes from number of undo levels
+  newSize = (level * sizeof(struct UserAction)) + 1;
+
+  if(data->undosize != newSize)
+  {
+    if(level == 0)
+    {
+      // if zero steps are requested then free everything
+      if(data->undobuffer != NULL)
+      {
+        ResetUndoBuffer(data);
+        MyFreePooled(data->mypool, data->undobuffer);
+        data->undobuffer = NULL;
+        data->undopointer = NULL;
+      }
+      data->undosize = 0;
+    }
+    else
+    {
+      // allocate a new undo buffer
+      if((data->undobuffer = MyAllocPooled(data->mypool, newSize)) != NULL)
+      {
+        data->undopointer = data->undobuffer;
+        *(short *)data->undopointer = 0xff;
+        data->undosize = newSize;
+      }
+      else
+      {
+        data->undosize = 0;
+      }
+    }
+  }
+
+  LEAVE();
 }

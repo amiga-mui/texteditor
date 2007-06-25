@@ -268,7 +268,7 @@ void InitConfig(Object *obj, struct InstData *data)
   UpdateStyles(data);
 
   {
-      long  lort = TRUE;
+    long lort = TRUE;
 
     setting = (long)&lort;
     DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_Smooth, &setting);
@@ -279,29 +279,28 @@ void InitConfig(Object *obj, struct InstData *data)
   }
 
   {
-      long undolevel = 500;
+    long undolevel;
 
-    if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_UndoSize, &setting))
+    if(data->userUndoSize == FALSE)
     {
-      undolevel = *(long *)setting;
-      if(undolevel < 20)
-        undolevel = 20;
-    }
-    undolevel += 5;
+      // get the saved undo size only if it was not yet set by the application
+      undolevel = 500;
 
-    if(data->undosize != (undolevel*sizeof(struct UserAction))+1)
-    {
-      if((data->undobuffer = MyAllocPooled(data->mypool, (undolevel*sizeof(struct UserAction))+1)))
+      if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_UndoSize, &setting))
       {
-        data->undopointer = data->undobuffer;
-        *(short *)data->undopointer = 0xff;
-        data->undosize = (undolevel*sizeof(struct UserAction))+1;
+        undolevel = *(long *)setting;
+        // constrain the number of undo levels only if undo is enabled
+        if(undolevel != 0 && undolevel < 20)
+          undolevel = 20;
       }
-      else
-      {
-        data->undosize = 0;
-      }
+      // add 5 levels only if undo is enabled at all
+      if(undolevel != 0)
+        undolevel += 5;
     }
+    else
+      undolevel = data->undosize;
+
+	ResizeUndoBuffer(data, undolevel);
   }
 
   data->LookupSpawn = 0;

@@ -35,6 +35,7 @@ TextEditor.mcc/MUIA_TextEditor_StyleItalic
 TextEditor.mcc/MUIA_TextEditor_StyleUnderline
 TextEditor.mcc/MUIA_TextEditor_TypeAndSpell
 TextEditor.mcc/MUIA_TextEditor_UndoAvailable
+TextEditor.mcc/MUIA_TextEditor_UndoLevels
 TextEditor.mcc/MUIA_TextEditor_WrapBorder
 TextEditor.mcc/MUIM_TextEditor_ARexxCmd
 TextEditor.mcc/MUIM_TextEditor_BlockInfo
@@ -421,7 +422,7 @@ TextEditor.mcc/MUIM_TextEditor_Search
         MUIV_TextEditor_ImportHook_MIME
         MUIV_TextEditor_ImportHook_MIMEQuoted
 
-    FUNCTION                                                
+    FUNCTION
         Since this gadget allows different text styles, you can supply an
         import hook to parse the text correctly.
 
@@ -620,7 +621,7 @@ TextEditor.mcc/MUIM_TextEditor_Search
         DoMethod(editor, MUIM_Notify,
                   MUIA_TextEditor_Prop_First, MUIV_EveryTime,
                   slider, 3, MUIM_Set, MUIA_Prop_First, MUIV_TriggerValue);
-        
+
         DoMethod(slider, MUIM_Notify,
                   MUIA_Prop_First, MUIV_EveryTime,
                   editor, 3, MUIM_Set, MUIA_TextEditor_Prop_First, MUIV_TriggerValue);
@@ -835,6 +836,19 @@ TextEditor.mcc/MUIM_TextEditor_Search
 
     SEE ALSO
         MUIA_TextEditor_RedoAvailable
+
+TextEditor.mcc/MUIA_TextEditor_UndoLevels
+
+    NAME
+        MUIA_TextEditor_UndoLevels -- [ISG], ULONG
+
+    FUNCTION
+        Using this tag an application is able to override the global undo level
+        setting. A value of zero will disable undo/redo completely. Upon OM_GET
+        the current number of undo levels will be returned.
+
+    SEE ALSO
+        MUIA_TextEditor_UndoAvailable, MUIA_TextEditor_RedoAvailable
 
 TextEditor.mcc/MUIA_TextEditor_WrapBorder
 

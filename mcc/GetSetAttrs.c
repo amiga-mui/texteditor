@@ -73,11 +73,11 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
     break;
 
     case MUIA_TextEditor_UndoAvailable:
-      ti_Data = data->undosize && data->undobuffer != data->undopointer;
+      ti_Data = data->undosize != 0 && data->undobuffer != data->undopointer;
     break;
 
     case MUIA_TextEditor_RedoAvailable:
-      ti_Data = data->undosize && *(short *)data->undopointer != 0xff;
+      ti_Data = data->undosize != 0 && *(short *)data->undopointer != 0xff;
     break;
 
     case MUIA_TextEditor_AutoClip:
@@ -172,6 +172,9 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
       break;
     case MUIA_Font:
       ti_Data = (ULONG)data->font;
+      break;
+    case MUIA_TextEditor_UndoLevels:
+      ti_Data = (data->undosize != 0) ? ((data->undosize - 1) / sizeof(struct UserAction)) : 0;
       break;
 
     default:
@@ -533,7 +536,7 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
       case MUIA_TextEditor_ImportWrap:
         data->ImportWrap = ti_Data;
         break;
-      
+
       case MUIA_TextEditor_ExportHook:
       {
         switch(ti_Data)
@@ -541,7 +544,7 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
           case MUIV_TextEditor_ExportHook_Plain:
             data->ExportHook = &ExportHookPlain;
           break;
-          
+
           case MUIV_TextEditor_ExportHook_EMail:
             data->ExportHook = &ExportHookEMail;
           break;
@@ -600,6 +603,10 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
         break;
       case MUIA_TextEditor_TypeAndSpell:
         data->TypeAndSpell = ti_Data;
+        break;
+      case MUIA_TextEditor_UndoLevels:
+        ResizeUndoBuffer(data, ti_Data);
+        data->userUndoSize = TRUE;
         break;
     }
   }

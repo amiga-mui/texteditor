@@ -224,7 +224,7 @@ int main(void)
           const char *classes[] = { "TextEditor.mcc", NULL };
 
         mcc = MUI_CreateCustomClass(NULL, "Area.mui", NULL, sizeof(struct InstData), ENTRY(_Dispatcher));
-        
+
         app = MUI_NewObject("Application.mui",
               MUIA_Application_Author,      "TextEditor.mcc Open Source Team",
               MUIA_Application_Base,        "TextEditor-Test",
@@ -429,11 +429,11 @@ int main(void)
 	              char  *text = AllocVec(50*1024, 0L);
 	              char  *buffer = text;
 	              int size;
-	
+
 	            size = Read(fh, text, (50*1024)-2);
 	            text[size] = '\0';
 	            Close(fh);
-	
+
 	            if(argarray[3])
 	            {
 	              while(*buffer != '\n' && buffer < &text[size])
@@ -441,7 +441,7 @@ int main(void)
 	                while(*buffer++ != '\n');
 	              }
 	            }
-	
+
 	            if(argarray[2])
 	              set(editorgad, MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_MIMEQuoted);
 	            else
@@ -450,7 +450,7 @@ int main(void)
 	              else
 	                if(argarray[5])
 	                  set(editorgad, MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_EMail);
-	
+
 	            SetAttrs(editorgad, MUIA_TextEditor_Contents, buffer,
 	                          TAG_DONE);
 	            FreeVec(text);

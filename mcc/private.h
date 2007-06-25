@@ -314,6 +314,7 @@ struct InstData
   APTR            undobuffer;
   APTR            undopointer;
   ULONG           undosize;
+  BOOL            userUndoSize;
   BOOL            TypeAndSpell;
   APTR            SuggestWindow;
   APTR            SuggestListview;
@@ -433,8 +434,9 @@ unsigned short  *CheckStyles      (char *);
 LONG CutBlock2 (struct InstData *, long, long, struct marking *, BOOL);
 char *GetBlock (struct marking *, struct InstData *);
 
-long AddToUndoBuffer (long, char *, struct InstData *);
-void ResetUndoBuffer (struct InstData *);
+long AddToUndoBuffer(long, char *, struct InstData *);
+void ResetUndoBuffer(struct InstData *);
+void ResizeUndoBuffer(struct InstData *, ULONG);
 long Undo       (struct InstData *);
 long Redo       (struct InstData *);
 

@@ -144,12 +144,12 @@ ULONG ClearText (struct InstData *data)
   struct line_node *newcontents;
 
   ENTER();
-  
+
   if((newcontents = AllocLine(data)))
   {
     if(Init_LineNode(newcontents, NULL, "\n", data))
     {
-      if(data->undosize)
+      if(data->undosize != 0)
       {
         struct  marking newblock;
 
@@ -324,7 +324,7 @@ ULONG InputTrigger(UNUSED struct IClass *cl, struct InstData *data)
 
         OffsetToLines(data->CPos_X, data->actualline, &pos, data);
         flow = FlowSpace(data->actualline->line.Flow, data->actualline->line.Contents+pos.bytes, data);
-        
+
         if(MouseX <= (LONG)(data->xpos+flow+TextLength(&data->tmprp, data->actualline->line.Contents+pos.bytes, pos.extra-pos.bytes-1)))
         {
           if(data->selectmode == 1)

@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-06-25  Thore Böckelmann <tboeckel@gmx.de>
+
+  * misc: the number of undo levels can now be set by the application. A value
+    of zero means that undo/redo is completely disabled. It is also possible to
+    disable undo/redo globally by setting the level to zero. This fulfils
+    feature request #1479534.
+
 2007-06-20  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale/french.ct: updated the french translation which kindly has been
