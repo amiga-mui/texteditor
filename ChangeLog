@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-07-01 Jens Langner <Jens.Langner@light-speed.de>
+
+  * include/mccinit.c: updated to latest 1.2 version which fixes some library
+    manager initialization issues.
+
 2007-06-25  Thore Böckelmann <tboeckel@gmx.de>
 
   * misc: the number of undo levels can now be set by the application. A value
