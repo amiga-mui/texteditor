@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-07-04 Jens Langner <Jens.Langner@light-speed.de>
+
+  * include/mccinit.c: updated to latest 1.3 version which introduces a stackswap
+    mechanism for OS3/MorphOS systems so that they may not run out of stack when
+    running through the various library initialization routines.
+
 2007-07-01 Jens Langner <Jens.Langner@light-speed.de>
 
   * include/mccinit.c: updated to latest 1.2 version which fixes some library
