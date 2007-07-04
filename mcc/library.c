@@ -49,6 +49,7 @@ static const char * const used_classesP[] = { "TextEditor.mcp", NULL };
 
 #define CLASSINIT
 #define CLASSEXPUNGE
+#define MIN_STACKSIZE 8192
 
 struct Library *DiskfontBase = NULL;
 struct Library *KeymapBase = NULL;

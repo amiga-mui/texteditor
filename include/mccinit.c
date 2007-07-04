@@ -1,7 +1,7 @@
 /*******************************************************************************
 
         Name:           mccinit.c
-        Versionstring:  $VER: mccinit.c 1.2 (01.07.2007)
+        Versionstring:  $VER: mccinit.c 1.3 (04.07.2007)
         Author:         Jens Langner <Jens.Langner@light-speed.de>
         Distribution:   PD (public domain)
         Description:    library init file for easy generation of a MUI
@@ -14,6 +14,8 @@
                      should prevent stack issues common on e.g. OS3. (damato)
   1.2   01.07.2007 : adapted library interface initialization to what the
                      very latest idltool 52.7 produces as well.
+  1.3   04.07.2007 : added MIN_STACKSIZE and all required StackSwap()
+                     mechanisms to enforce a large enough stack.
 
  About:
 
@@ -37,6 +39,9 @@
     CLASS         (char*)   - class name (including .mcc/.mcp)
     MASTERVERSION (int)     - the minimun required muimaster version
                               (default: MUIMASTER_VMIN)
+    MIN_STACKSIZE (int)     - if defined, the specified minimum stack size
+                              will be enforced when calling all user functions
+                              like ClassXXXX() and PreClassXXX().
 
     MCC only:
     --------
@@ -159,6 +164,18 @@ struct IntuitionBase  *IntuitionBase = NULL;
 extern "C" {
 #endif
 
+// we place a stack cookie in the binary so that
+// newer OS version can directly take the specified
+// number for the ramlib process
+#if defined(MIN_STACKSIZE)
+
+// transforms a define into a string
+#define STR(x)  STR2(x)
+#define STR2(x) #x
+
+static const char USED_VAR stack_size[] = "$STACK:" STR(MIN_STACKSIZE) "\n";
+#endif
+
 /* The name of the class will also become the name of the library. */
 /* We need a pointer to this string in our ROMTag (see below). */
 static const char UserLibName[] = CLASS;
@@ -214,7 +231,6 @@ struct LibraryHeader
   BPTR                   lh_Segment;
   struct SignalSemaphore lh_Semaphore;
   UWORD                  lh_Pad2;
-  BOOL                   lh_Initialized;
 };
 
 /******************************************************************************/
@@ -453,6 +469,7 @@ static const USED_VAR struct Resident ROMTag =
  * one for the ppc.library.
  * ** IMPORTANT **
  */
+const USED_VAR ULONG __amigappc__ = 1;
 const USED_VAR ULONG __abox__ = 1;
 
 #endif /* __MORPHOS__ */
@@ -487,6 +504,10 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
      GETINTERFACE(INewlib, NewlibBase))
   #endif
   {       
+    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+    struct StackSwapStruct *stack;
+    #endif
+
     D(DBF_STARTUP, "LibInit(%s)", CLASS);
 
     // cleanup the library header structure beginning with the
@@ -503,12 +524,165 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
     // init our protecting semaphore and the
     // initialized flag variable
     InitSemaphore(&base->lh_Semaphore);
-    base->lh_Initialized = FALSE;
 
-    // set the library base segment
-    base->lh_Segment = librarySegment;
+    // protect ClassInit()
+    ObtainSemaphore(&base->lh_Semaphore);
 
-    return base;
+    // If we are not running on AmigaOS4 (no stackswap required) we go and
+    // do an explicit StackSwap() in case the user wants to make sure we
+    // have enough stack for his user functions
+    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+    if((stack = AllocMem(sizeof(*stack)+MIN_STACKSIZE, MEMF_PUBLIC|MEMF_CLEAR)))
+    #endif
+    {
+      // perform the StackSwap
+      #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+      stack->stk_Lower = (stack + sizeof(*stack));
+      stack->stk_Upper = (ULONG)stack->stk_Lower + MIN_STACKSIZE;
+      stack->stk_Pointer = (APTR)stack->stk_Upper;
+      StackSwap(stack);
+      #endif
+
+      // now that this library/class is going to be initialized for the first time
+      // we go and open all necessary libraries on our own
+      if((DOSBase = (APTR)OpenLibrary("dos.library", 36)) &&
+         GETINTERFACE(IDOS, DOSBase))
+      if((GfxBase = (APTR)OpenLibrary("graphics.library", 36)) &&
+         GETINTERFACE(IGraphics, GfxBase))
+      if((IntuitionBase = (APTR)OpenLibrary("intuition.library", 36)) &&
+         GETINTERFACE(IIntuition, IntuitionBase))
+      if((UtilityBase = (APTR)OpenLibrary("utility.library", 36)) &&
+         GETINTERFACE(IUtility, UtilityBase))
+      {
+        // we have to please the internal utilitybase
+        // pointers of libnix and clib2
+        #if !defined(__NEWLIB__)
+          __UtilityBase = (APTR)UtilityBase;
+          #if defined(__amigaos4__)
+          __IUtility = IUtility;
+          #endif
+        #endif
+
+        #if defined(DEBUG)
+        SetupDebug();
+        #endif
+
+        if((MUIMasterBase = OpenLibrary(MUIMASTER_NAME, MASTERVERSION)) &&
+           GETINTERFACE(IMUIMaster, MUIMasterBase))
+        {
+          #if defined(PRECLASSINIT)
+          if(PreClassInit())
+          #endif
+          {
+            #ifdef SUPERCLASS
+            ThisClass = MUI_CreateCustomClass(&base->lh_Library, SUPERCLASS, NULL, sizeof(struct INSTDATA), ENTRY(_Dispatcher));
+            if(ThisClass)
+            #endif
+            {
+              #ifdef SUPERCLASSP
+              if((ThisClassP = MUI_CreateCustomClass(&base->lh_Library, SUPERCLASSP, NULL, sizeof(struct INSTDATAP), ENTRY(_DispatcherP))))
+              #endif
+              {
+                #ifdef SUPERCLASS
+                #define THISCLASS ThisClass
+                #else
+                #define THISCLASS ThisClassP
+                #endif
+
+                // in case the user defined an own ClassInit()
+                // function we call it protected by a semaphore as
+                // this user may be stupid and break the Forbid() state
+                // of LibInit()
+                #if defined(CLASSINIT)
+                if(ClassInit(&base->lh_Library))
+                #endif
+                {
+                  // everything was successfully so lets
+                  // set the initialized value and contiue
+                  // with the class open phase
+                  base->lh_Segment = librarySegment;
+
+                  // make sure to swap our stack back before we
+                  // exit
+                  #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+                  StackSwap(stack);
+                  FreeMem(stack, sizeof(*stack) + MIN_STACKSIZE);
+                  #endif
+
+                  // unprotect
+                  ReleaseSemaphore(&base->lh_Semaphore);
+
+                  // return the library base as success
+                  return base;
+                }
+
+                // if we pass this point than an error
+                // occurred and we have to cleanup
+                #if defined(SUPERCLASSP)
+                MUI_DeleteCustomClass(ThisClassP);
+                ThisClassP = NULL;
+                #endif
+              }
+
+              #if defined(SUPERCLASS)
+              MUI_DeleteCustomClass(ThisClass);
+              ThisClass = NULL;
+              #endif
+            }
+          }
+
+          DROPINTERFACE(IMUIMaster);
+          CloseLibrary(MUIMasterBase);
+          MUIMasterBase = NULL;
+        }
+
+        DROPINTERFACE(IUtility);
+        CloseLibrary(UtilityBase);
+        UtilityBase = NULL;
+      }
+
+      if(IntuitionBase)
+      {
+        DROPINTERFACE(IIntuition);
+        CloseLibrary((struct Library *)IntuitionBase);
+        IntuitionBase = NULL;
+      }
+
+      if(GfxBase)
+      {
+        DROPINTERFACE(IGraphics);
+        CloseLibrary((struct Library *)GfxBase);
+        GfxBase = NULL;
+      }
+
+      if(DOSBase)
+      {
+        DROPINTERFACE(IDOS);
+        CloseLibrary((struct Library *)DOSBase);
+        DOSBase = NULL;
+      }
+
+      E(DBF_STARTUP, "ClassInit(%s) failed", CLASS);
+
+      // make sure to swap our stack back before we
+      // exit
+      #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+      StackSwap(stack);
+      FreeMem(stack, sizeof(*stack) + MIN_STACKSIZE);
+      #endif
+    }
+
+    // unprotect
+    ReleaseSemaphore(&base->lh_Semaphore);
+
+    #if defined(__amigaos4__) && defined(__NEWLIB__)
+    if(NewlibBase)
+    {
+      DROPINTERFACE(INewlib);
+      CloseLibrary(NewlibBase);
+      NewlibBase = NULL;
+    }
+    #endif
   }
 
   return(NULL);
@@ -548,18 +722,32 @@ static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
   }
   else
   {
+    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+    struct StackSwapStruct *stack;
+    #endif
+
     // remove the library base from exec's lib list in advance
     Remove((struct Node *)base);
 
-    // protect access to lh_Initialized
+    // protect
     ObtainSemaphore(&base->lh_Semaphore);
 
-    // check if the lib was already initialized
-    if(base->lh_Initialized)
+    // make sure we have enough stack here
+    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+    if((stack = AllocMem(sizeof(*stack)+MIN_STACKSIZE, MEMF_PUBLIC|MEMF_CLEAR)))
+    #endif
     {
+      // perform the StackSwap
+      #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+      stack->stk_Lower = (stack + sizeof(*stack));
+      stack->stk_Upper = (ULONG)stack->stk_Lower + MIN_STACKSIZE;
+      stack->stk_Pointer = (APTR)stack->stk_Upper;
+      StackSwap(stack);
+      #endif
+
       // in case the user specified that he has an own class
       // expunge function we call it right here, not caring about
-      // and return value.
+      // any return value.
       #if defined(CLASSEXPUNGE)
       ClassExpunge(&base->lh_Library);
       #endif
@@ -623,7 +811,12 @@ static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
         DOSBase = NULL;
       }
 
-      base->lh_Initialized = FALSE;
+      // make sure to swap our stack back before we
+      // exit
+      #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+      StackSwap(stack);
+      FreeMem(stack, sizeof(*stack) + MIN_STACKSIZE);
+      #endif
     }
 
     // release access to lh_Initialized
@@ -638,8 +831,7 @@ static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
     }
     #endif
 
-    // make sure the system delete's the library
-    // as well.
+    // make sure the system deletes the library as well.
     rc = base->lh_Segment;
     DeleteLibrary(&base->lh_Library);
   }
@@ -654,8 +846,6 @@ static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
 static struct LibraryHeader *LibOpen(struct LibraryManagerInterface *Self, ULONG version UNUSED)
 {
   struct LibraryHeader *base = (struct LibraryHeader *)Self->Data.LibBase;
-  struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
-
 #elif defined(__MORPHOS__)
 static struct LibraryHeader *LibOpen(void)
 {
@@ -684,156 +874,57 @@ static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base
   // delete the late expunge flag
   base->lh_Library.lib_Flags &= ~LIBF_DELEXP;
 
-  // protected initialized variable
-  ObtainSemaphore(&base->lh_Semaphore);
-
-  // in case this is the first call to LibOpen()
-  // we can do our main initialization here instead of doing it in LibInit()
-  // because of eventually occurring stack issues.
-  if(base->lh_Initialized == FALSE)
+  // check if the user defined a ClassOpen() function
+  #if defined(CLASSOPEN)
   {
-    // now that this library/class is going to be initialized for the first time
-    // we go and open all necessary libraries on our own
-    if((DOSBase = (APTR)OpenLibrary("dos.library", 36)) &&
-       GETINTERFACE(IDOS, DOSBase))
-    if((GfxBase = (APTR)OpenLibrary("graphics.library", 36)) &&
-       GETINTERFACE(IGraphics, GfxBase))
-    if((IntuitionBase = (APTR)OpenLibrary("intuition.library", 36)) &&
-       GETINTERFACE(IIntuition, IntuitionBase))
-    if((UtilityBase = (APTR)OpenLibrary("utility.library", 36)) &&
-       GETINTERFACE(IUtility, UtilityBase))
-    if((MUIMasterBase = OpenLibrary(MUIMASTER_NAME, MASTERVERSION)) &&
-       GETINTERFACE(IMUIMaster, MUIMasterBase))
-    {
-      // we have to please the internal utilitybase
-      // pointers of libnix and clib2
-      #if !defined(__NEWLIB__)
-        __UtilityBase = (APTR)UtilityBase;
-        #if defined(__amigaos4__)
-        __IUtility = IUtility;
-        #endif
-      #endif
+    struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
 
-      #if defined(DEBUG)
-      SetupDebug();
-      #endif
-
-      #if defined(PRECLASSINIT)
-      if(PreClassInit())
-      #endif
-      {
-        #ifdef SUPERCLASS
-        ThisClass = MUI_CreateCustomClass(&base->lh_Library, SUPERCLASS, NULL, sizeof(struct INSTDATA), ENTRY(_Dispatcher));
-        if(ThisClass)
-        #endif
-        {
-          #ifdef SUPERCLASSP
-          if((ThisClassP = MUI_CreateCustomClass(&base->lh_Library, SUPERCLASSP, NULL, sizeof(struct INSTDATAP), ENTRY(_DispatcherP))))
-          #endif
-          {
-            #ifdef SUPERCLASS
-            #define THISCLASS ThisClass
-            #else
-            #define THISCLASS ThisClassP
-            #endif
-
-            // in case the user defined an own ClassInit()
-            // function we call it protected by a semaphore as
-            // this user may be stupid and break the Forbid() state
-            // of LibInit()
-            #if defined(CLASSINIT)
-            if(ClassInit(&base->lh_Library))
-            #endif
-            {
-              // everything was successfully so lets
-              // set the initialized value and contiue
-              // with the class open phase
-              base->lh_Initialized = TRUE;
-              goto class_open;
-            }
-
-            // if we pass this point than an error
-            // occurred and we have to cleanup
-            #if defined(SUPERCLASSP)
-            MUI_DeleteCustomClass(ThisClassP);
-            ThisClassP = NULL;
-            #endif
-          }
-
-          #if defined(SUPERCLASS)
-          MUI_DeleteCustomClass(ThisClass);
-          ThisClass = NULL;
-          #endif
-        }
-      }
-    }
-
-    if(MUIMasterBase)
-    {
-      DROPINTERFACE(IMUIMaster);
-      CloseLibrary(MUIMasterBase);
-      MUIMasterBase = NULL;
-    }
-
-    if(UtilityBase)
-    {
-      DROPINTERFACE(IUtility);
-      CloseLibrary(UtilityBase);
-      UtilityBase = NULL;
-    }
-
-    if(IntuitionBase)
-    {
-      DROPINTERFACE(IIntuition);
-      CloseLibrary((struct Library *)IntuitionBase);
-      IntuitionBase = NULL;
-    }
-
-    if(GfxBase)
-    {
-      DROPINTERFACE(IGraphics);
-      CloseLibrary((struct Library *)GfxBase);
-      GfxBase = NULL;
-    }
-
-    if(DOSBase)
-    {
-      DROPINTERFACE(IDOS);
-      CloseLibrary((struct Library *)DOSBase);
-      DOSBase = NULL;
-    }
-
-    E(DBF_STARTUP, "ClassInit(%s) failed", CLASS);
-
-    // decrease the open counter again
-  	base->lh_Library.lib_OpenCnt--;
-  }
-  else
-  {
-
-class_open:
-
-    #if defined(CLASSOPEN)
-
-    // here we call the user-specific function for LibOpen() where
-    // he can do whatever he wants because of the semaphore protection.
-    if(ClassOpen(&base->lh_Library))
-      res = base;
-    else
-    {
-      E(DBF_STARTUP, "ClassOpen(%s) failed", CLASS);
-
-      // decrease the open counter again
-    	base->lh_Library.lib_OpenCnt--;
-    }
-
-    #else
-      res = base;
+    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+    struct StackSwapStruct *stack;
     #endif
-  }
 
-  // release the semaphore
-  ReleaseSemaphore(&base->lh_Semaphore);
+    // protect
+    ObtainSemaphore(&base->lh_Semaphore);
+
+    // make sure we have enough stack here
+    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+    if((stack = AllocMem(sizeof(*stack)+MIN_STACKSIZE, MEMF_PUBLIC|MEMF_CLEAR)))
+    #endif
+    {
+      // perform the StackSwap
+      #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+      stack->stk_Lower = (stack + sizeof(*stack));
+      stack->stk_Upper = (ULONG)stack->stk_Lower + MIN_STACKSIZE;
+      stack->stk_Pointer = (APTR)stack->stk_Upper;
+      StackSwap(stack);
+      #endif
+
+      // here we call the user-specific function for LibOpen() where
+      // he can do whatever he wants because of the semaphore protection.
+      if(ClassOpen(&base->lh_Library))
+        res = base;
+      else
+      {
+        E(DBF_STARTUP, "ClassOpen(%s) failed", CLASS);
+
+        // decrease the open counter again
+      	base->lh_Library.lib_OpenCnt--;
+      }
+
+      // make sure to swap our stack back before we
+      // exit
+      #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+      StackSwap(stack);
+      FreeMem(stack, sizeof(*stack) + MIN_STACKSIZE);
+      #endif
+    }
+
+    // release the semaphore
+    ReleaseSemaphore(&base->lh_Semaphore);
+  }
+  #else
+    res = base;
+  #endif
 
   return res;
 }
@@ -845,7 +936,6 @@ class_open:
 static BPTR LibClose(struct LibraryManagerInterface *Self)
 {
   struct LibraryHeader *base = (struct LibraryHeader *)Self->Data.LibBase;
-  struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
 #elif defined(__MORPHOS__)
 static BPTR LibClose(void)
 {
@@ -858,10 +948,45 @@ static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
 
   D(DBF_STARTUP, "LibClose(%s): %ld", CLASS, base->lh_Library.lib_OpenCnt);
 
+  // check if the user defined a ClassClose() function
   #if defined(CLASSCLOSE)
-  ObtainSemaphore(&base->lh_Semaphore);
-  ClassClose(&base->lh_Library);
-  ReleaseSemaphore(&base->lh_Semaphore);
+  {
+    struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
+
+    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+    struct StackSwapStruct *stack;
+    #endif
+
+    // protect
+    ObtainSemaphore(&base->lh_Semaphore);
+
+    // make sure we have enough stack here
+    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+    if((stack = AllocMem(sizeof(*stack)+MIN_STACKSIZE, MEMF_PUBLIC|MEMF_CLEAR)))
+    #endif
+    {
+      // perform the StackSwap
+      #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+      stack->stk_Lower = (stack + sizeof(*stack));
+      stack->stk_Upper = (ULONG)stack->stk_Lower + MIN_STACKSIZE;
+      stack->stk_Pointer = (APTR)stack->stk_Upper;
+      StackSwap(stack);
+      #endif
+
+      // call the users' ClassClose() function
+      ClassClose(&base->lh_Library);
+
+      // make sure to swap our stack back before we
+      // exit
+      #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
+      StackSwap(stack);
+      FreeMem(stack, sizeof(*stack) + MIN_STACKSIZE);
+      #endif
+    }
+
+    // release the semaphore
+    ReleaseSemaphore(&base->lh_Semaphore);
+  }
   #endif
 
   // decrease the open counter
