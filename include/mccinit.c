@@ -16,6 +16,8 @@
                      very latest idltool 52.7 produces as well.
   1.3   04.07.2007 : added MIN_STACKSIZE and all required StackSwap()
                      mechanisms to enforce a large enough stack.
+  1.4   04.07.2007 : put the StackSwapStruct structure on the stack to avoid
+                     crashes.
 
  About:
 
@@ -305,38 +307,38 @@ static LONG LIBFUNC LibNull(VOID)
 /* ------------------- OS4 Manager Interface ------------------------ */
 STATIC uint32 _manager_Obtain(struct LibraryManagerInterface *Self)
 {
-	uint32 res;
-	__asm__ __volatile__(
-	"1:	lwarx	%0,0,%1\n"
-	"addic	%0,%0,1\n"
-	"stwcx.	%0,0,%1\n"
-	"bne-	1b"
-	: "=&r" (res)
-	: "r" (&Self->Data.RefCount)
-	: "cc", "memory");
+  uint32 res;
+  __asm__ __volatile__(
+  "1: lwarx	  %0,0,%1\n"
+  "addic  %0,%0,1\n"
+  "stwcx. %0,0,%1\n"
+  "bne-	  1b"
+  : "=&r" (res)
+  : "r" (&Self->Data.RefCount)
+  : "cc", "memory");
 
-	return res;
+  return res;
 }
 
 STATIC uint32 _manager_Release(struct LibraryManagerInterface *Self)
 {
-	uint32 res;
-	__asm__ __volatile__(
-	"1:	lwarx	%0,0,%1\n"
-	"addic	%0,%0,-1\n"
-	"stwcx.	%0,0,%1\n"
-	"bne-	1b"
-	: "=&r" (res)
-	: "r" (&Self->Data.RefCount)
-	: "cc", "memory");
+  uint32 res;
+  __asm__ __volatile__(
+  "1: lwarx	  %0,0,%1\n"
+  "addic  %0,%0,-1\n"
+  "stwcx. %0,0,%1\n"
+  "bne-	  1b"
+  : "=&r" (res)
+  : "r" (&Self->Data.RefCount)
+  : "cc", "memory");
 
-	return res;
+  return res;
 }
 
 STATIC CONST APTR lib_manager_vectors[] =
 {
-	_manager_Obtain,
-	_manager_Release,
+  _manager_Obtain,
+  _manager_Release,
   NULL,
   NULL,
   LibOpen,
@@ -378,17 +380,17 @@ STATIC CONST APTR main_vectors[] =
 
 STATIC CONST struct TagItem mainTags[] =
 {
-	{ MIT_Name,         (Tag)"main" },
-	{ MIT_VectorTable,	(Tag)main_vectors	},
-	{ MIT_Version,      1 },
-	{ TAG_DONE,         0	}
+  { MIT_Name,         (Tag)"main" },
+  { MIT_VectorTable,  (Tag)main_vectors	  },
+  { MIT_Version,      1 },
+  { TAG_DONE,         0	  }
 };
 
 STATIC CONST CONST_APTR libInterfaces[] =
 {
-	lib_managerTags,
-	mainTags,
-	NULL
+  lib_managerTags,
+  mainTags,
+  NULL
 };
 
 // Our libraries always have to carry a 68k jump table with it, so
@@ -505,7 +507,7 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
   #endif
   {       
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-    struct StackSwapStruct *stack;
+    struct StackSwapStruct stack;
     #endif
 
     D(DBF_STARTUP, "LibInit(%s)", CLASS);
@@ -532,15 +534,14 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
     // do an explicit StackSwap() in case the user wants to make sure we
     // have enough stack for his user functions
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-    if((stack = AllocMem(sizeof(*stack)+MIN_STACKSIZE, MEMF_PUBLIC|MEMF_CLEAR)))
+    if((stack.stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
     #endif
     {
       // perform the StackSwap
       #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-      stack->stk_Lower = (stack + sizeof(*stack));
-      stack->stk_Upper = (ULONG)stack->stk_Lower + MIN_STACKSIZE;
-      stack->stk_Pointer = (APTR)stack->stk_Upper;
-      StackSwap(stack);
+      stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
+      stack.stk_Pointer = (APTR)stack.stk_Upper;
+      StackSwap(&stack);
       #endif
 
       // now that this library/class is going to be initialized for the first time
@@ -605,8 +606,8 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
                   // make sure to swap our stack back before we
                   // exit
                   #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-                  StackSwap(stack);
-                  FreeMem(stack, sizeof(*stack) + MIN_STACKSIZE);
+                  StackSwap(&stack);
+                  FreeVec(stack.stk_Lower);
                   #endif
 
                   // unprotect
@@ -667,8 +668,8 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
       // make sure to swap our stack back before we
       // exit
       #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-      StackSwap(stack);
-      FreeMem(stack, sizeof(*stack) + MIN_STACKSIZE);
+      StackSwap(&stack);
+      FreeVec(stack.stk_Lower);
       #endif
     }
 
@@ -723,7 +724,7 @@ static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
   else
   {
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-    struct StackSwapStruct *stack;
+    struct StackSwapStruct stack;
     #endif
 
     // remove the library base from exec's lib list in advance
@@ -734,15 +735,14 @@ static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
 
     // make sure we have enough stack here
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-    if((stack = AllocMem(sizeof(*stack)+MIN_STACKSIZE, MEMF_PUBLIC|MEMF_CLEAR)))
+    if((stack.stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
     #endif
     {
       // perform the StackSwap
       #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-      stack->stk_Lower = (stack + sizeof(*stack));
-      stack->stk_Upper = (ULONG)stack->stk_Lower + MIN_STACKSIZE;
-      stack->stk_Pointer = (APTR)stack->stk_Upper;
-      StackSwap(stack);
+      stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
+      stack.stk_Pointer = (APTR)stack.stk_Upper;
+      StackSwap(&stack);
       #endif
 
       // in case the user specified that he has an own class
@@ -814,8 +814,8 @@ static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
       // make sure to swap our stack back before we
       // exit
       #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-      StackSwap(stack);
-      FreeMem(stack, sizeof(*stack) + MIN_STACKSIZE);
+      StackSwap(&stack);
+      FreeVec(stack.stk_Lower);
       #endif
     }
 
@@ -880,7 +880,7 @@ static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base
     struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
 
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-    struct StackSwapStruct *stack;
+    struct StackSwapStruct stack;
     #endif
 
     // protect
@@ -888,15 +888,14 @@ static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base
 
     // make sure we have enough stack here
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-    if((stack = AllocMem(sizeof(*stack)+MIN_STACKSIZE, MEMF_PUBLIC|MEMF_CLEAR)))
+    if((stack.stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
     #endif
     {
       // perform the StackSwap
       #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-      stack->stk_Lower = (stack + sizeof(*stack));
-      stack->stk_Upper = (ULONG)stack->stk_Lower + MIN_STACKSIZE;
-      stack->stk_Pointer = (APTR)stack->stk_Upper;
-      StackSwap(stack);
+      stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
+      stack.stk_Pointer = (APTR)stack.stk_Upper;
+      StackSwap(&stack);
       #endif
 
       // here we call the user-specific function for LibOpen() where
@@ -914,8 +913,8 @@ static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base
       // make sure to swap our stack back before we
       // exit
       #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-      StackSwap(stack);
-      FreeMem(stack, sizeof(*stack) + MIN_STACKSIZE);
+      StackSwap(&stack);
+      FreeVec(stack.stk_Lower);
       #endif
     }
 
@@ -954,7 +953,7 @@ static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
     struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
 
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-    struct StackSwapStruct *stack;
+    struct StackSwapStruct stack;
     #endif
 
     // protect
@@ -962,15 +961,14 @@ static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
 
     // make sure we have enough stack here
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-    if((stack = AllocMem(sizeof(*stack)+MIN_STACKSIZE, MEMF_PUBLIC|MEMF_CLEAR)))
+    if((stack.stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
     #endif
     {
       // perform the StackSwap
       #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-      stack->stk_Lower = (stack + sizeof(*stack));
-      stack->stk_Upper = (ULONG)stack->stk_Lower + MIN_STACKSIZE;
-      stack->stk_Pointer = (APTR)stack->stk_Upper;
-      StackSwap(stack);
+      stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
+      stack.stk_Pointer = (APTR)stack.stk_Upper;
+      StackSwap(&stack);
       #endif
 
       // call the users' ClassClose() function
@@ -979,8 +977,8 @@ static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
       // make sure to swap our stack back before we
       // exit
       #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-      StackSwap(stack);
-      FreeMem(stack, sizeof(*stack) + MIN_STACKSIZE);
+      StackSwap(&stack);
+      FreeVec(stack.stk_Lower);
       #endif
     }
 
