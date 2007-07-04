@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-07-04  Thore Böckelmann <tboeckel@gmx.de>
+
+  * include/mccinit.c: put the StackSwapStruct structure on the stack to avoid
+    crashes.
+
 2007-07-04 Jens Langner <Jens.Langner@light-speed.de>
 
   * include/mccinit.c: updated to latest 1.3 version which introduces a stackswap
