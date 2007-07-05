@@ -1,7 +1,7 @@
 /*******************************************************************************
 
         Name:           mccinit.c
-        Versionstring:  $VER: mccinit.c 1.3 (04.07.2007)
+        Versionstring:  $VER: mccinit.c 1.4 (04.07.2007)
         Author:         Jens Langner <Jens.Langner@light-speed.de>
         Distribution:   PD (public domain)
         Description:    library init file for easy generation of a MUI
@@ -17,7 +17,7 @@
   1.3   04.07.2007 : added MIN_STACKSIZE and all required StackSwap()
                      mechanisms to enforce a large enough stack.
   1.4   04.07.2007 : put the StackSwapStruct structure on the stack to avoid
-                     crashes.
+                     crashes on OS3/MOS.
 
  About:
 
@@ -309,10 +309,10 @@ STATIC uint32 _manager_Obtain(struct LibraryManagerInterface *Self)
 {
   uint32 res;
   __asm__ __volatile__(
-  "1: lwarx	  %0,0,%1\n"
+  "1: lwarx %0,0,%1\n"
   "addic  %0,%0,1\n"
   "stwcx. %0,0,%1\n"
-  "bne-	  1b"
+  "bne- 1b"
   : "=&r" (res)
   : "r" (&Self->Data.RefCount)
   : "cc", "memory");
@@ -324,10 +324,10 @@ STATIC uint32 _manager_Release(struct LibraryManagerInterface *Self)
 {
   uint32 res;
   __asm__ __volatile__(
-  "1: lwarx	  %0,0,%1\n"
+  "1: lwarx %0,0,%1\n"
   "addic  %0,%0,-1\n"
   "stwcx. %0,0,%1\n"
-  "bne-	  1b"
+  "bne- 1b"
   : "=&r" (res)
   : "r" (&Self->Data.RefCount)
   : "cc", "memory");
@@ -381,9 +381,9 @@ STATIC CONST APTR main_vectors[] =
 STATIC CONST struct TagItem mainTags[] =
 {
   { MIT_Name,         (Tag)"main" },
-  { MIT_VectorTable,  (Tag)main_vectors	  },
+  { MIT_VectorTable,  (Tag)main_vectors },
   { MIT_Version,      1 },
-  { TAG_DONE,         0	  }
+  { TAG_DONE,         0 }
 };
 
 STATIC CONST CONST_APTR libInterfaces[] =
@@ -535,14 +535,12 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
     // have enough stack for his user functions
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
     if((stack.stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
-    #endif
     {
       // perform the StackSwap
-      #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
       stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
       stack.stk_Pointer = (APTR)stack.stk_Upper;
       StackSwap(&stack);
-      #endif
+    #endif
 
       // now that this library/class is going to be initialized for the first time
       // we go and open all necessary libraries on our own
@@ -665,13 +663,13 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
 
       E(DBF_STARTUP, "ClassInit(%s) failed", CLASS);
 
+    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
       // make sure to swap our stack back before we
       // exit
-      #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
       StackSwap(&stack);
       FreeVec(stack.stk_Lower);
-      #endif
     }
+    #endif
 
     // unprotect
     ReleaseSemaphore(&base->lh_Semaphore);
@@ -736,14 +734,12 @@ static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
     // make sure we have enough stack here
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
     if((stack.stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
-    #endif
     {
       // perform the StackSwap
-      #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
       stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
       stack.stk_Pointer = (APTR)stack.stk_Upper;
       StackSwap(&stack);
-      #endif
+    #endif
 
       // in case the user specified that he has an own class
       // expunge function we call it right here, not caring about
@@ -811,13 +807,13 @@ static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
         DOSBase = NULL;
       }
 
+    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
       // make sure to swap our stack back before we
       // exit
-      #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
       StackSwap(&stack);
       FreeVec(stack.stk_Lower);
-      #endif
     }
+    #endif
 
     // release access to lh_Initialized
     ReleaseSemaphore(&base->lh_Semaphore);
@@ -889,14 +885,12 @@ static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base
     // make sure we have enough stack here
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
     if((stack.stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
-    #endif
     {
       // perform the StackSwap
-      #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
       stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
       stack.stk_Pointer = (APTR)stack.stk_Upper;
       StackSwap(&stack);
-      #endif
+    #endif
 
       // here we call the user-specific function for LibOpen() where
       // he can do whatever he wants because of the semaphore protection.
@@ -907,16 +901,16 @@ static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base
         E(DBF_STARTUP, "ClassOpen(%s) failed", CLASS);
 
         // decrease the open counter again
-      	base->lh_Library.lib_OpenCnt--;
+        base->lh_Library.lib_OpenCnt--;
       }
 
+    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
       // make sure to swap our stack back before we
       // exit
-      #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
       StackSwap(&stack);
       FreeVec(stack.stk_Lower);
-      #endif
     }
+    #endif
 
     // release the semaphore
     ReleaseSemaphore(&base->lh_Semaphore);
@@ -962,25 +956,23 @@ static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
     // make sure we have enough stack here
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
     if((stack.stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
-    #endif
     {
       // perform the StackSwap
-      #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
       stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
       stack.stk_Pointer = (APTR)stack.stk_Upper;
       StackSwap(&stack);
-      #endif
+    #endif
 
       // call the users' ClassClose() function
       ClassClose(&base->lh_Library);
 
+    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
       // make sure to swap our stack back before we
       // exit
-      #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
       StackSwap(&stack);
       FreeVec(stack.stk_Lower);
-      #endif
     }
+    #endif
 
     // release the semaphore
     ReleaseSemaphore(&base->lh_Semaphore);
