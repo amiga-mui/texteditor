@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-07-18 Jens Langner <Jens.Langner@light-speed.de>
+
+  * include/mccinit.c: updated to latest 1.4 version which uses a new inline
+    assembler version for those platforms where a StackSwap() is required (e.g.
+    MorphOS/AmigaOS3).
+
 2007-07-04  Thore Böckelmann <tboeckel@gmx.de>
 
   * include/mccinit.c: put the StackSwapStruct structure on the stack to avoid
