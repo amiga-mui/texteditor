@@ -1,7 +1,7 @@
 /*******************************************************************************
 
         Name:           mccinit.c
-        Versionstring:  $VER: mccinit.c 1.4 (04.07.2007)
+        Versionstring:  $VER: mccinit.c 1.5 (18.07.2007)
         Author:         Jens Langner <Jens.Langner@light-speed.de>
         Distribution:   PD (public domain)
         Description:    library init file for easy generation of a MUI
@@ -18,6 +18,10 @@
                      mechanisms to enforce a large enough stack.
   1.4   04.07.2007 : put the StackSwapStruct structure on the stack to avoid
                      crashes on OS3/MOS.
+  1.5   18.07.2007 : added new inline assember stackswap_call() function which
+                     allows to call a function within a new stack frame
+                     initiated by StackSwap(). This should make the whole
+                     stack swapping mechanism more safe.
 
  About:
 
@@ -476,6 +480,302 @@ const USED_VAR ULONG __abox__ = 1;
 
 #endif /* __MORPHOS__ */
 
+/****************************************************************************/
+/* Stack enforcing function which allows to make sure that a function has   */
+/* enough stack space during its execution time                             */
+/****************************************************************************/
+
+#if !defined(__amigaos4__)
+
+/* generic StackSwap() function which calls function() surrounded by
+   StackSwap() calls */
+extern ULONG stackswap_call(struct StackSwapStruct *stack,
+                            ULONG (*function)(struct LibraryHeader *),
+                            struct LibraryHeader *arg);
+
+#if defined(__MORPHOS__)
+asm(".section	 \".text\"              \n\
+     .align 2                         \n\
+	   .globl stackswap_call            \n\
+	   .type  stackswap_call,@function  \n\
+   stackswap_call:                    \n\
+	   stwu 1,-32(1)                    \n\
+     mflr 0                           \n\
+     stmw 27,12(1)                    \n\
+	   stw 0,36(1)                      \n\
+     lwz 9,100(2)                     \n\
+     mr 27,3                          \n\
+     lis 28,SysBase@ha                \n\
+     li 3,-732                        \n\
+     lwz 0,SysBase@l(28)              \n\
+     mr 29,5                          \n\
+     mtlr 9                           \n\
+     mr 31,4                          \n\
+     stw 27,32(2)                     \n\
+     stw 0,56(2)                      \n\
+     blrl                             \n\
+     mr 3,29                          \n\
+     mtlr 31                          \n\
+     blrl                             \n\
+     lwz 9,100(2)                     \n\
+     mr 29,3                          \n\
+     li 3,-732                        \n\
+     lwz 0,SysBase@l(28)              \n\
+     mtlr 9                           \n\
+     stw 27,32(2)                     \n\
+     stw 0,56(2)                      \n\
+     blrl                             \n\
+     mr 3,29                          \n\
+     lwz 0,36(1)                      \n\
+     mtlr 0                           \n\
+     lmw 27,12(1)                     \n\
+     la 1,32(1)                       \n\
+     blr                              \n\
+     .size  stackswap_call, .-stackswap_call");
+#elif defined(__mc68000__)
+asm(".text                    \n\
+     .even                    \n\
+     .globl _stackswap_call   \n\
+   _stackswap_call:           \n\
+      moveml #0x3022,sp@-     \n\
+      movel sp@(20),d3        \n\
+      movel sp@(24),a2        \n\
+      movel sp@(28),d2        \n\
+      movel _SysBase,a6       \n\
+      movel d3,a0             \n\
+      jsr a6@(-732:W)         \n\
+      movel d2,sp@-           \n\
+      jbsr a2@                \n\
+      movel d0,d2             \n\
+      addql #4,sp             \n\
+      movel _SysBase,a6       \n\
+      movel d3,a0             \n\
+      jsr a6@(-732:W)         \n\
+      movel d2,d0             \n\
+      moveml sp@+,#0x440c     \n\
+      rts");
+#else
+ULONG stackswap_call(struct StackSwapStruct *stack,
+                     ULONG (*function)(struct LibraryHeader *),
+                     struct LibraryHeader *arg)
+{
+   register ULONG result;
+   StackSwap(stack);
+   result = function(arg);
+   StackSwap(stack);
+   return result;
+}
+#endif
+
+#endif
+
+/******************************************************************************/
+/* Wrapper functions to perform certain tasks in our LibInit/LibOpen etc.     */
+/******************************************************************************/
+
+/* open and init all necessary library and stuff in the LibInit() phase */
+static ULONG mccLibInit(struct LibraryHeader *base)
+{
+  // now that this library/class is going to be initialized for the first time
+  // we go and open all necessary libraries on our own
+  if((DOSBase = (APTR)OpenLibrary("dos.library", 36)) &&
+     GETINTERFACE(IDOS, DOSBase))
+  if((GfxBase = (APTR)OpenLibrary("graphics.library", 36)) &&
+     GETINTERFACE(IGraphics, GfxBase))
+  if((IntuitionBase = (APTR)OpenLibrary("intuition.library", 36)) &&
+     GETINTERFACE(IIntuition, IntuitionBase))
+  if((UtilityBase = (APTR)OpenLibrary("utility.library", 36)) &&
+     GETINTERFACE(IUtility, UtilityBase))
+  {
+    // we have to please the internal utilitybase
+    // pointers of libnix and clib2
+    #if !defined(__NEWLIB__)
+      __UtilityBase = (APTR)UtilityBase;
+      #if defined(__amigaos4__)
+      __IUtility = IUtility;
+      #endif
+    #endif
+
+    #if defined(DEBUG)
+    SetupDebug();
+    #endif
+
+    if((MUIMasterBase = OpenLibrary(MUIMASTER_NAME, MASTERVERSION)) &&
+       GETINTERFACE(IMUIMaster, MUIMasterBase))
+    {
+      #if defined(PRECLASSINIT)
+      if(PreClassInit())
+      #endif
+      {
+        #ifdef SUPERCLASS
+        ThisClass = MUI_CreateCustomClass(&base->lh_Library, SUPERCLASS, NULL, sizeof(struct INSTDATA), ENTRY(_Dispatcher));
+        if(ThisClass)
+        #endif
+        {
+          #ifdef SUPERCLASSP
+          if((ThisClassP = MUI_CreateCustomClass(&base->lh_Library, SUPERCLASSP, NULL, sizeof(struct INSTDATAP), ENTRY(_DispatcherP))))
+          #endif
+          {
+            #ifdef SUPERCLASS
+            #define THISCLASS ThisClass
+            #else
+            #define THISCLASS ThisClassP
+            #endif
+
+            // in case the user defined an own ClassInit()
+            // function we call it protected by a semaphore as
+            // this user may be stupid and break the Forbid() state
+            // of LibInit()
+            #if defined(CLASSINIT)
+            if(ClassInit(&base->lh_Library))
+            #endif
+            {
+              // everything was successfully so lets
+              // make sure we return TRUE
+              return TRUE;
+            }
+            else
+              E(DBF_STARTUP, "ClassInit(%s) failed", CLASS);
+
+            // if we pass this point than an error
+            // occurred and we have to cleanup
+            #if defined(SUPERCLASSP)
+            MUI_DeleteCustomClass(ThisClassP);
+            ThisClassP = NULL;
+            #endif
+          }
+
+          #if defined(SUPERCLASS)
+          MUI_DeleteCustomClass(ThisClass);
+          ThisClass = NULL;
+          #endif
+        }
+      }
+
+      DROPINTERFACE(IMUIMaster);
+      CloseLibrary(MUIMasterBase);
+      MUIMasterBase = NULL;
+    }
+
+    DROPINTERFACE(IUtility);
+    CloseLibrary(UtilityBase);
+    UtilityBase = NULL;
+  }
+
+  if(IntuitionBase)
+  {
+    DROPINTERFACE(IIntuition);
+    CloseLibrary((struct Library *)IntuitionBase);
+    IntuitionBase = NULL;
+  }
+
+  if(GfxBase)
+  {
+    DROPINTERFACE(IGraphics);
+    CloseLibrary((struct Library *)GfxBase);
+    GfxBase = NULL;
+  }
+
+  if(DOSBase)
+  {
+    DROPINTERFACE(IDOS);
+    CloseLibrary((struct Library *)DOSBase);
+    DOSBase = NULL;
+  }
+
+  E(DBF_STARTUP, "mccLibInit(%s) failed", CLASS);
+  return FALSE;
+}
+
+/* expunge everything we previously opened and call user definable functions */
+static ULONG mccLibExpunge(struct LibraryHeader *base)
+{
+  // in case the user specified that he has an own class
+  // expunge function we call it right here, not caring about
+  // any return value.
+  #if defined(CLASSEXPUNGE)
+  ClassExpunge(&base->lh_Library);
+  #endif
+
+  // now we remove our own stuff here step-by-step
+  #ifdef SUPERCLASSP
+  if(ThisClassP)
+  {
+    MUI_DeleteCustomClass(ThisClassP);
+    ThisClassP = NULL;
+  }
+  #endif
+
+  #ifdef SUPERCLASS
+  if(ThisClass)
+  {
+    MUI_DeleteCustomClass(ThisClass);
+    ThisClass = NULL;
+  }
+  #endif
+
+  // we inform the user that all main class expunge stuff
+  // is finished, if he want's to get informed.
+  #if defined(POSTCLASSEXPUNGE)
+  PostClassExpunge();
+  #endif
+
+  // cleanup the various library bases and such
+  if(MUIMasterBase)
+  {
+    DROPINTERFACE(IMUIMaster);
+    CloseLibrary(MUIMasterBase);
+    MUIMasterBase = NULL;
+  }
+
+  if(UtilityBase)
+  {
+    DROPINTERFACE(IUtility);
+    CloseLibrary(UtilityBase);
+    UtilityBase = NULL;
+  }
+
+  if(IntuitionBase)
+  {
+    DROPINTERFACE(IIntuition);
+    CloseLibrary((struct Library *)IntuitionBase);
+    IntuitionBase = NULL;
+  }
+
+  if(GfxBase)
+  {
+    DROPINTERFACE(IGraphics);
+    CloseLibrary((struct Library *)GfxBase);
+    GfxBase = NULL;
+  }
+
+  if(DOSBase)
+  {
+    DROPINTERFACE(IDOS);
+    CloseLibrary((struct Library *)DOSBase);
+    DOSBase = NULL;
+  }
+
+  return TRUE;
+}
+
+/* we call the user definable function here only */
+#if defined(CLASSOPEN)
+static ULONG mccLibOpen(struct LibraryHeader *base)
+{
+  return ClassOpen(&base->lh_Library);
+}
+#endif
+
+/* we call the user definable function here only */
+#if defined(CLASSCLOSE)
+static ULONG mccLibClose(struct LibraryHeader *base)
+{
+  ClassClose(&base->lh_Library);
+  return TRUE;
+}
+#endif
+
 /******************************************************************************/
 /* Standard Library Functions, all of them are called in Forbid() state.      */
 /******************************************************************************/
@@ -506,6 +806,7 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
      GETINTERFACE(INewlib, NewlibBase))
   #endif
   {       
+    BOOL success = FALSE;
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
     struct StackSwapStruct stack;
     #endif
@@ -539,140 +840,30 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
       // perform the StackSwap
       stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
       stack.stk_Pointer = (APTR)stack.stk_Upper;
-      StackSwap(&stack);
-    #endif
 
-      // now that this library/class is going to be initialized for the first time
-      // we go and open all necessary libraries on our own
-      if((DOSBase = (APTR)OpenLibrary("dos.library", 36)) &&
-         GETINTERFACE(IDOS, DOSBase))
-      if((GfxBase = (APTR)OpenLibrary("graphics.library", 36)) &&
-         GETINTERFACE(IGraphics, GfxBase))
-      if((IntuitionBase = (APTR)OpenLibrary("intuition.library", 36)) &&
-         GETINTERFACE(IIntuition, IntuitionBase))
-      if((UtilityBase = (APTR)OpenLibrary("utility.library", 36)) &&
-         GETINTERFACE(IUtility, UtilityBase))
-      {
-        // we have to please the internal utilitybase
-        // pointers of libnix and clib2
-        #if !defined(__NEWLIB__)
-          __UtilityBase = (APTR)UtilityBase;
-          #if defined(__amigaos4__)
-          __IUtility = IUtility;
-          #endif
-        #endif
+      // call mccLibInit() but with embedding it into a StackSwap()
+      success = stackswap_call(&stack, mccLibInit, base);
 
-        #if defined(DEBUG)
-        SetupDebug();
-        #endif
-
-        if((MUIMasterBase = OpenLibrary(MUIMASTER_NAME, MASTERVERSION)) &&
-           GETINTERFACE(IMUIMaster, MUIMasterBase))
-        {
-          #if defined(PRECLASSINIT)
-          if(PreClassInit())
-          #endif
-          {
-            #ifdef SUPERCLASS
-            ThisClass = MUI_CreateCustomClass(&base->lh_Library, SUPERCLASS, NULL, sizeof(struct INSTDATA), ENTRY(_Dispatcher));
-            if(ThisClass)
-            #endif
-            {
-              #ifdef SUPERCLASSP
-              if((ThisClassP = MUI_CreateCustomClass(&base->lh_Library, SUPERCLASSP, NULL, sizeof(struct INSTDATAP), ENTRY(_DispatcherP))))
-              #endif
-              {
-                #ifdef SUPERCLASS
-                #define THISCLASS ThisClass
-                #else
-                #define THISCLASS ThisClassP
-                #endif
-
-                // in case the user defined an own ClassInit()
-                // function we call it protected by a semaphore as
-                // this user may be stupid and break the Forbid() state
-                // of LibInit()
-                #if defined(CLASSINIT)
-                if(ClassInit(&base->lh_Library))
-                #endif
-                {
-                  // everything was successfully so lets
-                  // set the initialized value and contiue
-                  // with the class open phase
-                  base->lh_Segment = librarySegment;
-
-                  // make sure to swap our stack back before we
-                  // exit
-                  #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-                  StackSwap(&stack);
-                  FreeVec(stack.stk_Lower);
-                  #endif
-
-                  // unprotect
-                  ReleaseSemaphore(&base->lh_Semaphore);
-
-                  // return the library base as success
-                  return base;
-                }
-
-                // if we pass this point than an error
-                // occurred and we have to cleanup
-                #if defined(SUPERCLASSP)
-                MUI_DeleteCustomClass(ThisClassP);
-                ThisClassP = NULL;
-                #endif
-              }
-
-              #if defined(SUPERCLASS)
-              MUI_DeleteCustomClass(ThisClass);
-              ThisClass = NULL;
-              #endif
-            }
-          }
-
-          DROPINTERFACE(IMUIMaster);
-          CloseLibrary(MUIMasterBase);
-          MUIMasterBase = NULL;
-        }
-
-        DROPINTERFACE(IUtility);
-        CloseLibrary(UtilityBase);
-        UtilityBase = NULL;
-      }
-
-      if(IntuitionBase)
-      {
-        DROPINTERFACE(IIntuition);
-        CloseLibrary((struct Library *)IntuitionBase);
-        IntuitionBase = NULL;
-      }
-
-      if(GfxBase)
-      {
-        DROPINTERFACE(IGraphics);
-        CloseLibrary((struct Library *)GfxBase);
-        GfxBase = NULL;
-      }
-
-      if(DOSBase)
-      {
-        DROPINTERFACE(IDOS);
-        CloseLibrary((struct Library *)DOSBase);
-        DOSBase = NULL;
-      }
-
-      E(DBF_STARTUP, "ClassInit(%s) failed", CLASS);
-
-    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-      // make sure to swap our stack back before we
-      // exit
-      StackSwap(&stack);
       FreeVec(stack.stk_Lower);
     }
+    #else
+    success = mccLibInit(base);
     #endif
 
     // unprotect
     ReleaseSemaphore(&base->lh_Semaphore);
+
+    // check if everything worked out fine
+    if(success == TRUE)
+    {
+      // everything was successfully so lets
+      // set the initialized value and contiue
+      // with the class open phase
+      base->lh_Segment = librarySegment;
+
+      // return the library base as success
+      return base;
+    }
 
     #if defined(__amigaos4__) && defined(__NEWLIB__)
     if(NewlibBase)
@@ -738,81 +929,14 @@ static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
       // perform the StackSwap
       stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
       stack.stk_Pointer = (APTR)stack.stk_Upper;
-      StackSwap(&stack);
-    #endif
 
-      // in case the user specified that he has an own class
-      // expunge function we call it right here, not caring about
-      // any return value.
-      #if defined(CLASSEXPUNGE)
-      ClassExpunge(&base->lh_Library);
-      #endif
+      // call mccLibExpunge() but with embedding it into a StackSwap()
+      stackswap_call(&stack, mccLibExpunge, base);
 
-      // now we remove our own stuff here step-by-step
-      #ifdef SUPERCLASSP
-      if(ThisClassP)
-      {
-        MUI_DeleteCustomClass(ThisClassP);
-        ThisClassP = NULL;
-      }
-      #endif
-
-      #ifdef SUPERCLASS
-      if(ThisClass)
-      {
-        MUI_DeleteCustomClass(ThisClass);
-        ThisClass = NULL;
-      }
-      #endif
-
-      // we inform the user that all main class expunge stuff
-      // is finished, if he want's to get informed.
-      #if defined(POSTCLASSEXPUNGE)
-      PostClassExpunge();
-      #endif
-
-      // cleanup the various library bases and such
-      if(MUIMasterBase)
-      {
-        DROPINTERFACE(IMUIMaster);
-        CloseLibrary(MUIMasterBase);
-        MUIMasterBase = NULL;
-      }
-
-      if(UtilityBase)
-      {
-        DROPINTERFACE(IUtility);
-        CloseLibrary(UtilityBase);
-        UtilityBase = NULL;
-      }
-
-      if(IntuitionBase)
-      {
-        DROPINTERFACE(IIntuition);
-        CloseLibrary((struct Library *)IntuitionBase);
-        IntuitionBase = NULL;
-      }
-
-      if(GfxBase)
-      {
-        DROPINTERFACE(IGraphics);
-        CloseLibrary((struct Library *)GfxBase);
-        GfxBase = NULL;
-      }
-
-      if(DOSBase)
-      {
-        DROPINTERFACE(IDOS);
-        CloseLibrary((struct Library *)DOSBase);
-        DOSBase = NULL;
-      }
-
-    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-      // make sure to swap our stack back before we
-      // exit
-      StackSwap(&stack);
       FreeVec(stack.stk_Lower);
     }
+    #else
+    mccLibExpunge(base);
     #endif
 
     // release access to lh_Initialized
@@ -874,7 +998,7 @@ static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base
   #if defined(CLASSOPEN)
   {
     struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
-
+    BOOL success = FALSE;
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
     struct StackSwapStruct stack;
     #endif
@@ -889,28 +1013,27 @@ static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base
       // perform the StackSwap
       stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
       stack.stk_Pointer = (APTR)stack.stk_Upper;
-      StackSwap(&stack);
-    #endif
 
-      // here we call the user-specific function for LibOpen() where
-      // he can do whatever he wants because of the semaphore protection.
-      if(ClassOpen(&base->lh_Library))
-        res = base;
-      else
-      {
-        E(DBF_STARTUP, "ClassOpen(%s) failed", CLASS);
+      // call mccLibOpen() but with embedding it into a StackSwap()
+      success = stackswap_call(&stack, mccLibOpen, base);
 
-        // decrease the open counter again
-        base->lh_Library.lib_OpenCnt--;
-      }
-
-    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-      // make sure to swap our stack back before we
-      // exit
-      StackSwap(&stack);
       FreeVec(stack.stk_Lower);
     }
+    #else
+    success = mccLibOpen(base);
     #endif
+
+    // here we call the user-specific function for LibOpen() where
+    // he can do whatever he wants because of the semaphore protection.
+    if(success == TRUE)
+      res = base;
+    else
+    {
+      E(DBF_STARTUP, "ClassOpen(%s) failed", CLASS);
+
+      // decrease the open counter again
+      base->lh_Library.lib_OpenCnt--;
+    }
 
     // release the semaphore
     ReleaseSemaphore(&base->lh_Semaphore);
@@ -960,18 +1083,14 @@ static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
       // perform the StackSwap
       stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
       stack.stk_Pointer = (APTR)stack.stk_Upper;
-      StackSwap(&stack);
-    #endif
 
-      // call the users' ClassClose() function
-      ClassClose(&base->lh_Library);
+      // call mccLibClose() but with embedding it into a StackSwap()
+      stackswap_call(&stack, mccLibClose, base);
 
-    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-      // make sure to swap our stack back before we
-      // exit
-      StackSwap(&stack);
       FreeVec(stack.stk_Lower);
     }
+    #else
+    mccLibClose(base);
     #endif
 
     // release the semaphore
