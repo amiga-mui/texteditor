@@ -311,6 +311,7 @@ struct InstData
   BOOL            Smooth;
   UWORD           TabSize;
   ULONG           WrapBorder;
+  ULONG           WrapMode;
   APTR            undobuffer;
   APTR            undopointer;
   ULONG           undosize;
@@ -358,7 +359,7 @@ LONG  PrintLine   (LONG, struct line_node *, LONG, BOOL, struct InstData *);
 void  ClearLine   (char *, LONG, LONG, struct InstData *);
 void  ScrollUp    (LONG, LONG, struct InstData *);
 void  ScrollDown    (LONG, LONG, struct InstData *);
-void  SetCursor   (LONG, struct line_node *, long, struct InstData *);
+void  SetCursor   (LONG, struct line_node *, BOOL, struct InstData *);
 LONG  LineCharsWidth (char *, struct InstData *);
 ULONG FlowSpace   (UWORD, STRPTR, struct InstData *);
 long  ExpandLine    (struct line_node *, LONG, struct InstData *);

@@ -37,6 +37,7 @@ TextEditor.mcc/MUIA_TextEditor_TypeAndSpell
 TextEditor.mcc/MUIA_TextEditor_UndoAvailable
 TextEditor.mcc/MUIA_TextEditor_UndoLevels
 TextEditor.mcc/MUIA_TextEditor_WrapBorder
+TextEditor.mcc/MUIA_TextEditor_WrapMode
 TextEditor.mcc/MUIM_TextEditor_ARexxCmd
 TextEditor.mcc/MUIM_TextEditor_BlockInfo
 TextEditor.mcc/MUIM_TextEditor_ClearText
@@ -354,11 +355,20 @@ TextEditor.mcc/MUIM_TextEditor_Search
         MUIA_TextEditor_ExportWrap -- [ISG], ULONG
 
     FUNCTION
-        This attribute allows the built-in export hooks to perform wordwrap.
+        This attribute allows the built-in export hooks to perform hard
+        word wrapping while exporting text.
+
         Zero means no wrap (default value).
 
+    NOTE
+        Please note that MUIA_TextEditor_WrapMode doesn't have any effect
+        on the way the export function works. That means, setting
+        ExportWrap will always end up in hard word wrapping.
+
     SEE ALSO
-        MUIA_TextEditor_ExportHook, MUIA_TextEditor_WrapBorder
+        MUIA_TextEditor_ExportHook
+        MUIA_TextEditor_WrapBorder
+        MUIA_TextEditor_WrapMode
 
 TextEditor.mcc/MUIA_TextEditor_FixedFont
 
@@ -527,12 +537,21 @@ TextEditor.mcc/MUIM_TextEditor_Search
         MUIA_TextEditor_ImportWrap -- [ISG], ULONG
 
     FUNCTION
-        This is here to allow the built-in import hooks to perform wordwrap.
-        The built-in hooks accept a value between 4 and 1024.  Defaults to
-        1023.
+        This attribute allows the built-in import hooks to perform automatic
+        word wrapping when importing text.
+
+        The built-in hooks accept a value between 4 and 1024.
+        Default is 1023.
+
+    NOTE
+        Please note that MUIA_TextEditor_WrapMode doesn't have any effect
+        on the way the import function works. That means, setting
+        ImportWrap will always end up in hard word wrapping.
 
     SEE ALSO
-        MUIA_TextEditor_ImportHook, MUIA_TextEditor_WrapBorder
+        MUIA_TextEditor_ImportHook
+        MUIA_TextEditor_WrapBorder
+        MUIA_TextEditor_WrapMode
 
 TextEditor.mcc/MUIA_TextEditor_InsertMode
 
@@ -848,7 +867,8 @@ TextEditor.mcc/MUIM_TextEditor_Search
         the current number of undo levels will be returned.
 
     SEE ALSO
-        MUIA_TextEditor_UndoAvailable, MUIA_TextEditor_RedoAvailable
+        MUIA_TextEditor_UndoAvailable
+        MUIA_TextEditor_RedoAvailable
 
 TextEditor.mcc/MUIA_TextEditor_WrapBorder
 
@@ -856,14 +876,76 @@ TextEditor.mcc/MUIM_TextEditor_Search
         MUIA_TextEditor_WrapBorder -- [ISG], ULONG
 
     FUNCTION
-        The gadget will insert a line break in front of the current word
-        if the cursor goes beyond the column given here.
+        This attribute allows to define the number of characters in texteditor
+        at which text should be wrapped to the next line (i.e. 'autowrap').
 
-        Please remember that the gadget does real time wordwrap, which is
-        much better! This tag is only for special cases!!!
+        However, the way wrapping is done depends on the actual 'WrapMode'
+        that was specified by MUIA_TextEditor_WrapMode.
+
+        Per default the WrapBorder is set to 0 which in fact disables the
+        wrapping and depending on the set WrapMode, wrapping will either be
+        completly ignored or wrapping will be done at the window limits,
+        which is the default.
 
     SEE ALSO
-        MUIA_TextEditor_ExportWrap, MUIA_TextEditor_ImportWrap
+        MUIA_TextEditro_WrapMode
+        MUIA_TextEditor_ExportWrap
+        MUIA_TextEditor_ImportWrap
+
+TextEditor.mcc/MUIA_TextEditor_WrapMode
+
+    NAME
+        MUIA_TextEditor_WrapMode -- [ISG], ULONG
+
+    FUNCTION
+        With this attribute, the way text wrapping is performed can be directly
+        controlled if MUIA_TextEditor_WrapBorder was set > 0. There are two
+        major ways of how wrapping can be performed. 'soft wrapping' and
+        'hard wrapping'. Whereas soft wrapping refers to the process where lines
+        will just be graphically wrapped to the next line, but are still be
+        considered a single line. Hard wrapping in turn immediately inserts a
+        newline character as soon as the cursor passed the specified amount of
+        characters in one line and therefore seperate them in a 'hard' direct
+        way.
+
+    INPUTS
+        One of the following values:
+
+          MUIV_TextEditor_WrapMode_NoWrap
+            Wrapping is completly disabled, setting WrapBorder > 0 will
+            have no effect. That means, the window will have to be resizes
+            by the user to e.g. see or edit all text.
+
+          MUIV_TextEditor_WrapMode_SoftWrap
+            Enables soft wrapping of lines if WrapBorder > 0. That means,
+            lines are being wrapped at the specified border in a way that
+            they are still logically one line. This allows to e.g. dynamically
+            reconcatenate lines. This should be considered the new preferred
+            setting for new/revised applications. If WrapBorder == 0, soft
+            wrapping will be performed at the current window limits.
+
+          MUIV_TextEditor_WrapMode_HardWrap (default)
+            Enables hard wrapping of lines if WrapBorder > 0. That means,
+            lines are being wrapped at the specified border by directly
+            inserting newline characters as soon as the cursor passes the
+            specified border. While this mode is the default, due to
+            historical reasons, it doesn't allow to directly reconcatenate
+            lines if the user e.g. removes characters. If WrapBorder == 0,
+            soft wrapping will be performed at the current window limits.
+
+    NOTE
+        Due to historical reasons the default is to hard wrap a line if the
+        WrapBorder attribute is set > 0 and WrapMode is kept untouched.
+        However, for new applications, soft wrapping should be considered the
+        preferred setting as this mode is more intuitive and allows users of
+        texteditor to directly concatenate lines if they e.g. remove
+        characters while they are writing.
+
+    SEE ALSO
+        MUIA_TextEditro_WrapBorder
+        MUIA_TextEditor_ExportWrap
+        MUIA_TextEditor_ImportWrap
+
 
 TextEditor.mcc/MUIM_TextEditor_ARexxCmd
 

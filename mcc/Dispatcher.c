@@ -141,6 +141,8 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
             data->update = TRUE;
             data->ImportHook = &ImPlainHook;
             data->ImportWrap = 1023;
+            data->WrapBorder = 0;
+            data->WrapMode = MUIV_TextEditor_WrapMode_HardWrap;
 
             data->ExportHook = &ExportHookPlain;
             data->flags |= FLG_AutoClip;

@@ -5,6 +5,21 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-07-22 Jens Langner <Jens.Langner@light-speed.de>
+
+  * misc: added new MUIA_TextEditor_WrapMode attribute which can now be set to
+    either NoWrap, SoftWrap or HardWrap to set the wanted word wrapping mode. Whereas
+    HardWrap is the default as in previous versions, SoftWrap should be considered
+    the new setting that should be used in new and revised applications as it allows
+    to set the number of characters at which the texteditor will soft wrap word, but
+    keep them logically together. This allows to easily concatenate lines by just
+    e.g. removing characters again. NoWrap, in contrast, will completly disable word
+    wrapping and will require a user to enlarge the gadget himself to fit the text as
+    currently TextEditor.mcc can't scroll horizontal.
+  * MixedFunctions.c: when the gadgets is in inactive/unactivated state, the cursor
+    will be drawn by just its outline to make it easier to identify where it last
+    resisted when the gadget is being activated again.
+
 2007-07-18 Jens Langner <Jens.Langner@light-speed.de>
 
   * include/mccinit.c: updated to latest 1.4 version which uses a new inline

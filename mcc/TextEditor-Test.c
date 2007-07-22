@@ -219,9 +219,11 @@ int main(void)
       {
           Object *app, *window, *clear, *cut, *copy, *paste, *erase,
                  *bold, *italic, *underline, *ischanged, *undo, *redo, *string,
-                 *xslider, *yslider, *flow, *search, *replace;
+                 *xslider, *yslider, *flow, *search, *replace, *wrapmode, *wrapborder;
           const char *flow_text[] = { "Left", "Center", "Right", NULL };
+          const char *wrap_modes[] = { "NoWrap", "SoftWrap", "HardWrap", NULL };
           const char *classes[] = { "TextEditor.mcc", NULL };
+          int wrap_border = 80;
 
         mcc = MUI_CreateCustomClass(NULL, "Area.mui", NULL, sizeof(struct InstData), ENTRY(_Dispatcher));
 
@@ -289,6 +291,8 @@ int main(void)
 
                       Child, ischanged = MUI_MakeObject(MUIO_Checkmark, "Is changed?"),
                       Child, flow = MUI_MakeObject(MUIO_Cycle, NULL, flow_text),
+                      Child, wrapmode = MUI_MakeObject(MUIO_Cycle, NULL, wrap_modes),
+                      Child, wrapborder = MUI_MakeObject(MUIO_Slider, NULL, 0, 1000),
 
                     End,
 
@@ -335,12 +339,12 @@ int main(void)
                                   MUIA_TextEditor_DoubleClickHook, &URLHook,
 //                                MUIA_TextEditor_HorizontalScroll, TRUE,
 //                                MUIA_TextEditor_ImportWrap, 1023,
-                                  MUIA_TextEditor_WrapBorder, 80,
-//                                  MUIA_TextEditor_ExportWrap, 80,
+                                  MUIA_TextEditor_WrapBorder, wrap_border,
+//                                MUIA_TextEditor_ExportWrap, 80,
+
                                 MUIA_TextEditor_ExportHook, MUIV_TextEditor_ExportHook_NoStyle,
 //                                MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_EMail,
                                   MUIA_CycleChain,    TRUE,
-//                                MUIA_TextEditor_WrapBorder, 80,
 //                                MUIA_TextEditor_ReadOnly, TRUE,
 //                                MUIA_TextEditor_InVirtualGroup, TRUE,
 //                                MUIA_Disabled, TRUE,
@@ -462,6 +466,8 @@ int main(void)
           DoMethod(window, MUIM_Notify, MUIA_Window_CloseRequest, TRUE, app, 2, MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit);
 
           DoMethod(flow, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_Flow, MUIV_TriggerValue);
+          DoMethod(wrapmode, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_WrapMode, MUIV_TriggerValue);
+          DoMethod(wrapborder, MUIM_Notify, MUIA_Numeric_Value, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_WrapBorder, MUIV_TriggerValue);
           DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_Flow, MUIV_EveryTime, flow, 3, MUIM_NoNotifySet, MUIA_Cycle_Active, MUIV_TriggerValue);
 
           DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_CursorX, MUIV_EveryTime, xslider, 3, MUIM_NoNotifySet, MUIA_Numeric_Value, MUIV_TriggerValue);
@@ -505,6 +511,8 @@ int main(void)
 
           set(window, MUIA_Window_ActiveObject, editorgad);
           set(window, MUIA_Window_Open, TRUE);
+          set(wrapmode, MUIA_Cycle_Active, MUIV_TextEditor_WrapMode_HardWrap);
+          set(wrapborder, MUIA_Numeric_Value, wrap_border);
 
 /*          {
             ULONG delta = xget(editorgad, MUIA_TextEditor_Prop_DeltaFactor);
