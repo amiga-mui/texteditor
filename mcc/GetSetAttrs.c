@@ -167,9 +167,15 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
     case MUIA_TextEditor_TypeAndSpell:
       ti_Data = data->TypeAndSpell;
       break;
+
     case MUIA_TextEditor_WrapBorder:
       ti_Data = data->WrapBorder;
-      break;
+    break;
+
+    case MUIA_TextEditor_WrapMode:
+      ti_Data = data->WrapMode;
+    break;
+
     case MUIA_Font:
       ti_Data = (ULONG)data->font;
       break;
@@ -598,9 +604,27 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
           data->HasChanged = TRUE;
         }
         break;
+
       case MUIA_TextEditor_WrapBorder:
-        data->WrapBorder = ti_Data;
-        break;
+      {
+        if(data->WrapBorder != ti_Data)
+        {
+          data->WrapBorder = ti_Data;
+          ResetDisplay(data);
+        }
+      }
+      break;
+
+      case MUIA_TextEditor_WrapMode:
+      {
+        if(data->WrapMode != ti_Data)
+        {
+          data->WrapMode = ti_Data;
+          ResetDisplay(data);
+        }
+      }
+      break;
+
       case MUIA_TextEditor_TypeAndSpell:
         data->TypeAndSpell = ti_Data;
         break;

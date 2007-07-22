@@ -186,8 +186,10 @@ LONG LineCharsWidth(char *text, struct InstData *data)
 
   textlen = strlen(text)-1; // the last char is always a "\n"
 
-  // check the innerwidth as well.
-  if(w > 0 && textlen > 0)
+  // check the innerwidth as well. But we also check if we need to
+  // take care of any of the word wrapping techniques we provide
+  if(w > 0 && textlen > 0 &&
+     data->WrapMode != MUIV_TextEditor_WrapMode_NoWrap)
   {
     struct TextExtent tExtend;
     ULONG fontheight = data->font ? data->font->tf_YSize : 0;
@@ -203,8 +205,14 @@ LONG LineCharsWidth(char *text, struct InstData *data)
       c = TextFit(&data->tmprp, text, textlen, &tExtend, NULL, 1, w, fontheight);
     }
 
+    // if the user selected soft wrapping with a defined wrapborder
+    // we have to check if we take that border or do the soft wrapping
+    // at the innerwidth of the texteditor
+    if(data->WrapBorder > 0 && (ULONG)c > data->WrapBorder && data->WrapMode == MUIV_TextEditor_WrapMode_SoftWrap)
+      c = data->WrapBorder;
+
     // now we check wheter all chars fit on the current innerwidth
-    // or if we have to do word wrapping by searching for the last
+    // or if we have to do soft word wrapping by searching for the last
     // occurance of a linear white space character
     if(c < textlen)
     {
@@ -335,7 +343,7 @@ void OffsetToLines(LONG x, struct line_node *line, struct pos_info *pos, struct 
 /*------------------*
  * Place the cursor *
  *------------------*/
-void SetCursor(LONG x, struct line_node *line, long Set, struct InstData *data)
+void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
 {
   unsigned char chars[4] = "   \0";
   LONG   line_nr;
@@ -389,263 +397,105 @@ void SetCursor(LONG x, struct line_node *line, long Set, struct InstData *data)
     yplace  = data->ypos + (data->height * (line_nr + pos.lines - 1));
     cursorxplace = xplace + TextLength(&data->tmprp, line->line.Contents+(x+start), 0-start);
 
-    // if font is anti aliased, clear area near the cursor first
-    if(IS_ANTIALIASED(data->font))
-    {
-      DoMethod(data->object, MUIM_DrawBackground, xplace, yplace,
-                                                  TextLength(&data->tmprp, start == 0 ? (STRPTR)chars+1 : (STRPTR)chars, stop-start+1), data->height,
-                                                  cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0),
-                                                  ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2),
-                                                  0);
-    }
+    //D(DBF_STARTUP, "xplace: %ld, yplace: %ld cplace: %ld, innerwidth: %ld width: %ld %ld", xplace, yplace, cursorxplace, data->innerwidth, _width(data->object), data->xpos);
 
-    if(Set)
+    if(xplace < (ULONG)(data->xpos+data->innerwidth))
     {
-      SetAPen(data->rport, data->cursorcolor);
-      SetDrMd(data->rport, JAM2);
-      RectFill(data->rport, cursorxplace, yplace, cursorxplace+cursor_width-1, yplace+data->height-1);
-    }
-    else
-    {
-      // Clear the place of the cursor in case we are using NO anti-aliased font
-      if(IS_ANTIALIASED(data->font) == FALSE)
+      // if font is anti aliased, clear area near the cursor first
+      if(IS_ANTIALIASED(data->font))
       {
-        DoMethod(data->object, MUIM_DrawBackground, cursorxplace, yplace,
-                                                    cursor_width, data->height,
+        DoMethod(data->object, MUIM_DrawBackground, xplace, yplace,
+                                                    TextLength(&data->tmprp, start == 0 ? (STRPTR)chars+1 : (STRPTR)chars, stop-start+1), data->height,
                                                     cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0),
                                                     ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2),
                                                     0);
       }
-    }
 
-    SetDrMd(data->rport, JAM1);
-    SetFont(data->rport, data->font);
-    Move(data->rport, xplace, yplace+data->rport->TxBaseline);
-
-    if((data->font->tf_Flags & FPF_PROPORTIONAL) &&
-       ((LONG)(xplace + *((short *)data->font->tf_CharKern-data->font->tf_LoChar+chars[1+start])) < data->xpos))
-    {
-      clipping = TRUE;
-      AddClipping(data);
-    }
-
-    for(c = start; c <= stop; c++)
-    {
-      SetAPen(data->rport, ConvertPen(colors[1+c], line->line.Color, data));
-      SetSoftStyle(data->rport, styles[1+c], ~0);
-      Text(data->rport, (STRPTR)&chars[1+c], 1);
-    }
-
-    /* This is really bad code!!! */
-    if(line->line.Separator)
-    {
-      WORD LeftX, LeftWidth;
-      WORD RightX, RightWidth;
-      WORD Y, Height;
-      UWORD flow = FlowSpace(line->line.Flow, line->line.Contents+pos.bytes, data);
-
-      LeftX = data->xpos;
-      LeftWidth = flow-3;
-      RightX = data->xpos + flow + TextLength(&data->tmprp, line->line.Contents+pos.bytes, pos.extra-pos.bytes-1) + 3;
-      RightWidth = data->xpos+data->innerwidth - RightX;
-      Y = yplace;
-      Height = (line->line.Separator & LNSF_Thick) ? 2 : 1;
-
-      if(line->line.Separator & LNSF_Middle)
-        Y += (data->height/2)-Height;
-      else
+      if(Set || ((data->flags & FLG_Active) == 0 && (data->flags & FLG_Activated) == 0))
       {
-        if(line->line.Separator & LNSF_Bottom)
-          Y += data->height-(2*Height);
-      }
+        SetAPen(data->rport, data->cursorcolor);
+        SetDrMd(data->rport, JAM2);
+        RectFill(data->rport, cursorxplace, yplace, cursorxplace+cursor_width-1, yplace+data->height-1);
 
-      if(line->line.Separator & LNSF_StrikeThru || line->line.Length == 1)
-      {
-        LeftWidth = data->innerwidth;
+        // if the gadget is in inactive state we just draw a skeleton cursor instead
+        if((data->flags & FLG_Active) == 0 && (data->flags & FLG_Activated) == 0)
+        {
+          DoMethod(data->object, MUIM_DrawBackground, cursorxplace+1, yplace+1,
+                                                      cursor_width-2, data->height-2,
+                                                      cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0),
+                                                      ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2),
+                                                      0);
+        }
       }
       else
       {
-        DrawSeparator(data->rport, RightX, Y, RightWidth, Height, data);
+        // Clear the place of the cursor in case we are using NO anti-aliased font
+        if(IS_ANTIALIASED(data->font) == FALSE)
+        {
+          DoMethod(data->object, MUIM_DrawBackground, cursorxplace, yplace,
+                                                      cursor_width, data->height,
+                                                      cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0),
+                                                      ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2),
+                                                      0);
+        }
       }
-      DrawSeparator(data->rport, LeftX, Y, LeftWidth, Height, data);
-    }
 
-    if(clipping)
-    {
-      RemoveClipping(data);
-    }
-  }
-
-/*  {
-      struct line_node *oldline = data->actualline;
-
-    data->actualline = Set ? oldline : NULL;
-    PrintLine(pos.bytes, line, line_nr+pos.lines, TRUE, data);
-    data->actualline = oldline;
-  }
-*/
-/*  if(Set)
-  {
-      UBYTE cursor_char;
-      BOOL  clipping = FALSE;
-      BOOL  slowcrsr = FALSE;
-      APTR  frontlayer = muiRenderInfo(data->object)->mri_Window->WLayer->front;
-
-    if(frontlayer || (muiRenderInfo(data->object)->mri_Flags & MUIMRI_TRUECOLOR))
-      slowcrsr = TRUE;
-
-    if(data->cursor_width || (!data->update))
-      return;
-
-    SetDrMd(data->rport, JAM2);
-    xplace = data->xpos + TextLength(&data->tmprp, line->line.Contents+(x-pos.x), pos.x);
-    yplace = data->ypos + (data->height * (line_nr + pos.lines - 1));
-
-    if(data->CursorWidth == 6)
-    {
-        long  style = convert(GetStyle(x, line));
-        short space;
-
-      if(*(line->line.Contents+x) == '\n')
-          cursor_char = ' ';
-      else  cursor_char = *(line->line.Contents+x);
-
+      SetDrMd(data->rport, JAM1);
       SetFont(data->rport, data->font);
       Move(data->rport, xplace, yplace+data->rport->TxBaseline);
 
-      data->cursor_width = TextLength(&data->tmprp, &cursor_char, 1);
-      if(data->font->tf_Flags & FPF_PROPORTIONAL)
+      if((data->font->tf_Flags & FPF_PROPORTIONAL) &&
+         ((LONG)(xplace + *((short *)data->font->tf_CharKern-data->font->tf_LoChar+chars[1+start])) < data->xpos))
       {
-        space = *((short *)data->font->tf_CharLoc-data->font->tf_LoChar+(cursor_char*2)+1);
-        if(space > data->cursor_width)
-          data->cursor_width = space;
-
-        if(*((short *)data->font->tf_CharKern - data->font->tf_LoChar + cursor_char) < 0)
-        {
-          xplace += *((short *)data->font->tf_CharKern-data->font->tf_LoChar+cursor_char);
-          data->cursor_width -= *((short *)data->font->tf_CharKern-data->font->tf_LoChar+cursor_char);
-        }
-      }
-      if(style & ITALIC)
-      {
-        xplace -= (data->height-data->rport->TxBaseline+1)>>1;
-        data->cursor_width += (data->height+1)>>1;
-      }
-      if(style & BOLD)
-        data->cursor_width += 1;
-
-      data->cursor_width += 3;
-
-      if(xplace < data->xpos)
-      {
-        xplace = data->xpos;
-        AddClipping(data);
         clipping = TRUE;
+        AddClipping(data);
       }
-      data->cursor_xpos = xplace-data->xpos;
-      data->cursor_ypos = yplace-data->ypos;
 
-      if(xplace+data->cursor_width > data->xpos+data->innerwidth)
+      for(c = start; c <= stop; c++)
       {
-        data->cursor_width = data->xpos+data->innerwidth - xplace;
-        if(clipping)
+        SetAPen(data->rport, ConvertPen(colors[1+c], line->line.Color, data));
+        SetSoftStyle(data->rport, styles[1+c], ~0);
+        Text(data->rport, (STRPTR)&chars[1+c], 1);
+      }
+
+      /* This is really bad code!!! */
+      if(line->line.Separator)
+      {
+        WORD LeftX, LeftWidth;
+        WORD RightX, RightWidth;
+        WORD Y, Height;
+        UWORD flow = FlowSpace(line->line.Flow, line->line.Contents+pos.bytes, data);
+
+        LeftX = data->xpos;
+        LeftWidth = flow-3;
+        RightX = data->xpos + flow + TextLength(&data->tmprp, line->line.Contents+pos.bytes, pos.extra-pos.bytes-1) + 3;
+        RightWidth = data->xpos+data->innerwidth - RightX;
+        Y = yplace;
+        Height = (line->line.Separator & LNSF_Thick) ? 2 : 1;
+
+        if(line->line.Separator & LNSF_Middle)
+          Y += (data->height/2)-Height;
+        else
         {
-          DisplayBeep(NULL);
+          if(line->line.Separator & LNSF_Bottom)
+            Y += data->height-(2*Height);
+        }
+
+        if(line->line.Separator & LNSF_StrikeThru || line->line.Length == 1)
+        {
+          LeftWidth = data->innerwidth;
         }
         else
         {
-          AddClipping(data);
-          clipping = TRUE;
+          DrawSeparator(data->rport, RightX, Y, RightWidth, Height, data);
         }
+        DrawSeparator(data->rport, LeftX, Y, LeftWidth, Height, data);
       }
-
-      if(slowcrsr)
-      {
-          struct RastPort tmprp = *(data->rport);
-
-        tmprp.Layer = NULL;
-        if(tmprp.BitMap = AllocBitMap(data->cursor_allocatedwidth, 1, data->rport->BitMap->Depth, 0L, NULL))
-        {
-          if(data->cursor_width > data->cursor_allocatedwidth)
-          {
-            DisplayBeep(NULL);
-            data->cursor_width = data->cursor_allocatedwidth;
-          }
-          ReadPixelArray8(data->rport, xplace, yplace, xplace+data->cursor_width-1, yplace+data->height-1, (char *)data->cursor_bm, &tmprp);
-          FreeBitMap(tmprp.BitMap);
-        }
-        data->flags &= ~FLG_FastCursor;
-      }
-      else
-      {
-        BltBitMap(data->rport->BitMap, xplace+data->rport->Layer->bounds.MinX, yplace+data->rport->Layer->bounds.MinY, data->cursor_fastbm, 0, 0, data->cursor_width, data->height, 0x0C0, 0xff, NULL);
-        data->flags |= FLG_FastCursor;
-      }
-      SetAPen(data->rport, data->cursortextcolor);
-      SetBPen(data->rport, data->cursorcolor);
-      SetSoftStyle(data->rport, style, ~0);
-      Text(data->rport, &cursor_char, 1);
 
       if(clipping)
         RemoveClipping(data);
-      SetBPen(data->rport, data->backgroundcolor);
-    }
-    else
-    {
-      data->cursor_xpos = xplace-data->xpos;
-      data->cursor_ypos = yplace-data->ypos;
-      data->cursor_width = data->CursorWidth;
-
-      if(slowcrsr)
-      {
-          struct RastPort tmprp = *(data->rport);
-
-        tmprp.Layer = NULL;
-        if(tmprp.BitMap = AllocBitMap(data->cursor_allocatedwidth, 1, data->rport->BitMap->Depth, 0L, NULL))
-        {
-          if(data->cursor_width > data->cursor_allocatedwidth)
-          {
-            DisplayBeep(NULL);
-            data->cursor_width = data->cursor_allocatedwidth;
-          }
-          ReadPixelArray8(data->rport, xplace, yplace, xplace+data->cursor_width-1, yplace+data->height-1, (char *)data->cursor_bm, &tmprp);
-          FreeBitMap(tmprp.BitMap);
-        }
-        data->flags &= ~FLG_FastCursor;
-      }
-      else
-      {
-        BltBitMap(data->rport->BitMap, xplace+data->rport->Layer->bounds.MinX, yplace+data->rport->Layer->bounds.MinY, data->cursor_fastbm, 0, 0, data->CursorWidth, data->height, 0x0C0, 0xff, NULL);
-        data->flags |= FLG_FastCursor;
-      }
-
-      SetAPen(data->rport, data->cursorcolor);
-      RectFill(data->rport, xplace, yplace, xplace+data->CursorWidth-1, yplace+data->height-1);
     }
   }
-  else
-  {
-    if(data->cursor_width)
-    {
-
-      if(data->flags & FLG_FastCursor)
-      {
-        BltBitMapRastPort(data->cursor_fastbm, 0, 0, data->rport, data->cursor_xpos+data->xpos, data->cursor_ypos+data->ypos, data->cursor_width, data->height, 0x0C0);
-      }
-      else
-      {
-          struct RastPort tmprp = *(data->rport);
-
-        tmprp.Layer = NULL;
-        if(tmprp.BitMap = AllocBitMap(data->cursor_allocatedwidth, 1, data->rport->BitMap->Depth, 0L, NULL))
-        {
-          WritePixelArray8(data->rport, data->cursor_xpos+data->xpos, data->cursor_ypos+data->ypos, data->cursor_xpos+data->xpos+data->cursor_width-1, data->cursor_ypos+data->ypos+data->height-1, (char *)data->cursor_bm, &tmprp);
-          FreeBitMap(tmprp.BitMap);
-        }
-      }
-      data->cursor_width = 0;
-    }
-  }*/
 
   LEAVE();
 }

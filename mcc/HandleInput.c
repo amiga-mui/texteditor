@@ -733,10 +733,11 @@ void Key_Normal(UBYTE key, struct InstData *data)
   AddToUndoBuffer(pastechar, NULL, data);
   PasteChars(data->CPos_X++, data->actualline, 1, (char *)&key, NULL, data);
 
-  // check if the user selected the texteditor to do an automatic word
-  // wrapping during writing text and if so we go and perform the word
+  // check if the user selected the texteditor to do an automatic hard word
+  // wrapping during writing text and if so we go and perform the hard word
   // wrapping at the correct border.
-  if(data->WrapBorder > 0 && (data->CPos_X > data->WrapBorder) && (key != ' '))
+  if(data->WrapMode == MUIV_TextEditor_WrapMode_HardWrap &&
+     data->WrapBorder > 0 && (data->CPos_X > data->WrapBorder) && (key != ' '))
   {
     ULONG xpos = data->WrapBorder+1;
 
