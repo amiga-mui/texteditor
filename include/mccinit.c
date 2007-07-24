@@ -22,6 +22,9 @@
                      allows to call a function within a new stack frame
                      initiated by StackSwap(). This should make the whole
                      stack swapping mechanism more safe.
+  1.6   24.07.2007 : corrected an else-branch which only exists if CLASSINIT
+                     is defined and added an UNUSED extension to the Expunge()
+                     function in case the base parameter is not used.
 
  About:
 
@@ -634,8 +637,10 @@ static ULONG mccLibInit(struct LibraryHeader *base)
               // make sure we return TRUE
               return TRUE;
             }
+            #if defined(CLASSINIT)
             else
               E(DBF_STARTUP, "ClassInit(%s) failed", CLASS);
+            #endif
 
             // if we pass this point than an error
             // occurred and we have to cleanup
@@ -688,7 +693,7 @@ static ULONG mccLibInit(struct LibraryHeader *base)
 }
 
 /* expunge everything we previously opened and call user definable functions */
-static ULONG mccLibExpunge(struct LibraryHeader *base)
+static ULONG mccLibExpunge(UNUSED struct LibraryHeader *base)
 {
   // in case the user specified that he has an own class
   // expunge function we call it right here, not caring about
