@@ -255,6 +255,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 
                 RequestInput(data);
                 data->mousemove = TRUE;
+                data->flags |= FLG_Activated;
                 SetCursor(data->CPos_X, data->actualline, FALSE, data);
                 PosFromCursor(imsg->MouseX, imsg->MouseY, data);
 
