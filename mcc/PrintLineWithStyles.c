@@ -160,7 +160,8 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
     }
 
     {
-      UWORD blockstart = 0, blockwidth = 0;
+      UWORD blockstart = 0;
+      UWORD blockwidth = 0;
       struct RastPort *old = muiRenderInfo(data->object)->mri_RastPort;
 
       if(startx < x+c_length && stopx > x)
@@ -175,7 +176,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       else if(!(data->flags & (FLG_ReadOnly | FLG_Ghosted)) &&
               line == data->actualline && data->CPos_X >= x &&
               data->CPos_X < x+c_length && !Enabled(data) &&
-              !data->scrollaction && (data->flags & FLG_Active))
+              !data->scrollaction)
       {
         cursor = TRUE;
         blockstart = TextLength(&data->tmprp, text+x, data->CPos_X-x);
@@ -192,7 +193,12 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       muiRenderInfo(data->object)->mri_RastPort = rp;
 
       // clear the background first
-      DoMethod(data->object, MUIM_DrawBackground, xoffset, starty, flow+blockstart, data->height, (data->flags & FLG_InVGrp) ? 0 : data->xpos, (data->flags & FLG_InVGrp) ? data->height*(data->visual_y+line_nr-2) : data->realypos+data->height * (data->visual_y+line_nr-2));
+      DoMethod(data->object, MUIM_DrawBackground, xoffset, starty,
+                                                  flow+blockstart, data->height,
+                                                  (data->flags & FLG_InVGrp) ? 0 : data->xpos,
+                                                  (data->flags & FLG_InVGrp) ? data->height*(data->visual_y+line_nr-2) : data->realypos+data->height * (data->visual_y+line_nr-2),
+                                                  0);
+
 
       if(blockwidth)
       {
@@ -214,6 +220,16 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
         {
           SetAPen(rp, cursor ? data->cursorcolor : data->markedcolor);
           RectFill(rp, xoffset+flow+blockstart, starty, xoffset+flow+blockstart+blockwidth-1, starty+data->height-1);
+
+          // if the gadget is in inactive state we just draw a skeleton cursor instead
+          if(cursor == TRUE && (data->flags & FLG_Active) == 0 && (data->flags & FLG_Activated) == 0)
+          {
+            DoMethod(data->object, MUIM_DrawBackground, xoffset+flow+blockstart+1, starty+1,
+                                                        blockwidth-2, data->height-2,
+                                                        (data->flags & FLG_InVGrp) ? 0 : data->xpos,
+                                                        (data->flags & FLG_InVGrp) ? data->height*(data->visual_y+line_nr-2) : data->realypos+data->height * (data->visual_y+line_nr-2),
+                                                        0);
+          }
         }
       }
 

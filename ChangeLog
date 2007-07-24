@@ -6,7 +6,10 @@ $Id$
 $URL$
 
 2007-07-24 Jens Langner <Jens.Langner@light-speed.de>
-
+ 
+  * PrintLineWithStyles.c: the inactive cursor wasn't drawn when the window in
+    which the gadgets resists was being resized. Now the inactive cursor
+    should always be layouted.
   * HandleInput.c: when resetting the previous cursor position we make sure
     the gadget is flagged as activated or otherwise a reactivated gadget might
     not reset the cursor sign properly and end up in multiple inactive cursor
