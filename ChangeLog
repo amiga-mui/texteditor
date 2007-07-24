@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-07-24  Thore Böckelmann <tboeckel@gmx.de>
+
+  * include/mccinit.c: updated to latest 1.6 version which fixes an unbalanced
+    if statement.
+
 2007-07-24 Jens Langner <Jens.Langner@light-speed.de>
  
   * PrintLineWithStyles.c: the inactive cursor wasn't drawn when the window in
