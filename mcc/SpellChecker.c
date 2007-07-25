@@ -148,16 +148,16 @@ static BPTR CloneSearchPath(void)
 {
   BPTR path = 0;
 
-  if (WorkbenchBase)
-  {
-    WorkbenchControl(NULL, WBCTRLA_DuplicateSearchPath, &path, TAG_DONE);
-  }
+  ENTER();
 
-  if (!path)
+  if(WorkbenchBase != NULL && WorkbenchBase->lib_Version >= 44)
+    WorkbenchControl(NULL, WBCTRLA_DuplicateSearchPath, &path, TAG_DONE);
+
+  // We don't like this evil code in OS4 compile, as we should have
+  // a recent enough workbench available
+  #ifndef __amigaos4__
+  if(!path)
   {
-    /* We don't like this evil code in OS4 compile, as we should have
-     * a recent enough workbench available */
-#ifndef __amigaos4__
     struct Process *pr = (struct Process*)FindTask(NULL);
 
     if (pr->pr_Task.tc_Node.ln_Type == NT_PROCESS)
@@ -194,8 +194,10 @@ static BPTR CloneSearchPath(void)
         }
       }
     }
-#endif
   }
+  #endif
+
+  RETURN(path);
   return path;
 }
 

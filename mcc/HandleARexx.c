@@ -260,7 +260,7 @@ static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struc
       {
         STRPTR buffer;
 
-        if((buffer = AllocVec(data->actualline->line.Length+1, MEMF_ANY)))
+        if((buffer = AllocVec(data->actualline->line.Length+1, MEMF_SHARED)))
         {
           memcpy(buffer, data->actualline->line.Contents, data->actualline->line.Length);
 
@@ -275,7 +275,7 @@ static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struc
       {
         STRPTR buffer;
 
-        if((buffer = AllocVec(6, MEMF_ANY)))
+        if((buffer = AllocVec(6, MEMF_SHARED)))
         {
           LONG pos = 0;
 

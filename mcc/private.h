@@ -47,6 +47,11 @@
 #define ITALIC    0x04
 #define COLOURED  0x08
 
+// define memory flags not existing on older platforms
+#ifndef MEMF_SHARED
+#define MEMF_SHARED MEMF_PUBLIC
+#endif
+
 // proper RAWKEY_ defines were first introduced in OS4 and MorphOS
 // and unfortunately they are also a bit different, so lets
 // prepare an alternate table for it
