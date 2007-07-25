@@ -27,6 +27,10 @@
                      function in case the base parameter is not used.
   1.7   25.07.2007 : adapted GETINTERFACE() and library base definitions so
                      that mccinit.c can also be used with C++
+  1.8   25.07.2007 : removed the obsolete 2-parameter version of GETINTERFACE()
+                     from mcc_common.h and adapted all calls accordingly.
+                     Also moved the inclusion of mccinit.c in front of all
+                     user definable functions.
 
  About:
 
@@ -595,13 +599,13 @@ static ULONG mccLibInit(struct LibraryHeader *base)
   // now that this library/class is going to be initialized for the first time
   // we go and open all necessary libraries on our own
   if((DOSBase = OpenLibrary("dos.library", 36)) &&
-     GETINTERFACE(IDOS, struct DOSIFace*, DOSBase))
+     GETINTERFACE(IDOS, struct DOSIFace *, DOSBase))
   if((GfxBase = OpenLibrary("graphics.library", 36)) &&
-     GETINTERFACE(IGraphics, struct GraphicsIFace*, GfxBase))
+     GETINTERFACE(IGraphics, struct GraphicsIFace *, GfxBase))
   if((IntuitionBase = OpenLibrary("intuition.library", 36)) &&
-     GETINTERFACE(IIntuition, struct IntuitionIFace*, IntuitionBase))
+     GETINTERFACE(IIntuition, struct IntuitionIFace *, IntuitionBase))
   if((UtilityBase = OpenLibrary("utility.library", 36)) &&
-     GETINTERFACE(IUtility, struct UtilityIFace*, UtilityBase))
+     GETINTERFACE(IUtility, struct UtilityIFace *, UtilityBase))
   {
     // we have to please the internal utilitybase
     // pointers of libnix and clib2
