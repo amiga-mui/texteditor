@@ -7,6 +7,10 @@ $URL$
 
 2007-07-25  Thore Böckelmann <tboeckel@gmx.de>
 
+  * #?/library.c: now really uses the 3 parameter version of GETINTERFACE()
+    defined in mccinit.c instead of the old obsolete version in mcc_common.h.
+    The user definable functions (i.e. ClassInit()) must be declared before
+    the inclusion of mccinit.c.
   * include/mccinit.c: updated to latest 1.8 version which really uses the
     GETINTERFACE() macro with 3 parameters.
 
