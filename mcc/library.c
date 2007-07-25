@@ -69,32 +69,45 @@ struct IFFParseIFace *IIFFParse = NULL;
 struct Interface *IWorkbench = NULL;
 #endif
 
+/******************************************************************************/
+/* define the functions used by the startup code ahead of including mccinit.c */
+/******************************************************************************/
+
+static BOOL ClassInit(UNUSED struct Library *base);
+static VOID ClassExpunge(UNUSED struct Library *base);
+
+/******************************************************************************/
+/* include the lib startup code for the mcc/mcp  (and muimaster inlines)      */
+/******************************************************************************/
+
+#include "mccinit.c"
+
 static BOOL ClassInit(UNUSED struct Library *base)
 {
   ENTER();
 
   if((LocaleBase = OpenLibrary("locale.library", 38)) &&
-     GETINTERFACE(ILocale, LocaleBase))
+     GETINTERFACE(ILocale, struct LocaleIFace *, LocaleBase))
   {
     if((LayersBase = OpenLibrary("layers.library", 36)) &&
-       GETINTERFACE(ILayers, LayersBase))
+       GETINTERFACE(ILayers, struct LayersIFace *, LayersBase))
     {
       if((KeymapBase = OpenLibrary("keymap.library", 36)) &&
-         GETINTERFACE(IKeymap, KeymapBase))
+         GETINTERFACE(IKeymap, struct KeymapIFace *, KeymapBase))
       {
         if((RexxSysBase = OpenLibrary("rexxsyslib.library", 36)) &&
-           GETINTERFACE(IRexxSys, RexxSysBase))
+           GETINTERFACE(IRexxSys, struct RexxSysIFace *, RexxSysBase))
         {
           if((DiskfontBase = OpenLibrary("diskfont.library", 36)) &&
-             GETINTERFACE(IDiskfont, DiskfontBase))
+             GETINTERFACE(IDiskfont, struct DiskfontIFace *, DiskfontBase))
           {
             if((IFFParseBase = OpenLibrary("iffparse.library", 36)) &&
-               GETINTERFACE(IIFFParse, IFFParseBase))
+               GETINTERFACE(IIFFParse, struct IFFParseIFace *, IFFParseBase))
             {
               /* workbench.library is optional */
               if ((WorkbenchBase = OpenLibrary("workbench.library", 44)))
               {
-                if (!(GETINTERFACE(IWorkbench, WorkbenchBase)))
+                if (!(GETINTERFACE(IWorkbench, struct Interface *, WorkbenchBase)))
                 {
                   CloseLibrary(WorkbenchBase);
                   WorkbenchBase = NULL;
@@ -190,11 +203,3 @@ static VOID ClassExpunge(UNUSED struct Library *base)
 
   LEAVE();
 }
-
-/******************************************************************************/
-/*                                                                            */
-/* include the lib startup code for the mcc/mcp  (and muimaster inlines)      */
-/*                                                                            */
-/******************************************************************************/
-
-#include "mccinit.c"
