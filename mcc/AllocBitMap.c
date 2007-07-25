@@ -27,6 +27,8 @@
 #include "SDI_compiler.h"
 #include "Debug.h"
 
+#include "private.h"
+
 #if 0
 #define USE_OS3 (1)
 #else
@@ -53,7 +55,7 @@ struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG width), REG(d1, LONG he
   }
   else
   {
-    struct BitMap *bm = AllocMem(sizeof(struct BitMap), MEMF_CLEAR);
+    struct BitMap *bm = AllocMem(sizeof(struct BitMap), MEMF_SHARED|MEMF_CLEAR);
 
     if(bm != NULL)
     {

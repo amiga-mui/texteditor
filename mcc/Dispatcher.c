@@ -129,7 +129,7 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
     struct InstData *data = INST_DATA(cl, obj);
     data->object = obj;
 
-    if((data->mypool = CreatePool(MEMF_ANY, 3*1024, 512)))
+    if((data->mypool = CreatePool(MEMF_SHARED, 3*1024, 512)))
     {
       if((data->mylocale = OpenLocale(NULL)))
       {
