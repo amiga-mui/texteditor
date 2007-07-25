@@ -7,6 +7,8 @@ $URL$
 
 2007-07-25 Jens Langner <Jens.Langner@light-speed.de>
  
+  * PrintLineWithStyles.c: replaced 0xc0 minterm by "(ABC|ABNC)" which in
+    fact will do the very same, but is more descriptive.
   * include/mccinit.c: updated to latest 1.7 version
   * misc: adapted MEMF_#? allocation flags to use MEMF_SHARED whereever
     appropriate.
