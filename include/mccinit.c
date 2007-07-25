@@ -1,7 +1,7 @@
 /*******************************************************************************
 
         Name:           mccinit.c
-        Versionstring:  $VER: mccinit.c 1.5 (18.07.2007)
+        Versionstring:  $VER: mccinit.c 1.7 (25.07.2007)
         Author:         Jens Langner <Jens.Langner@light-speed.de>
         Distribution:   PD (public domain)
         Description:    library init file for easy generation of a MUI
@@ -25,6 +25,8 @@
   1.6   24.07.2007 : corrected an else-branch which only exists if CLASSINIT
                      is defined and added an UNUSED extension to the Expunge()
                      function in case the base parameter is not used.
+  1.7   25.07.2007 : adapted GETINTERFACE() and library base definitions so
+                     that mccinit.c can also be used with C++
 
  About:
 
@@ -224,6 +226,17 @@ DISPATCHERPROTO(_DispatcherP);
 #endif /* __GNUC__ */
 
 
+// define own macros for the OS4 interfaces
+#undef GETINTERFACE
+#undef DROPINTERFACE
+#if defined(__amigaos4__)
+#define GETINTERFACE(iface, type, base)	(iface = (type)GetInterface((struct Library *)(base), "main", 1L, NULL))
+#define DROPINTERFACE(iface)			(DropInterface((struct Interface *)iface), iface = NULL)
+#else
+#define GETINTERFACE(iface, type, base)	TRUE
+#define DROPINTERFACE(iface)
+#endif
+
 // in case the user didn't specify an own minimum
 // muimaster version we increase it here.
 #ifndef MASTERVERSION
@@ -342,17 +355,17 @@ STATIC uint32 _manager_Release(struct LibraryManagerInterface *Self)
   return res;
 }
 
-STATIC CONST APTR lib_manager_vectors[] =
+STATIC CONST CONST_APTR lib_manager_vectors[] =
 {
-  _manager_Obtain,
-  _manager_Release,
-  NULL,
-  NULL,
-  LibOpen,
-  LibClose,
-  LibExpunge,
-  NULL,
-  (APTR)-1
+  (CONST_APTR)_manager_Obtain,
+  (CONST_APTR)_manager_Release,
+  (CONST_APTR)NULL,
+  (CONST_APTR)NULL,
+  (CONST_APTR)LibOpen,
+  (CONST_APTR)LibClose,
+  (CONST_APTR)LibExpunge,
+  (CONST_APTR)NULL,
+  (CONST_APTR)-1
 };
 
 STATIC CONST struct TagItem lib_managerTags[] =
@@ -375,14 +388,14 @@ ULONG _MCCClass_Release(UNUSED struct Interface *Self)
   return 0;
 }
 
-STATIC CONST APTR main_vectors[] =
+STATIC CONST CONST_APTR main_vectors[] =
 {
-  _MCCClass_Obtain,
-  _MCCClass_Release,
-  NULL,
-  NULL,
-  MCC_Query,
-  (APTR)-1
+  (CONST_APTR)_MCCClass_Obtain,
+  (CONST_APTR)_MCCClass_Release,
+  (CONST_APTR)NULL,
+  (CONST_APTR)NULL,
+  (CONST_APTR)MCC_Query,
+  (CONST_APTR)-1
 };
 
 STATIC CONST struct TagItem mainTags[] =
@@ -395,9 +408,9 @@ STATIC CONST struct TagItem mainTags[] =
 
 STATIC CONST CONST_APTR libInterfaces[] =
 {
-  lib_managerTags,
-  mainTags,
-  NULL
+  (CONST_APTR)lib_managerTags,
+  (CONST_APTR)mainTags,
+  (CONST_APTR)NULL
 };
 
 // Our libraries always have to carry a 68k jump table with it, so
@@ -420,20 +433,20 @@ STATIC CONST struct TagItem libCreateTags[] =
 
 #else
 
-static const APTR LibVectors[] =
+STATIC CONST CONST_APTR LibVectors[] =
 {
   #ifdef __MORPHOS__
-  (APTR)FUNCARRAY_32BIT_NATIVE,
+  (CONST_APTR)FUNCARRAY_32BIT_NATIVE,
   #endif
-  (APTR)LibOpen,
-  (APTR)LibClose,
-  (APTR)LibExpunge,
-  (APTR)LibNull,
-  (APTR)MCC_Query,
-  (APTR)-1
+  (CONST_APTR)LibOpen,
+  (CONST_APTR)LibClose,
+  (CONST_APTR)LibExpunge,
+  (CONST_APTR)LibNull,
+  (CONST_APTR)MCC_Query,
+  (CONST_APTR)-1
 };
 
-static const ULONG LibInitTab[] =
+STATIC CONST ULONG LibInitTab[] =
 {
   sizeof(struct LibraryHeader),
   (ULONG)LibVectors,
@@ -581,14 +594,14 @@ static ULONG mccLibInit(struct LibraryHeader *base)
 {
   // now that this library/class is going to be initialized for the first time
   // we go and open all necessary libraries on our own
-  if((DOSBase = (APTR)OpenLibrary("dos.library", 36)) &&
-     GETINTERFACE(IDOS, DOSBase))
-  if((GfxBase = (APTR)OpenLibrary("graphics.library", 36)) &&
-     GETINTERFACE(IGraphics, GfxBase))
-  if((IntuitionBase = (APTR)OpenLibrary("intuition.library", 36)) &&
-     GETINTERFACE(IIntuition, IntuitionBase))
-  if((UtilityBase = (APTR)OpenLibrary("utility.library", 36)) &&
-     GETINTERFACE(IUtility, UtilityBase))
+  if((DOSBase = OpenLibrary("dos.library", 36)) &&
+     GETINTERFACE(IDOS, struct DOSIFace*, DOSBase))
+  if((GfxBase = OpenLibrary("graphics.library", 36)) &&
+     GETINTERFACE(IGraphics, struct GraphicsIFace*, GfxBase))
+  if((IntuitionBase = OpenLibrary("intuition.library", 36)) &&
+     GETINTERFACE(IIntuition, struct IntuitionIFace*, IntuitionBase))
+  if((UtilityBase = OpenLibrary("utility.library", 36)) &&
+     GETINTERFACE(IUtility, struct UtilityIFace*, UtilityBase))
   {
     // we have to please the internal utilitybase
     // pointers of libnix and clib2
@@ -604,7 +617,7 @@ static ULONG mccLibInit(struct LibraryHeader *base)
     #endif
 
     if((MUIMasterBase = OpenLibrary(MUIMASTER_NAME, MASTERVERSION)) &&
-       GETINTERFACE(IMUIMaster, MUIMasterBase))
+       GETINTERFACE(IMUIMaster, struct MUIMasterIFace*, MUIMasterBase))
     {
       #if defined(PRECLASSINIT)
       if(PreClassInit())
@@ -808,7 +821,7 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
 
   #if defined(__amigaos4__) && defined(__NEWLIB__)
   if((NewlibBase = OpenLibrary("newlib.library", 3)) &&
-     GETINTERFACE(INewlib, NewlibBase))
+     GETINTERFACE(INewlib, struct Interface*, NewlibBase))
   #endif
   {       
     BOOL success = FALSE;
