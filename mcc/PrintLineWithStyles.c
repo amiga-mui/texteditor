@@ -51,13 +51,6 @@ VOID DrawSeparator (struct RastPort *rp, WORD X, WORD Y, WORD Width, WORD Height
 
   if(Width > 3*Height)
   {
-/*    SetAPen(rp, data->separatorshadow);
-    RectFill(rp, X, Y, X+Width-1-Height, Y+Height-1);
-    RectFill(rp, X, Y+Height, X+Height-1, Y+(2*Height)-1);
-    SetAPen(rp, data->separatorshine);
-    RectFill(rp, X+Height, Y+Height, X+Width-1, Y+(2*Height)-1);
-    RectFill(rp, X+Width-Height, Y, X+Width-1, Y+Height-1);
-*/
     SetAPen(rp, data->separatorshadow);
     RectFill(rp, X, Y, X+Width-2, Y);
     RectFill(rp, X, Y, X, Y+Height);
@@ -65,13 +58,7 @@ VOID DrawSeparator (struct RastPort *rp, WORD X, WORD Y, WORD Width, WORD Height
     SetAPen(rp, data->separatorshine);
     RectFill(rp, X+1, Y+Height, X+Width-1, Y+Height);
     RectFill(rp, X+Width-1, Y, X+Width-1, Y+Height);
-
-/*    if(Height == 2)
-    {
-      SetAPen(rp, data->markedcolor);
-      RectFill(rp, X+1, Y+1, X+Width-2, Y+(2*Height)-2);
-    }
-*/  }
+  }
 
   LEAVE();
 }
@@ -86,11 +73,8 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
 
   length  = LineCharsWidth(text+x, data);
 
-  if(!doublebuffer)
-  {
-    doublebuffer = FALSE;
+  if(doublebuffer == FALSE)
     rp = &data->copyrp;
-  }
 
   if((line_nr > 0) && (data->update) && !(data->flags & FLG_Quiet) && data->rport != NULL && data->shown == TRUE)
   {
@@ -106,7 +90,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
     if(line->line.Color && x == 0 && line->line.Length == 1)
       line->line.Color = FALSE;
 
-    if(!doublebuffer)
+    if(doublebuffer == FALSE)
     {
       starty = data->ypos+(data->height * (line_nr-1));
       xoffset = data->xpos;
@@ -259,10 +243,8 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       muiRenderInfo(data->object)->mri_RastPort = old;
     }
 
-    if(!doublebuffer)
-    {
+    if(doublebuffer == FALSE)
       AddClipping(data);
-    }
 
     SetAPen(rp, (line->line.Color ? data->highlightcolor : data->textcolor));
 
@@ -364,7 +346,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
         UBYTE oldSize = rp->AreaPtSz;
         UWORD newPattern[] = {0x1111, 0x4444};
 
-      if(doublebuffer)
+      if(doublebuffer == TRUE)
       {
           ULONG ptrn1 = 0x11111111;
           ULONG ptrn2 = 0x44444444;
@@ -401,10 +383,8 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       rp->AreaPtSz = oldSize;
     }
 
-    if(!doublebuffer)
-    {
+    if(doublebuffer == FALSE)
       RemoveClipping(data);
-    }
     else
     {
       if(line_nr == 1)
