@@ -1,5 +1,5 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.21 (07.03.2007)
+@$VER: TextEditor.Guide 15.22 (29.07.2007)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
@@ -339,6 +339,20 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.22 (29.07.2007)
+
+- when a texteditor gadget is being set to inactive state the cursor will now be
+  explicitly shown in an inactive manner (just outlined) rather than completly
+  hided. This should make it more easier to identify the position where the cursor
+  resists in inactive state.
+- the word wrapping mode can now be explicitly set by an application by specifying
+  MUIA_TextEditor_WrapMode. While the normal hard wrapping is still the default,
+  the new softwrap mode should be used with new/revised applications.
+- the number of UndoLevels can now be set via an application by specifying
+  MUIA_TextEditor_UndoLevels. A value of zero disables the undo/redo completly.
+- added dansk/russian translation.
+- fixed certain issueﬂ with library initialization
 
 15.21 (07.03.2007)
 
