@@ -1,7 +1,7 @@
 /*******************************************************************************
 
         Name:           mccinit.c
-        Versionstring:  $VER: mccinit.c 1.7 (25.07.2007)
+        Versionstring:  $VER: mccinit.c 1.9 (09.08.2007)
         Author:         Jens Langner <Jens.Langner@light-speed.de>
         Distribution:   PD (public domain)
         Description:    library init file for easy generation of a MUI
@@ -31,6 +31,11 @@
                      from mcc_common.h and adapted all calls accordingly.
                      Also moved the inclusion of mccinit.c in front of all
                      user definable functions.
+  1.9   09.08.2007 : applied a patch kindly provided by Ilkka Lehtoranta which
+                     replaces the assembler code for stack swapping with the
+                     appropriate call to the NewPPCStackSwap() function in
+                     MorphOS. In addition, the stack size will now be properly
+                     checked before a stack swap is attempted.
 
  About:
 
@@ -505,7 +510,7 @@ const USED_VAR ULONG __abox__ = 1;
 /* enough stack space during its execution time                             */
 /****************************************************************************/
 
-#if !defined(__amigaos4__)
+#if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
 
 /* generic StackSwap() function which calls function() surrounded by
    StackSwap() calls */
@@ -513,46 +518,7 @@ extern ULONG stackswap_call(struct StackSwapStruct *stack,
                             ULONG (*function)(struct LibraryHeader *),
                             struct LibraryHeader *arg);
 
-#if defined(__MORPHOS__)
-asm(".section	 \".text\"              \n\
-     .align 2                         \n\
-	   .globl stackswap_call            \n\
-	   .type  stackswap_call,@function  \n\
-   stackswap_call:                    \n\
-	   stwu 1,-32(1)                    \n\
-     mflr 0                           \n\
-     stmw 27,12(1)                    \n\
-	   stw 0,36(1)                      \n\
-     lwz 9,100(2)                     \n\
-     mr 27,3                          \n\
-     lis 28,SysBase@ha                \n\
-     li 3,-732                        \n\
-     lwz 0,SysBase@l(28)              \n\
-     mr 29,5                          \n\
-     mtlr 9                           \n\
-     mr 31,4                          \n\
-     stw 27,32(2)                     \n\
-     stw 0,56(2)                      \n\
-     blrl                             \n\
-     mr 3,29                          \n\
-     mtlr 31                          \n\
-     blrl                             \n\
-     lwz 9,100(2)                     \n\
-     mr 29,3                          \n\
-     li 3,-732                        \n\
-     lwz 0,SysBase@l(28)              \n\
-     mtlr 9                           \n\
-     stw 27,32(2)                     \n\
-     stw 0,56(2)                      \n\
-     blrl                             \n\
-     mr 3,29                          \n\
-     lwz 0,36(1)                      \n\
-     mtlr 0                           \n\
-     lmw 27,12(1)                     \n\
-     la 1,32(1)                       \n\
-     blr                              \n\
-     .size  stackswap_call, .-stackswap_call");
-#elif defined(__mc68000__)
+#if defined(__mc68000__)
 asm(".text                    \n\
      .even                    \n\
      .globl _stackswap_call   \n\
@@ -574,7 +540,7 @@ asm(".text                    \n\
       movel d2,d0             \n\
       moveml sp@+,#0x440c     \n\
       rts");
-#else
+#elif !defined(__MORPHOS__)
 ULONG stackswap_call(struct StackSwapStruct *stack,
                      ULONG (*function)(struct LibraryHeader *),
                      struct LibraryHeader *arg)
@@ -587,7 +553,57 @@ ULONG stackswap_call(struct StackSwapStruct *stack,
 }
 #endif
 
-#endif
+static BOOL callMccFunction(ULONG (*function)(struct LibraryHeader *), struct LibraryHeader *arg)
+{
+  BOOL success = FALSE;
+  struct StackSwapStruct stack;
+  struct Task *tc;
+  ULONG stacksize;
+
+  // retrieve the task structure for the
+  // current task
+  tc = FindTask(NULL);
+
+  #if defined(__MORPHOS__)
+  // In MorphOS we have two stacks. One for PPC code and another for 68k code.
+  // We are only interested in the PPC stack.
+  NewGetTaskAttrsA(tc, &stacksize, sizeof(ULONG), TASKINFOTYPE_STACKSIZE, NULL);
+  #else
+  // on all other systems we query via SPUpper-SPLower calculation
+  stacksize = tc->tc_SPUpper - tc->tc_SPLower;
+  #endif
+
+  // Swap stacks only if current stack is insufficient
+  if(stacksize < MIN_STACKSIZE)
+  {
+    if((stack.stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
+    {
+      #if defined(__MORPHOS__)
+      struct PPCStackSwapArgs swapargs;
+      #endif
+
+      // perform the StackSwap
+      stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
+      stack.stk_Pointer = (APTR)stack.stk_Upper;
+
+      // call routine but with embedding it into a [NewPPC]StackSwap()
+      #if defined(__MORPHOS__)
+      swapargs.Args[0] = (ULONG)arg;
+      success = NewPPCStackSwap(&stack, function, &swapargs);
+      #else
+      success = stackswap_call(&stack, function, arg);
+      #endif
+
+      FreeVec(stack.stk_Lower);
+    }
+  }
+  else
+    success = function(arg);
+
+  return success;
+}
+
+#endif // !__amigaos4__
 
 /******************************************************************************/
 /* Wrapper functions to perform certain tasks in our LibInit/LibOpen etc.     */
@@ -829,9 +845,6 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
   #endif
   {       
     BOOL success = FALSE;
-    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-    struct StackSwapStruct stack;
-    #endif
 
     D(DBF_STARTUP, "LibInit(%s)", CLASS);
 
@@ -850,24 +863,14 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
     // initialized flag variable
     InitSemaphore(&base->lh_Semaphore);
 
-    // protect ClassInit()
+    // protect mccLibInit()
     ObtainSemaphore(&base->lh_Semaphore);
 
     // If we are not running on AmigaOS4 (no stackswap required) we go and
     // do an explicit StackSwap() in case the user wants to make sure we
     // have enough stack for his user functions
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-    if((stack.stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
-    {
-      // perform the StackSwap
-      stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
-      stack.stk_Pointer = (APTR)stack.stk_Upper;
-
-      // call mccLibInit() but with embedding it into a StackSwap()
-      success = stackswap_call(&stack, mccLibInit, base);
-
-      FreeVec(stack.stk_Lower);
-    }
+    success = callMccFunction(mccLibInit, base);
     #else
     success = mccLibInit(base);
     #endif
@@ -934,34 +937,20 @@ static BPTR LIBFUNC LibExpunge(REG(a6, struct LibraryHeader *base))
   }
   else
   {
-    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-    struct StackSwapStruct stack;
-    #endif
-
     // remove the library base from exec's lib list in advance
     Remove((struct Node *)base);
 
-    // protect
+    // protect mccLibExpunge()
     ObtainSemaphore(&base->lh_Semaphore);
 
     // make sure we have enough stack here
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-    if((stack.stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
-    {
-      // perform the StackSwap
-      stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
-      stack.stk_Pointer = (APTR)stack.stk_Upper;
-
-      // call mccLibExpunge() but with embedding it into a StackSwap()
-      stackswap_call(&stack, mccLibExpunge, base);
-
-      FreeVec(stack.stk_Lower);
-    }
+    callMccFunction(mccLibExpunge, base);
     #else
     mccLibExpunge(base);
     #endif
 
-    // release access to lh_Initialized
+    // unprotect
     ReleaseSemaphore(&base->lh_Semaphore);
 
     #if defined(__amigaos4__) && defined(__NEWLIB__)
@@ -1021,26 +1010,13 @@ static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base
   {
     struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
     BOOL success = FALSE;
-    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-    struct StackSwapStruct stack;
-    #endif
 
     // protect
     ObtainSemaphore(&base->lh_Semaphore);
 
     // make sure we have enough stack here
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-    if((stack.stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
-    {
-      // perform the StackSwap
-      stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
-      stack.stk_Pointer = (APTR)stack.stk_Upper;
-
-      // call mccLibOpen() but with embedding it into a StackSwap()
-      success = stackswap_call(&stack, mccLibOpen, base);
-
-      FreeVec(stack.stk_Lower);
-    }
+    success = callMccFunction(mccLibOpen, base);
     #else
     success = mccLibOpen(base);
     #endif
@@ -1091,26 +1067,12 @@ static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
   {
     struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
 
-    #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-    struct StackSwapStruct stack;
-    #endif
-
     // protect
     ObtainSemaphore(&base->lh_Semaphore);
 
     // make sure we have enough stack here
     #if defined(MIN_STACKSIZE) && !defined(__amigaos4__)
-    if((stack.stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
-    {
-      // perform the StackSwap
-      stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
-      stack.stk_Pointer = (APTR)stack.stk_Upper;
-
-      // call mccLibClose() but with embedding it into a StackSwap()
-      stackswap_call(&stack, mccLibClose, base);
-
-      FreeVec(stack.stk_Lower);
-    }
+    success = callMccFunction(mccLibClose, base);
     #else
     mccLibClose(base);
     #endif
