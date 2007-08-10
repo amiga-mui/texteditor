@@ -1211,7 +1211,9 @@ static LONG ReactOnRawKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg,
 
   if(key <= IECODE_KEY_CODE_LAST)
   {
-    LONG dummy = FindKey(key, qualifier, data);
+    LONG dummy;
+
+    dummy = FindKey(key, qualifier, data);
     if(dummy == 1)
     {
       data->pixel_x = 0;
@@ -1266,11 +1268,11 @@ static LONG ReactOnRawKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg,
           result = FALSE;
         }
 
+/*
         if(dummy == 4)
         {
           result = TRUE;
         }
-/*
         else
         {
           if(((data->flags & FLG_ReadOnly || qualifier & IEQUALIFIER_RCOMMAND) || !ConvertKey(key, qualifier, imsg, data)))

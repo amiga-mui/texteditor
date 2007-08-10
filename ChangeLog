@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-08-10  Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/HandleInput.c: a read-only editor with a marked search result could not
+    be scrolled by keyboard anymore if that would scroll the marked text out of
+    the visible area. I am not sure if this change has any impact on other
+    functions, so please test.
+
 2007-08-09 Jens Langner <Jens.Langner@light-speed.de>
 
   * include/mccinit.c: updated to 1.9 version which includes fixes for the
