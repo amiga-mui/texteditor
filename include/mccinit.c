@@ -36,6 +36,10 @@
                      appropriate call to the NewPPCStackSwap() function in
                      MorphOS. In addition, the stack size will now be properly
                      checked before a stack swap is attempted.
+  1.10  13.08.2007 : the StackSwap structure itself *must* *not* be placed on the
+                     stack which will be swapped later, because swapping it back
+                     will access the wrong place in memory. Hence this structure
+                     is allocated from global memory now.
 
  About:
 
@@ -556,7 +560,6 @@ ULONG stackswap_call(struct StackSwapStruct *stack,
 static BOOL callMccFunction(ULONG (*function)(struct LibraryHeader *), struct LibraryHeader *arg)
 {
   BOOL success = FALSE;
-  struct StackSwapStruct stack;
   struct Task *tc;
   ULONG stacksize;
 
@@ -576,25 +579,31 @@ static BOOL callMccFunction(ULONG (*function)(struct LibraryHeader *), struct Li
   // Swap stacks only if current stack is insufficient
   if(stacksize < MIN_STACKSIZE)
   {
-    if((stack.stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
+    struct StackSwapStruct *stack;
+
+    if((stack = AllocVec(sizeof(*stack), MEMF_PUBLIC)) != NULL)
     {
-      #if defined(__MORPHOS__)
-      struct PPCStackSwapArgs swapargs;
-      #endif
+      if((stack->stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
+      {
+        #if defined(__MORPHOS__)
+        struct PPCStackSwapArgs swapargs;
+        #endif
 
-      // perform the StackSwap
-      stack.stk_Upper = (ULONG)stack.stk_Lower + MIN_STACKSIZE;
-      stack.stk_Pointer = (APTR)stack.stk_Upper;
+        // perform the StackSwap
+        stack->stk_Upper = (ULONG)stack->stk_Lower + MIN_STACKSIZE;
+        stack->stk_Pointer = (APTR)stack->stk_Upper;
 
-      // call routine but with embedding it into a [NewPPC]StackSwap()
-      #if defined(__MORPHOS__)
-      swapargs.Args[0] = (ULONG)arg;
-      success = NewPPCStackSwap(&stack, function, &swapargs);
-      #else
-      success = stackswap_call(&stack, function, arg);
-      #endif
+        // call routine but with embedding it into a [NewPPC]StackSwap()
+        #if defined(__MORPHOS__)
+        swapargs.Args[0] = (ULONG)arg;
+        success = NewPPCStackSwap(stack, function, &swapargs);
+        #else
+        success = stackswap_call(stack, function, arg);
+        #endif
 
-      FreeVec(stack.stk_Lower);
+        FreeVec(stack->stk_Lower);
+      }
+      FreeVec(stack);
     }
   }
   else
@@ -843,7 +852,7 @@ static struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
   if((NewlibBase = OpenLibrary("newlib.library", 3)) &&
      GETINTERFACE(INewlib, struct Interface*, NewlibBase))
   #endif
-  {       
+  {
     BOOL success = FALSE;
 
     D(DBF_STARTUP, "LibInit(%s)", CLASS);

@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-08-13  Thore Böckelmann <tboeckel@gmx.de>
+
+  * include/mccinit.c: updated to 1.10 version which fixes a wrong memory
+    access to the StackSwap structure if this is placed on the stack.
+
 2007-08-10  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c: a read-only editor with a marked search result could not
@@ -29,7 +34,7 @@ $URL$
     GETINTERFACE() macro with 3 parameters.
 
 2007-07-25 Jens Langner <Jens.Langner@light-speed.de>
- 
+
   * PrintLineWithStyles.c: replaced 0xc0 minterm by "(ABC|ABNC)" which in
     fact will do the very same, but is more descriptive.
   * include/mccinit.c: updated to latest 1.7 version
@@ -42,7 +47,7 @@ $URL$
     if statement.
 
 2007-07-24 Jens Langner <Jens.Langner@light-speed.de>
- 
+
   * PrintLineWithStyles.c: the inactive cursor wasn't drawn when the window in
     which the gadgets resists was being resized. Now the inactive cursor
     should always be layouted.
