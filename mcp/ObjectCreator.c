@@ -303,7 +303,7 @@ static Object *PrefsObject(struct InstData_MCP *data)
             data->blinkspeed, data->suggestcmd, data->lookupcmd,
             data->typenspell, data->undosize, data->LookupExeType,
             data->SuggestExeType, data->CheckWord, data->insertkey,
-            data->separatorshadow, data->separatorshine, NULL);
+            data->separatorshadow, data->separatorshine, data->inactiveCursor, NULL);
   }
 
   return(data->obj);
@@ -347,6 +347,7 @@ ULONG New(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct opSet
         DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->textcolor, MUICFG_TextEditor_TextColor, 1, tr(MSG_Label_Text));
         DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->separatorshine, MUICFG_TextEditor_SeparatorShine, 1, tr(MSG_Label_SeparatorShine));
         DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->separatorshadow, MUICFG_TextEditor_SeparatorShadow, 1, tr(MSG_Label_SeparatorShadow));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->inactiveCursor, MUICFG_TextEditor_InactiveCursor, 1, tr(MSG_Label_InactiveCursor));
       }
       else
         set(data->frame, MUIA_Disabled, TRUE);
@@ -460,6 +461,9 @@ ULONG GadgetsToConfig(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, 
   cfg_data = xget(data->separatorshadow, MUIA_Pendisplay_Spec);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, sizeof(struct MUI_PenSpec), MUICFG_TextEditor_SeparatorShadow);
 
+  cfg_data = xget(data->inactiveCursor, MUIA_Selected);
+  DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(LONG), MUICFG_TextEditor_InactiveCursor);
+
   RETURN(0);
   return(0);
 }
@@ -526,6 +530,7 @@ ULONG ConfigToGadgets(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, 
   set(data->textcolor, MUIA_Pendisplay_Spec, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_TextColor)) ? cfg_data : "m5");
   set(data->separatorshine, MUIA_Pendisplay_Spec, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_SeparatorShine)) ? cfg_data : "m1");
   set(data->separatorshadow, MUIA_Pendisplay_Spec, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_SeparatorShadow)) ? cfg_data : "m3");
+  set(data->inactiveCursor, MUIA_Selected, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_InactiveCursor)) ? *(ULONG *)cfg_data : TRUE);
 
   return(0);
 }

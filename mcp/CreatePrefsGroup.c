@@ -505,6 +505,13 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
               MUIA_Numeric_Max, 20,
               MUIA_Numeric_Format, tr(MSG_SliderText_StdSpeed),
             End,
+            Child, TxtLabel(tr(MSG_Label_InactiveCursor), 0),
+            Child, HGroup,
+              MUIA_ShortHelp, tr(MSG_HELP_InactiveCursor),
+              Child, data->inactiveCursor = MUI_MakeObject(MUIO_Checkmark, NULL),
+              Child, RectangleObject,
+              End,
+            End,
           End,
 
         End,

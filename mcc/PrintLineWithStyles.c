@@ -160,7 +160,8 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       else if(!(data->flags & (FLG_ReadOnly | FLG_Ghosted)) &&
               line == data->actualline && data->CPos_X >= x &&
               data->CPos_X < x+c_length && !Enabled(data) &&
-              !data->scrollaction)
+              !data->scrollaction &&
+              (data->flags & FLG_Active || data->inactiveCursor == TRUE))
       {
         cursor = TRUE;
         blockstart = TextLength(&data->tmprp, text+x, data->CPos_X-x);
@@ -206,7 +207,8 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
           RectFill(rp, xoffset+flow+blockstart, starty, xoffset+flow+blockstart+blockwidth-1, starty+data->height-1);
 
           // if the gadget is in inactive state we just draw a skeleton cursor instead
-          if(cursor == TRUE && (data->flags & FLG_Active) == 0 && (data->flags & FLG_Activated) == 0)
+          if(cursor == TRUE &&
+             (data->flags & FLG_Active) == 0 && (data->flags & FLG_Activated) == 0)
           {
             DoMethod(data->object, MUIM_DrawBackground, xoffset+flow+blockstart+1, starty+1,
                                                         blockwidth-2, data->height-2,
