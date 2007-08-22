@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-08-22 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcc/mcp: on request, the inactive cursor introduced in 15.22 can now be
+    explicitly disabled in the preference program to get back the old behaviour.
+    However, it will still be enabled per default to make use of it at all.
+
 2007-08-13  Thore Böckelmann <tboeckel@gmx.de>
 
   * include/mccinit.c: updated to 1.10 version which fixes a wrong memory

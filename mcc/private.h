@@ -322,6 +322,7 @@ struct InstData
   ULONG           undosize;
   BOOL            userUndoSize;
   BOOL            TypeAndSpell;
+  BOOL            inactiveCursor;
   APTR            SuggestWindow;
   APTR            SuggestListview;
   UWORD           SuggestSpawn;

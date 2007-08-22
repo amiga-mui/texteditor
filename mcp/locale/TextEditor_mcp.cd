@@ -452,3 +452,10 @@ installed and try again.
 MSG_Ok (132//)
 Ok
 ;
+MSG_Label_InactiveCursor (133//)
+Inactive Cursor
+;
+MSG_HELP_InactiveCursor (134//)
+If enabled, shows a special cursor in case the texteditor\n\
+gadget is in inactive state.
+;

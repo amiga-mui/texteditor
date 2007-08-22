@@ -411,7 +411,8 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
                                                     0);
       }
 
-      if(Set || ((data->flags & FLG_Active) == 0 && (data->flags & FLG_Activated) == 0))
+      if(Set ||
+         (data->inactiveCursor == TRUE && (data->flags & FLG_Active) == 0 && (data->flags & FLG_Activated) == 0))
       {
         SetAPen(data->rport, data->cursorcolor);
         SetDrMd(data->rport, JAM2);
