@@ -280,10 +280,10 @@ void InitConfig(Object *obj, struct InstData *data)
 
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_InactiveCursor, &setting))
   {
-    data->InactiveCursor = *(long *)setting;
+    data->inactiveCursor = *(long *)setting;
   }
   else
-    data->InactiveCursor = TRUE;
+    data->inactiveCursor = TRUE;
 
   {
     long undolevel;
