@@ -1,6 +1,6 @@
 ## chunk AUTH Pär Boberg
 ## language svenska
-## version $VER: TextEditor_mcp.ct 2.1 (08.03.07)
+## version $VER: TextEditor_mcp.ct 2.2 (25.08.07)
 HelpBubble_BlockQual
 Håll nere tangenten som du har valt här\noch flytta markören för att markera text.
 ;#DEF Move the cursor key and hold down the qualifier\nthat you set here to mark text.
@@ -534,3 +534,11 @@ MSG_Ok
 Ok
 ;#DEF Ok
 ;#SET (132//)
+MSG_Label_InactiveCursor
+Inaktiv markör
+;#DEF Inactive Cursor
+;#SET (133//)
+MSG_HELP_InactiveCursor
+Om vald, så visas en speciell markör när texteditorn\när i inaktivt tillstånd.
+;#DEF If enabled, shows a special cursor in case the texteditor\ngadget is in inactive state.
+;#SET (134//)
