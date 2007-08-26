@@ -5,6 +5,14 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-08-26 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcc/EditorStuff.c: fixed bug #1779587 where in SoftWrap mode, the MergeLines()
+    functions didn't take correctly respect of the fact that by merging lines
+    upon pressing "backspace", the amount of visual lines may perfectly increase
+    and therefore ended up in a distorted text display. Now the ScrollUp/ScrollDown
+    operations are done right before redrawing the content of the merge lines.
+
 2007-08-25 Pär Boberg <pbobbenb@spray.se>
 
    * mcp/locale/svenska.ct: Updated according to changes.

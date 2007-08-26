@@ -516,29 +516,9 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
     FreeLine(next, data);
 
     line_nr = LineToVisual(line, data);
-    if(!(emptyline && (line_nr + line->visual - 1 < data->maxlines)))
-    {
-      LONG t_oldvisual = oldvisual;
-      LONG t_line_nr   = line_nr;
-      ULONG c = 0;
-      
-      while((--t_oldvisual) && (t_line_nr++ <= data->maxlines))
-        c = c + LineCharsWidth(line->line.Contents+c, data);
-      
-      while((c < line->line.Length) && (t_line_nr <= data->maxlines))
-        c = c + PrintLine(c, line, t_line_nr++, TRUE, data);
-    }
 
-    if(line_nr + oldvisual == 1 && line->visual == visual-1)
-    {
-      data->visual_y--;
-      data->totallines -= 1;
-      if(data->fastbackground)
-          DumpText(data->visual_y, 0, visual-1, TRUE, data);
-      else  DumpText(data->visual_y, 0, data->maxlines, TRUE, data);
-      return(TRUE);
-    }
-
+    // handle that we have to scroll up/down due to word wrapping
+    // that occurrs when merging lines
     if(visual > line->visual)
     {
       data->totallines -= 1;
@@ -561,14 +541,35 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
         }
       }
     }
-    else
+    else if(visual < line->visual)
     {
-      if(visual < line->visual)
-      {
-        data->totallines += 1;
-        if(line_nr+line->visual-1 < data->maxlines)
-          ScrollDown(line_nr + line->visual - 2, 1, data);
-      }
+      data->totallines += 1;
+      if(line_nr+line->visual-1 < data->maxlines)
+        ScrollDown(line_nr + line->visual - 2, 1, data);
+    }
+
+    if(!(emptyline && (line_nr + line->visual - 1 < data->maxlines)))
+    {
+      LONG t_oldvisual = oldvisual;
+      LONG t_line_nr   = line_nr;
+      ULONG c = 0;
+
+      while((--t_oldvisual) && (t_line_nr++ <= data->maxlines))
+        c = c + LineCharsWidth(line->line.Contents+c, data);
+
+      while((c < line->line.Length) && (t_line_nr <= data->maxlines))
+        c = c + PrintLine(c, line, t_line_nr++, TRUE, data);
+    }
+
+    if(line_nr + oldvisual == 1 && line->visual == visual-1)
+    {
+      data->visual_y--;
+      data->totallines -= 1;
+
+      if(data->fastbackground)
+        DumpText(data->visual_y, 0, visual-1, TRUE, data);
+      else
+        DumpText(data->visual_y, 0, data->maxlines, TRUE, data);
     }
 
     RETURN(TRUE);
