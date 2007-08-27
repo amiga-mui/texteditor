@@ -282,6 +282,7 @@ struct InstData
 
   Object  *slider;
   Object  *KeyUpFocus;
+  Object  *PointerObj;
 
   ULONG   Rows, Columns;  // The value of the rows/columns tags
 
@@ -488,6 +489,9 @@ ULONG OM_BlockInfo  (struct MUIP_TextEditor_BlockInfo *, struct InstData *);
 ULONG OM_Search   (struct MUIP_TextEditor_Search *, struct InstData *);
 ULONG OM_Replace    (Object *obj, struct MUIP_TextEditor_Replace *msg, struct InstData *data);
 ULONG OM_QueryKeyAction(struct IClass *cl, Object *obj, struct MUIP_TextEditor_QueryKeyAction *msg);
+
+void SetMousePointer(Object *obj, struct InstData *data);
+void ClearMousePointer(Object *obj, struct InstData *data);
 
 extern struct Hook ImPlainHook;
 extern struct Hook ImEMailHook;

@@ -96,6 +96,22 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
       return(MUI_EventHandlerRC_Eat);
     }
 
+    // we check if this is a mousemove input message and if
+    // so we check whether the mouse is currently over our
+    // texteditor object or not.
+    if(imsg->Class == IDCMP_MOUSEMOVE)
+    {
+      // if the mouse is currently over the object we go and
+      // change the pointer to show the selection pointer
+      if(_isinobject(obj, msg->imsg->MouseX, msg->imsg->MouseY))
+      {
+        if(data->PointerObj == NULL)
+          SetMousePointer(obj, data);
+      }
+      else
+        ClearMousePointer(obj, data);
+    }
+    else
     #if defined(__amigaos4__)
     if((imsg->Class == IDCMP_MOUSEBUTTONS) || (activeobj == obj) ||
        (data->flags & FLG_ReadOnly && defaultobj == obj && !activeobj) ||
@@ -392,17 +408,10 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
       RETURN(MUI_EventHandlerRC_Eat);
       return(MUI_EventHandlerRC_Eat);
     }
-    else
-    {
-      RETURN(0);
-      return(0);
-    }
   }
-  else
-  {
-    RETURN(0);
-    return(0);
-  }
+
+  RETURN(0);
+  return(0);
 }
 
 static VOID DoBlock(BOOL clipboard, BOOL erase, struct InstData *data)
