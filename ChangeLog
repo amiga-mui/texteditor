@@ -9,10 +9,14 @@ $URL$
 
   * mcc/Pointer.c: when setting up the pointer image the colors matching white
     and black best are now calculated instead of guessed. This way the pointer
-    will have the correct colors regardless of the user defined palette.
+    will have the most correct colors regardless of the user defined palette.
 
 2007-08-27 Jens Langner <Jens.Langner@light-speed.de>
 
+  * mcc/Pointer.c, misc: the pointer object will now be create/destroyed in the
+    Setup/Cleanup methods of the class rather than before any show/hide operation
+    of the pointer. This should also fix problems where the mouse pointer isn't
+    hided/restored when the texteditor is cleaned up by MUI.
   * mcc: when the mouse pointer is now over an active TextEditor object, a
     specialized mouse pointer image for selection of text will be shown
     instead of the default system mouse pointer image. Currently it can not be
@@ -23,7 +27,7 @@ $URL$
 2007-08-26 Jens Langner <Jens.Langner@light-speed.de>
 
   * mcc/EditorStuff.c: fixed bug #1779587 where in SoftWrap mode, the MergeLines()
-    functions didn't take correctly respect of the fact that by merging lines
+    function didn't take correctly respect of the fact that by merging lines
     upon pressing "backspace", the amount of visual lines may perfectly increase
     and therefore ended up in a distorted text display. Now the ScrollUp/ScrollDown
     operations are done right before redrawing the content of the merge lines.
