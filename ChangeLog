@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-08-27  Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Pointer.c: when setting up the pointer image the colors matching white
+    and black best are now calculated instead of guessed. This way the pointer
+    will have the correct colors regardless of the user defined palette.
+
 2007-08-27 Jens Langner <Jens.Langner@light-speed.de>
 
   * mcc: when the mouse pointer is now over an active TextEditor object, a
