@@ -29,6 +29,7 @@
 #include <proto/utility.h>
 #include <proto/intuition.h>
 #include <proto/exec.h>
+#include <proto/graphics.h>
 
 #include "private.h"
 
@@ -128,29 +129,107 @@ static struct BitMap selectPointerBitmap =
   { (PLANEPTR)selectPointer_bp0, (PLANEPTR)selectPointer_bp1, NULL, NULL, NULL, NULL, NULL }
 };
 
-static void SpecPointerColors(LONG blacknum)
+static void SpecPointerColors(Object *obj)
 {
   int i;
+  ULONG colors[3*3];
+  LONG blackDiff[3];
+  LONG whiteDiff[3];
+  LONG blackIndex;
+  LONG whiteIndex;
 
   ENTER();
 
   for(i=0; i<16; i++)
     selectPointer_bp2[i] = selectPointer_bp0[i] | selectPointer_bp1[i];
 
-  if(blacknum == 1)
+  // get the current screen's pointer colors (17 to 19)
+  GetRGB32(_window(obj)->WScreen->ViewPort.ColorMap, 17, 3, colors);
+
+  for(i = 0; i < 3; i++)
   {
-    selectPointerBitmap.Planes[0] = (PLANEPTR)selectPointer_bp2;
-    selectPointerBitmap.Planes[1] = (PLANEPTR)selectPointer_bp0;
+    LONG dr, dg, db;
+
+    // normalize the colors to 8 bit per gun as GetRGB32() returns
+    // 32bit left aligned values
+    colors[i*3+0] >>= 24;
+    colors[i*3+1] >>= 24;
+    colors[i*3+2] >>= 24;
+
+    // calculate the geometric difference to the color black (=0x00000000)
+	dr = 0x00000000 - colors[i*3+0];
+	dg = 0x00000000 - colors[i*3+1];
+	db = 0x00000000 - colors[i*3+2];
+    blackDiff[i] = dr * dr + dg * dg + db * db;
+    // calculate the geometric difference to the color white (=0x000000ff)
+	dr = 0x000000ff - colors[i*3+0];
+	dg = 0x000000ff - colors[i*3+1];
+	db = 0x000000ff - colors[i*3+2];
+    whiteDiff[i] = dr * dr + dg * dg + db * db;
   }
-  else if(blacknum == 3)
-  {
-    selectPointerBitmap.Planes[0] = (PLANEPTR)selectPointer_bp2;
-    selectPointerBitmap.Planes[1] = (PLANEPTR)selectPointer_bp1;
-  }
+
+  // the smallest difference defines the color which is closest to black or
+  // equal to black
+  if(blackDiff[0] > blackDiff[1])
+    if(blackDiff[1] > blackDiff[2])
+      blackIndex = 19;
+    else
+      blackIndex = 18;
+  else if(blackDiff[0] > blackDiff[2])
+  	blackIndex = 19;
   else
+    blackIndex = 17;
+
+  // the smallest difference defines the color which is closest to white or
+  // equal to white
+  if(whiteDiff[0] > whiteDiff[1])
+    if(whiteDiff[1] > whiteDiff[2])
+      whiteIndex = 19;
+    else
+      whiteIndex = 18;
+  else if(whiteDiff[0] > whiteDiff[2])
+  	whiteIndex = 19;
+  else
+    whiteIndex = 17;
+
+  // Here we expect the user to have set up quite "different" colors. That
+  // means the color closest to white will never be close to black and vice
+  // versa. According to these differences we spread the required bitplanes.
+  if(whiteIndex == 17)
   {
-    selectPointerBitmap.Planes[0] = (PLANEPTR)selectPointer_bp0;
-    selectPointerBitmap.Planes[1] = (PLANEPTR)selectPointer_bp1;
+    if(blackIndex == 18) {
+      selectPointerBitmap.Planes[0] = (PLANEPTR)selectPointer_bp0;
+      selectPointerBitmap.Planes[1] = (PLANEPTR)selectPointer_bp1;
+    }
+    else // blackIndex == 19
+    {
+      selectPointerBitmap.Planes[0] = (PLANEPTR)selectPointer_bp2;
+      selectPointerBitmap.Planes[1] = (PLANEPTR)selectPointer_bp1;
+    }
+  }
+  else if(whiteIndex == 18)
+  {
+    if(blackIndex == 17) {
+      selectPointerBitmap.Planes[0] = (PLANEPTR)selectPointer_bp1;
+      selectPointerBitmap.Planes[1] = (PLANEPTR)selectPointer_bp0;
+    }
+    else // blackIndex == 19
+    {
+      selectPointerBitmap.Planes[0] = (PLANEPTR)selectPointer_bp1;
+      selectPointerBitmap.Planes[1] = (PLANEPTR)selectPointer_bp2;
+    }
+  }
+  else // whiteIndex == 19
+  {
+    if(blackIndex == 17) {
+      selectPointerBitmap.Planes[0] = (PLANEPTR)selectPointer_bp2;
+      selectPointerBitmap.Planes[1] = (PLANEPTR)selectPointer_bp0;
+    }
+    else // blackIndex == 18
+    {
+      selectPointerBitmap.Planes[0] = (PLANEPTR)selectPointer_bp0;
+      selectPointerBitmap.Planes[1] = (PLANEPTR)selectPointer_bp2;
+    }
   }
 
   LEAVE();
@@ -160,11 +239,11 @@ void SetMousePointer(Object *obj, struct InstData *data)
 {
   ENTER();
 
-	if(data->PointerObj == NULL)
+  if(data->PointerObj == NULL)
   {
-    if(IntuitionBase->lib_Version >= 39)
+    if(IntuitionBase->LibNode.lib_Version >= 39)
     {
-      SpecPointerColors(1);
+      SpecPointerColors(obj);
 
       if((data->PointerObj = (Object *)NewObject(NULL, "pointerclass",
           POINTERA_BitMap,      (LONG)&selectPointerBitmap,
@@ -173,7 +252,7 @@ void SetMousePointer(Object *obj, struct InstData *data)
           POINTERA_WordWidth,   (ULONG)1,
           POINTERA_XResolution, (ULONG)POINTERXRESN_SCREENRES,
           POINTERA_YResolution, (ULONG)POINTERYRESN_SCREENRESASPECT,
-          TAG_DONE)))
+          TAG_DONE)) != NULL)
       {
         SetWindowPointer(_window(obj), WA_Pointer, data->PointerObj, TAG_DONE);
       }
@@ -182,7 +261,7 @@ void SetMousePointer(Object *obj, struct InstData *data)
     }
     else
     {
-    	if((data->PointerObj = (Object *)AllocVec(sizeof(selectPointer), MEMF_CHIP|MEMF_PUBLIC)))
+      if((data->PointerObj = (Object *)AllocVec(sizeof(selectPointer), MEMF_CHIP|MEMF_PUBLIC)) != NULL)
       {
         memcpy(data->PointerObj, selectPointer, sizeof(selectPointer));
         SetPointer(_window(obj), (APTR)data->PointerObj, selectPointerHeight, selectPointerWidth, selectPointerXOffset, selectPointerYOffset);
@@ -195,15 +274,13 @@ void SetMousePointer(Object *obj, struct InstData *data)
   LEAVE();
 }
 
-
-
 void ClearMousePointer(Object *obj, struct InstData *data)
 {
   ENTER();
 
-  if(data->PointerObj)
+  if(data->PointerObj != NULL)
   {
-    if(IntuitionBase->lib_Version >= 39)
+    if(IntuitionBase->LibNode.lib_Version >= 39)
     {
       SetWindowPointer(_window(obj), TAG_DONE);
       DisposeObject(data->PointerObj);
@@ -219,4 +296,3 @@ void ClearMousePointer(Object *obj, struct InstData *data)
 
   LEAVE();
 }
-
