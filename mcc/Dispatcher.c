@@ -222,7 +222,7 @@ ULONG Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
       data->ehnode.ehn_Flags    = MUI_EHF_GUIMODE;
       data->ehnode.ehn_Object   = obj;
       data->ehnode.ehn_Class    = cl;
-      data->ehnode.ehn_Events   = IDCMP_ACTIVEWINDOW | IDCMP_MOUSEBUTTONS | IDCMP_RAWKEY;
+      data->ehnode.ehn_Events   = IDCMP_ACTIVEWINDOW | IDCMP_MOUSEBUTTONS | IDCMP_RAWKEY | IDCMP_MOUSEMOVE;
 
       #if defined(__amigaos4__)
       data->ehnode.ehn_Events  |= IDCMP_EXTENDEDMOUSE;

@@ -241,6 +241,7 @@ MCCOBJS = $(OBJDIR)/library.o \
           $(OBJDIR)/Methods.o \
           $(OBJDIR)/MixedFunctions.o \
           $(OBJDIR)/Navigation.o \
+          $(OBJDIR)/Pointer.o \
           $(OBJDIR)/PrintLineWithStyles.o \
           $(OBJDIR)/Search.o \
           $(OBJDIR)/SpellChecker.o \
@@ -269,6 +270,7 @@ TESTOBJS= $(OBJDIR)/TextEditor-Test.o \
           $(OBJDIR)/Methods.o \
           $(OBJDIR)/MixedFunctions.o \
           $(OBJDIR)/Navigation.o \
+          $(OBJDIR)/Pointer.o \
           $(OBJDIR)/PrintLineWithStyles.o \
           $(OBJDIR)/Search.o \
           $(OBJDIR)/SpellChecker.o \

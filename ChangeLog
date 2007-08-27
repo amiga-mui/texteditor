@@ -5,6 +5,15 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-08-27 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcc: when the mouse pointer is now over an active TextEditor object, a
+    specialized mouse pointer image for selection of text will be shown
+    instead of the default system mouse pointer image. Currently it can not be
+    disabled via the mcp, but this should be the case until the final release
+    of a new stable version. In addition, not all situations like Hide/Show
+    are catched to disable/enable the mouse pointer image.
+
 2007-08-26 Jens Langner <Jens.Langner@light-speed.de>
 
   * mcc/EditorStuff.c: fixed bug #1779587 where in SoftWrap mode, the MergeLines()
