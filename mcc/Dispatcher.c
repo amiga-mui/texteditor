@@ -238,6 +238,9 @@ ULONG Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
       data->smooth_wait = 0;
       data->scrollaction      = FALSE;
 
+      // setup the selection pointer
+      SetupSelectPointer(data);
+
       RETURN(TRUE);
       return(TRUE);
     }
@@ -252,6 +255,9 @@ ULONG Cleanup(struct IClass *cl, Object *obj, Msg msg)
   struct InstData *data = INST_DATA(cl, obj);
 
   ENTER();
+
+  // cleanup the selection pointer
+  CleanupSelectPointer(obj, data);
 
   DoMethod(_win(obj), MUIM_Window_RemEventHandler, &data->ehnode);
 

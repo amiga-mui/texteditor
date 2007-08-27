@@ -308,9 +308,9 @@ struct InstData
 
   UWORD           BlinkSpeed;
   UWORD           CursorWidth;
-  struct  Hook      *DoubleClickHook;
-  struct  Hook      *ExportHook;
-  struct  Hook      *ImportHook;
+  struct  Hook    *DoubleClickHook;
+  struct  Hook    *ExportHook;
+  struct  Hook    *ImportHook;
   ULONG           ExportWrap;
   UWORD           ImportWrap;
   BOOL            HasChanged;
@@ -324,6 +324,7 @@ struct InstData
   BOOL            userUndoSize;
   BOOL            TypeAndSpell;
   BOOL            inactiveCursor;
+  BOOL            activeSelectPointer;
   APTR            SuggestWindow;
   APTR            SuggestListview;
   UWORD           SuggestSpawn;
@@ -490,8 +491,11 @@ ULONG OM_Search   (struct MUIP_TextEditor_Search *, struct InstData *);
 ULONG OM_Replace    (Object *obj, struct MUIP_TextEditor_Replace *msg, struct InstData *data);
 ULONG OM_QueryKeyAction(struct IClass *cl, Object *obj, struct MUIP_TextEditor_QueryKeyAction *msg);
 
-void SetMousePointer(Object *obj, struct InstData *data);
-void ClearMousePointer(Object *obj, struct InstData *data);
+// Pointer.c
+void SetupSelectPointer(struct InstData *data);
+void CleanupSelectPointer(Object *obj, struct InstData *data);
+void ShowSelectPointer(Object *obj, struct InstData *data);
+void HideSelectPointer(Object *obj, struct InstData *data);
 
 extern struct Hook ImPlainHook;
 extern struct Hook ImEMailHook;

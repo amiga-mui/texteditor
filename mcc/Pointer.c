@@ -129,7 +129,7 @@ static struct BitMap selectPointerBitmap =
   { (PLANEPTR)selectPointer_bp0, (PLANEPTR)selectPointer_bp1, NULL, NULL, NULL, NULL, NULL }
 };
 
-static void SpecPointerColors(Object *obj)
+static void IdentifyPointerColors(Object *obj)
 {
   int i;
   ULONG colors[3*3];
@@ -146,9 +146,11 @@ static void SpecPointerColors(Object *obj)
   // get the current screen's pointer colors (17 to 19)
   GetRGB32(_window(obj)->WScreen->ViewPort.ColorMap, 17, 3, colors);
 
-  for(i = 0; i < 3; i++)
+  for(i=0; i < 3; i++)
   {
-    LONG dr, dg, db;
+    LONG dr;
+    LONG dg;
+    LONG db;
 
     // normalize the colors to 8 bit per gun as GetRGB32() returns
     // 32bit left aligned values
@@ -157,38 +159,43 @@ static void SpecPointerColors(Object *obj)
     colors[i*3+2] >>= 24;
 
     // calculate the geometric difference to the color black (=0x00000000)
-	dr = 0x00000000 - colors[i*3+0];
-	dg = 0x00000000 - colors[i*3+1];
-	db = 0x00000000 - colors[i*3+2];
+    dr = 0x00000000 - colors[i*3+0];
+    dg = 0x00000000 - colors[i*3+1];
+    db = 0x00000000 - colors[i*3+2];
     blackDiff[i] = dr * dr + dg * dg + db * db;
+
     // calculate the geometric difference to the color white (=0x000000ff)
-	dr = 0x000000ff - colors[i*3+0];
-	dg = 0x000000ff - colors[i*3+1];
-	db = 0x000000ff - colors[i*3+2];
+    dr = 0x000000ff - colors[i*3+0];
+    dg = 0x000000ff - colors[i*3+1];
+    db = 0x000000ff - colors[i*3+2];
     whiteDiff[i] = dr * dr + dg * dg + db * db;
   }
 
   // the smallest difference defines the color which is closest to black or
   // equal to black
   if(blackDiff[0] > blackDiff[1])
+  {
     if(blackDiff[1] > blackDiff[2])
       blackIndex = 19;
     else
       blackIndex = 18;
+  }
   else if(blackDiff[0] > blackDiff[2])
-  	blackIndex = 19;
+    blackIndex = 19;
   else
     blackIndex = 17;
 
   // the smallest difference defines the color which is closest to white or
   // equal to white
   if(whiteDiff[0] > whiteDiff[1])
+  {
     if(whiteDiff[1] > whiteDiff[2])
       whiteIndex = 19;
     else
       whiteIndex = 18;
+  }
   else if(whiteDiff[0] > whiteDiff[2])
-  	whiteIndex = 19;
+    whiteIndex = 19;
   else
     whiteIndex = 17;
 
@@ -197,7 +204,8 @@ static void SpecPointerColors(Object *obj)
   // versa. According to these differences we spread the required bitplanes.
   if(whiteIndex == 17)
   {
-    if(blackIndex == 18) {
+    if(blackIndex == 18)
+    {
       selectPointerBitmap.Planes[0] = (PLANEPTR)selectPointer_bp0;
       selectPointerBitmap.Planes[1] = (PLANEPTR)selectPointer_bp1;
     }
@@ -209,7 +217,8 @@ static void SpecPointerColors(Object *obj)
   }
   else if(whiteIndex == 18)
   {
-    if(blackIndex == 17) {
+    if(blackIndex == 17)
+    {
       selectPointerBitmap.Planes[0] = (PLANEPTR)selectPointer_bp1;
       selectPointerBitmap.Planes[1] = (PLANEPTR)selectPointer_bp0;
     }
@@ -221,7 +230,8 @@ static void SpecPointerColors(Object *obj)
   }
   else // whiteIndex == 19
   {
-    if(blackIndex == 17) {
+    if(blackIndex == 17)
+    {
       selectPointerBitmap.Planes[0] = (PLANEPTR)selectPointer_bp2;
       selectPointerBitmap.Planes[1] = (PLANEPTR)selectPointer_bp0;
     }
@@ -235,52 +245,40 @@ static void SpecPointerColors(Object *obj)
   LEAVE();
 }
 
-void SetMousePointer(Object *obj, struct InstData *data)
+void SetupSelectPointer(struct InstData *data)
 {
   ENTER();
 
   if(data->PointerObj == NULL)
   {
-    if(IntuitionBase->LibNode.lib_Version >= 39)
+    if(((struct Library *)IntuitionBase)->lib_Version >= 39)
     {
-      SpecPointerColors(obj);
-
-      if((data->PointerObj = (Object *)NewObject(NULL, "pointerclass",
-          POINTERA_BitMap,      (LONG)&selectPointerBitmap,
-          POINTERA_XOffset,     (LONG)selectPointerXOffset,
-          POINTERA_YOffset,     (LONG)selectPointerYOffset,
-          POINTERA_WordWidth,   (ULONG)1,
-          POINTERA_XResolution, (ULONG)POINTERXRESN_SCREENRES,
-          POINTERA_YResolution, (ULONG)POINTERYRESN_SCREENRESASPECT,
-          TAG_DONE)) != NULL)
-      {
-        SetWindowPointer(_window(obj), WA_Pointer, data->PointerObj, TAG_DONE);
-      }
-      else
-        SetWindowPointer(_window(obj), TAG_DONE);
+      data->PointerObj = (Object *)NewObject(NULL, "pointerclass",
+        POINTERA_BitMap,      (LONG)&selectPointerBitmap,
+        POINTERA_XOffset,     (LONG)selectPointerXOffset,
+        POINTERA_YOffset,     (LONG)selectPointerYOffset,
+        POINTERA_WordWidth,   (ULONG)1,
+        POINTERA_XResolution, (ULONG)POINTERXRESN_SCREENRES,
+        POINTERA_YResolution, (ULONG)POINTERYRESN_SCREENRESASPECT,
+        TAG_DONE);
     }
     else
     {
       if((data->PointerObj = (Object *)AllocVec(sizeof(selectPointer), MEMF_CHIP|MEMF_PUBLIC)) != NULL)
-      {
         memcpy(data->PointerObj, selectPointer, sizeof(selectPointer));
-        SetPointer(_window(obj), (APTR)data->PointerObj, selectPointerHeight, selectPointerWidth, selectPointerXOffset, selectPointerYOffset);
-      }
-      else
-        ClearPointer(_window(obj));
     }
   }
 
   LEAVE();
 }
 
-void ClearMousePointer(Object *obj, struct InstData *data)
+void CleanupSelectPointer(Object *obj, struct InstData *data)
 {
   ENTER();
 
   if(data->PointerObj != NULL)
   {
-    if(IntuitionBase->LibNode.lib_Version >= 39)
+    if(((struct Library *)IntuitionBase)->lib_Version >= 39)
     {
       SetWindowPointer(_window(obj), TAG_DONE);
       DisposeObject(data->PointerObj);
@@ -292,6 +290,52 @@ void ClearMousePointer(Object *obj, struct InstData *data)
       FreeVec(data->PointerObj);
       data->PointerObj = NULL;
     }
+
+    data->activeSelectPointer = TRUE;
+  }
+
+  LEAVE();
+}
+
+void ShowSelectPointer(Object *obj, struct InstData *data)
+{
+  ENTER();
+
+  if(data->activeSelectPointer == FALSE &&
+     data->PointerObj != NULL)
+  {
+    if(((struct Library *)IntuitionBase)->lib_Version >= 39)
+    {
+      // try to identify the black/white colors
+      // of the current screen colormap
+      IdentifyPointerColors(obj);
+
+      SetWindowPointer(_window(obj), WA_Pointer, data->PointerObj, TAG_DONE);
+    }
+    else
+      SetPointer(_window(obj), (APTR)data->PointerObj, selectPointerHeight,
+                                                       selectPointerWidth,
+                                                       selectPointerXOffset,
+                                                       selectPointerYOffset);
+    data->activeSelectPointer = TRUE;
+  }
+
+  LEAVE();
+}
+
+void HideSelectPointer(Object *obj, struct InstData *data)
+{
+  ENTER();
+
+  if(data->activeSelectPointer == TRUE &&
+     data->PointerObj != NULL)
+  {
+    if(((struct Library *)IntuitionBase)->lib_Version >= 39)
+      SetWindowPointer(_window(obj), TAG_DONE);
+    else
+      ClearPointer(_window(obj));
+
+    data->activeSelectPointer = FALSE;
   }
 
   LEAVE();
