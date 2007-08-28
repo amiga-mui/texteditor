@@ -291,7 +291,7 @@ void CleanupSelectPointer(Object *obj, struct InstData *data)
       data->PointerObj = NULL;
     }
 
-    data->activeSelectPointer = TRUE;
+    data->activeSelectPointer = FALSE;
   }
 
   LEAVE();

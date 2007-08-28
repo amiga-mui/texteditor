@@ -153,6 +153,7 @@ struct InstData_MCP
   Object *separatorshadow;
   Object *CfgObj;
   Object *inactiveCursor;
+  Object *selectPointer;
 
   const char *gTitles[5];
   const char *functions[41];

@@ -70,6 +70,7 @@ extern "C" {
 #define MUICFG_TextEditor_SeparatorShadow  0xad000067
 #define MUICFG_TextEditor_ConfigVersion    0xad000068
 #define MUICFG_TextEditor_InactiveCursor   0xad000069
+#define MUICFG_TextEditor_SelectPointer    0xad00006a
 
 #ifdef __GNUC__
   #ifdef __PPC__

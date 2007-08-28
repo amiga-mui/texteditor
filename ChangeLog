@@ -5,6 +5,14 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-08-28 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcc: propaged the new mcp option to enable/disable the selection pointer to
+    our corresponding mcc routines. Now a user can disable the selection pointer
+    in case he finds it annoying/unnecessary. But per default it will be enabled.
+  * mcp: implemented a new settings option to be able to enable/disable the new
+    selection pointer.
+
 2007-08-27  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Pointer.c: when setting up the pointer image the colors matching white
