@@ -278,6 +278,13 @@ void InitConfig(Object *obj, struct InstData *data)
     }
   }
 
+  if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_SelectPointer, &setting))
+  {
+    data->selectPointer = *(long *)setting;
+  }
+  else
+    data->selectPointer = TRUE;
+
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_InactiveCursor, &setting))
   {
     data->inactiveCursor = *(long *)setting;

@@ -107,6 +107,9 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
         ShowSelectPointer(obj, data);
       else
         HideSelectPointer(obj, data);
+
+      RETURN(MUI_EventHandlerRC_Eat);
+      return(MUI_EventHandlerRC_Eat);
     }
     else
     #if defined(__amigaos4__)
@@ -219,23 +222,6 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
         break;
         #endif
 
-/*
-        case IDCMP_INACTIVEWINDOW:
-        {
-          if(data->mousemove)
-          {
-            data->mousemove = FALSE;
-            RejectInput(data);
-          }
-        }
-        break;
-*/
-/*
-        case IDCMP_MOUSEMOVE:
-          if(data->mousemove && !data->smooth_wait)
-            InputTrigger(cl, data);
-          break;
-*/
         case IDCMP_MOUSEBUTTONS:
         {
           if(data->ypos != data->realypos)

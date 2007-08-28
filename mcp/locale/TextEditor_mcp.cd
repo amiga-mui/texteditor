@@ -459,3 +459,10 @@ MSG_HELP_InactiveCursor (134//)
 If enabled, shows a special cursor in case the texteditor\n\
 gadget is in inactive state.
 ;
+MSG_Label_SelectPointer (135//)
+Selection Pointer
+;
+MSG_HELP_SelectPointer (136//)
+If enabled, a specialized selection pointer will be shown\n\
+when the mouse pointer is above the texteditor gadget.
+;

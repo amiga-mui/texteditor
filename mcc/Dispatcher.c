@@ -222,11 +222,18 @@ ULONG Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
       data->ehnode.ehn_Flags    = MUI_EHF_GUIMODE;
       data->ehnode.ehn_Object   = obj;
       data->ehnode.ehn_Class    = cl;
-      data->ehnode.ehn_Events   = IDCMP_ACTIVEWINDOW | IDCMP_MOUSEBUTTONS | IDCMP_RAWKEY | IDCMP_MOUSEMOVE;
+      data->ehnode.ehn_Events   = IDCMP_INACTIVEWINDOW | IDCMP_MOUSEBUTTONS | IDCMP_RAWKEY;
 
       #if defined(__amigaos4__)
       data->ehnode.ehn_Events  |= IDCMP_EXTENDEDMOUSE;
       #endif
+
+      // setup the selection pointer
+      if(data->selectPointer == TRUE)
+      {
+        data->ehnode.ehn_Events  |= IDCMP_MOUSEMOVE;
+        SetupSelectPointer(data);
+      }
 
       data->ihnode.ihn_Object   = obj;
       data->ihnode.ihn_Millis   = 20;
@@ -237,9 +244,6 @@ ULONG Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
 
       data->smooth_wait = 0;
       data->scrollaction      = FALSE;
-
-      // setup the selection pointer
-      SetupSelectPointer(data);
 
       RETURN(TRUE);
       return(TRUE);
@@ -253,6 +257,7 @@ ULONG Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
 ULONG Cleanup(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
+  ULONG result = 0;
 
   ENTER();
 
@@ -262,9 +267,8 @@ ULONG Cleanup(struct IClass *cl, Object *obj, Msg msg)
   DoMethod(_win(obj), MUIM_Window_RemEventHandler, &data->ehnode);
 
   if(DoMethod(_app(obj), OM_REMMEMBER, data->SuggestWindow))
-  {
     MUI_DisposeObject(data->SuggestWindow);
-  }
+
   if(!(data->flags & FLG_ReadOnly))
     _flags(obj) &= ~(1<<7);
 
@@ -276,8 +280,10 @@ ULONG Cleanup(struct IClass *cl, Object *obj, Msg msg)
 
   FreeConfig(data, muiRenderInfo(obj));
 
-  LEAVE();
-  return(DoSuperMethodA(cl, obj, msg));
+  result = DoSuperMethodA(cl, obj, msg);
+
+  RETURN(result);
+  return result;
 }
 
 ULONG AskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)

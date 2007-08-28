@@ -324,6 +324,7 @@ struct InstData
   BOOL            userUndoSize;
   BOOL            TypeAndSpell;
   BOOL            inactiveCursor;
+  BOOL            selectPointer;
   BOOL            activeSelectPointer;
   APTR            SuggestWindow;
   APTR            SuggestListview;
