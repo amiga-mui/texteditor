@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-08-27  Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Pointer.c: with OS4 a 32bit ARGB pointer will now be used. Currently
+    the image is just 2bit and very simple, but just to get the idea...
+
 2007-08-29 Jens Langner <Jens.Langner@light-speed.de>
 
   * mcc/PrintLineWithStyles.c, mcc/Dispatcher.c: the text will now always be
