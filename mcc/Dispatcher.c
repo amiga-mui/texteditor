@@ -354,10 +354,10 @@ ULONG Show(struct IClass *cl, Object *obj, Msg msg)
   data->rport       = muiRenderInfo(obj)->mri_RastPort;
   data->height      = data->font->tf_YSize;
   data->xpos        = ad->mad_Box.Left + ad->mad_addleft;
-  data->innerwidth    = ad->mad_Box.Width - ad->mad_subwidth;
-  data->maxlines      = (ad->mad_Box.Height - ad->mad_subheight) / data->height;
-  data->ypos        = ad->mad_Box.Top + ad->mad_addtop + ((ad->mad_Box.Height-ad->mad_subheight)%data->height)/2;
-  data->realypos      = data->ypos;
+  data->innerwidth  = ad->mad_Box.Width - ad->mad_subwidth;
+  data->maxlines    = (ad->mad_Box.Height - ad->mad_subheight) / data->height;
+  data->ypos        = ad->mad_Box.Top + ad->mad_addtop;
+  data->realypos    = data->ypos;
 
   line = data->firstline;
   while(line)
@@ -457,22 +457,16 @@ ULONG mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
     ScrollIntoDisplay(data);
     data->update = TRUE;
 */
-    DoMethod(obj, MUIM_DrawBackground,
-          data->xpos,
-          ad->mad_Box.Top+ad->mad_addtop,
-          data->innerwidth,
-          (ad->mad_Box.Height-ad->mad_subheight-(data->maxlines*data->height))/2,
-          data->xpos,
-          ad->mad_Box.Top+ad->mad_addtop);
 
-    DoMethod(obj, MUIM_DrawBackground,
-          data->xpos,
-          data->realypos+(data->maxlines*data->height),
-          data->innerwidth,
-          (ad->mad_Box.Height-ad->mad_subheight-(data->maxlines*data->height)+1)/2,
-          data->xpos,
-          data->realypos+(data->maxlines*data->height));
+    // we clear the very last part of the gadget
+    // content at the very bottom because that one will not be
+    // automatically cleared by PrintLine() later on
+    DoMethod(obj, MUIM_DrawBackground, data->xpos, data->ypos+(data->height * (data->maxlines)),
+                                       data->innerwidth, (ad->mad_Box.Height-ad->mad_subheight-(data->height * (data->maxlines))),
+                                       data->xpos, ad->mad_Box.Top+ad->mad_addtop, 0);
 
+    // make sure we ghost out the whole area in case
+    // the gadget was flagged as being ghosted.
     if(data->flags & FLG_Ghosted)
     {
       UWORD *oldPattern = data->rport->AreaPtrn;
@@ -488,6 +482,7 @@ ULONG mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
       data->rport->AreaPtSz = oldSize;
     }
 
+    // dump all text now
     DumpText(data->visual_y, 0, data->maxlines, FALSE, data);
   }
 

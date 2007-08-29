@@ -344,9 +344,9 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
 
     if(data->flags & FLG_Ghosted)
     {
-        UWORD *oldPattern = rp->AreaPtrn;
-        UBYTE oldSize = rp->AreaPtSz;
-        UWORD newPattern[] = {0x1111, 0x4444};
+      UWORD *oldPattern = rp->AreaPtrn;
+      UBYTE oldSize = rp->AreaPtSz;
+      UWORD newPattern[] = {0x1111, 0x4444};
 
       if(doublebuffer == TRUE)
       {
