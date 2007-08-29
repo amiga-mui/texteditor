@@ -5,8 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
-2007-08-27  Thore Böckelmann <tboeckel@gmx.de>
+2007-08-29  Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/Pointer.c: just in case the 32bit pointer cannot be created the old
+    bitmap is also passed in again.
   * mcc/Pointer.c: with OS4 a 32bit ARGB pointer will now be used. Currently
     the image is just 2bit and very simple, but just to get the idea...
 

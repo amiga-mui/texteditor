@@ -147,6 +147,7 @@ static const ULONG argbPointer[] =
 #define selectPointerXOffset -5
 #define selectPointerYOffset -7
 
+#if defined(__amigaos4__)
 #ifndef POINTERA_ImageData
 #define POINTERA_ImageData (POINTERA_Dummy + 0x07) // ARGB (width * height * sizeof(ULONG))
 #endif
@@ -155,6 +156,7 @@ static const ULONG argbPointer[] =
 #endif
 #ifndef POINTERA_Height
 #define POINTERA_Height    (POINTERA_Dummy + 0x09) // <= 64
+#endif
 #endif
 
 static struct BitMap selectPointerBitmap =
@@ -292,10 +294,9 @@ void SetupSelectPointer(struct InstData *data)
         POINTERA_ImageData,   argbPointer,
         POINTERA_Width,       selectPointerWidth,
         POINTERA_Height,      selectPointerHeight,
-      #else
+      #endif
         POINTERA_BitMap,      (LONG)&selectPointerBitmap,
         POINTERA_WordWidth,   (ULONG)1,
-      #endif
         POINTERA_XResolution, (ULONG)POINTERXRESN_SCREENRES,
         POINTERA_YResolution, (ULONG)POINTERYRESN_SCREENRESASPECT,
         POINTERA_XOffset,     (LONG)selectPointerXOffset,
