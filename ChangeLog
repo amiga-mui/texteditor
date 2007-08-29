@@ -7,6 +7,10 @@ $URL$
 
 2007-08-29 Jens Langner <Jens.Langner@light-speed.de>
 
+  * mcc/PrintLineWithStyles.c, mcc/Dispatcher.c: the text will now always be
+    rendered right from the top rather than layouting it vertically centered
+    throughout the available space. This should fix the common vertical text
+    floating when resizing a window which is redrawn with every resize operation.
   * mcc/Dispatcher.c: when the gadgeted will be hided via a MUIM_Hide call we go
     and hide the selection pointer as well. This should make the selection pointer
     disappear as soon as a texteditor gadget is in a register group and gets
