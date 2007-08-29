@@ -417,8 +417,8 @@ ULONG Hide(struct IClass *cl, Object *obj, Msg msg)
 
   ENTER();
 
-  data->shown   = FALSE;
-
+  data->shown = FALSE;
+  HideSelectPointer(obj, data);
   nnset(data->SuggestWindow, MUIA_Window_Open, FALSE);
   set(_win(obj), MUIA_Window_DisableKeys, 0L);
   MUIG_FreeBitMap(data->doublebuffer);

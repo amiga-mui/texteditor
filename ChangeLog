@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-08-29 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcc/Dispatcher.c: when the gadgeted will be hided via a MUIM_Hide call we go
+    and hide the selection pointer as well. This should make the selection pointer
+    disappear as soon as a texteditor gadget is in a register group and gets
+    hided as soon as the group is switched.
+
 2007-08-28 Jens Langner <Jens.Langner@light-speed.de>
 
   * mcc: propaged the new mcp option to enable/disable the selection pointer to
