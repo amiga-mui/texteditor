@@ -72,6 +72,14 @@ static const ULONG selectPointer[] =
 #define POINTERA_Height    (POINTERA_Dummy + 0x09) // <= 64
 #endif
 
+// the 32bit pointer image setup seems to require
+// to have a fake bitmap.
+static struct BitMap fakeBitmap =
+{
+  2, 16, 0, 2, 0,
+  { NULL, NULL, NULL, NULL, NULL, NULL, NULL }
+};
+
 #else // __amigaos4__
 
 static const UWORD selectPointer_bp0[] =
@@ -293,6 +301,7 @@ void SetupSelectPointer(struct InstData *data)
       POINTERA_ImageData,   selectPointer,
       POINTERA_Width,       selectPointerWidth,
       POINTERA_Height,      selectPointerHeight,
+      POINTERA_BitMap,      &fakeBitmap,
       POINTERA_XResolution, (ULONG)POINTERXRESN_SCREENRES,
       POINTERA_YResolution, (ULONG)POINTERYRESN_SCREENRESASPECT,
       POINTERA_XOffset,     (LONG)selectPointerXOffset,
