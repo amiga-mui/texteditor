@@ -7,6 +7,9 @@ $URL$
 
 2007-08-30 Jens Langner <Jens.Langner@light-speed.de>
 
+  * mcc/Pointer.c: the 32bit pointer setup seems to require to have a fake
+    bitmap setup passed to the pointer class or otherwise the pointer might
+    not be generated properly.
   * mcc/Pointer.c: on OS4 we generally prefer to use the 32bit pointer image
     data and don't do any color identification or use the select pointer
     bitmap at all. However, we still need to get the 32bit select pointer
