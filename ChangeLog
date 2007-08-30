@@ -5,6 +5,14 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-08-30 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcc/Pointer.c: on OS4 we generally prefer to use the 32bit pointer image
+    data and don't do any color identification or use the select pointer
+    bitmap at all. However, we still need to get the 32bit select pointer
+    ready as we still have just an example image up&running, but it is nice
+    to be able to freely define a 32bit pointer on OS4.
+
 2007-08-29  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Pointer.c: just in case the 32bit pointer cannot be created the old
