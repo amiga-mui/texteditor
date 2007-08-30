@@ -33,6 +33,47 @@
 
 #include "private.h"
 
+// the meta data of the pointer image/data
+#define selectPointerWidth   7
+#define selectPointerHeight  16
+#define selectPointerXOffset -5
+#define selectPointerYOffset -7
+
+#if defined(__amigaos4__)
+// a very simple 32bit pointer image :)
+static const ULONG selectPointer[] =
+{
+  0x00000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0xffffffff, 0x00000000,
+  0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff,
+  0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000,
+  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000,
+  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000,
+  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000,
+  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000,
+  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000,
+  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000,
+  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000,
+  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000,
+  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000,
+  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000,
+  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000,
+  0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000,
+  0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff,
+  0x00000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0xffffffff, 0x00000000,
+};
+
+#ifndef POINTERA_ImageData
+#define POINTERA_ImageData (POINTERA_Dummy + 0x07) // ARGB (width * height * sizeof(ULONG))
+#endif
+#ifndef POINTERA_Width
+#define POINTERA_Width     (POINTERA_Dummy + 0x08) // <= 64
+#endif
+#ifndef POINTERA_Height
+#define POINTERA_Height    (POINTERA_Dummy + 0x09) // <= 64
+#endif
+
+#else // __amigaos4__
+
 static const UWORD selectPointer_bp0[] =
 {
   0x8800,    /* #...#........... */
@@ -117,47 +158,6 @@ static const UWORD selectPointer[] =
 
   0x0000,   0x0000
 };
-
-#if defined(__amigaos4__)
-// a very simple 32bit pointer image :)
-static const ULONG argbPointer[] =
-{
-  0x00000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-  0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-  0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-  0x00000000, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-  0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-  0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0xffffffff, 0xff000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-  0x00000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-};
-#endif
-
-#define selectPointerWidth   15
-#define selectPointerHeight  16
-#define selectPointerXOffset -5
-#define selectPointerYOffset -7
-
-#if defined(__amigaos4__)
-#ifndef POINTERA_ImageData
-#define POINTERA_ImageData (POINTERA_Dummy + 0x07) // ARGB (width * height * sizeof(ULONG))
-#endif
-#ifndef POINTERA_Width
-#define POINTERA_Width     (POINTERA_Dummy + 0x08) // <= 64
-#endif
-#ifndef POINTERA_Height
-#define POINTERA_Height    (POINTERA_Dummy + 0x09) // <= 64
-#endif
-#endif
 
 static struct BitMap selectPointerBitmap =
 {
@@ -280,6 +280,7 @@ static void IdentifyPointerColors(Object *obj)
 
   LEAVE();
 }
+#endif
 
 void SetupSelectPointer(struct InstData *data)
 {
@@ -287,14 +288,20 @@ void SetupSelectPointer(struct InstData *data)
 
   if(data->PointerObj == NULL)
   {
+    #if defined(__amigaos4__)
+    data->PointerObj = (Object *)NewObject(NULL, "pointerclass",
+      POINTERA_ImageData,   selectPointer,
+      POINTERA_Width,       selectPointerWidth,
+      POINTERA_Height,      selectPointerHeight,
+      POINTERA_XResolution, (ULONG)POINTERXRESN_SCREENRES,
+      POINTERA_YResolution, (ULONG)POINTERYRESN_SCREENRESASPECT,
+      POINTERA_XOffset,     (LONG)selectPointerXOffset,
+      POINTERA_YOffset,     (LONG)selectPointerYOffset,
+      TAG_DONE);
+    #else
     if(((struct Library *)IntuitionBase)->lib_Version >= 39)
     {
       data->PointerObj = (Object *)NewObject(NULL, "pointerclass",
-      #if defined(__amigaos4__)
-        POINTERA_ImageData,   argbPointer,
-        POINTERA_Width,       selectPointerWidth,
-        POINTERA_Height,      selectPointerHeight,
-      #endif
         POINTERA_BitMap,      (LONG)&selectPointerBitmap,
         POINTERA_WordWidth,   (ULONG)1,
         POINTERA_XResolution, (ULONG)POINTERXRESN_SCREENRES,
@@ -308,6 +315,7 @@ void SetupSelectPointer(struct InstData *data)
       if((data->PointerObj = (Object *)AllocVec(sizeof(selectPointer), MEMF_CHIP|MEMF_PUBLIC)) != NULL)
         memcpy(data->PointerObj, selectPointer, sizeof(selectPointer));
     }
+    #endif
   }
 
   LEAVE();
@@ -319,6 +327,11 @@ void CleanupSelectPointer(Object *obj, struct InstData *data)
 
   if(data->PointerObj != NULL)
   {
+    #if defined(__amigaos4__)
+    SetWindowPointer(_window(obj), TAG_DONE);
+    DisposeObject(data->PointerObj);
+    data->PointerObj = NULL;
+    #else
     if(((struct Library *)IntuitionBase)->lib_Version >= 39)
     {
       SetWindowPointer(_window(obj), TAG_DONE);
@@ -331,6 +344,7 @@ void CleanupSelectPointer(Object *obj, struct InstData *data)
       FreeVec(data->PointerObj);
       data->PointerObj = NULL;
     }
+    #endif
 
     data->activeSelectPointer = FALSE;
   }
@@ -345,6 +359,9 @@ void ShowSelectPointer(Object *obj, struct InstData *data)
   if(data->activeSelectPointer == FALSE &&
      data->PointerObj != NULL)
   {
+    #if defined(__amigaos4__)
+    SetWindowPointer(_window(obj), WA_Pointer, data->PointerObj, TAG_DONE);
+    #else
     if(((struct Library *)IntuitionBase)->lib_Version >= 39)
     {
       // try to identify the black/white colors
@@ -358,6 +375,8 @@ void ShowSelectPointer(Object *obj, struct InstData *data)
                                                        selectPointerWidth,
                                                        selectPointerXOffset,
                                                        selectPointerYOffset);
+    #endif
+
     data->activeSelectPointer = TRUE;
   }
 
@@ -371,10 +390,14 @@ void HideSelectPointer(Object *obj, struct InstData *data)
   if(data->activeSelectPointer == TRUE &&
      data->PointerObj != NULL)
   {
+    #if defined(__amigaos4__)
+    SetWindowPointer(_window(obj), TAG_DONE);
+    #else
     if(((struct Library *)IntuitionBase)->lib_Version >= 39)
       SetWindowPointer(_window(obj), TAG_DONE);
     else
       ClearPointer(_window(obj));
+    #endif
 
     data->activeSelectPointer = FALSE;
   }
