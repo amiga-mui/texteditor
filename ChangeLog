@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-08-31 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcc/Pointer.c: tuned the 32bit pointer image a bit to look better on
+    both, bright and dark background colors while still maintaining the
+    general look&feel of the new pointer.
+
 2007-08-30 Jens Langner <Jens.Langner@light-speed.de>
 
   * mcc/Pointer.c: the 32bit pointer setup seems to require to have a fake
