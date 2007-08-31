@@ -7,6 +7,9 @@ $URL$
 
 2007-08-31 Jens Langner <Jens.Langner@light-speed.de>
 
+  * mcc/GetSetAttrs.c: fixed bug where an initial MUIA_Disabled state for a
+    texteditor object in OM_NEW didn't automatically end up in having an added
+    slider set disabled as well.
   * mcc/HandleInput.c: an instant scroll operation wasn't possible anymore if
     the texteditor object was currently active because the IDCMP_MOUSEMOVE catch
     operations blocked it.

@@ -463,9 +463,15 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
       break;
 
       case MUIA_TextEditor_Slider:
+      {
         if(!data->shown)
         {
           data->slider = (void *)ti_Data;
+
+          // disable the slider right away if the texteditor
+          // gadget is disabled as well.
+          if(data->flags & FLG_Ghosted)
+            set(data->slider, MUIA_Disabled, TRUE);
 
           DoMethod(data->slider, MUIM_Notify,
               MUIA_Prop_Release, MUIV_EveryTime,
@@ -486,7 +492,9 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
               MUIA_TextEditor_Prop_DeltaFactor, MUIV_EveryTime,
               data->slider, 3, MUIM_NoNotifySet, MUIA_Prop_DeltaFactor, MUIV_TriggerValue);
         }
-        break;
+      }
+      break;
+
       case MUIA_TextEditor_FixedFont:
         {
           if(!data->shown)
