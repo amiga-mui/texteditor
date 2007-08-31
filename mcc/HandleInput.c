@@ -35,7 +35,7 @@
 #include "newmouse.h"
 #endif
 
-static LONG ReactOnRawKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data);
+static BOOL ReactOnRawKey(struct IntuiMessage *imsg, struct InstData *data);
 
 static ULONG RAWToANSI(struct IntuiMessage *imsg)
 {
@@ -134,6 +134,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
       {
         case IDCMP_RAWKEY:
         {
+  D(DBF_ALWAYS, "HandleInput rawkey code=%02x qual=%04x", imsg->Code, imsg->Qualifier);
           if(data->ypos != data->realypos ||
              (wasActivated && imsg->Code == 66)) // ignore TAB key if the gadget was activated recently
           {
@@ -177,10 +178,17 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
           #endif
 
           // if not we check wheter we have to react on that particular RAWKEY event
-          if(ReactOnRawKey(imsg->Code, imsg->Qualifier, imsg, data) == 0)
+          if(ReactOnRawKey(imsg, data) == FALSE)
           {
+            D(DBF_ALWAYS, "not reacted");
             RETURN(0);
             return(0);
+          }
+          else
+          {
+            D(DBF_ALWAYS, "reacted");
+            RETURN(MUI_EventHandlerRC_Eat);
+            return(MUI_EventHandlerRC_Eat);
           }
         }
         break;
@@ -765,9 +773,9 @@ void Key_Normal(UBYTE key, struct InstData *data)
 /*----------------*
  * Convert Rawkey *
  *----------------*/
-static LONG ConvertKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
+static BOOL ConvertKey(struct IntuiMessage *imsg, struct InstData *data)
 {
-  LONG result = TRUE;
+  BOOL result = FALSE;
   UBYTE code = 0;
   struct InputEvent event;
 
@@ -776,8 +784,8 @@ static LONG ConvertKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, st
   event.ie_NextEvent    = NULL;
   event.ie_Class        = IECLASS_RAWKEY;
   event.ie_SubClass     = 0;
-  event.ie_Code         = key;
-  event.ie_Qualifier    = qualifier;
+  event.ie_Code         = imsg->Code;
+  event.ie_Qualifier    = imsg->Qualifier;
   event.ie_EventAddress = (APTR *) *((ULONG *)imsg->IAddress);
 
   if(MapRawKey(&event, (STRPTR)&code, 1, NULL) > 0)
@@ -785,20 +793,16 @@ static LONG ConvertKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, st
     SHOWVALUE(DBF_INPUT, code);
 
 #ifdef FILTER_NONPRINTABLE
-    if((code < 32) || ((code > 126) && (code < 160)))
+    if((code >= 32 && code <= 126) || code >= 160)
 #else
-    if(code < 32)
+    if(code >= 32)
 #endif
-    {
-      result = FALSE;
-    }
-    else
     {
       data->pixel_x = 0;
       Key_Normal(code, data);
+      result = TRUE;
     }
   }
-  else  result = FALSE;
 
   RETURN(result);
   return(result);
@@ -862,36 +866,32 @@ static BOOL MatchQual(ULONG input, ULONG match, UWORD action, struct InstData *d
 /*---------------------------------*
  * Function to handle a cursormove *
  *---------------------------------*/
-static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
+static LONG FindKey(UBYTE key, ULONG qualifier, struct InstData *data)
 {
   struct te_key *t_keys = data->RawkeyBindings;
-  BOOL speed = FALSE;
   int i;
+  UBYTE pressKey = key & ~IECODE_UP_PREFIX;
+  UBYTE releaseKey = key | IECODE_UP_PREFIX;
 
   ENTER();
 
   if(t_keys == NULL)
     t_keys = (struct te_key *)default_keybindings;
 
-#ifdef FAST_SCROLL
-  if(qualifier & IEQUALIFIER_REPEAT)
-  {
-    static ULONG  repeatcount = 0;
-
-    if(repeatcount == 20)
-        speed = TRUE;
-    else  repeatcount++;
-  }
-  else  repeatcount = 0;
-#endif
-
   qualifier &= ~(IEQUALIFIER_RELATIVEMOUSE | IEQUALIFIER_REPEAT | IEQUALIFIER_CAPSLOCK);
   for(i=0; (WORD)t_keys[i].code != -1; i++)
   {
     struct te_key *curKey = &t_keys[i];
 
-    if((key == curKey->code) && MatchQual(qualifier, curKey->qual, curKey->act, data))
+    if(curKey->code == pressKey && MatchQual(qualifier, curKey->qual, curKey->act, data))
     {
+      if(key == releaseKey)
+      {
+        // We have been called for a known shortcut, but this was a release action.
+        // This will also be "eaten" to avoid double input
+        RETURN(5);
+        return 5;
+      }
       if(data->flags & FLG_ReadOnly)
       {
         LONG new_y = data->visual_y-1;
@@ -908,8 +908,6 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
 
           case MUIV_TextEditor_KeyAction_Up:
             new_y -= 1;
-            if(speed)
-              new_y -= 1;
             break;
 
           case MUIV_TextEditor_KeyAction_Bottom:
@@ -922,8 +920,6 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
 
           case MUIV_TextEditor_KeyAction_Down:
             new_y += 1;
-            if(speed)
-              new_y += 1;
             break;
 
           case MUIV_TextEditor_KeyAction_Copy:
@@ -993,8 +989,6 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
 
           case MUIV_TextEditor_KeyAction_Up:
             GoUp(data);
-            if(speed)
-              GoUp(data);
             RETURN(FALSE);
             return(FALSE);
 
@@ -1015,8 +1009,6 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
 
           case MUIV_TextEditor_KeyAction_Down:
             GoDown(data);
-            if(speed)
-              GoDown(data);
             RETURN(FALSE);
             return(FALSE);
 
@@ -1037,8 +1029,6 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
 
           case MUIV_TextEditor_KeyAction_Right:
             GoRight(data);
-            if(speed)
-              GoRight(data);
             RETURN(TRUE);
             return(TRUE);
 
@@ -1059,8 +1049,6 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
 
           case MUIV_TextEditor_KeyAction_Left:
             GoLeft(data);
-            if(speed)
-              GoLeft(data);
             RETURN(TRUE);
             return(TRUE);
 
@@ -1183,6 +1171,7 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
         RETURN(3);
         return(3);
       }
+      break;
     }
   }
 
@@ -1190,93 +1179,73 @@ static LONG FindKey (UBYTE key, ULONG qualifier, struct InstData *data)
   return(2);
 }
 
-static LONG ReactOnRawKey(UBYTE key, ULONG qualifier, struct IntuiMessage *imsg, struct InstData *data)
+static BOOL ReactOnRawKey(struct IntuiMessage *imsg, struct InstData *data)
 {
   struct line_node *oldactualline = data->actualline;
   UWORD oldCPos_X = data->CPos_X;
-  LONG result = TRUE;
+  BOOL result = TRUE;
+  BOOL mustScroll = FALSE;
+  LONG dummy;
 
   ENTER();
 
-  if(key <= IECODE_KEY_CODE_LAST)
+  dummy = FindKey(imsg->Code, imsg->Qualifier, data);
+  if(dummy == 1)
   {
-    LONG dummy;
+    data->pixel_x = 0;
+  }
 
-    dummy = FindKey(key, qualifier, data);
-    if(dummy == 1)
+  if(dummy == 1 || dummy == 0)
+  {
+    if((data->CPos_X != oldCPos_X || oldactualline != data->actualline) || (!(imsg->Qualifier & data->blockqual) && data->blockinfo.enabled))
     {
-      data->pixel_x = 0;
-    }
+      SetCursor(oldCPos_X, oldactualline, FALSE, data);
 
-    if(dummy == 1 || dummy == 0)
-    {
-      if((data->CPos_X != oldCPos_X || oldactualline != data->actualline) || (!(qualifier & data->blockqual) && data->blockinfo.enabled))
+      if(!(data->flags & FLG_ReadOnly))
       {
-        SetCursor(oldCPos_X, oldactualline, FALSE, data);
-
-        if(!(data->flags & FLG_ReadOnly))
+        if(imsg->Qualifier & data->blockqual)
         {
-          if(qualifier & data->blockqual)
+          data->blockinfo.stopline = data->actualline;
+          data->blockinfo.stopx = data->CPos_X;
+          if(!data->blockinfo.enabled)
           {
-            data->blockinfo.stopline = data->actualline;
-            data->blockinfo.stopx = data->CPos_X;
-            if(!data->blockinfo.enabled)
-            {
-              data->blockinfo.enabled = TRUE;
-              data->blockinfo.startline = oldactualline;
-              data->blockinfo.startx = oldCPos_X;
-            }
-
-            MarkText(oldCPos_X, oldactualline, data->CPos_X, data->actualline, data);
-          }
-          else
-          {
-            data->flags &= ~FLG_ARexxMark;
-            if(data->blockinfo.enabled)
-            {
-              data->blockinfo.enabled = FALSE;
-              MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
-            }
+            data->blockinfo.enabled = TRUE;
+            data->blockinfo.startline = oldactualline;
+            data->blockinfo.startx = oldCPos_X;
           }
 
-          ScrollIntoDisplay(data);
-          SetCursor(data->CPos_X, data->actualline, TRUE, data);
-        }
-      }
-    }
-    else
-    {
-      if(dummy == 3)
-      {
-        data->pixel_x = 0;
-      }
-      else
-      {
-        if(((dummy != 4 && ((data->flags & FLG_ReadOnly) || (qualifier & IEQUALIFIER_RCOMMAND))) || !ConvertKey(key, qualifier, imsg, data)))
-        {
-          result = FALSE;
-        }
-
-/*
-        if(dummy == 4)
-        {
-          result = TRUE;
+          MarkText(oldCPos_X, oldactualline, data->CPos_X, data->actualline, data);
         }
         else
         {
-          if(((data->flags & FLG_ReadOnly || qualifier & IEQUALIFIER_RCOMMAND) || !ConvertKey(key, qualifier, imsg, data)))
-            result = FALSE;
+          data->flags &= ~FLG_ARexxMark;
+          if(data->blockinfo.enabled)
+          {
+            data->blockinfo.enabled = FALSE;
+            MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+          }
         }
-*/
+
+        ScrollIntoDisplay(data);
+        SetCursor(data->CPos_X, data->actualline, TRUE, data);
       }
+      mustScroll = TRUE;
     }
   }
-  else
+  else if(dummy == 2)
   {
-    result = FALSE;
+  	// the pressed key was none of our defined shortcuts
+    if((data->flags & FLG_ReadOnly) || (imsg->Qualifier & IEQUALIFIER_RCOMMAND) || !ConvertKey(imsg, data))
+    {
+      mustScroll = TRUE;
+    }
+  }
+  else if(dummy == 3)
+  {
+    data->pixel_x = 0;
   }
 
-  if(result)
+  if(mustScroll == TRUE)
     ScrollIntoDisplay(data);
 
   RETURN(result);
