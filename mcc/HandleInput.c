@@ -107,9 +107,6 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
         ShowSelectPointer(obj, data);
       else
         HideSelectPointer(obj, data);
-
-      RETURN(MUI_EventHandlerRC_Eat);
-      return(MUI_EventHandlerRC_Eat);
     }
     else
     #if defined(__amigaos4__)

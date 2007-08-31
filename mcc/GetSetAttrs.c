@@ -274,10 +274,13 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
         break;
 
       case MUIA_TextEditor_Prop_Release:
+      {
         data->smooth_wait = ti_Data;
-        break;
+      }
+      break;
 
       case MUIA_TextEditor_Prop_First:
+      {
         if(((data->visual_y-1)*data->height+(data->realypos - data->ypos) != (LONG)ti_Data) && (data->shown))
         {
             LONG     diff, smooth;
@@ -397,7 +400,9 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
                       data->totallines))
                     * data->height,
                   TAG_DONE);
-        break;
+      }
+      break;
+
       case MUIA_TextEditor_ReadOnly:
         if(ti_Data)
         {

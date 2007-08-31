@@ -7,6 +7,9 @@ $URL$
 
 2007-08-31 Jens Langner <Jens.Langner@light-speed.de>
 
+  * mcc/HandleInput.c: an instant scroll operation wasn't possible anymore if
+    the texteditor object was currently active because the IDCMP_MOUSEMOVE catch
+    operations blocked it.
   * mcc/Pointer.c: tuned the 32bit pointer image a bit to look better on
     both, bright and dark background colors while still maintaining the
     general look&feel of the new pointer.
