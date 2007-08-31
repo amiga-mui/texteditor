@@ -219,11 +219,12 @@ int main(void)
       {
           Object *app, *window, *clear, *cut, *copy, *paste, *erase,
                  *bold, *italic, *underline, *ischanged, *undo, *redo, *string,
-                 *xslider, *yslider, *flow, *search, *replace, *wrapmode, *wrapborder;
+                 *xslider, *yslider, *flow, *search, *replace, *wrapmode, *wrapborder,
+                 *rgroup, *isdisabled;
           const char *flow_text[] = { "Left", "Center", "Right", NULL };
           const char *wrap_modes[] = { "NoWrap", "SoftWrap", "HardWrap", NULL };
           const char *classes[] = { "TextEditor.mcc", NULL };
-          int wrap_border = 80;
+          int wrap_border = 76;
 
         mcc = MUI_CreateCustomClass(NULL, "Area.mui", NULL, sizeof(struct InstData), ENTRY(_Dispatcher));
 
@@ -290,6 +291,7 @@ int main(void)
                       End,
 
                       Child, ischanged = MUI_MakeObject(MUIO_Checkmark, "Is changed?"),
+                      Child, isdisabled = MUI_MakeObject(MUIO_Checkmark, "Is disabled?"),
                       Child, flow = MUI_MakeObject(MUIO_Cycle, NULL, flow_text),
                       Child, wrapmode = MUI_MakeObject(MUIO_Cycle, NULL, wrap_modes),
                       Child, wrapborder = MUI_MakeObject(MUIO_Slider, NULL, 0, 1000),
@@ -325,7 +327,7 @@ int main(void)
                               Child, NewObject(mcc->mcc_Class, NULL, End,
                             End,
 */
-                            Child, RegisterGroup(page_titles),
+                            Child, rgroup = RegisterGroup(page_titles),
                             	MUIA_Register_Frame, TRUE,
                               Child,HGroup,
                                 MUIA_Group_Spacing, 0,
@@ -353,6 +355,7 @@ int main(void)
 //                                MUIA_TextEditor_CursorY, 7,
                                   MUIA_ControlChar, 'a',
                                   MUIA_TextEditor_Contents,
+
                                     "\33r\33b" __DATE__ "\33n\n"
                                     "\n\33cTextEditor.gadget V15.0ß\n"
                                     "Copyright 1997 by Allan Odgaard\n"
@@ -486,8 +489,10 @@ int main(void)
           DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_HasChanged, MUIV_EveryTime, ischanged, 3, MUIM_NoNotifySet, MUIA_Image_State, MUIV_TriggerValue);
           DoMethod(ischanged, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_HasChanged, MUIV_TriggerValue);
 
-//          DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "Clear");
-          DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_CallHook, &ExportBlockHook);
+          DoMethod(isdisabled, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_Set, MUIA_Disabled, MUIV_TriggerValue);
+
+          DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "Clear");
+//          DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_CallHook, &ExportBlockHook);
 //          DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_HasChanged, FALSE);
 
           DoMethod(cut,   MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "Cut");
@@ -509,10 +514,15 @@ int main(void)
 //          DoMethod(string, MUIM_Notify, MUIA_String_Acknowledge, MUIV_EveryTime, editorgad, 3, MUIM_TextEditor_Search, MUIV_TriggerValue, 0L);//MUIF_TextEditor_Search_FromTop);
 //          DoMethod(string, MUIM_Notify, MUIA_String_Acknowledge, MUIV_EveryTime, editorgad, 3, MUIM_TextEditor_Replace, MUIV_TriggerValue, 0L);//MUIF_TextEditor_Search_FromTop);
 
+          DoMethod(window, MUIM_Notify, MUIA_Window_InputEvent, "f1", rgroup, 3, MUIM_Set, MUIA_Group_ActivePage, 0);
+          DoMethod(window, MUIM_Notify, MUIA_Window_InputEvent, "f2", rgroup, 3, MUIM_Set, MUIA_Group_ActivePage, 1);
+
           set(window, MUIA_Window_ActiveObject, editorgad);
           set(window, MUIA_Window_Open, TRUE);
-          set(wrapmode, MUIA_Cycle_Active, MUIV_TextEditor_WrapMode_HardWrap);
+//          set(wrapmode, MUIA_Cycle_Active, MUIV_TextEditor_WrapMode_HardWrap);
+          set(wrapmode, MUIA_Cycle_Active, MUIV_TextEditor_WrapMode_SoftWrap);
           set(wrapborder, MUIA_Numeric_Value, wrap_border);
+
 
 /*          {
             ULONG delta = xget(editorgad, MUIA_TextEditor_Prop_DeltaFactor);
