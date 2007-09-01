@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-09-01 Pär Boberg <pbobbenb@spray.se>
+
+   * mcp/locale/svenska.ct: Updated according to changes.
+
 2007-08-31  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c: key releases of known shortcuts (like cursor up/down)
