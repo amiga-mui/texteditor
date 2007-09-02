@@ -160,7 +160,6 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       else if(!(data->flags & (FLG_ReadOnly | FLG_Ghosted)) &&
               line == data->actualline && data->CPos_X >= x &&
               data->CPos_X < x+c_length && !Enabled(data) &&
-              !data->scrollaction &&
               (data->flags & FLG_Active || data->inactiveCursor == TRUE))
       {
         cursor = TRUE;
@@ -183,7 +182,6 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
                                                   (data->flags & FLG_InVGrp) ? 0 : data->xpos,
                                                   (data->flags & FLG_InVGrp) ? data->height*(data->visual_y+line_nr-2) : data->realypos+data->height * (data->visual_y+line_nr-2),
                                                   0);
-
 
       if(blockwidth)
       {

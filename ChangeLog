@@ -7,6 +7,12 @@ $URL$
 
 2007-09-02 Jens Langner <Jens.Langner@light-speed.de>
 
+  * mcc/GetSetAttrs.c, mcc/PrintLineWithStyles.c: The cursor will now scroll
+    with the text rather than kept at the very same position relately to the
+    window. This should be more intuitive and what a normal user would expect.
+    So as soon as the user wants to enter text and the cursor is not visible
+    texteditor.mcc will scroll down/up so that it will become visible as
+    expected.
   * doc/TextEditor.doc: added missing documentation about the function of the
     MUIA_TextEditor_KeyUpFocus attribute.
 
