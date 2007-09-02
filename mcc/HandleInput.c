@@ -620,8 +620,6 @@ void Key_Backspace (struct InstData *data)
     Key_Clear(data);
   else
   {
-    ScrollIntoDisplay(data);
-
     if(data->CPos_X > 0)
     {
       AddToUndoBuffer(backspacechar, data->actualline->line.Contents+--data->CPos_X, data);
@@ -637,6 +635,8 @@ void Key_Backspace (struct InstData *data)
         MergeLines(data->actualline, data);
       }
     }
+
+    ScrollIntoDisplay(data);
   }
 
   LEAVE();
