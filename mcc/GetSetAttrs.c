@@ -285,15 +285,11 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
         {
             LONG     diff, smooth;
             LONG     lastpixel = ((data->visual_y-1)*data->height) + (data->realypos - data->ypos);
-            LONG     old_visual_y = data->visual_y;
             struct   Hook  *oldhook;
             void    *cliphandle;
-            struct  line_node *oldline = data->actualline;
 
           diff = data->visual_y - ((ti_Data/data->height)+1);
 
-          if(data->flags & FLG_Active)
-            SetCursor(data->CPos_X, data->actualline, FALSE, data);
           data->visual_y = (ti_Data/data->height)+1;
           smooth = ti_Data - lastpixel;
 
@@ -301,7 +297,6 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
               data->scr_direction = 1;
           else  data->scr_direction = 0;
 
-          data->actualline = NULL;
           oldhook = InstallLayerHook(data->rport->Layer, LAYERS_NOBACKFILL);
           cliphandle = MUI_AddClipping(muiRenderInfo(data->object), data->xpos, data->realypos, data->innerwidth, data->maxlines*data->height);
           if(smooth > 0 && smooth < data->maxlines*data->height)
@@ -328,6 +323,7 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
                 }
               }
             }
+
             DumpText(data->visual_y+line_nr, line_nr, data->maxlines+1, FALSE, data);
           }
           else
@@ -352,38 +348,17 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
                     MUI_EndRefresh(muiRenderInfo(data->object), 0);
                   }
               }
+
               DumpText(data->visual_y, 0, lines, FALSE, data);
             }
             else
             {
               if(smooth)
-              {
                 DumpText(data->visual_y, 0, data->maxlines+1, FALSE, data);
-              }
             }
           }
           MUI_RemoveClipping(muiRenderInfo(data->object), cliphandle);
           InstallLayerHook(data->rport->Layer, oldhook);
-          data->actualline = oldline;
-
-          if(!Enabled(data))
-          {
-              LONG   move = old_visual_y - data->visual_y;
-
-            if(move > 0)
-            {
-              while(move--)
-                GoUp(data);
-            }
-            else
-            {
-              while(move++)
-                GoDown(data);
-            }
-            data->blockinfo.enabled = FALSE;
-            data->blockinfo.startline = data->actualline;
-            data->blockinfo.startx = data->CPos_X;
-          }
 
           if(!data->scrollaction)
           {
