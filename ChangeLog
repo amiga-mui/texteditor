@@ -7,6 +7,10 @@ $URL$
 
 2007-09-02 Jens Langner <Jens.Langner@light-speed.de>
 
+  * mcc/HandleInput.c: an invisible cursor was not automatically made visible
+    on certain key events (e.g. Return/Tab, etc). Now a cursor should always
+    be made visible as soon as a relevant input key is pressed and right before
+    any scroll action might take place.
   * mcc/HandleInput.c: as soon as a key is pressed and the cursor is outside
     the currently visible area, the text is immediately scrolled down/up now
     rather than waiting for the user to release the key. This should be a bit

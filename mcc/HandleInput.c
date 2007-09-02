@@ -519,6 +519,7 @@ void Key_Cut(struct InstData *data)
 {
   ENTER();
 
+  ScrollIntoDisplay(data);
   EraseBlock(TRUE, data);
 
   LEAVE();
@@ -530,12 +531,11 @@ void Key_Copy (struct InstData *data)
 
   if(Enabled(data))
   {
+    ScrollIntoDisplay(data);
     DoBlock(TRUE, FALSE, data);
   }
   else
-  {
     DoMethod(data->object, MUIM_TextEditor_HandleError, Error_NoAreaMarked);
-  }
 
   LEAVE();
 }
@@ -549,6 +549,8 @@ void Key_Paste (struct InstData *data)
 
   if(Enabled(data))
     Key_Clear(data);
+  else
+    ScrollIntoDisplay(data);
 
   block.startline = data->actualline;
   block.startx = data->CPos_X;
@@ -572,6 +574,8 @@ void Key_Tab (struct InstData *data)
 
   if(Enabled(data))
     Key_Clear(data);
+  else
+    ScrollIntoDisplay(data);
 
   {
     struct marking block =
@@ -598,6 +602,8 @@ void Key_Return (struct InstData *data)
 
   if(Enabled(data))
     Key_Clear(data);
+  else
+    ScrollIntoDisplay(data);
 
   CheckWord(data);
   AddToUndoBuffer(splitline, NULL, data);
@@ -611,11 +617,11 @@ void Key_Backspace (struct InstData *data)
   ENTER();
 
   if(Enabled(data))
-  {
     Key_Clear(data);
-  }
   else
   {
+    ScrollIntoDisplay(data);
+
     if(data->CPos_X > 0)
     {
       AddToUndoBuffer(backspacechar, data->actualline->line.Contents+--data->CPos_X, data);
@@ -641,11 +647,11 @@ void Key_Delete (struct InstData *data)
   ENTER();
 
   if(Enabled(data))
-  {
     Key_Clear(data);
-  }
   else
   {
+    ScrollIntoDisplay(data);
+
     if(data->actualline->line.Length > (ULONG)(data->CPos_X+1))
     {
       AddToUndoBuffer(deletechar, data->actualline->line.Contents+data->CPos_X, data);
@@ -721,6 +727,8 @@ void Key_Normal(UBYTE key, struct InstData *data)
 
   if(Enabled(data))
     Key_Clear(data);
+  else
+    ScrollIntoDisplay(data);
 
   // check if the user wants to do a direct spell checking while
   // writing some text.
@@ -800,7 +808,10 @@ static BOOL ConvertKey(struct IntuiMessage *imsg, struct InstData *data)
 #endif
     {
       data->pixel_x = 0;
+
+      // now we perform the key action
       Key_Normal(code, data);
+
       result = TRUE;
     }
   }
@@ -1181,13 +1192,11 @@ static BOOL ReactOnRawKey(struct IntuiMessage *imsg, struct InstData *data)
   struct line_node *oldactualline = data->actualline;
   UWORD oldCPos_X = data->CPos_X;
   BOOL result = TRUE;
-  BOOL mustScroll = FALSE;
   LONG dummy;
 
   ENTER();
 
   dummy = FindKey(imsg->Code, imsg->Qualifier, data);
-
   if(dummy == 1 || dummy == 0)
   {
     if(dummy == 1)
@@ -1226,26 +1235,20 @@ static BOOL ReactOnRawKey(struct IntuiMessage *imsg, struct InstData *data)
         SetCursor(data->CPos_X, data->actualline, TRUE, data);
       }
       else
-        mustScroll = TRUE;
+        ScrollIntoDisplay(data);
     }
   }
   else if(dummy == 2)
   {
-  	// the pressed key was none of our defined shortcuts
-    if((data->flags & FLG_ReadOnly) ||
-       (imsg->Qualifier & IEQUALIFIER_RCOMMAND) ||
-       (ConvertKey(imsg, data) == TRUE && (imsg->Qualifier & IEQUALIFIER_REPEAT) == 0))
+    // we execute the ConvertKey() action which in fact will
+    // perform the actual key press reaction
+    if((data->flags & FLG_ReadOnly) == 0 && (imsg->Qualifier & IEQUALIFIER_RCOMMAND) == 0)
     {
-      mustScroll = TRUE;
+      ConvertKey(imsg, data);
     }
   }
   else if(dummy == 3)
-  {
     data->pixel_x = 0;
-  }
-
-  if(mustScroll == TRUE)
-    ScrollIntoDisplay(data);
 
   RETURN(result);
   return(result);
