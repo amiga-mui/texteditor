@@ -7,6 +7,10 @@ $URL$
 
 2007-09-02 Jens Langner <Jens.Langner@light-speed.de>
 
+  * mcc/HandleInput.c: as soon as a key is pressed and the cursor is outside
+    the currently visible area, the text is immediately scrolled down/up now
+    rather than waiting for the user to release the key. This should be a bit
+    more intuitive to what a user might expect to happen.
   * mcc/GetSetAttrs.c, mcc/PrintLineWithStyles.c: The cursor will now scroll
     with the text rather than kept at the very same position relately to the
     window. This should be more intuitive and what a normal user would expect.
