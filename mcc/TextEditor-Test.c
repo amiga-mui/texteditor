@@ -220,7 +220,7 @@ int main(void)
           Object *app, *window, *clear, *cut, *copy, *paste, *erase,
                  *bold, *italic, *underline, *ischanged, *undo, *redo, *string,
                  *xslider, *yslider, *flow, *search, *replace, *wrapmode, *wrapborder,
-                 *rgroup, *isdisabled;
+                 *rgroup, *isdisabled, *isreadonly;
           const char *flow_text[] = { "Left", "Center", "Right", NULL };
           const char *wrap_modes[] = { "NoWrap", "SoftWrap", "HardWrap", NULL };
           const char *classes[] = { "TextEditor.mcc", NULL };
@@ -292,6 +292,7 @@ int main(void)
 
                       Child, ischanged = MUI_MakeObject(MUIO_Checkmark, "Is changed?"),
                       Child, isdisabled = MUI_MakeObject(MUIO_Checkmark, "Is disabled?"),
+                      Child, isreadonly = MUI_MakeObject(MUIO_Checkmark, "Is read-only?"),
                       Child, flow = MUI_MakeObject(MUIO_Cycle, NULL, flow_text),
                       Child, wrapmode = MUI_MakeObject(MUIO_Cycle, NULL, wrap_modes),
                       Child, wrapborder = MUI_MakeObject(MUIO_Slider, NULL, 0, 1000),
@@ -490,6 +491,7 @@ int main(void)
           DoMethod(ischanged, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_HasChanged, MUIV_TriggerValue);
 
           DoMethod(isdisabled, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_Set, MUIA_Disabled, MUIV_TriggerValue);
+          DoMethod(isreadonly, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_Set, MUIA_TextEditor_ReadOnly, MUIV_TriggerValue);
 
           DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "Clear");
 //          DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_CallHook, &ExportBlockHook);
