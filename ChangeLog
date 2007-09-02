@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-09-02 Jens Langner <Jens.Langner@light-speed.de>
+
+  * doc/TextEditor.doc: added missing documentation about the function of the
+    MUIA_TextEditor_KeyUpFocus attribute.
+
 2007-09-01 Pär Boberg <pbobbenb@spray.se>
 
    * mcp/locale/svenska.ct: Updated according to changes.
