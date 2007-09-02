@@ -19,6 +19,7 @@ TextEditor.mcc/MUIA_TextEditor_ImportHook
 TextEditor.mcc/MUIA_TextEditor_ImportWrap
 TextEditor.mcc/MUIA_TextEditor_InsertMode         (not yet implemented...)
 TextEditor.mcc/MUIA_TextEditor_InVirtualGroup
+TextEditor.mcc/MUIA_TextEditor_KeyUpFocus
 TextEditor.mcc/MUIA_TextEditor_Pen
 TextEditor.mcc/MUIA_TextEditor_Prop_DeltaFactor
 TextEditor.mcc/MUIA_TextEditor_Prop_Entries
@@ -570,6 +571,16 @@ TextEditor.mcc/MUIM_TextEditor_Search
         Set this to TRUE when the gadget is inside a virtual group.
         The reason is cosmetical - the pattern will be relative to the
         gadget instead of the window, since the gadget can be "moved" around.
+
+TextEditor.mcc/MUIA_TextEditor_KeyUpFocus
+
+    NAME
+        MUIA_TextEditor_KeyUpFocus -- [ISG], Object *
+
+    FUNCTION
+        Allows to specify a specific object that will be set as the new
+        window's default object in case the user pressed the UP cursor key and
+        the texteditor was already at the very first line.
 
 TextEditor.mcc/MUIA_TextEditor_Pen
 

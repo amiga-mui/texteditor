@@ -134,7 +134,8 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
       {
         case IDCMP_RAWKEY:
         {
-  D(DBF_ALWAYS, "HandleInput rawkey code=%02x qual=%04x", imsg->Code, imsg->Qualifier);
+          D(DBF_INPUT, "HandleInput rawkey code=%02x qual=%04x", imsg->Code, imsg->Qualifier);
+
           if(data->ypos != data->realypos ||
              (wasActivated && imsg->Code == 66)) // ignore TAB key if the gadget was activated recently
           {
@@ -180,13 +181,13 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
           // if not we check wheter we have to react on that particular RAWKEY event
           if(ReactOnRawKey(imsg, data) == FALSE)
           {
-            D(DBF_ALWAYS, "not reacted");
+            D(DBF_INPUT, "not reacted");
             RETURN(0);
             return(0);
           }
           else
           {
-            D(DBF_ALWAYS, "reacted");
+            D(DBF_INPUT, "reacted");
             RETURN(MUI_EventHandlerRC_Eat);
             return(MUI_EventHandlerRC_Eat);
           }
