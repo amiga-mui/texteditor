@@ -809,10 +809,6 @@ static BOOL ConvertKey(struct IntuiMessage *imsg, struct InstData *data)
   return(result);
 }
 
-/*  data->pixel_x = 0;
-  return(MUI_EventHandlerRC_Eat);
-*/
-
 static BOOL MatchQual(ULONG input, ULONG match, UWORD action, struct InstData *data)
 {
   BOOL result = FALSE;
@@ -1191,13 +1187,12 @@ static BOOL ReactOnRawKey(struct IntuiMessage *imsg, struct InstData *data)
   ENTER();
 
   dummy = FindKey(imsg->Code, imsg->Qualifier, data);
-  if(dummy == 1)
-  {
-    data->pixel_x = 0;
-  }
 
   if(dummy == 1 || dummy == 0)
   {
+    if(dummy == 1)
+      data->pixel_x = 0;
+
     if((data->CPos_X != oldCPos_X || oldactualline != data->actualline) || (!(imsg->Qualifier & data->blockqual) && data->blockinfo.enabled))
     {
       SetCursor(oldCPos_X, oldactualline, FALSE, data);
@@ -1230,13 +1225,16 @@ static BOOL ReactOnRawKey(struct IntuiMessage *imsg, struct InstData *data)
         ScrollIntoDisplay(data);
         SetCursor(data->CPos_X, data->actualline, TRUE, data);
       }
-      mustScroll = TRUE;
+      else
+        mustScroll = TRUE;
     }
   }
   else if(dummy == 2)
   {
   	// the pressed key was none of our defined shortcuts
-    if((data->flags & FLG_ReadOnly) || (imsg->Qualifier & IEQUALIFIER_RCOMMAND) || !ConvertKey(imsg, data))
+    if((data->flags & FLG_ReadOnly) ||
+       (imsg->Qualifier & IEQUALIFIER_RCOMMAND) ||
+       (ConvertKey(imsg, data) == TRUE && (imsg->Qualifier & IEQUALIFIER_REPEAT) == 0))
     {
       mustScroll = TRUE;
     }
