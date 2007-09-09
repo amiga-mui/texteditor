@@ -365,8 +365,15 @@ void ShowSelectPointer(Object *obj, struct InstData *data)
 {
   ENTER();
 
-  if(data->activeSelectPointer == FALSE &&
-     data->PointerObj != NULL)
+  // even if it seems to be a waste of performance, but
+  // we unfortunately have to always set the window pointer
+  // regardless of the point if it was previously set or not.
+  // This is required as any other gadget or process might
+  // reset the window pointer and as such we would end up
+  // with no custom pointer as well. So we only check the window
+  // sleep status here :(
+  if(data->PointerObj != NULL &&
+     xget(_win(obj), MUIA_Window_Sleep) == FALSE)
   {
     #if defined(__amigaos4__)
     SetWindowPointer(_window(obj), WA_Pointer, data->PointerObj, TAG_DONE);

@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-09-09 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcc/Pointer.c: fixed an issue where in case some other gadget/process
+    set the window pointer to something else we might have ended up with the
+    wrong or no custom pointer at all.
+
 2007-09-02 Jens Langner <Jens.Langner@light-speed.de>
 
   * mcc/HandleInput.c: an invisible cursor was not automatically made visible
