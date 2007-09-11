@@ -146,6 +146,8 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
 
             data->ExportHook = &ExportHookPlain;
             data->flags |= FLG_AutoClip;
+            data->flags |= FLG_ActiveOnClick;
+
             if(FindTagItem(MUIA_Background, msg->ops_AttrList))
               data->flags |= FLG_OwnBkgn;
             if(FindTagItem(MUIA_Frame, msg->ops_AttrList))
@@ -154,11 +156,13 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
             // initialize our temporary rastport
             InitRastPort(&data->tmprp);
 
+            // walk through all attributes and check if
+            // they were set during OM_NEW
             Set(cl, obj, (struct opSet *)msg);
             data->visual_y = 1;
 
-            RETURN((long)obj);
-            return((long)obj);
+            RETURN((ULONG)obj);
+            return((ULONG)obj);
           }
         }
       }
@@ -198,7 +202,9 @@ ULONG Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
 
   if(DoSuperMethodA(cl, obj, (Msg)rinfo))
   {
-    if(!(data->flags & FLG_ReadOnly))
+    // disable that the object will automatically get a border when
+    // the ActiveObjectOnClick option is active
+    if((data->flags & FLG_ActiveOnClick) != 0)
       _flags(obj) |= (1<<7);
 
     // now we check whether we have a valid font or not
@@ -269,7 +275,9 @@ ULONG Cleanup(struct IClass *cl, Object *obj, Msg msg)
   if(DoMethod(_app(obj), OM_REMMEMBER, data->SuggestWindow))
     MUI_DisposeObject(data->SuggestWindow);
 
-  if(!(data->flags & FLG_ReadOnly))
+  // enable that the object will automatically get a border when
+  // the ActiveObjectOnClick option is active
+  if((data->flags & FLG_ActiveOnClick) != 0)
     _flags(obj) &= ~(1<<7);
 
   if(data->mousemove)
@@ -597,6 +605,8 @@ DISPATCHER(_Dispatcher)
 
     case MUIM_GoActive:
     {
+      D(DBF_STARTUP, "MUIM_GoActive");
+
       // set the gadgets flags to active and also "activated" so that
       // other functions know that the gadget was activated recently.
       data->flags |= (FLG_Active | FLG_Activated);
@@ -604,7 +614,13 @@ DISPATCHER(_Dispatcher)
       if(data->shown)
       {
         SetCursor(data->CPos_X, data->actualline, TRUE, data);
-        if(!(data->flags & FLG_ReadOnly))
+
+        // in case we ought to show a selected area in a different
+        // color than in inactive state we call MarkText()
+        if((data->flags & FLG_ActiveOnClick) && Enabled(data))
+          MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+
+        if((data->flags & FLG_ReadOnly) == 0)
           set(_win(obj), MUIA_Window_DisableKeys, MUIKEYF_GADGET_NEXT);
       }
 
@@ -623,14 +639,14 @@ DISPATCHER(_Dispatcher)
 
     case MUIM_GoInactive:
     {
+      D(DBF_STARTUP, "MUIM_GoInActive");
+
       // clear the active and activated flag so that others know about it
       data->flags &= ~FLG_Active;
       data->flags &= ~FLG_Activated;
 
       if(data->shown)
-      {
         set(_win(obj), MUIA_Window_DisableKeys, 0L);
-      }
 
       if(data->mousemove)
       {
@@ -646,7 +662,13 @@ DISPATCHER(_Dispatcher)
         DoMethod(_app(obj), MUIM_Application_RemInputHandler, &data->blinkhandler);
         data->BlinkSpeed = 1;
       }
+
       SetCursor(data->CPos_X, data->actualline, FALSE, data);
+
+      // in case we ought to show a selected area in a different
+      // color than in inactive state we call MarkText()
+      if((data->flags & FLG_ActiveOnClick) && Enabled(data))
+        MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
 
       DoSuperMethodA(cl, obj, msg);
 

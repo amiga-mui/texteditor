@@ -410,7 +410,11 @@ int main(void)
                       Child, xslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 1000),
                       Child, yslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 200),
                       End,
-                    Child, string = MUI_MakeObject(MUIO_String, NULL, 256),
+                    Child, string = StringObject,
+                      StringFrame,
+                      MUIA_CycleChain, TRUE,
+                      MUIA_String_MaxLen, 256,
+                    End,
 
                     TAG_DONE ),
                   TAG_DONE ),
@@ -464,8 +468,6 @@ int main(void)
 	            FreeVec(text);
 	          }
 					}
-
-          set(string, MUIA_CycleChain, TRUE);
 
           DoMethod(window, MUIM_Notify, MUIA_Window_CloseRequest, TRUE, app, 2, MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit);
 

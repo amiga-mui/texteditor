@@ -80,6 +80,10 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = data->undosize != 0 && *(short *)data->undopointer != 0xff;
     break;
 
+    case MUIA_TextEditor_ActiveObjectOnClick:
+      ti_Data = ((data->flags & FLG_ActiveOnClick) ? TRUE : FALSE);
+    break;
+
     case MUIA_TextEditor_AutoClip:
       ti_Data = ((data->flags & FLG_AutoClip) ? TRUE : FALSE);
     break;
@@ -179,6 +183,7 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
     case MUIA_Font:
       ti_Data = (ULONG)data->font;
       break;
+
     case MUIA_TextEditor_UndoLevels:
       ti_Data = (data->undosize != 0) ? ((data->undosize - 1) / sizeof(struct UserAction)) : 0;
       break;
@@ -274,9 +279,7 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
         break;
 
       case MUIA_TextEditor_Prop_Release:
-      {
         data->smooth_wait = ti_Data;
-      }
       break;
 
       case MUIA_TextEditor_Prop_First:
@@ -379,10 +382,19 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
       break;
 
       case MUIA_TextEditor_ReadOnly:
+      {
         if(ti_Data)
         {
           SetCursor(data->CPos_X, data->actualline, FALSE, data);
           data->flags |= FLG_ReadOnly;
+
+          // force the activeOnClick to be turned off
+          // in case the user explicitly sets the readonly object
+          data->flags &= ~FLG_ActiveOnClick;
+
+          // enable that the object will automatically get a border when
+          // the ActiveObjectOnClick option is active
+          _flags(obj) &= ~(1<<7);
         }
         else
         {
@@ -392,13 +404,45 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
             if(data->flags & FLG_Active)
               SetCursor(data->CPos_X, data->actualline, TRUE, data);
           }
+
+          // disable that the object will automatically get a border when
+          // the ActiveObjectOnClick option is active
+          if((data->flags & FLG_ActiveOnClick) != 0)
+            _flags(obj) |= (1<<7);
         }
-        break;
-      case MUIA_TextEditor_PopWindow_Open:
+      }
+      break;
+
+      case MUIA_TextEditor_ActiveObjectOnClick:
+      {
         if(ti_Data)
-            data->flags |=  FLG_PopWindow;
-        else  data->flags &= ~FLG_PopWindow;
-        break;
+        {
+          data->flags |=  FLG_ActiveOnClick;
+
+          // disable that the object will automatically get a border when
+          // the ActiveObjectOnClick option is active
+          _flags(obj) |= (1<<7);
+        }
+        else
+        {
+          data->flags &= ~FLG_ActiveOnClick;
+
+          // enable that the object will automatically get a border when
+          // the ActiveObjectOnClick option is active
+          _flags(obj) &= ~(1<<7);
+        }
+      }
+      break;
+
+      case MUIA_TextEditor_PopWindow_Open:
+      {
+        if(ti_Data)
+          data->flags |=  FLG_PopWindow;
+        else
+          data->flags &= ~FLG_PopWindow;
+      }
+      break;
+
       case MUIA_TextEditor_Quiet:
         if(ti_Data)
         {
