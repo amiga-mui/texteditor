@@ -136,6 +136,7 @@ struct InstData_MCP
   Object *highlightcolor;
   Object *cursorcolor;
   Object *markedcolor;
+  Object *inactiveColor;
   Object *blockqual;
   Object *smooth;
   Object *tabsize;

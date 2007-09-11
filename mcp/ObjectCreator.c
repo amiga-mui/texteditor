@@ -304,7 +304,7 @@ static Object *PrefsObject(struct InstData_MCP *data)
             data->typenspell, data->undosize, data->LookupExeType,
             data->SuggestExeType, data->CheckWord, data->insertkey,
             data->separatorshadow, data->separatorshine, data->inactiveCursor,
-            data->selectPointer, NULL);
+            data->selectPointer, data->inactiveColor, NULL);
   }
 
   return(data->obj);
@@ -339,6 +339,7 @@ ULONG New(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct opSet
         DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->fixedfont, MUICFG_TextEditor_FixedFont, 1, tr(MSG_Label_Fixed));
         DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->highlightcolor, MUICFG_TextEditor_HighlightColor, 1, tr(MSG_Label_Highlight));
         DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->markedcolor, MUICFG_TextEditor_MarkedColor, 1, tr(MSG_Label_Selected));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->inactiveColor, MUICFG_TextEditor_InactiveColor, 1, tr(MSG_Label_InactiveColor));
         DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->normalfont, MUICFG_TextEditor_NormalFont, 1, tr(MSG_Label_Normal));
         DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->smooth, MUICFG_TextEditor_Smooth, 1, tr(MSG_Label_Smooth));
         DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->selectPointer, MUICFG_TextEditor_SelectPointer, 1, tr(MSG_Label_SelectPointer));
@@ -421,6 +422,9 @@ ULONG GadgetsToConfig(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, 
 
   cfg_data = xget(data->markedcolor, MUIA_Pendisplay_Spec);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, sizeof(struct MUI_PenSpec), MUICFG_TextEditor_MarkedColor);
+
+  cfg_data = xget(data->inactiveColor, MUIA_Pendisplay_Spec);
+  DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, sizeof(struct MUI_PenSpec), MUICFG_TextEditor_InactiveColor);
 
   cfg_data = xget(data->normalfont, MUIA_String_Contents);
   DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, strlen((char *)cfg_data)+1, MUICFG_TextEditor_NormalFont);
@@ -526,6 +530,7 @@ ULONG ConfigToGadgets(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, 
   set(data->fixedfont, MUIA_String_Contents, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_FixedFont)) ? cfg_data : "");
   set(data->highlightcolor, MUIA_Pendisplay_Spec, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_HighlightColor)) ? cfg_data : "m0");
   set(data->markedcolor, MUIA_Pendisplay_Spec, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_MarkedColor)) ? cfg_data : "m6");
+  set(data->inactiveColor, MUIA_Pendisplay_Spec, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_InactiveColor)) ? cfg_data : "m3");
   set(data->normalfont, MUIA_String_Contents, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_NormalFont)) ? cfg_data : "");
   set(data->smooth, MUIA_Selected, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_Smooth)) ? *(ULONG *)cfg_data : TRUE);
   set(data->selectPointer, MUIA_Selected, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_SelectPointer)) ? *(ULONG *)cfg_data : TRUE);
