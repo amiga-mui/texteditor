@@ -246,6 +246,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
           }
           else
           {
+            // user has pressed the left mousebutton
             if(imsg->Code == IECODE_LBUTTON)
             {
               struct MUI_AreaData *ad = muiAreaData(obj);
@@ -255,122 +256,133 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                  (imsg->MouseY >= data->ypos) &&
                  (imsg->MouseY <  data->ypos+(data->maxlines * data->height))))
               {
-                UWORD last_x = data->CPos_X;
-                struct line_node *lastline = data->actualline;
-
-                RequestInput(data);
-                data->mousemove = TRUE;
-                data->flags |= FLG_Activated;
-                SetCursor(data->CPos_X, data->actualline, FALSE, data);
-                PosFromCursor(imsg->MouseX, imsg->MouseY, data);
-
-                if(imsg->Qualifier & (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT))
+                if((data->flags & FLG_Active) == 0 && (data->flags & FLG_Activated) == 0 &&
+                   (data->flags & FLG_ActiveOnClick) != 0 && Enabled(data) && (imsg->Qualifier & IEQUALIFIER_CONTROL))
                 {
-                  data->selectmode  = 0;
+                  // in case the user hold the control key while pressing in an
+                  // inactive object we go and just activate it and let the MUIM_GoActive
+                  // function refresh the selected area.
+                  set(_win(obj), MUIA_Window_ActiveObject, obj);
                 }
-
-                if(!(data->blockinfo.enabled && (imsg->Qualifier & (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT))))
+                else
                 {
-                  // if we already have an enabled block we have to disable it
-                  // and clear the marking area with MarkText()
-                  if(Enabled(data))
-                  {
-                    data->blockinfo.enabled = FALSE;
-                    MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
-                  }
+                  UWORD last_x = data->CPos_X;
+                  struct line_node *lastline = data->actualline;
 
-                  data->blockinfo.enabled = TRUE;
-                  data->blockinfo.startline = data->actualline;
-                  data->blockinfo.startx = data->CPos_X;
-                  if(last_x == data->CPos_X && lastline == data->actualline && DoubleClick(data->StartSecs, data->StartMicros, imsg->Seconds, imsg->Micros))
+                  RequestInput(data);
+                  data->mousemove = TRUE;
+
+                  data->flags |= FLG_Activated;
+                  SetCursor(data->CPos_X, data->actualline, FALSE, data);
+                  PosFromCursor(imsg->MouseX, imsg->MouseY, data);
+
+                  if(imsg->Qualifier & (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT))
+                    data->selectmode  = 0;
+
+                  if(!(data->blockinfo.enabled && (imsg->Qualifier & (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT))))
                   {
-                    if((data->DoubleClickHook && !CallHook(data->DoubleClickHook, (Object *)data->object, data->actualline->line.Contents, data->CPos_X)) || (!data->DoubleClickHook))
+                    // if we already have an enabled block we have to disable it
+                    // and clear the marking area with MarkText()
+                    if(Enabled(data))
                     {
-                      if(!CheckSep(data->actualline->line.Contents[data->CPos_X], data))
+                      data->blockinfo.enabled = FALSE;
+                      MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+                    }
+
+                    data->blockinfo.enabled = TRUE;
+                    data->blockinfo.startline = data->actualline;
+                    data->blockinfo.startx = data->CPos_X;
+                    if(last_x == data->CPos_X && lastline == data->actualline && DoubleClick(data->StartSecs, data->StartMicros, imsg->Seconds, imsg->Micros))
+                    {
+                      if((data->DoubleClickHook && !CallHook(data->DoubleClickHook, (Object *)data->object, data->actualline->line.Contents, data->CPos_X)) || (!data->DoubleClickHook))
                       {
-                        if(data->selectmode > 0)
+                        if(!CheckSep(data->actualline->line.Contents[data->CPos_X], data))
                         {
-                          GoStartOfLine(data);
-                          data->blockinfo.startx = data->CPos_X;
-                          GoEndOfLine(data);
+                          if(data->selectmode > 0)
+                          {
+                            GoStartOfLine(data);
+                            data->blockinfo.startx = data->CPos_X;
+                            GoEndOfLine(data);
 
-                          // set selectmode to 2 so that PrintLine() knows that the user has tripleclicked
-                          // on a line, it will afterwards automatically set to 3 anyway.
-                          data->selectmode = 2;
+                            // set selectmode to 2 so that PrintLine() knows that the user has tripleclicked
+                            // on a line, it will afterwards automatically set to 3 anyway.
+                            data->selectmode = 2;
 
-                          // reset the time values
-                          data->StartSecs = 0;
-                          data->StartMicros = 0;
-                        }
-                        else
-                        {
-                          int x = data->CPos_X;
-
-                          while(x > 0 && !CheckSep(*(data->actualline->line.Contents+x-1), data))
-                            x--;
-
-                          data->blockinfo.startx = x;
-                          data->selectmode  = 1;
-                          data->StartSecs = imsg->Seconds;
-                          data->StartMicros = imsg->Micros;
-                        }
-                      }
-                      else
-                      {
-                        // if the user clicked somewhere where we didn't find any separator
-                        // we have to check wheter this is already a tripleclick or still a doubleclick
-                        // because we ensure that on a tripleclick ALWAYS the whole line is marked
-                        // regardless if the user clicked on a actual word that can be separated or not.
-                        if(data->selectmode == 1)
-                        {
-                          GoStartOfLine(data);
-                          data->blockinfo.startx = data->CPos_X;
-                          GoEndOfLine(data);
-
-                          // set selectmode to 2 so that PrintLine() knows that the user has tripleclicked
-                          // on a line, it will afterwards automatically set to 3 anyway.
-                          data->selectmode = 2;
-
-                          // reset the time values
-                          data->StartSecs = 0;
-                          data->StartMicros = 0;
-                        }
-                        else
-                        {
-                          if(data->selectmode == 0)
-                            data->selectmode = 1;
+                            // reset the time values
+                            data->StartSecs = 0;
+                            data->StartMicros = 0;
+                          }
                           else
                           {
-                            data->blockinfo.enabled = FALSE;
-                            data->selectmode = 0;
-                          }
+                            int x = data->CPos_X;
 
-                          data->StartSecs = imsg->Seconds;
-                          data->StartMicros = imsg->Micros;
+                            while(x > 0 && !CheckSep(*(data->actualline->line.Contents+x-1), data))
+                              x--;
+
+                            data->blockinfo.startx = x;
+                            data->selectmode  = 1;
+                            data->StartSecs = imsg->Seconds;
+                            data->StartMicros = imsg->Micros;
+                          }
+                        }
+                        else
+                        {
+                          // if the user clicked somewhere where we didn't find any separator
+                          // we have to check wheter this is already a tripleclick or still a doubleclick
+                          // because we ensure that on a tripleclick ALWAYS the whole line is marked
+                          // regardless if the user clicked on a actual word that can be separated or not.
+                          if(data->selectmode == 1)
+                          {
+                            GoStartOfLine(data);
+                            data->blockinfo.startx = data->CPos_X;
+                            GoEndOfLine(data);
+
+                            // set selectmode to 2 so that PrintLine() knows that the user has tripleclicked
+                            // on a line, it will afterwards automatically set to 3 anyway.
+                            data->selectmode = 2;
+
+                            // reset the time values
+                            data->StartSecs = 0;
+                            data->StartMicros = 0;
+                          }
+                          else
+                          {
+                            if(data->selectmode == 0)
+                              data->selectmode = 1;
+                            else
+                            {
+                              data->blockinfo.enabled = FALSE;
+                              data->selectmode = 0;
+                            }
+
+                            data->StartSecs = imsg->Seconds;
+                            data->StartMicros = imsg->Micros;
+                          }
                         }
                       }
+                    }
+                    else
+                    {
+                      data->blockinfo.enabled = FALSE;
+                      data->selectmode  = 0;
+                      data->StartSecs = imsg->Seconds;
+                      data->StartMicros = imsg->Micros;
                     }
                   }
                   else
                   {
-                    data->blockinfo.enabled = FALSE;
-                    data->selectmode  = 0;
-                    data->StartSecs = imsg->Seconds;
-                    data->StartMicros = imsg->Micros;
+                    if(data->blockinfo.stopline != data->actualline || data->blockinfo.stopx != data->CPos_X)
+                      MarkText(data->blockinfo.stopx, data->blockinfo.stopline, data->CPos_X, data->actualline, data);
                   }
-                }
-                else
-                {
-                  if(data->blockinfo.stopline != data->actualline || data->blockinfo.stopx != data->CPos_X)
-                    MarkText(data->blockinfo.stopx, data->blockinfo.stopline, data->CPos_X, data->actualline, data);
-                }
 
-                data->blockinfo.stopline = data->actualline;
-                data->blockinfo.stopx = data->CPos_X;
+                  data->blockinfo.stopline = data->actualline;
+                  data->blockinfo.stopx = data->CPos_X;
 
-                SetCursor(data->CPos_X, data->actualline, TRUE, data);
-                if(!(data->flags & FLG_ReadOnly))
-                  set(_win(obj), MUIA_Window_ActiveObject, obj);
+                  SetCursor(data->CPos_X, data->actualline, TRUE, data);
+
+                  if((data->flags & FLG_ActiveOnClick) != 0)
+                    set(_win(obj), MUIA_Window_ActiveObject, obj);
+                }
               }
               else
               {

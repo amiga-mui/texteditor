@@ -295,6 +295,7 @@ struct InstData
   ULONG   cursorcolor;
   ULONG   cursortextcolor;
   ULONG   markedcolor;
+  ULONG   inactivecolor;
   ULONG   separatorshine;
   ULONG   separatorshadow;
   ULONG   allocatedpens;
@@ -549,26 +550,27 @@ struct KeyAction
 
 enum
 {
-  FLG_HScroll     = 1L << 0,
-  FLG_NumLock     = 1L << 1,
-  FLG_ReadOnly    = 1L << 2,
-  FLG_FastCursor  = 1L << 3,
-  FLG_CheckWords  = 1L << 4,
-  FLG_InsertMode  = 1L << 5,
-  FLG_Quiet       = 1L << 6,
-  FLG_PopWindow   = 1L << 7,
-  FLG_UndoLost    = 1L << 8,
-  FLG_Draw        = 1L << 9,
-  FLG_InVGrp      = 1L << 10,
-  FLG_Ghosted     = 1L << 11,
-  FLG_OwnBkgn     = 1L << 12,
-  FLG_FreezeCrsr  = 1L << 13,
-  FLG_Active      = 1L << 14,
-  FLG_OwnFrame    = 1L << 15,
-  FLG_ARexxMark   = 1L << 16,
-  FLG_FirstInit   = 1L << 17,
-  FLG_AutoClip    = 1L << 18,
-  FLG_Activated   = 1L << 19, // the gadget was activated by MUIM_GoActive()
+  FLG_HScroll       = 1L << 0,
+  FLG_NumLock       = 1L << 1,
+  FLG_ReadOnly      = 1L << 2,
+  FLG_FastCursor    = 1L << 3,
+  FLG_CheckWords    = 1L << 4,
+  FLG_InsertMode    = 1L << 5,
+  FLG_Quiet         = 1L << 6,
+  FLG_PopWindow     = 1L << 7,
+  FLG_UndoLost      = 1L << 8,
+  FLG_Draw          = 1L << 9,
+  FLG_InVGrp        = 1L << 10,
+  FLG_Ghosted       = 1L << 11,
+  FLG_OwnBkgn       = 1L << 12,
+  FLG_FreezeCrsr    = 1L << 13,
+  FLG_Active        = 1L << 14,
+  FLG_OwnFrame      = 1L << 15,
+  FLG_ARexxMark     = 1L << 16,
+  FLG_FirstInit     = 1L << 17,
+  FLG_AutoClip      = 1L << 18,
+  FLG_Activated     = 1L << 19, // the gadget was activated by MUIM_GoActive()
+  FLG_ActiveOnClick = 1L << 20, // should the gadget activated on click
 
   FLG_NumberOf
 };

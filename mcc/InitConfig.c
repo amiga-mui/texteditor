@@ -102,6 +102,8 @@ void SetCol (struct InstData *data, void *obj, long item, ULONG *storage, long b
     *storage = MUI_ObtainPen(muiRenderInfo(obj), spec, 0L);
     data->allocatedpens |= 1<<bit;
   }
+  else
+    W(DBF_STARTUP, "couldn't get config item: 0x%08lx", item);
 
   LEAVE();
 }
@@ -122,7 +124,8 @@ void InitConfig(Object *obj, struct InstData *data)
   data->cursortextcolor   = *(muipens+MPEN_TEXT);
   data->markedcolor       = *(muipens+MPEN_FILL);
   data->separatorshine    = *(muipens+MPEN_HALFSHINE);
-  data->separatorshadow = *(muipens+MPEN_HALFSHADOW);
+  data->separatorshadow   = *(muipens+MPEN_HALFSHADOW);
+  data->inactivecolor     = *(muipens+MPEN_HALFSHADOW);
 
   SetCol(data, obj, MUICFG_TextEditor_TextColor, &data->textcolor, 0);
   SetCol(data, obj, MUICFG_TextEditor_CursorColor, &data->cursorcolor, 1);
@@ -131,6 +134,7 @@ void InitConfig(Object *obj, struct InstData *data)
   SetCol(data, obj, MUICFG_TextEditor_MarkedColor, &data->markedcolor, 4);
   SetCol(data, obj, MUICFG_TextEditor_SeparatorShine, &data->separatorshine, 5);
   SetCol(data, obj, MUICFG_TextEditor_SeparatorShadow, &data->separatorshadow, 6);
+  SetCol(data, obj, MUICFG_TextEditor_InactiveColor, &data->inactivecolor, 7);
 
   if(!(data->flags & FLG_OwnBkgn))
   {
@@ -426,6 +430,8 @@ void  FreeConfig  (struct InstData *data, struct MUI_RenderInfo *mri)
     MUI_ReleasePen(mri, data->separatorshine);
   if(data->allocatedpens & 128)
     MUI_ReleasePen(mri, data->separatorshadow);
+  if(data->allocatedpens & 256)
+    MUI_ReleasePen(mri, data->inactivecolor);
 
   if(data->normalfont)
     CloseFont(data->normalfont);

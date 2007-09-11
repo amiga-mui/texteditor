@@ -1,6 +1,7 @@
 TABLE OF CONTENTS
 
 TextEditor.mcc/TextEditor.mcc
+TextEditor.mcc/MUIA_TextEditor_ActiveObjectOnClick
 TextEditor.mcc/MUIA_TextEditor_AreaMarked
 TextEditor.mcc/MUIA_TextEditor_AutoClip
 TextEditor.mcc/MUIA_TextEditor_ColorMap
@@ -73,6 +74,33 @@ TextEditor.mcc/MUIM_TextEditor_Search
     Please visit http://www.sf.net/projects/texteditor-mcc/ for
     the very latest version and information regarding TextEditor.mcc.
     *******************************************************************
+
+TextEditor.mcc/MUIA_TextEditor_ActiveObjectOnClick
+
+    NAME
+        MUIA_TextEditor_ActiveObjectOnClick -- [ISG], BOOL
+
+    FUNCTION
+        This tag allows to set/get whether the texteditor object is
+        automatically set the MUIA_Window_ActiveObject object of the
+        window in case the user performs a mouse action (click/select)
+        in the texteditor. As a consequence, the texteditor will then
+        get the full keyboard focus and will eventually signal it's
+        active status by highlighting a marked area with the active
+        color rather than using the inactive marked color in inactive
+        state.
+
+    NOTE
+        Please note that depending on the MUIA_TextEditor_ReadOnly
+        setting, this attribute has different default values. In case
+        the texteditor is set to ReadOnly while initialized (OM_NEW)
+        this attribute will be set to FALSE as a default. In contrast,
+        when the object is in full write mode it will be set to TRUE
+        instead. However, during operation or in OM_NEW this behaviour
+        can be overrided by setting this attribute to another value.
+
+    SEE ALSO
+        MUIA_TextEditor_ReadOnly
 
 TextEditor.mcc/MUIA_TextEditor_AreaMarked
 
@@ -702,16 +730,28 @@ TextEditor.mcc/MUIM_TextEditor_Search
 
     FUNCTION
         Setting this tag to TRUE will make the text read-only.
-        This is very similar to the FloatText.mui, except that
-        this gadget offers blocking.
+        This is very similar to what FloatText.mui provides, except
+        that this gadget offers blocking.
 
-        In read-only mode
-         - there will be no cursor (only a normal TAB frame),
-         - TAB will activate the next gadget (instead of alt-TAB),
-         - the frame will be set to a ReadListFrame (may change),
-         - there is no ARexx support, except "Copy".
+        In read-only mode:
+          - there will be no cursor (only a normal TAB frame),
+          - TAB will activate the next gadget (instead of alt-TAB),
+          - the frame will be set to a ReadListFrame (may change),
+          - there is no ARexx support, except "Copy".
 
-        The MUIA_TextEditor_StyleXXX tags are still usable.
+        However, the MUIA_TextEditor_StyleXXX tags are still
+        usable. In addition, due to backward compatibility when
+        setting the ReadOnly tag to TRUE via OM_SET,
+        MUIA_TextEditor_ActiveObjectOnClick will be set to FALSE.
+        This will prevent the object from getting the active object
+        of the window in case a user presses a mouse button in front
+        of a readonly texteditor object.
+
+    SEE ALSO
+        MUIA_TextEditor_StyleBold
+        MUIA_TextEditor_StyleItalic
+        MUIA_TextEditor_StyleUnderline
+        MUIA_TextEditor_ActiveObjectOnClick
 
 TextEditor.mcc/MUIA_TextEditor_RedoAvailable
 

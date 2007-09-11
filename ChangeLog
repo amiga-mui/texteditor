@@ -7,6 +7,15 @@ $URL$
 
 2007-09-12 Jens Langner <Jens.Langner@light-speed.de>
 
+  * mcc: implemented new MUIA_TextEditor_ActiveObjectOnClick attributes which
+    allows to automatically set a texteditor object as the active object of
+    a window in case the user clicks into it regardless of the ReadOnly status.
+    However, per default this will be set to FALSE in case ReadOnly is turned
+    on. In addition, in inactive state a selection will now be drawn in the
+    new inactive color rather than always with the marked color. This should
+    make it more obvious if the object has the keyboard focus. Last, but not
+    least by clicking into a texteditor object with the CTRL key pressed will
+    not clear the selection in case the object is currently inactive.
   * mcp: added new "inactive color" selection where the user will be able to
     select a color for displaying selected text in an inactive color in case
     the texteditor object is set inactive. The color will default to the

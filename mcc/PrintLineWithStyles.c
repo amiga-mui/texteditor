@@ -185,6 +185,18 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
 
       if(blockwidth)
       {
+        ULONG color;
+
+        // in case the gadget is in inactive state we use a different background
+        // color for our selected area
+        if((data->flags & FLG_Active) == 0 && (data->flags & FLG_Activated) == 0 &&
+           (data->flags & FLG_ActiveOnClick) != 0)
+        {
+          color = data->inactivecolor;
+        }
+        else
+          color = data->markedcolor;
+
         // if selectmode == 2 then a whole line should be drawn as being marked, so
         // we have to start at xoffset instead of xoffset+flow+blockstart.
         // Please note that the second part of the following "empiric" evaluation should
@@ -196,12 +208,12 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
            (flow && data->selectmode != 1 && startx-x == 0 && cursor == FALSE &&
             ((data->blockinfo.startline != data->blockinfo.stopline) || x > 0)))
         {
-          SetAPen(rp, data->markedcolor);
+          SetAPen(rp, color);
           RectFill(rp, xoffset, starty, xoffset+flow+blockwidth-1, starty+data->height-1);
         }
         else
         {
-          SetAPen(rp, cursor ? data->cursorcolor : data->markedcolor);
+          SetAPen(rp, cursor ? data->cursorcolor : color);
           RectFill(rp, xoffset+flow+blockstart, starty, xoffset+flow+blockstart+blockwidth-1, starty+data->height-1);
 
           // if the gadget is in inactive state we just draw a skeleton cursor instead
