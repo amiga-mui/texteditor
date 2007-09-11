@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-09-12 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcp: added new "inactive color" selection where the user will be able to
+    select a color for displaying selected text in an inactive color in case
+    the texteditor object is set inactive. The color will default to the
+    halfshadow pen of MUI which should fit to the other default colors.
+
 2007-09-09 Jens Langner <Jens.Langner@light-speed.de>
 
   * mcc/Pointer.c: fixed an issue where in case some other gadget/process

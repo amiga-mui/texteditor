@@ -466,3 +466,9 @@ MSG_HELP_SelectPointer (136//)
 If enabled, a specialized selection pointer will be shown\n\
 when the mouse pointer is above the texteditor gadget.
 ;
+MSG_Label_InactiveColor (137//)
+Inactive
+;
+MSG_PopWinTitle_InactiveColor (138//)
+Select inactive color
+;
