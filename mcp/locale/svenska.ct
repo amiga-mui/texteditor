@@ -1,6 +1,6 @@
 ## chunk AUTH Pär Boberg
 ## language svenska
-## version $VER: TextEditor_mcp.ct 2.3 (01.09.07)
+## version $VER: TextEditor_mcp.ct 2.4 (23.09.07)
 HelpBubble_BlockQual
 Håll nere tangenten som du har valt här\noch flytta markören för att markera text.
 ;#DEF Move the cursor key and hold down the qualifier\nthat you set here to mark text.
@@ -550,3 +550,11 @@ MSG_HELP_SelectPointer
 Om vald, kommer en speciell pekare att visas\nnär muspekaren är ovanför texteditorn.
 ;#DEF If enabled, a specialized selection pointer will be shown\nwhen the mouse pointer is above the texteditor gadget.
 ;#SET (136//)
+MSG_Label_InactiveColor
+Inaktiv
+;#DEF Inactive
+;#SET (137//)
+MSG_PopWinTitle_InactiveColor
+Välj inaktiv färg
+;#DEF Select inactive color
+;#SET (138//)
