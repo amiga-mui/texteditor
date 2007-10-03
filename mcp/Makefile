@@ -289,9 +289,9 @@ $(OBJDIR)/library.o: library.c ../include/mccinit.c \
   ../include/mui/TextEditor_mcc.h private.h icon.bh TextEditor_mcp.h rev.h
 
 locale.h: locale.c
-locale.c: locale/TextEditor_mcp.cd C_h.sd C_c.sd
+locale.c: $(LOCALE)/TextEditor_mcp.cd C_h.sd C_c.sd
 	@printf '\033[33mGenerating locale file $@...\033[0m\n'
-	@$(FC) locale/TextEditor_mcp.cd locale.h=C_h.sd locale.c=C_c.sd
+	@$(FC) $(LOCALE)/TextEditor_mcp.cd locale.h=C_h.sd locale.c=C_c.sd
 
 ## CATALOG GENERATION #################
 
@@ -315,5 +315,6 @@ clean:
 .PHONY: distclean
 distclean: clean
 	-$(RM) locale.?
+	-$(RM) $(LOCALE)/*.catalog
 	-$(RMDIR) $(OBJDIR)
 	-$(RMDIR) $(BINDIR)
