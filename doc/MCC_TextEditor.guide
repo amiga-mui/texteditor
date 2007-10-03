@@ -1,5 +1,5 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.22 (29.07.2007)
+@$VER: TextEditor.Guide 15.23 (03.10.2007)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
@@ -339,6 +339,40 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.23 (03.10.2007)
+
+- new MUIA_TextEditor_ActiveObjectOnClick attributes which allows to automatically
+  set a texteditor object as the active object of a window in case the user clicks
+  into it regardless of the ReadOnly status.
+- new "inactive color" selection where the user will be able to select a color for
+  displaying selected text in an inactive color in case the texteditor object is set
+  inactive. The color will default to the halfshadow pen of MUI which should fit to
+  the other default colors.
+- added missing documentation about the function of the MUIA_TextEditor_KeyUpFocus
+  attribute.
+- the previously added inactive cursor mode is now fully user configurable. This
+  means that a user can now explicitly enable/disable the inactive cursor.
+- key releases of known shortcuts (like cursor up/down) were not handled correctly
+  and caused MUI to trigger the same action a second time. That caused double
+  scrolling. Now key releases of the short-cuts will be "eaten" as well. This fixes
+  bug #1784873.
+- fixed bug where an initial MUIA_Disabled state for a texteditor object in OM_NEW
+  didn't automatically end up in having an added slider set disabled as well.
+- the text will now always be rendered right from the top rather than layouting it
+  vertically centered throughout the available space. This should fix the common
+  vertical text floating when resizing a window which is redrawn with every resize
+  operation.
+- when the mouse pointer is now over an active TextEditor object, a specialized
+  mouse pointer image for selection of text will be shown instead of the default
+  system mouse pointer image.
+- fixed bug #1779587 where in SoftWrap mode, the MergeLines() function didn't take
+  correctly respect of the fact that by merging lines upon pressing "backspace",
+  the amount of visual lines may perfectly increase and therefore ended up in a
+  distorted text display. Now the ScrollUp/ScrollDown operations are done right
+  before redrawing the content of the merge lines.
+- a read-only editor with a marked search result could not be scrolled by keyboard
+  anymore if that would scroll the marked text out of the visible area.
 
 15.22 (29.07.2007)
 
