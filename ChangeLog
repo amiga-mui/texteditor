@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.23 RELEASE ############################################################
+
+2007-10-03 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcp/Makefile: modified makefile to use LOCALE as a variable for the
+     locale directory.
+
 2007-09-23 Pär Boberg <pbobbenb@spray.se>
 
    * mcp/locale/svenska.ct: Updated according to changes.
