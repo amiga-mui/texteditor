@@ -9,6 +9,9 @@ $URL$
 
 2007-10-03 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcc/MixedFunctions.c: changed the inactive cursor to always have a width
+     of the actual character it resists on. This should be more intuitive and
+     obvious.
    * mcp/Makefile: modified makefile to use LOCALE as a variable for the
      locale directory.
 

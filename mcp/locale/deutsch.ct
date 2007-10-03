@@ -1,5 +1,5 @@
 ## chunk AUTH Thore Böckelmann
-## version $VER: TextEditor_mcp.catalog 2.1 (26.02.2007)
+## version $VER: TextEditor_mcp.catalog 2.2 (03.10.2007)
 ## language deutsch
 ## codeset 0
 ;
@@ -627,4 +627,25 @@ installiert haben.
 MSG_Ok
 Ok
 ; Ok
+MSG_Label_InactiveCursor
+Inaktiver Cursor
+;
+MSG_HELP_InactiveCursor
+Wenn ausgewählt wird ein spezieller inaktiver\n\
+Cursor dargestellt falls der gesamte TextEditor\n\
+inaktiv wird.
+;
+MSG_Label_SelectPointer
+Auswahl-Mauszeiger
+;
+MSG_HELP_SelectPointer
+Wenn ausgewählt wird ein spezieller Mauszeiger\n\
+dargestellt der das selektieren von Zeichen\n\
+vereinfachen soll.
+;
+MSG_Label_InactiveColor
+Inaktiv
+;
+MSG_PopWinTitle_InactiveColor
+Inaktiv-Farbe auswählen
 ;

@@ -416,17 +416,24 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
       {
         SetAPen(data->rport, data->cursorcolor);
         SetDrMd(data->rport, JAM2);
-        RectFill(data->rport, cursorxplace, yplace, cursorxplace+cursor_width-1, yplace+data->height-1);
 
         // if the gadget is in inactive state we just draw a skeleton cursor instead
         if((data->flags & FLG_Active) == 0 && (data->flags & FLG_Activated) == 0)
         {
+          ULONG cwidth = cursor_width;
+
+          if(data->CursorWidth != 6)
+            cwidth = TextLength(&data->tmprp, chars[1] < ' ' ? (char *)" " : (char *)&chars[1], 1);
+
+          RectFill(data->rport, cursorxplace, yplace, cursorxplace+cwidth-1, yplace+data->height-1);
           DoMethod(data->object, MUIM_DrawBackground, cursorxplace+1, yplace+1,
-                                                      cursor_width-2, data->height-2,
+                                                      cwidth-2, data->height-2,
                                                       cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0),
                                                       ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2),
                                                       0);
         }
+        else
+          RectFill(data->rport, cursorxplace, yplace, cursorxplace+cursor_width-1, yplace+data->height-1);
       }
       else
       {
