@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-10-04 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcc/HandleInput.c: fixed bug where a texteditor object didn't ate all
+     rawkey events regardless of the fact that it might be the active object
+     and in read-only mode.
+
 #### v15.23 RELEASE ############################################################
 
 2007-10-03 Jens Langner <Jens.Langner@light-speed.de>

@@ -1209,6 +1209,8 @@ static BOOL ReactOnRawKey(struct IntuiMessage *imsg, struct InstData *data)
   ENTER();
 
   dummy = FindKey(imsg->Code, imsg->Qualifier, data);
+
+  D(DBF_INPUT, "FindKey: %ld", dummy);
   if(dummy == 1 || dummy == 0)
   {
     if(dummy == 1)
@@ -1255,9 +1257,9 @@ static BOOL ReactOnRawKey(struct IntuiMessage *imsg, struct InstData *data)
     // we execute the ConvertKey() action which in fact will
     // perform the actual key press reaction
     if((data->flags & FLG_ReadOnly) == 0 && (imsg->Qualifier & IEQUALIFIER_RCOMMAND) == 0)
-    {
       ConvertKey(imsg, data);
-    }
+    else
+      result = FALSE;
   }
   else if(dummy == 3)
     data->pixel_x = 0;
