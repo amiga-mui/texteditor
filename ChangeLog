@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-10-07 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcp/CreatePrefsGroup.c: the inactive cursor checkbox will not automatically
+     adjust its size automatically to the current height of the window. This
+     should prevent the checkbox image to end up in a wide clumsy image being
+     shown.
+
 2007-10-04 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcc/HandleInput.c: fixed bug where a texteditor object didn't ate all
