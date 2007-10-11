@@ -72,16 +72,37 @@ static const ULONG selectPointer[] =
 #define POINTERA_Height    (POINTERA_Dummy + 0x09) // <= 64
 #endif
 
-// the 32bit pointer image setup seems to require
-// to have a fake bitmap.
-static struct BitMap fakeBitmap =
-{
-  2, 16, 0, 2, 0,
-  { NULL, NULL, NULL, NULL, NULL, NULL, NULL }
-};
-
 #else // __amigaos4__
 
+static const UWORD selectPointer[] =
+{
+//plane1    plane2
+  0x0000,   0x0000,
+
+  0x8800,   0x4600,
+  0x5000,   0x2800,
+  0x2000,   0x1000,
+  0x2000,   0x1000,
+  0x2000,   0x1000,
+  0x2000,   0x1000,
+  0x2000,   0x1000,
+  0x2000,   0x1000,
+  0x4000,   0x3800,
+  0x2000,   0x1000,
+  0x2000,   0x1000,
+  0x2000,   0x1000,
+  0x2000,   0x1000,
+  0x2000,   0x1000,
+  0x5000,   0x2800,
+  0x8800,   0x4600,
+
+  0x0000,   0x0000
+};
+
+#endif // __amigaos4__
+
+// Classic bitmap data for the pointer. These will be used for OS4 aswell,
+// if the graphic card cannot handle 32bit pointers.
 static const UWORD selectPointer_bp0[] =
 {
   0x8800,    // #...#..
@@ -140,31 +161,6 @@ static const UWORD selectPointer_bp2[] =
   0x3000,    // ..%#...
   0x7800,    // .%#%#..
   0xce00,    // %#..%#.
-};
-
-static const UWORD selectPointer[] =
-{
-//plane1    plane2
-  0x0000,   0x0000,
-
-  0x8800,   0x4600,
-  0x5000,   0x2800,
-  0x2000,   0x1000,
-  0x2000,   0x1000,
-  0x2000,   0x1000,
-  0x2000,   0x1000,
-  0x2000,   0x1000,
-  0x2000,   0x1000,
-  0x4000,   0x3800,
-  0x2000,   0x1000,
-  0x2000,   0x1000,
-  0x2000,   0x1000,
-  0x2000,   0x1000,
-  0x2000,   0x1000,
-  0x5000,   0x2800,
-  0x8800,   0x4600,
-
-  0x0000,   0x0000
 };
 
 static struct BitMap selectPointerBitmap =
@@ -285,7 +281,6 @@ static void IdentifyPointerColors(Object *obj)
 
   LEAVE();
 }
-#endif
 
 void SetupSelectPointer(struct InstData *data)
 {
@@ -298,7 +293,8 @@ void SetupSelectPointer(struct InstData *data)
       POINTERA_ImageData,   selectPointer,
       POINTERA_Width,       selectPointerWidth,
       POINTERA_Height,      selectPointerHeight,
-      POINTERA_BitMap,      &fakeBitmap,
+      POINTERA_BitMap,      &selectPointerBitmap,
+      POINTERA_WordWidth,   (ULONG)1,
       POINTERA_XResolution, (ULONG)POINTERXRESN_SCREENRES,
       POINTERA_YResolution, (ULONG)POINTERYRESN_SCREENRESASPECT,
       POINTERA_XOffset,     (LONG)selectPointerXOffset,
@@ -372,17 +368,15 @@ void ShowSelectPointer(Object *obj, struct InstData *data)
   if(data->PointerObj != NULL &&
      xget(_win(obj), MUIA_Window_Sleep) == FALSE)
   {
+    // try to identify the black/white colors
+    // of the current screen colormap
+    IdentifyPointerColors(obj);
+
     #if defined(__amigaos4__)
     SetWindowPointer(_window(obj), WA_Pointer, data->PointerObj, TAG_DONE);
     #else
     if(((struct Library *)IntuitionBase)->lib_Version >= 39)
-    {
-      // try to identify the black/white colors
-      // of the current screen colormap
-      IdentifyPointerColors(obj);
-
       SetWindowPointer(_window(obj), WA_Pointer, data->PointerObj, TAG_DONE);
-    }
     else
       SetPointer(_window(obj), (APTR)data->PointerObj, selectPointerHeight,
                                                        selectPointerWidth,
