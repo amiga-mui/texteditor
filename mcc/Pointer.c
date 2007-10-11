@@ -122,24 +122,24 @@ static const UWORD selectPointer_bp1[] =
   0x4600,    // .#...##
 };
 
-static UWORD selectPointer_bp2[] =
+static const UWORD selectPointer_bp2[] =
 {
-  0x0000,
-  0x0000,
-  0x0000,
-  0x0000,
-  0x0000,
-  0x0000,
-  0x0000,
-  0x0000,
-  0x0000,
-  0x0000,
-  0x0000,
-  0x0000,
-  0x0000,
-  0x0000,
-  0x0000,
-  0x0000,
+  0xce00,    // %#..%#.
+  0x7800,    // .%#%#..
+  0x3000,    // ..%#...
+  0x3000,    // ..%#...
+  0x3000,    // ..%#...
+  0x3000,    // ..%#...
+  0x3000,    // ..%#...
+  0x3000,    // ..%#...
+  0x7800,    // .%%%#..
+  0x3000,    // ..%#...
+  0x3000,    // ..%#...
+  0x3000,    // ..%#...
+  0x3000,    // ..%#...
+  0x3000,    // ..%#...
+  0x7800,    // .%#%#..
+  0xce00,    // %#..%#.
 };
 
 static const UWORD selectPointer[] =
@@ -183,9 +183,6 @@ static void IdentifyPointerColors(Object *obj)
   LONG whiteIndex;
 
   ENTER();
-
-  for(i=0; i<16; i++)
-    selectPointer_bp2[i] = selectPointer_bp0[i] | selectPointer_bp1[i];
 
   // get the current screen's pointer colors (17 to 19)
   GetRGB32(_window(obj)->WScreen->ViewPort.ColorMap, 17, 3, colors);
