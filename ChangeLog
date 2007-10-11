@@ -9,6 +9,9 @@ $URL$
 
    * mcc/Pointer.c: the combinated bitplane is now also declared as constant
      data instead of "calculating" it.
+   * mcc/Pointer.c: for OS4 the normal bitmap data are now used for the fall-
+     back pointer in case the graphic card cannot handle 32bit hardware sprites
+     as pointer.
 
 2007-10-07 Jens Langner <Jens.Langner@light-speed.de>
 
