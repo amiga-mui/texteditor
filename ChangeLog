@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-10-14 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcc/HandleInput.c: fixed bug #1812179 where pressing return/enter on the
+     visible last line didn't end up in the display being scrolled according to
+     the vertical cursor change.
+
 2007-10-11  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcc/Pointer.c: the combinated bitplane is now also declared as constant
