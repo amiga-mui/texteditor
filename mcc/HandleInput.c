@@ -621,6 +621,9 @@ void Key_Return (struct InstData *data)
   AddToUndoBuffer(splitline, NULL, data);
   SplitLine(data->CPos_X, data->actualline, TRUE, NULL, data);
 
+  // make sure the cursor is visible
+  ScrollIntoDisplay(data);
+
   LEAVE();
 }
 
@@ -912,6 +915,7 @@ static LONG FindKey(UBYTE key, ULONG qualifier, struct InstData *data)
         RETURN(5);
         return 5;
       }
+
       if(data->flags & FLG_ReadOnly)
       {
         LONG new_y = data->visual_y-1;
@@ -990,6 +994,8 @@ static LONG FindKey(UBYTE key, ULONG qualifier, struct InstData *data)
       }
       else
       {
+        D(DBF_INPUT, "curKey->act: %ld", curKey->act);
+
         switch(curKey->act)
         {
           case MUIV_TextEditor_KeyAction_Top:
@@ -1262,15 +1268,7 @@ static BOOL ReactOnRawKey(struct IntuiMessage *imsg, struct InstData *data)
       result = FALSE;
   }
   else if(dummy == 3)
-  {
     data->pixel_x = 0;
-
-    // if this action changed to another actualline
-    // we go and have to scroll into the display to
-    // make the cursor visible again.
-    if(oldactualline != data->actualline)
-      ScrollIntoDisplay(data);
-  }
 
   RETURN(result);
   return(result);
