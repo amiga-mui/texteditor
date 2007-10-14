@@ -1,12 +1,12 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.23 (03.10.2007)
+@$VER: TextEditor.Guide 15.24 (03.10.2007)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
 Welcome to the @{b}TextEditor @{ub}AmigaGuide(R) documentation.
 
-TextEditor is (C) 1997-2000 by Allan Odgaard,
 (C) 2005-2007 by the TextEditor.mcc Open Source team
+(C) 1997-2000 by Allan Odgaard
 
 
 @{b}@{uu}Table of contents @{uu}@{ub}
@@ -339,6 +339,19 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.24 (14.10.2007)
+
+- fixed a bug where upon using the backspace key at the very top might have corrupted
+  the display in case it concatenated two lines.
+- fixed a bug where pressing return/enter on the last active line might have ended
+  up in not seeing TE.mcc scrolling down to keep the cursor in the display.
+- fixed a bug in the 32bit pointer management where the fakeBitmap was now
+  replaced against a fallback Bitmap. This should fix issues on gfx hardware which
+  couldn't handle softsprites on OS4.
+- fixed a bug in the MCP GUI display where some checkboxs were layouted incorrectly.
+- fixed a bug where a TE.mcc object ate all key events regardless if it is the
+  active object in a window or not.
 
 15.23 (03.10.2007)
 
