@@ -647,6 +647,7 @@ void Key_Backspace (struct InstData *data)
         data->actualline = data->actualline->previous;
         data->CPos_X = data->actualline->line.Length-1;
         AddToUndoBuffer(backspacemerge, NULL, data);
+        ScrollIntoDisplay(data);
         MergeLines(data->actualline, data);
       }
     }
@@ -1291,11 +1292,14 @@ void ScrollIntoDisplay(struct InstData *data)
     {
       data->visual_y += diff-data->maxlines;
       ScrollUp(0, diff-data->maxlines, data);
+      D(DBF_INPUT,"scrollup: %ld", diff-data->maxlines);
     }
+
     if(diff < 1)
     {
       data->visual_y += diff-1;
       ScrollDown(0, (-diff)+1, data);
+      D(DBF_INPUT,"scrolldown: %ld", -diff+1);
     }
   }
 

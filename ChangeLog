@@ -7,6 +7,10 @@ $URL$
 
 2007-10-14 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcc/HandleInput.c: fixed a bug in the Backspace key handling where upcon
+     concatenating two lines via the backspace key the display may have ended up
+     mixed up in case they were concatenated at the visual top of the editor
+     gadget.
    * mcc/HandleInput.c: fixed bug #1812179 where pressing return/enter on the
      visible last line didn't end up in the display being scrolled according to
      the vertical cursor change.
