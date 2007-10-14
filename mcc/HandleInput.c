@@ -1262,7 +1262,15 @@ static BOOL ReactOnRawKey(struct IntuiMessage *imsg, struct InstData *data)
       result = FALSE;
   }
   else if(dummy == 3)
+  {
     data->pixel_x = 0;
+
+    // if this action changed to another actualline
+    // we go and have to scroll into the display to
+    // make the cursor visible again.
+    if(oldactualline != data->actualline)
+      ScrollIntoDisplay(data);
+  }
 
   RETURN(result);
   return(result);
