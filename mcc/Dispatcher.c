@@ -579,27 +579,30 @@ DISPATCHER(_Dispatcher)
     case MUIM_HandleEvent:
     {
       ULONG oldx = data->CPos_X;
-      ULONG oldy = LineNr(data->actualline, data)-1;
-      ULONG newy;
+      struct line_node *oldy = data->actualline;
 
+      // process all input events
       result = HandleInput(cl, obj, (struct MUIP_HandleEvent *)msg);
-      if(result == 0)
-      {
-        RETURN(0);
-        return(0);
-      }
 
+      // see if the cursor was moved and if so we go and notify
+      // others
       data->NoNotify = TRUE;
 
       if(data->CPos_X != oldx)
         set(obj, MUIA_TextEditor_CursorX, data->CPos_X);
 
-      newy = LineNr(data->actualline, data)-1;
-
-      if(oldy != newy)
-        set(obj, MUIA_TextEditor_CursorY, newy);
+      if(data->actualline != oldy)
+        set(obj, MUIA_TextEditor_CursorY, LineNr(data->actualline, data)-1);
 
       data->NoNotify = FALSE;
+
+      // if the HandleInput() function didn't return
+      // an MUI_EventHandlerRC_Eat we can return immediately
+      if(result == 0)
+      {
+        RETURN(0);
+        return(0);
+      }
     }
     break;
 
@@ -682,7 +685,7 @@ DISPATCHER(_Dispatcher)
     case OM_DISPOSE:                    result = Dispose(cl, obj, msg); RETURN(result); return(result); break;
     case MUIM_TextEditor_ClearText:     result = ClearText(data);       break;
     case MUIM_TextEditor_ToggleCursor:  result = ToggleCursor(data);    RETURN(result); return(result); break;
-    case MUIM_TextEditor_InputTrigger:  result = InputTrigger(cl, data);break;
+    case MUIM_TextEditor_InputTrigger:  result = InputTrigger(cl, obj); break;
 
     case MUIM_TextEditor_InsertText:
     {

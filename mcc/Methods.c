@@ -203,8 +203,10 @@ ULONG ToggleCursor (struct InstData *data)
   return(TRUE);
 }
 
-ULONG InputTrigger(UNUSED struct IClass *cl, struct InstData *data)
+ULONG InputTrigger(struct IClass *cl, Object *obj)
 {
+  struct InstData *data = INST_DATA(cl, obj);
+
   ENTER();
 
   if(data->smooth_wait == 1 && data->scrollaction)
@@ -379,6 +381,17 @@ ULONG InputTrigger(UNUSED struct IClass *cl, struct InstData *data)
     {
       ScrollIntoDisplay(data);
       PosFromCursor(MouseX, MouseY, data);
+
+      // make sure to notify others that the cursor has changed and so on.
+      data->NoNotify = TRUE;
+
+      if(data->CPos_X != oldCPos_X)
+        set(obj, MUIA_TextEditor_CursorX, data->CPos_X);
+
+      if(data->actualline != oldactualline)
+        set(obj, MUIA_TextEditor_CursorY, LineNr(data->actualline, data)-1);
+
+      data->NoNotify = FALSE;
     }
   }
 

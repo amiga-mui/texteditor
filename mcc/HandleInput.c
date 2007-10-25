@@ -107,6 +107,8 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
         ShowSelectPointer(obj, data);
       else
         HideSelectPointer(obj, data);
+
+      D(DBF_INPUT, "IDCMP_MOUSEMOVE");
     }
     else
     #if defined(__amigaos4__)
@@ -292,6 +294,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                     data->blockinfo.enabled = TRUE;
                     data->blockinfo.startline = data->actualline;
                     data->blockinfo.startx = data->CPos_X;
+
                     if(last_x == data->CPos_X && lastline == data->actualline && DoubleClick(data->StartSecs, data->StartMicros, imsg->Seconds, imsg->Micros))
                     {
                       if((data->DoubleClickHook && !CallHook(data->DoubleClickHook, (Object *)data->object, data->actualline->line.Contents, data->CPos_X)) || (!data->DoubleClickHook))
