@@ -453,7 +453,7 @@ long Redo       (struct InstData *);
 
 ULONG ClearText   (struct InstData *);
 ULONG ToggleCursor  (struct InstData *);
-ULONG InputTrigger  (struct IClass *, struct InstData *);
+ULONG InputTrigger  (struct IClass *, Object *);
 ULONG InsertText    (struct InstData *, STRPTR, BOOL);
 void  FreeTextMem   (struct line_node *, struct InstData *);
 void  ResetDisplay  (struct InstData *);

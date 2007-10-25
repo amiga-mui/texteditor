@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-10-25 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcc/HandleInput.c, Methods.c, Dispatcher.c: fixed bug #1819513 where TE.mcc
+     didn't propagate a cursor change in all cases via a notify through the
+     MUIA_TextEditor_CusorX/Y attributes.
+
 #### v15.24 RELEASE ############################################################
 
 2007-10-14 Jens Langner <Jens.Langner@light-speed.de>
