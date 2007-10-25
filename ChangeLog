@@ -7,6 +7,9 @@ $URL$
 
 2007-10-25 Jens Langner <Jens.Langner@light-speed.de>
 
+   * mcc/HandleArexx.c: when firing an arexx command which did change the cursor
+     position, the cursor change was also not propagated to other MUI objects via
+     the common CursorX/Y attributes.
    * mcc/HandleInput.c, Methods.c, Dispatcher.c: fixed bug #1819513 where TE.mcc
      didn't propagate a cursor change in all cases via a notify through the
      MUIA_TextEditor_CusorX/Y attributes.

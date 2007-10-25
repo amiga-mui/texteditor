@@ -392,6 +392,17 @@ static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struc
 
       if(data->flags & FLG_Active && function <= GOTOBOOKMARK && function >= GOTOLINE)
         SetCursor(data->CPos_X, data->actualline, TRUE, data);
+
+      // make sure to notify others that the cursor has changed and so on.
+      data->NoNotify = TRUE;
+
+      if(data->CPos_X != oldCPos_X)
+        set(data->object, MUIA_TextEditor_CursorX, data->CPos_X);
+
+      if(data->actualline != oldactualline)
+        set(data->object, MUIA_TextEditor_CursorY, LineNr(data->actualline, data)-1);
+
+      data->NoNotify = FALSE;
     }
   }
 
