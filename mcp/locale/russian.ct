@@ -1,4 +1,4 @@
-## version $VER: TextEditor_mcp.catalog 2.5 (11.03.2007) © Michael Malyshev (Amiga-1251)
+## version $VER: TextEditor_mcp.catalog 2.6 (07.10.2007) © Michael Malyshev (Amiga-1251)
 ## language russian
 ## codeset 2104
 ## chunk AUTH Translated by <Michael_Malyshev@mail.ru> (Amiga-1251)
@@ -19,6 +19,9 @@
 ;
 ; 2.5 (11.03.2007) <vvinogradov>
 ; - add new string from TextEditor.mcc v15.21
+;
+; 2.6 (07.10.2007) <vvinogradov>
+; - add new string from TextEditor.mcc v15.23
 ;
 ;-----------------------------------------------------------------------------
 ;
@@ -655,4 +658,32 @@ TextEditor.mcp не может открыть минимально требуюмую\n\
 MSG_Ok
 Далее
 ; Ok
+;
+MSG_Label_InactiveCursor
+Неактивный курсор
+; Inactive Cursor
+;
+MSG_HELP_InactiveCursor
+Показывать специальный курсор, когда поле редактирования\n\
+текста находится к неактивном состоянии.
+; If enabled, shows a special cursor in case the texteditor\n\
+; gadget is in inactive state.
+;
+MSG_Label_SelectPointer
+Смена курсора
+; Selection Pointer
+;
+MSG_HELP_SelectPointer
+Подменять курсор на специальный, когда он\n\
+находится над полем редактирования текста.
+; If enabled, a specialized selection pointer will be shown\n\
+; when the mouse pointer is above the texteditor gadget.
+;
+MSG_Label_InactiveColor
+Неактивный
+; Inactive
+;
+MSG_PopWinTitle_InactiveColor
+Выбор цвета для неактивного выделенного текста
+; Select inactive color
 ;
