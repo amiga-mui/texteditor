@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-10-27 David Rey <tactica@users.sourceforge.net>
+
+   * mcp/locale/TextEditor_mcp.cd, mcp/CreatePrefsGroup.c: added the missing
+     help bubbles to almost everything that was missing them, also reworded
+     a few strings.
+
 2007-10-25 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcp/locale/russian.ct: update russian catalog translation kindly provided
