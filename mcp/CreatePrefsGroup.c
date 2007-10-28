@@ -361,7 +361,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
     }
   }
 
-  if(!hotkeystringOk)
+  if(hotkeystringOk == FALSE)
   {
     MUI_Request(NULL, NULL, 0L, tr(MSG_WarnHotkeyString_Title), tr(MSG_Ok), tr(MSG_WarnHotkeyString));
 
@@ -540,7 +540,6 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
       Child, VGroup,
         Child, HGroup,
           Child, defaultkeys = SimpleButton(tr(MSG_Button_DefaultKeys)),
-          MUIA_ShortHelp, tr(MSG_HELP_BUTTON_DEFAULTKEYS),
           Child, TxtLabel(tr(MSG_Label_BlkQual), 1000),
           Child, data->blockqual = MUI_MakeObject(MUIO_Cycle, NULL, data->cycleentries),
         End,
@@ -601,9 +600,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
           End,
           Child, HGroup,
             Child, data->insertkey = SimpleButton(tr(MSG_Button_Insert)),
-            MUIA_ShortHelp, tr(MSG_HELP_BUTTON_INSERT),
             Child, data->deletekey = SimpleButton(tr(MSG_Button_Delete)),
-            MUIA_ShortHelp, tr(MSG_HELP_BUTTON_DELETE),
           End,
         End,
       End,
@@ -707,6 +704,10 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
     set(data->blockqual, MUIA_ShortHelp, tr(HelpBubble_BlockQual));
     set(data->typenspell, MUIA_ShortHelp, tr(HelpBubble_TypeNSpell));
     set(data->CheckWord, MUIA_ShortHelp, tr(HelpBubble_CheckWord));
+    set(defaultkeys, MUIA_ShortHelp, tr(MSG_HELP_BUTTON_DEFAULTKEYS));
+    set(data->hotkey, MUIA_ShortHelp, tr(MSG_HELP_BUTTON_SNOOP));
+    set(data->insertkey, MUIA_ShortHelp, tr(MSG_HELP_BUTTON_INSERT));
+    set(data->deletekey, MUIA_ShortHelp, tr(MSG_HELP_BUTTON_DELETE));
 
     set(data->hotkey, MUIA_String_AttachedList, data->keybindings);
     set(popbutton, MUIA_CycleChain, TRUE);
