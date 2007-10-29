@@ -472,7 +472,7 @@ MSG_PopWinTitle_InactiveColor (138//)
 Select inactive color
 ;
 MSG_HELP_TABSIZE (139//)
-How many spaces hitting the <Tab> key will jump.
+How many spaces hitting the <TAB> key will jump.
 ;
 MSG_HELP_DESIGN_FRAME (140//)
 This is a button to adjust a frame.\n\
@@ -550,4 +550,4 @@ leave this empty to disable the type'n'spell feature.
 MSG_HELP_SPELLCHECKER_SUGGEST_CMD (158//)
 Specify here the command that will be used\n\
 to suggest an alternate word. As explained above,\n\
-usually you should specify an script here.
+usually you should specify a script here.
