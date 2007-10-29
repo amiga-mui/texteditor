@@ -8,6 +8,7 @@ $URL$
 2007-10-29  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/locale/TextEditor_mcp.cd: fixed some small typos.
+   * mcp/locale/deutsch.ct: Updated according to the latest changes.
 
 2007-10-28  Thore Böckelmann <tboeckel@gmx.de>
 

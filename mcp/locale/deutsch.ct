@@ -649,3 +649,89 @@ Inaktiv
 MSG_PopWinTitle_InactiveColor
 Inaktiv-Farbe auswählen
 ;
+MSG_HELP_TABSIZE
+Anzahl Leerzeichen, die beim Drücken von <TAB> eingefügt werden.
+;
+MSG_HELP_DESIGN_FRAME
+Mit diesem Schalter wird der Rahmen eingestellt.\n\
+Durch einen Klick kann das Einstellungsfenster geöffnet werden,\n\
+oder benutzen Sie Drag'n'Drop, um die Einstellungen von oder\n\
+zu einem anderen Rahmen zu kopieren.
+;
+MSG_HELP_DESIGN_BACKGROUND
+Mit diesem Schalter wird die Hintergrundfarbe eingestellt.\n\
+Durch einen Klick kann das Einstellungsfenster geöffnet werden,\n\
+oder benutzen Sie Drag'n'Drop, um die Einstellungen von oder\n\
+zu einem anderen Hintergrund zu kopieren.
+;
+MSG_HELP_DESIGN_TEXT
+Dies ist die Farbe, die für\n\
+normalen Text verwendet wird.
+;
+MSG_HELP_DESIGN_HIGHLIGHT
+Dies ist die Farbe, die für\n\
+hervorgehobenen Text verwendet wird.
+;
+MSG_HELP_SEPARATOR_SHINE
+Dies ist die Farbe, die für die\n\
+Trennlinie verwendet wird.
+;
+MSG_HELP_SEPARATOR_SHADOW
+Dies ist die Farbe, die für den Schatten\n\
+der Trennlinie verwendet wird.
+;
+MSG_HELP_FONTS_NORMAL
+Die Standardschriftart für den Editor.
+;
+MSG_HELP_FONTS_FIXED
+Die Standardschriftart für den Editor,\n\
+falls eine Schriftart mit fester Breite\n\
+benötigt wird.
+;
+MSG_HELP_CURSOR_NORMAL
+Dies ist die Farbe, die für\n\
+den Cursor verwendet wird.
+;
+MSG_HELP_CURSOR_SELECTED
+Dies ist die Farbe, die für\n\
+markierten Text verwendet wird.
+;
+MSG_HELP_CURSOR_INACTIVE
+Dies ist die Farbe, die verwendet\n\
+wird, wenn der Editor inaktiv ist.
+;
+MSG_HELP_CURSOR_WIDTH
+Dies ist die Breite des Cursors.
+;
+MSG_HELP_CURSOR_BLINKSPEED
+Sie können den Cursor blinken lassen,\n\
+um ihn leichter zu finden. Wählen Sie\n\
+'aus', um einen nicht blinkenden Cursor\n\
+zu bekommen.
+;
+MSG_HELP_BUTTON_DEFAULTKEYS
+Alle Tastenbelegungen auf die\n\
+Standardbelegung zurücksetzen.
+;
+MSG_HELP_BUTTON_SNOOP
+Benutzen Sie dieses Feld, um eine Tastenkombination für\n\
+die Aktion festzulegen. Sie können entweder die Belegung\n\
+von Hand eingeben, oder klicken Sie auf den 'Snoop'-Schalter,\n\
+um die Tastenkombination automatisch bis zum wiederholten\n\
+Klicken ermitteln zu lassen.
+;
+MSG_HELP_BUTTON_INSERT
+Neue Tastenbelegung in die Liste einfügen.
+;
+MSG_HELP_BUTTON_DELETE
+Diese Tastenbelegung aus der Liste löschen.
+;
+MSG_HELP_SPELLCHECKER_LOOKUP_CMD
+Geben Sie hier das Kommando ein, das zum Prüfen der\n\
+Rechtschreibung verwendet werden soll, oder lassen Sie\n\
+das Feld leer, um die Prüfung zu deaktivieren.
+;
+MSG_HELP_SPELLCHECKER_SUGGEST_CMD
+Geben Sie hier das Kommando ein, um ein alternatives\n\
+Wort vorschlagen zu lassen. Wie oben beschrieben,\n\
+sollte hier üblicherweise ein Skript angegeben werden.
