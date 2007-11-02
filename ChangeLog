@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-11-02  Thore Böckelmann <tboeckel@gmx.de>
+
+   * mcp/CreatePrefsGroup.c: added all missing buttons to the cycle chain.
+
 2007-10-29  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/locale/TextEditor_mcp.cd: fixed some small typos.
