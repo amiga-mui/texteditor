@@ -291,7 +291,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
   BOOL hotkeystringOk = FALSE;
   Object *slider, *slider2, *readview, *button, *group,
          *editor, *keylist, *defaultkeys, *functionname,
-         *plist, *popbutton;
+         *plist, *popbutton, *popNormalFontButton, *popFixedFontButton;
 
   struct NewMenu editpopupdata[] =
   {
@@ -390,6 +390,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
                 MUIA_Numeric_Min, 0,
                 MUIA_Numeric_Max, 2000,
                 MUIA_Numeric_Format, "%ld (± 5)",
+                MUIA_CycleChain, TRUE,
               End,
               Child, TxtLabel(tr(MSG_Label_TabSize), 0),
               Child, data->tabsize = SliderObject,
@@ -397,6 +398,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
                 MUIA_Numeric_Min, 2,
                 MUIA_Numeric_Max, 12,
                 MUIA_Numeric_Format, tr(MSG_SliderText_TabSize),
+                MUIA_CycleChain, TRUE,
               End,
               Child, TxtLabel(tr(MSG_Label_Smooth), 0),
               Child, HGroup,
@@ -425,22 +427,26 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
             Child, data->frame = MUI_NewObject("Popframe.mui",
               MUIA_Window_Title, tr(MSG_PopWinTitle_Frame),
               MUIA_ShortHelp, tr(MSG_HELP_DESIGN_FRAME),
+              MUIA_CycleChain, TRUE,
             End,
             Child, TxtLabel(tr(MSG_Label_Background), 0),
             Child, data->background = MUI_NewObject("Popimage.mui",
               MUIA_Window_Title, tr(MSG_PopWinTitle_Background),
               MUIA_ShortHelp, tr(MSG_HELP_DESIGN_BACKGROUND),
               MUIA_Imageadjust_Type, 2,
+              MUIA_CycleChain, TRUE,
             End,
             Child, TxtLabel(tr(MSG_Label_Text), 0),
             Child, data->textcolor = PoppenObject,
               MUIA_Window_Title, tr(MSG_PopWinTitle_Text),
               MUIA_ShortHelp, tr(MSG_HELP_DESIGN_TEXT),
+              MUIA_CycleChain, TRUE,
             End,
             Child, TxtLabel(tr(MSG_Label_Highlight), 0),
             Child, data->highlightcolor = PoppenObject,
               MUIA_Window_Title, tr(MSG_PopWinTitle_Highlight),
               MUIA_ShortHelp, tr(MSG_HELP_DESIGN_HIGHLIGHT),
+              MUIA_CycleChain, TRUE,
             End,
           End,
 
@@ -453,11 +459,13 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
             Child, data->separatorshine = PoppenObject,
               MUIA_Window_Title, tr(MSG_PopWinTitle_SeparatorShine),
               MUIA_ShortHelp, tr(MSG_HELP_SEPARATOR_SHINE),
+              MUIA_CycleChain, TRUE,
             End,
             Child, TxtLabel(tr(MSG_Label_SeparatorShadow), 0),
             Child, data->separatorshadow = PoppenObject,
               MUIA_Window_Title, tr(MSG_PopWinTitle_SeparatorShadow),
               MUIA_ShortHelp, tr(MSG_HELP_SEPARATOR_SHADOW),
+              MUIA_CycleChain, TRUE,
             End,
           End,
         End,
@@ -472,15 +480,21 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
             Child, ColGroup(2),
               Child, TxtLabel(tr(MSG_Label_Normal), 0),
               Child, PopaslObject,
-                MUIA_Popstring_String,  data->normalfont = BetterStringObject, StringFrame, End,
-                MUIA_Popstring_Button,  MUI_MakeObject(MUIO_PopButton, MUII_PopUp),
+                MUIA_Popstring_String,  data->normalfont = BetterStringObject,
+                  StringFrame,
+                  MUIA_CycleChain, TRUE,
+                End,
+                MUIA_Popstring_Button,  popNormalFontButton = MUI_MakeObject(MUIO_PopButton, MUII_PopUp),
                 MUIA_Popasl_Type,     ASL_FontRequest,
                 MUIA_ShortHelp, tr(MSG_HELP_FONTS_NORMAL),
               End,
               Child, TxtLabel(tr(MSG_Label_Fixed), 0),
               Child, PopaslObject,
-                MUIA_Popstring_String,  data->fixedfont = BetterStringObject, StringFrame, End,
-                MUIA_Popstring_Button,  MUI_MakeObject(MUIO_PopButton, MUII_PopUp),
+                MUIA_Popstring_String,  data->fixedfont = BetterStringObject,
+                  StringFrame,
+                  MUIA_CycleChain, TRUE,
+                End,
+                MUIA_Popstring_Button,  popFixedFontButton = MUI_MakeObject(MUIO_PopButton, MUII_PopUp),
                 MUIA_Popasl_Type,     ASL_FontRequest,
                 ASLFO_Flags,        FOF_FIXEDWIDTHONLY,
                 MUIA_ShortHelp, tr(MSG_HELP_FONTS_FIXED),
@@ -499,16 +513,19 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
             Child, data->cursorcolor = PoppenObject,
               MUIA_Window_Title, tr(MSG_PopWinTitle_Cursor),
               MUIA_ShortHelp, tr(MSG_HELP_CURSOR_NORMAL),
+              MUIA_CycleChain, TRUE,
             End,
             Child, TxtLabel(tr(MSG_Label_Selected), 0),
             Child, data->markedcolor = PoppenObject,
               MUIA_Window_Title, tr(MSG_PopWinTitle_Selected),
               MUIA_ShortHelp, tr(MSG_HELP_CURSOR_SELECTED),
+              MUIA_CycleChain, TRUE,
             End,
             Child, TxtLabel(tr(MSG_Label_InactiveColor), 0),
             Child, data->inactiveColor = PoppenObject,
               MUIA_Window_Title, tr(MSG_PopWinTitle_InactiveColor),
               MUIA_ShortHelp, tr(MSG_HELP_CURSOR_INACTIVE),
+              MUIA_CycleChain, TRUE,
             End,
             Child, TxtLabel(tr(MSG_Label_Width), 0),
             Child, data->cursorwidth = NewObject(widthslider_mcc->mcc_Class, NULL,
@@ -516,6 +533,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
               MUIA_Numeric_Max, 6,
               MUIA_Numeric_Format, tr(MSG_SliderText_StdWidth),
               MUIA_ShortHelp, tr(MSG_HELP_CURSOR_WIDTH),
+              MUIA_CycleChain, TRUE,
             End,
             Child, TxtLabel(tr(MSG_Label_BlinkSpeed), 0),
             Child, data->blinkspeed = NewObject(speedslider_mcc->mcc_Class, NULL,
@@ -523,6 +541,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
               MUIA_Numeric_Max, 20,
               MUIA_Numeric_Format, tr(MSG_SliderText_StdSpeed),
               MUIA_ShortHelp, tr(MSG_HELP_CURSOR_BLINKSPEED),
+              MUIA_CycleChain, TRUE,
             End,
             Child, TxtLabel(tr(MSG_Label_InactiveCursor), 0),
             Child, HGroup,
@@ -626,18 +645,22 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
           Child, data->LookupExeType = CycleObject,
             MUIA_Cycle_Entries, data->execution,
             MUIA_Weight, 0,
+            MUIA_CycleChain, TRUE,
           End,
           Child, data->lookupcmd = BetterStringObject, StringFrame,
             MUIA_ShortHelp, tr(MSG_HELP_SPELLCHECKER_LOOKUP_CMD),
+            MUIA_CycleChain, TRUE,
           End,
           Child, TxtLabel(tr(MSG_Label_SuggestCmd), 0),
           Child, data->SuggestExeType = CycleObject,
             MUIA_Cycle_Entries, data->execution,
             MUIA_Weight, 0,
+            MUIA_CycleChain, TRUE,
           End,
           Child, data->suggestcmd = BetterStringObject, StringFrame,
             MUIA_String_AdvanceOnCR, TRUE,
             MUIA_ShortHelp, tr(MSG_HELP_SPELLCHECKER_SUGGEST_CMD),
+            MUIA_CycleChain, TRUE,
           End,
         End,
         Child, ColGroup(2),
@@ -705,12 +728,15 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
     set(data->typenspell, MUIA_ShortHelp, tr(HelpBubble_TypeNSpell));
     set(data->CheckWord, MUIA_ShortHelp, tr(HelpBubble_CheckWord));
     set(defaultkeys, MUIA_ShortHelp, tr(MSG_HELP_BUTTON_DEFAULTKEYS));
+    set(defaultkeys, MUIA_CycleChain, TRUE);
     set(data->hotkey, MUIA_ShortHelp, tr(MSG_HELP_BUTTON_SNOOP));
     set(data->insertkey, MUIA_ShortHelp, tr(MSG_HELP_BUTTON_INSERT));
     set(data->deletekey, MUIA_ShortHelp, tr(MSG_HELP_BUTTON_DELETE));
 
     set(data->hotkey, MUIA_String_AttachedList, data->keybindings);
     set(popbutton, MUIA_CycleChain, TRUE);
+    set(popNormalFontButton, MUIA_CycleChain, TRUE);
+    set(popFixedFontButton, MUIA_CycleChain, TRUE);
 
     DoMethod(data->lookupcmd, MUIM_Notify, MUIA_String_Acknowledge, MUIV_EveryTime, MUIV_Notify_Window, 3, MUIM_Set, MUIA_Window_ActiveObject, data->suggestcmd);
 
