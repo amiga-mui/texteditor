@@ -26,3 +26,8 @@ struct MUI_FrameSpec
 	char buf[8];
 };
 
+#define PopframeObject MUI_NewObject(MUIC_Popframe
+#define PopimageObject MUI_NewObject("Popimage.mui"
+#define CrawlingObject MUI_NewObject("Crawling.mcc"
+
+

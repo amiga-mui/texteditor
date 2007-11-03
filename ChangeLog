@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-11-03 Jens Langner <Jens.Langner@light-speed.de>
+
+   * mcp/CreatePrefsGroup.c: added a copyright crawling object to the bottom
+     of the mcp to match the Look&Feel to our other classes.
+	  
 2007-11-03 Pär Boberg <pbobbenb@spray.se>
 
    * mcp/locale/svenska.ct: Updated according to changes.
