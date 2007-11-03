@@ -327,6 +327,13 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
     { NM_END,   NULL, 0, 0, 0, (APTR)0 }
   };
 
+  static const char infotext[] = "\033bTextEditor.mcp " LIB_REV_STRING "\033n (" LIB_DATE ")\n"
+                                 "Copyright (c) 1997-2000 Allan Odgaard\n"
+                                 LIB_COPYRIGHT "\n\n"
+                                 "Distributed under the terms of the LGPL2.\n\n"
+                                 "For the latest version, check out:\n"
+                                 "http://www.sf.net/projects/texteditor-mcc/\n\n";
+
   ENTER();
 
   // check that HotkeyString.mcc exists and is
@@ -717,6 +724,23 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
         End,
       End,
     End,
+
+    Child, CrawlingObject,
+      TextFrame,
+      MUIA_FixHeightTxt, "\n\n",
+      MUIA_Background,   "m1",
+
+      Child, TextObject,
+        MUIA_Text_PreParse, "\033c",
+        MUIA_Text_Contents, infotext,
+      End,
+
+      Child, TextObject,
+        MUIA_Text_PreParse, "\033c",
+        MUIA_Text_Contents, infotext,
+      End,
+    End,
+
   End;
 
   if(group && data->editpopup)
