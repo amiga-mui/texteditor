@@ -169,6 +169,15 @@ static struct BitMap selectPointerBitmap =
   { (PLANEPTR)selectPointer_bp0, (PLANEPTR)selectPointer_bp1, NULL, NULL, NULL, NULL, NULL }
 };
 
+#if defined(__MORPHOS__)
+#ifndef POINTERTYPE_SELECTTEXT
+#define POINTERTYPE_SELECTTEXT 7
+#endif
+#ifndef WA_PointerType
+#define WA_PointerType (WA_Dummy + 164)
+#endif
+#endif
+
 static void IdentifyPointerColors(Object *obj)
 {
   int i;
@@ -286,6 +295,11 @@ void SetupSelectPointer(struct InstData *data)
 {
   ENTER();
 
+  #if defined(__MORPHOS__)
+  if(((struct Library *)IntuitionBase)->lib_Version >= 50 && ((struct Library *)IntuitionBase)->lib_Revision >= 86)
+    data->PointerObj = (APTR)POINTERTYPE_SELECTTEXT;
+  #endif
+
   if(data->PointerObj == NULL)
   {
     #if defined(__amigaos4__)
@@ -333,6 +347,13 @@ void CleanupSelectPointer(Object *obj, struct InstData *data)
     SetWindowPointer(_window(obj), TAG_DONE);
     DisposeObject(data->PointerObj);
     data->PointerObj = NULL;
+    #elif defined(__MORPHOS__)
+    SetWindowPointer(_window(obj), TAG_DONE);
+
+    if ((IPTR)data->PointerObj != POINTERTYPE_SELECTTEXT)
+      DisposeObject(data->PointerObj);
+
+    data->PointerObj = NULL;
     #else
     if(((struct Library *)IntuitionBase)->lib_Version >= 39)
     {
@@ -374,6 +395,11 @@ void ShowSelectPointer(Object *obj, struct InstData *data)
 
     #if defined(__amigaos4__)
     SetWindowPointer(_window(obj), WA_Pointer, data->PointerObj, TAG_DONE);
+    #elif defined(__MORPHOS__)
+    if(((struct Library *)IntuitionBase)->lib_Version >= 50 && ((struct Library *)IntuitionBase)->lib_Revision >= 86)
+      SetWindowPointer(_window(obj), WA_PointerType, data->PointerObj, TAG_DONE);
+    else
+      SetWindowPointer(_window(obj), WA_Pointer, data->PointerObj, TAG_DONE);
     #else
     if(((struct Library *)IntuitionBase)->lib_Version >= 39)
       SetWindowPointer(_window(obj), WA_Pointer, data->PointerObj, TAG_DONE);
@@ -397,7 +423,7 @@ void HideSelectPointer(Object *obj, struct InstData *data)
   if(data->activeSelectPointer == TRUE &&
      data->PointerObj != NULL)
   {
-    #if defined(__amigaos4__)
+    #if defined(__amigaos4__) || defined(__MORPHOS__)
     SetWindowPointer(_window(obj), TAG_DONE);
     #else
     if(((struct Library *)IntuitionBase)->lib_Version >= 39)

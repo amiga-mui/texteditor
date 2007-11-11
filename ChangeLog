@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-11-11 Ilkka Lehtoranta <ilkleht@isoveli.org>
+
+   * mcc/Pointer.c: use system pointers on MorphOS if possible.
+
 2007-11-03 Jens Langner <Jens.Langner@light-speed.de>
 
    * mcp/CreatePrefsGroup.c: added a copyright crawling object to the bottom
