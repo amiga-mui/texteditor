@@ -9,6 +9,8 @@ $URL$
 
    * mcc/MixedFunctions.c: changed the return code of some functions to BOOL to
      reflect the true nature of the return code.
+   * mcc/EditorStuff.c: added one more scroll command after inserting a single
+     character. This should finally fix bug #1812179.
 
 2007-11-11 Ilkka Lehtoranta <ilkleht@isoveli.org>
 
