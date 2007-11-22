@@ -900,8 +900,8 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
 
   ENTER();
 
-  line_nr   = LineToVisual(line, data);
-  orgline_nr  = line_nr;
+  line_nr = LineToVisual(line, data);
+  orgline_nr = line_nr;
 
   while((skip + (width = LineCharsWidth(line->line.Contents+skip, data))) < x)
   {
@@ -915,13 +915,13 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
       break;
   }
 
-  if(characters)
+  if(characters != NULL)
   {
     strcpyback(line->line.Contents+x+length, line->line.Contents+x);
     memcpy(line->line.Contents+x, characters, length);
     width += length;
     line->line.Length += length;
-    if(buffer)
+    if(buffer != NULL)
     {
       UWORD style = buffer->del.style;
   
@@ -940,9 +940,9 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
   }
 
   diff = VisualHeight(line, data) - line->visual;
-  if(diff)
+  if(diff != 0)
   {
-      LONG  movement;
+    LONG movement;
 
     movement = orgline_nr + line->visual - 1;
 
@@ -976,6 +976,7 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
     }
   }
   OptimizedPrint(skip, line, line_nr, width, data);
+  ScrollIntoDisplay(data);
   data->HasChanged = TRUE;
 
   LEAVE();
@@ -1023,7 +1024,7 @@ BOOL PasteChars(LONG x, struct line_node *line, LONG length, const char *charact
 
   if((*((long *)line->line.Contents-1))-4 < (LONG)(line->line.Length + length + 1))
   {
-    if(!ExpandLine(line, length, data))
+    if(ExpandLine(line, length, data) == FALSE)
     {
       RETURN(FALSE);
       return(FALSE);
