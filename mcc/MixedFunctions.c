@@ -133,45 +133,43 @@ BOOL Init_LineNode(struct line_node *line, struct line_node *previous, const cha
   return(success);
 }
 
-long  ExpandLine    (struct line_node *line, LONG length, struct InstData *data)
+BOOL ExpandLine(struct line_node *line, LONG length, struct InstData *data)
 {
-  char  *newbuffer;
+  BOOL result = FALSE;
+  char *newbuffer;
 
   ENTER();
 
-  if((newbuffer = MyAllocPooled(data->mypool, line->line.Length+40+length)))
+  if((newbuffer = MyAllocPooled(data->mypool, line->line.Length+40+length)) != NULL)
   {
     memcpy(newbuffer, line->line.Contents, line->line.Length+1);
     MyFreePooled(data->mypool, line->line.Contents);
     line->line.Contents = newbuffer;
-
-    RETURN(TRUE);
-    return(TRUE);
+    result = TRUE;
   }
 
-  RETURN(FALSE);
-  return(FALSE);
+  RETURN(result);
+  return result;
 }
 
-long  CompressLine  (struct line_node *line, struct InstData *data)
+BOOL CompressLine(struct line_node *line, struct InstData *data)
 {
-  char  *newbuffer;
+  BOOL result = FALSE;
+  char *newbuffer;
 
   ENTER();
 
-  if((newbuffer = MyAllocPooled(data->mypool, strlen(line->line.Contents)+1)))
+  if((newbuffer = MyAllocPooled(data->mypool, strlen(line->line.Contents)+1)) != NULL)
   {
     memcpy(newbuffer, line->line.Contents, line->line.Length+1);
     MyFreePooled(data->mypool, line->line.Contents);
     line->line.Contents = newbuffer;
     line->line.Length  = strlen(newbuffer);
-
-    RETURN(TRUE);
-    return(TRUE);
+    result = TRUE;
   }
 
-  RETURN(FALSE);
-  return(FALSE);
+  RETURN(result);
+  return result;
 }
 /*-----------------------------------------------------*
  * Returns the number of chars that will fit on a line *

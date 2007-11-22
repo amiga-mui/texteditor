@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-11-22  Thore Böckelmann <tboeckel@gmx.de>
+
+   * mcc/MixedFunctions.c: changed the return code of some functions to BOOL to
+     reflect the true nature of the return code.
+
 2007-11-11 Ilkka Lehtoranta <ilkleht@isoveli.org>
 
    * mcc/Pointer.c: use system pointers on MorphOS if possible.
