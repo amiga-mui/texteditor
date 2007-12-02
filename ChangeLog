@@ -5,6 +5,9 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-12-02  Vit Sindlar <sindlarv at centrum dot cz>
+   * mcp/locale/czech.ct: added czech mcp catalog translation
+
 2007-11-22  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcc/MixedFunctions.c: changed the return code of some functions to BOOL to
