@@ -5,7 +5,15 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-12-12  Thore Böckelmann <tboeckel@gmx.de>
+
+   * Dispatcher.c, Pointer.c: the select pointer will now be set and hidden
+     in the Show/Hide methods. Hiding it in the Cleanup method is forbidden,
+     because the necessary window is not existing anymore then. This fixes
+     bug #1849264.
+
 2007-12-02  Vit Sindlar <sindlarv at centrum dot cz>
+
    * mcp/locale/czech.ct: added czech mcp catalog translation
 
 2007-11-22  Thore Böckelmann <tboeckel@gmx.de>
@@ -23,7 +31,7 @@ $URL$
 
    * mcp/CreatePrefsGroup.c: added a copyright crawling object to the bottom
      of the mcp to match the Look&Feel to our other classes.
-	  
+
 2007-11-03 Pär Boberg <pbobbenb@spray.se>
 
    * mcp/locale/svenska.ct: Updated according to changes.
