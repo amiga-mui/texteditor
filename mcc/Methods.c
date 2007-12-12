@@ -238,11 +238,11 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
 
   if(data->mousemove)
   {
-      LONG  MouseX = muiRenderInfo(data->object)->mri_Window->MouseX,
-          MouseY = muiRenderInfo(data->object)->mri_Window->MouseY;
-      LONG  oldCPos_X = data->CPos_X;
-      struct line_node *oldactualline = data->actualline;
-      BOOL  Scroll = TRUE;
+    LONG MouseX = muiRenderInfo(data->object)->mri_Window->MouseX;
+    LONG MouseY = muiRenderInfo(data->object)->mri_Window->MouseY;
+    LONG oldCPos_X = data->CPos_X;
+    struct line_node *oldactualline = data->actualline;
+    BOOL Scroll = TRUE;
 
     if(xget(_win(data->object), MUIA_Window_Activate) == FALSE)
     {
@@ -255,7 +255,7 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
 
     if(MouseY < data->ypos)
     {
-        LONG diff = data->ypos - MouseY;
+      LONG diff = data->ypos - MouseY;
 
       if(diff > 30)
         GoUp(data);
@@ -268,15 +268,16 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
     }
     else
     {
-        LONG limit = data->ypos;
+      LONG limit = data->ypos;
 
       if(data->maxlines < (data->totallines-data->visual_y+1))
-          limit += (data->maxlines * data->height);
-      else  limit += (data->totallines-data->visual_y+1)*data->height;
+        limit += (data->maxlines * data->height);
+      else
+        limit += (data->totallines-data->visual_y+1)*data->height;
 
       if(MouseY >= limit)
       {
-          LONG diff = MouseY - limit;
+        LONG diff = MouseY - limit;
 
         if(diff > 30)
           GoDown(data);
@@ -284,6 +285,7 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
           GoDown(data);
         if(diff > 10)
           GoDown(data);
+
         GoDown(data);
       }
       else
@@ -462,7 +464,7 @@ ULONG InsertText (struct InstData *data, STRPTR text, BOOL movecursor)
   }
 
   {
-      LONG tvisual_y;
+    LONG tvisual_y;
 
     ScrollIntoDisplay(data);
 

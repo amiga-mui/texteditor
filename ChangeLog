@@ -7,10 +7,11 @@ $URL$
 
 2007-12-12  Thore Böckelmann <tboeckel@gmx.de>
 
-   * Dispatcher.c, Pointer.c: the select pointer will now be set and hidden
-     in the Show/Hide methods. Hiding it in the Cleanup method is forbidden,
-     because the necessary window is not existing anymore then. This fixes
-     bug #1849264.
+   * mcc/HandleInput.c, mcc/Methods.c: fixed some indentations and comparisons.
+   * mcc/Dispatcher.c, mcc/Pointer.c: the select pointer will now be set and
+     hidden in the Show/Hide methods. Hiding it in the Cleanup method is for-
+     bidden, because the necessary window is not existing anymore then. This
+     fixes bug #1849264.
 
 2007-12-02  Vit Sindlar <sindlarv at centrum dot cz>
 

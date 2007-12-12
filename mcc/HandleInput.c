@@ -540,7 +540,7 @@ void Key_Cut(struct InstData *data)
   LEAVE();
 }
 
-void Key_Copy (struct InstData *data)
+void Key_Copy(struct InstData *data)
 {
   ENTER();
 
@@ -555,7 +555,7 @@ void Key_Copy (struct InstData *data)
   LEAVE();
 }
 
-void Key_Paste (struct InstData *data)
+void Key_Paste(struct InstData *data)
 {
   BOOL update;
   struct marking block;
@@ -583,7 +583,7 @@ void Key_Paste (struct InstData *data)
   LEAVE();
 }
 
-void Key_Tab (struct InstData *data)
+void Key_Tab(struct InstData *data)
 {
   ENTER();
 
@@ -611,7 +611,7 @@ void Key_Tab (struct InstData *data)
   LEAVE();
 }
 
-void Key_Return (struct InstData *data)
+void Key_Return(struct InstData *data)
 {
   ENTER();
 
@@ -630,7 +630,7 @@ void Key_Return (struct InstData *data)
   LEAVE();
 }
 
-void Key_Backspace (struct InstData *data)
+void Key_Backspace(struct InstData *data)
 {
   ENTER();
 
@@ -766,6 +766,7 @@ void Key_Normal(UBYTE key, struct InstData *data)
      data->WrapBorder > 0 && (data->CPos_X > data->WrapBorder) && (key != ' '))
   {
     ULONG xpos = data->WrapBorder+1;
+    D(DBF_INPUT, "must wrap");
 
     // now we make sure to wrap *exactly* at the WrapBorder the user
     // specified instead of wrapping right where we are.
@@ -781,8 +782,9 @@ void Key_Normal(UBYTE key, struct InstData *data)
         xpos++;
     }
 
+    D(DBF_INPUT, "xpos=%ld cposx=%ld", xpos, data->CPos_X);
     // now we do the line split operation at the xpos we found
-    if(xpos && xpos < data->CPos_X)
+    if(xpos != 0 && xpos < data->CPos_X)
     {
       ULONG length = data->CPos_X-xpos;
 
