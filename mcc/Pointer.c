@@ -145,7 +145,7 @@ static const UWORD selectPointer_bp1[] =
 
 static const UWORD selectPointer_bp2[] =
 {
-  0xce00,    // %#..%#.
+  0xce00,    // %#..%##
   0x7800,    // .%#%#..
   0x3000,    // ..%#...
   0x3000,    // ..%#...
@@ -160,7 +160,7 @@ static const UWORD selectPointer_bp2[] =
   0x3000,    // ..%#...
   0x3000,    // ..%#...
   0x7800,    // .%#%#..
-  0xce00,    // %#..%#.
+  0xce00,    // %#..%##
 };
 
 static struct BitMap selectPointerBitmap =
@@ -334,42 +334,39 @@ void SetupSelectPointer(struct InstData *data)
     #endif
   }
 
+  data->activeSelectPointer = FALSE;
+
   LEAVE();
 }
 
-void CleanupSelectPointer(Object *obj, struct InstData *data)
+void CleanupSelectPointer(struct InstData *data)
 {
   ENTER();
 
   if(data->PointerObj != NULL)
   {
-    #if defined(__amigaos4__)
-    SetWindowPointer(_window(obj), TAG_DONE);
-    DisposeObject(data->PointerObj);
-    data->PointerObj = NULL;
-    #elif defined(__MORPHOS__)
-    SetWindowPointer(_window(obj), TAG_DONE);
+    #if defined(DEBUG)
+    if(data->activeSelectPointer == TRUE)
+      E(DBF_ALWAYS, "pointer was still active upon MUIM_Cleanup!!");
+    #endif
 
+    #if defined(__amigaos4__)
+    DisposeObject(data->PointerObj);
+    #elif defined(__MORPHOS__)
     if ((IPTR)data->PointerObj != POINTERTYPE_SELECTTEXT)
       DisposeObject(data->PointerObj);
-
-    data->PointerObj = NULL;
     #else
     if(((struct Library *)IntuitionBase)->lib_Version >= 39)
     {
-      SetWindowPointer(_window(obj), TAG_DONE);
       DisposeObject(data->PointerObj);
-      data->PointerObj = NULL;
     }
     else
     {
-      ClearPointer(_window(obj));
       FreeVec(data->PointerObj);
-      data->PointerObj = NULL;
     }
     #endif
 
-    data->activeSelectPointer = FALSE;
+    data->PointerObj = NULL;
   }
 
   LEAVE();

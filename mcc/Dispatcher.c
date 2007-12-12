@@ -268,7 +268,7 @@ ULONG Cleanup(struct IClass *cl, Object *obj, Msg msg)
   ENTER();
 
   // cleanup the selection pointer
-  CleanupSelectPointer(obj, data);
+  CleanupSelectPointer(data);
 
   DoMethod(_win(obj), MUIM_Window_RemEventHandler, &data->ehnode);
 
@@ -413,7 +413,7 @@ ULONG Show(struct IClass *cl, Object *obj, Msg msg)
 
   set(data->SuggestWindow, MUIA_Window_Open, (data->flags & FLG_PopWindow ? TRUE : FALSE));
 
-  data->shown   = TRUE;
+  data->shown = TRUE;
 
   RETURN(TRUE);
   return(TRUE);
@@ -692,16 +692,20 @@ DISPATCHER(_Dispatcher)
       struct MUIP_TextEditor_InsertText *ins_msg = (struct MUIP_TextEditor_InsertText *)msg;
       struct marking block;
 
-  		switch(ins_msg->pos)
-	  	{
-		  	case MUIV_TextEditor_InsertText_Top:
-			  	GoTop(data);
-				break;
+  	  switch(ins_msg->pos)
+      {
+        case MUIV_TextEditor_InsertText_Top:
+        {
+          GoTop(data);
+        }
+        break;
 
-			  case MUIV_TextEditor_InsertText_Bottom:
-				  GoBottom(data);
-				break;
-  		}
+        case MUIV_TextEditor_InsertText_Bottom:
+        {
+          GoBottom(data);
+        }
+        break;
+      }
 
       block.startx = data->CPos_X;
       block.startline = data->actualline;
