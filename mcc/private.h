@@ -495,7 +495,7 @@ ULONG OM_QueryKeyAction(struct IClass *cl, Object *obj, struct MUIP_TextEditor_Q
 
 // Pointer.c
 void SetupSelectPointer(struct InstData *data);
-void CleanupSelectPointer(Object *obj, struct InstData *data);
+void CleanupSelectPointer(struct InstData *data);
 void ShowSelectPointer(Object *obj, struct InstData *data);
 void HideSelectPointer(Object *obj, struct InstData *data);
 
