@@ -71,6 +71,21 @@ static VOID ClassExpunge(UNUSED struct Library *base);
 /******************************************************************************/
 /* include the lib startup code for the mcc/mcp  (and muimaster inlines)      */
 /******************************************************************************/
+#define USE_IMAGE_COLORS
+#define USE_IMAGE_BODY
+#define PREFSIMAGEOBJECT \
+  BodychunkObject,\
+    MUIA_FixWidth,              IMAGE_WIDTH,\
+    MUIA_FixHeight,             IMAGE_HEIGHT,\
+    MUIA_Bitmap_Width,          IMAGE_WIDTH ,\
+    MUIA_Bitmap_Height,         IMAGE_HEIGHT,\
+    MUIA_Bodychunk_Depth,       IMAGE_DEPTH,\
+    MUIA_Bodychunk_Body,        (UBYTE *)image_body,\
+    MUIA_Bodychunk_Compression, IMAGE_COMPRESSION,\
+    MUIA_Bodychunk_Masking,     IMAGE_MASKING,\
+    MUIA_Bitmap_SourceColors,   (ULONG *)image_colors,\
+    MUIA_Bitmap_Transparent,    0,\
+  End
 #include "icon.bh"
 #include "mccinit.c"
 
