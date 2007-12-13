@@ -36,19 +36,6 @@
 // will popup a warning about and obsolete configuration.
 #define CONFIG_VERSION 4
 
-// our PREFSIMAGE macro
-#define PREFSIMAGEOBJECT \
-  BitmapObject,\
-    MUIA_Bitmap_Bitmap,       (UBYTE *)&image_bitmap,\
-    MUIA_Bitmap_Height,       IMAGE_HEIGHT,\
-    MUIA_Bitmap_Precision,    0,\
-    MUIA_Bitmap_SourceColors, (ULONG *)image_palette,\
-    MUIA_Bitmap_Transparent,  0,\
-    MUIA_Bitmap_Width,        IMAGE_WIDTH,\
-    MUIA_FixHeight,           IMAGE_HEIGHT,\
-    MUIA_FixWidth,            IMAGE_WIDTH,\
-  End
-
 #define MCPMAXRAWBUF 64
 
 #define IEQUALIFIER_SHIFT   0x0200

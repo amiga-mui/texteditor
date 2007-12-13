@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2007-12-13  Thore Böckelmann <tboeckel@gmx.de>
+
+   * mcp/misc: replaced the old BitmapObject by a BodyChunkObject and added a
+     IFF-ILBM image with proper transparent color. This should fix the broken
+     display on the prefs image on some old machines.
+
 2007-12-12  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcc/HandleInput.c, mcc/Methods.c: fixed some indentations and comparisons.
