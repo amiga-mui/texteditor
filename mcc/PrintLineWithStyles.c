@@ -360,8 +360,8 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
 
       if(doublebuffer == TRUE)
       {
-          ULONG ptrn1 = 0x11111111;
-          ULONG ptrn2 = 0x44444444;
+        ULONG ptrn1 = 0x11111111;
+        ULONG ptrn2 = 0x44444444;
 
         ptrn1 = ptrn1>>((data->xpos-xoffset)%16);
         ptrn2 = ptrn2>>((data->xpos-xoffset)%16);

@@ -7,6 +7,7 @@ $URL$
 
 2007-12-13  Thore Böckelmann <tboeckel@gmx.de>
 
+   * mcc/PrintWithStyles.c: fixed some indentations.
    * mcp/misc: replaced the old BitmapObject by a BodyChunkObject and added a
      IFF-ILBM image with proper transparent color. This should fix the broken
      display on the prefs image on some old machines.
