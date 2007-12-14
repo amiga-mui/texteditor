@@ -28,6 +28,7 @@
 #include <proto/keymap.h>
 #include <proto/locale.h>
 #include <proto/utility.h>
+#include <proto/layers.h>
 
 #include "private.h"
 
@@ -101,9 +102,25 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
     // texteditor object or not.
     if(imsg->Class == IDCMP_MOUSEMOVE)
     {
-      // if the mouse is currently over the object we go and
-      // change the pointer to show the selection pointer
+      BOOL isOverObject = FALSE;
+
       if(_isinobject(obj, msg->imsg->MouseX, msg->imsg->MouseY))
+      {
+        struct Layer_Info *li = &(_screen(obj)->LayerInfo);
+        struct Layer *layer;
+
+        // get the layer that belongs to the current mouse coordinates
+        LockLayerInfo(li);
+        layer = WhichLayer(li, _window(obj)->LeftEdge + msg->imsg->MouseX, _window(obj)->TopEdge + msg->imsg->MouseY);
+        UnlockLayerInfo(li);
+
+        // if the mouse is currently over the object and over the object's
+        // window we go and change the pointer to show the selection pointer
+        if(layer != NULL && layer->Window == _window(obj))
+          isOverObject = TRUE;
+      }
+
+      if(isOverObject == TRUE)
         ShowSelectPointer(obj, data);
       else
         HideSelectPointer(obj, data);
@@ -767,6 +784,7 @@ void Key_Normal(UBYTE key, struct InstData *data)
   {
     ULONG xpos = data->WrapBorder+1;
     D(DBF_INPUT, "must wrap");
+
 
     // now we make sure to wrap *exactly* at the WrapBorder the user
     // specified instead of wrapping right where we are.
