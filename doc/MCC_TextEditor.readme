@@ -3,10 +3,9 @@ Author:       TextEditor.mcc Open Source Team
 Uploader:     Jens Langner <Jens.Langner@light-speed.de>
 Type:         dev/mui
 Version:      15.25
-Replaces:     dev/mui/mcc_texteditor-15.24.lha
+Replaces:     dev/mui/MCC_TextEditor-15.24.lha
 Requires:     AmigaOS 3.0+ or MorphOS, MUI 3.8+, 68020+/PPC604e+
 Architecture: ppc-amigaos >= 4.0.0; m68k-amigaos >= 3.0; ppc-morphos >= 1.4.2
-Distribution: Aminet
 
 ABOUT TextEditor.mcc
 ********************
