@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.25 RELEASE ############################################################
+
+2007-12-20 Jens Langner <Jens.Langner@light-speed.de>
+
+   * misc: final release preparations.
+
 2007-12-14  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcc/ImportHook.c: fixed some indentations.

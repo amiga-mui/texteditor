@@ -1,6 +1,6 @@
 Short:        TextEditor custom class for MUI, V15.25
 Author:       TextEditor.mcc Open Source Team
-Uploader:     Jens Langner <Jens.Langner@light-speed de>
+Uploader:     Jens Langner <Jens.Langner@light-speed.de>
 Type:         dev/mui
 Version:      15.25
 Replaces:     dev/mui/mcc_texteditor-15.24.lha
@@ -53,9 +53,5 @@ about the licensing of the gadget and its source code.
 CHANGES SINCE THE LAST RELEASE
 ******************************
 
-(fill this in before the next public version is released)
-
-
 Please refer to the included ChangeLog in the archive for a detailed information
 on the changes since the last public release.
-
