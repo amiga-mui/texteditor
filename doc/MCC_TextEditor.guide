@@ -1,5 +1,5 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.24 (03.10.2007)
+@$VER: TextEditor.Guide 15.25 (20.12.2007)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
@@ -339,6 +339,16 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.25 (20.12.2007)
+
+- selection pointer will now only be shown if the gadget is in the frontmost window.
+- fixed some problems with the preferences image display.
+- fixed possible crashing issue with the way the selection pointer was created.
+- added czech catalog translation.
+- fixed some graphical scrolling issues.
+- added crawling object to the preference pane.
+- fixed cursor position notification issues.
 
 15.24 (14.10.2007)
 
