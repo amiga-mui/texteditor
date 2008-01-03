@@ -735,3 +735,7 @@ MSG_HELP_SPELLCHECKER_SUGGEST_CMD
 Geben Sie hier das Kommando ein, um ein alternatives\n\
 Wort vorschlagen zu lassen. Wie oben beschrieben,\n\
 sollte hier üblicherweise ein Skript angegeben werden.
+;
+MSG_UNDO_SLIDER_FORMAT
+%ld (± 5)
+;
