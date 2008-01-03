@@ -7,6 +7,8 @@ $URL$
 
 2008-01-03  Thore Böckelmann <tboeckel@gmx.de>
 
+   * mcp/locale/#?.ct: changed all .ct file names to english names instead of
+     translated ones.
    * mcp/CreatePrefsGroup.c, mcp/Preference.c, mcp/locale/TextEditor_mcp.cd:
      the undo slide format string is now localizable to avoid character set
      issues because of the plus/minus sign. Also changed the "(R)" sign to a
