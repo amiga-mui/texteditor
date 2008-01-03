@@ -551,3 +551,7 @@ MSG_HELP_SPELLCHECKER_SUGGEST_CMD (158//)
 Specify here the command that will be used\n\
 to suggest an alternate word. As explained above,\n\
 usually you should specify a script here.
+;
+MSG_UNDO_SLIDER_FORMAT (159//)
+%ld (± 5)
+;
