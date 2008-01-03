@@ -94,7 +94,7 @@ int main(void)
             app = MUI_NewObject("Application.mui",
                 MUIA_Application_Author,    "Allan Odgaard",
                 MUIA_Application_Base,      "TextEditor-Prefs",
-                MUIA_Application_Copyright, "®1997 Allan Odgaard",
+                MUIA_Application_Copyright, "(C)1997 Allan Odgaard",
                 MUIA_Application_Description, "Preference for TextEditor.mcc",
                 MUIA_Application_Title,     "TextEditor-Prefs",
                 MUIA_Application_Version,   "$VER: TextEditor-Prefs V1.0 (18-Feb-97)",

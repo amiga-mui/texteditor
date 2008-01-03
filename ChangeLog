@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-01-03  Thore Böckelmann <tboeckel@gmx.de>
+
+   * mcp/CreatePrefsGroup.c, mcp/Preference.c, mcp/locale/TextEditor_mcp.cd:
+     the undo slide format string is now localizable to avoid character set
+     issues because of the plus/minus sign. Also changed the "(R)" sign to a
+     "(C)" string, which is in fact more correct.
+
 #### v15.25 RELEASE ############################################################
 
 2007-12-20 Jens Langner <Jens.Langner@light-speed.de>
