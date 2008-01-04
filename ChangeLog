@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-01-04  Vit Sindlar <sindlarv at centrum dot cz>
+
+   * mcp/locale/czech.ct: updated Czech catalog translation.
+
 2008-01-04  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/rev.h: fixed broken date string.
