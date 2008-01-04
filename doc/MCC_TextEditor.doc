@@ -307,12 +307,17 @@ TextEditor.mcc/MUIM_TextEditor_Search
         will point to the hook itself.  Your hook should return TRUE if it
         wants to stop the editor from blocking.
 
+        From V15.26 on the ClickMessage also contains the qualifiers being
+        pressed during the double click. Please note that SHIFT is not possible
+        as a custom qualifier, because SHIFT + mouse click is already handled
+        internally. However, all other qualifiers are of course possible.
+
     EXAMPLE
         /* This hook will test if the user double clicked an HTTP address */
 
         BOOL URLHookCode (register __a1 struct ClickMessage *clickmsg)
         {
-              UWORD pos = clickmsg->ClickPosition;
+           UWORD pos = clickmsg->ClickPosition;
 
            while(pos && *(clickmsg->LineContents+pos-1) != ' ' && *(clickmsg->LineContents+pos-1) != '<')
            {
