@@ -7,6 +7,8 @@ $URL$
 
 2008-01-04  Thore Böckelmann <tboeckel@gmx.de>
 
+   * include/mui/TextEditor_mcc.h: added version requirement to the new
+     qualifier in struct ClickMessage.
    * mcc/HandleInput.c: the qualifiers being pressed during a double click are
      now also passed to the DoubleClickHook.
 
