@@ -7,6 +7,7 @@ $URL$
 
 2008-01-04  Thore Böckelmann <tboeckel@gmx.de>
 
+   * mcp/rev.h: fixed broken date string.
    * include/mui/TextEditor_mcc.h: added version requirement to the new
      qualifier in struct ClickMessage.
    * mcc/HandleInput.c: the qualifiers being pressed during a double click are
