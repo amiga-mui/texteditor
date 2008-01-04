@@ -170,6 +170,7 @@ struct ClickMessage
 {
   STRPTR  LineContents;  /* This field is ReadOnly!!! */
   ULONG   ClickPosition;
+  ULONG   Qualifier;     /* A possible qualifier that was pressed during the double click */
 };
 
 /* Definitions for Separator type */

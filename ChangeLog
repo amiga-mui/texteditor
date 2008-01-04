@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-01-04  Thore Böckelmann <tboeckel@gmx.de>
+
+   * mcc/HandleInput.c: the qualifiers being pressed during a double click are
+     now also passed to the DoubleClickHook.
+
 2008-01-03  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/locale/#?.ct: changed all .ct file names to english names instead of
