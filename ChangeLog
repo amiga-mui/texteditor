@@ -7,6 +7,9 @@ $URL$
 
 2008-01-20 Jens Langner <Jens.Langner@light-speed.de>
 
+   * MixedFunctions.c: fixed bug #1825864 where upon using a non-antialiased font
+     together with a small cursor caused the inactive cursor to leave graphical
+     traces when reactivating a texteditor object.
    * Dispatcher.c: we catch the result values of the GoActive/GoInactive methods
      of the MUIC_Area supercall and forward it accordingly. Not that this might
      fix something, but well, it seems to be more correct :)

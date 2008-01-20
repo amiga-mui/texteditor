@@ -438,8 +438,13 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
         // Clear the place of the cursor in case we are using NO anti-aliased font
         if(IS_ANTIALIASED(data->font) == FALSE)
         {
+          ULONG cwidth = cursor_width;
+
+          if(data->CursorWidth != 6 && Set == FALSE)
+            cwidth = TextLength(&data->tmprp, chars[1] < ' ' ? (char *)" " : (char *)&chars[1], 1);
+
           DoMethod(data->object, MUIM_DrawBackground, cursorxplace, yplace,
-                                                      cursor_width, data->height,
+                                                      cwidth, data->height,
                                                       cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0),
                                                       ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2),
                                                       0);
