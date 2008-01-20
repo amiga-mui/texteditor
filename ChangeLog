@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-01-20 Jens Langner <Jens.Langner@light-speed.de>
+
+   * Dispatcher.c: we catch the result values of the GoActive/GoInactive methods
+     of the MUIC_Area supercall and forward it accordingly. Not that this might
+     fix something, but well, it seems to be more correct :)
+
 2008-01-04  Vit Sindlar <sindlarv at centrum dot cz>
 
    * mcp/locale/czech.ct: updated Czech catalog translation.
