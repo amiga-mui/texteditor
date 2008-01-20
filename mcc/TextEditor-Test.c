@@ -2,7 +2,7 @@
 
  TextEditor.mcc - Textediting MUI Custom Class
  Copyright (C) 1997-2000 Allan Odgaard
- Copyright (C) 2005-2007 by TextEditor.mcc Open Source Team
+ Copyright (C) 2005-2008 by TextEditor.mcc Open Source Team
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -231,7 +231,7 @@ int main(void)
         app = MUI_NewObject("Application.mui",
               MUIA_Application_Author,      "TextEditor.mcc Open Source Team",
               MUIA_Application_Base,        "TextEditor-Test",
-              MUIA_Application_Copyright,   "(c) 2000-2007 TextEditor.mcc Open Source Team",
+              MUIA_Application_Copyright,   "(c) 2000-2008 TextEditor.mcc Open Source Team",
               MUIA_Application_Description, "TextEditor.mcc test program",
               MUIA_Application_Title,       "TextEditor-Test",
               MUIA_Application_Version,     "$VER: TextEditor-Test (" __DATE__ ")",
