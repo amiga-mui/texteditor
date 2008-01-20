@@ -608,6 +608,8 @@ DISPATCHER(_Dispatcher)
 
     case MUIM_GoActive:
     {
+      ULONG result;
+
       D(DBF_STARTUP, "MUIM_GoActive");
 
       // set the gadgets flags to active and also "activated" so that
@@ -633,15 +635,17 @@ DISPATCHER(_Dispatcher)
         data->BlinkSpeed = 2;
       }
 
-      DoSuperMethodA(cl, obj, msg);
+      result = DoSuperMethodA(cl, obj, msg);
 
-      RETURN(1);
-      return(1);
+      RETURN(result);
+      return(result);
     }
     break;
 
     case MUIM_GoInactive:
     {
+      ULONG result;
+
       D(DBF_STARTUP, "MUIM_GoInActive");
 
       // clear the active and activated flag so that others know about it
@@ -673,10 +677,10 @@ DISPATCHER(_Dispatcher)
       if((data->flags & FLG_ActiveOnClick) && Enabled(data))
         MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
 
-      DoSuperMethodA(cl, obj, msg);
+      result = DoSuperMethodA(cl, obj, msg);
 
-      RETURN(1);
-      return(1);
+      RETURN(result);
+      return(result);
     }
     break;
 
