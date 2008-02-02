@@ -141,6 +141,25 @@
 #define CLEAR_FLAG(v,f)     ((v) &= ~(f))         // clear the flag f in v
 #define MASK_FLAG(v,f)      ((v) &= (f))          // mask the variable v with flag f bitwise
 
+enum EventType
+{
+  ET_PASTECHAR = 0,
+  ET_BACKSPACECHAR,
+  ET_DELETECHAR,
+  ET_SPLITLINE,
+  ET_MERGELINES,
+  ET_BACKSPACEMERGE,
+  ET_PASTEBLOCK,
+  ET_DELETEBLOCK,
+  ET_DELETEBLOCK_NOMOVE,
+  ET_STYLEBOLD,
+  ET_STYLEUNBOLD,
+  ET_STYLEITALIC,
+  ET_STYLEUNITALIC,
+  ET_STYLEUNDERLINE,
+  ET_STYLEUNUNDERLINE,
+};
+
 struct LineNode
 {
   STRPTR   Contents;      // Set this to the linecontents (allocated via the poolhandle)
@@ -190,7 +209,7 @@ struct pos_info
 
 struct UserAction
 {
-  UWORD type;
+  enum EventType type;
 
   struct
   {
@@ -445,7 +464,7 @@ unsigned short  *CheckStyles      (char *);
 LONG CutBlock2 (struct InstData *, long, long, struct marking *, BOOL);
 char *GetBlock (struct marking *, struct InstData *);
 
-long AddToUndoBuffer(long, char *, struct InstData *);
+long AddToUndoBuffer(enum EventType, char *, struct InstData *);
 void ResetUndoBuffer(struct InstData *);
 void ResizeUndoBuffer(struct InstData *, ULONG);
 long Undo       (struct InstData *);
@@ -507,25 +526,6 @@ extern struct Hook ImMIMEQuoteHook;
 extern struct Hook ExportHookPlain;
 extern struct Hook ExportHookEMail;
 extern struct Hook ExportHookNoStyle;
-
-enum
-{
-  pastechar = 0,
-  backspacechar,
-  deletechar,
-  splitline,
-  mergelines,
-  backspacemerge,
-  pasteblock,
-  deleteblock,
-  deleteblock_nomove,
-  stylebold,
-  styleunbold,
-  styleitalic,
-  styleunitalic,
-  styleunderline,
-  styleununderline
-};
 
 struct UpdateData
 {

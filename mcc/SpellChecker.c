@@ -71,7 +71,7 @@ HOOKPROTONH(SelectCode, void, void *lvobj, long **parms)
     block.startx    = data->CPos_X;
     block.stopline    = data->actualline;
     block.stopx     = data->CPos_X+length;
-    AddToUndoBuffer(pasteblock, (char *)&block, data);
+    AddToUndoBuffer(ET_PASTEBLOCK, (char *)&block, data);
     oldpos = data->CPos_X;
     data->CPos_X += length;
     PasteChars(oldpos, data->actualline, length, entry, NULL, data);
