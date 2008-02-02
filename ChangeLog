@@ -7,6 +7,8 @@ $URL$
 
 2008-02-02 Jens Langner <Jens.Langner@light-speed.de>
 
+  * mcc/misc: minor modification to use uppercase letters for the EventType
+    enumeration we use for our Undo operation handling.
   * mccinit.c: updated to latest version available which fixes some
     MorphOS specific compiler warnings.
 

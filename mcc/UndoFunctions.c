@@ -91,7 +91,7 @@ long Undo(struct InstData *data)
 
     switch(buffer->type)
     {
-      case pastechar:
+      case ET_PASTECHAR:
       {
         buffer->del.character = *(data->actualline->line.Contents+data->CPos_X);
         buffer->del.style = GetStyle(data->CPos_X, data->actualline);
@@ -101,37 +101,37 @@ long Undo(struct InstData *data)
       }
       break;
 
-      case backspacechar:
+      case ET_BACKSPACECHAR:
       {
         PasteChars(data->CPos_X++, data->actualline, 1, (char *)&buffer->del.character, buffer, data);
       }
       break;
 
-      case deletechar:
+      case ET_DELETECHAR:
       {
         PasteChars(data->CPos_X, data->actualline, 1, (char *)&buffer->del.character, buffer, data);
       }
       break;
 
-      case splitline:
+      case ET_SPLITLINE:
       {
         MergeLines(data->actualline, data);
       }
       break;
 
-      case mergelines:
+      case ET_MERGELINES:
       {
         SplitLine(data->CPos_X, data->actualline, FALSE, buffer, data);
       }
       break;
 
-      case backspacemerge:
+      case ET_BACKSPACEMERGE:
       {
         SplitLine(data->CPos_X, data->actualline, TRUE, buffer, data);
       }
       break;
 
-      case pasteblock:
+      case ET_PASTEBLOCK:
       {
         struct marking block =
         {
@@ -148,11 +148,11 @@ long Undo(struct InstData *data)
       }
       break;
 
-      case deleteblock_nomove:
+      case ET_DELETEBLOCK_NOMOVE:
         crsr_move = FALSE;
       // continue
 
-      case deleteblock:
+      case ET_DELETEBLOCK:
       {
         struct Hook *oldhook = data->ImportHook;
         char *clip = (char *)buffer->clip;
@@ -225,22 +225,26 @@ long Redo(struct InstData *data)
 
     switch(buffer->type)
     {
-      case pastechar:
+      case ET_PASTECHAR:
         PasteChars(data->CPos_X++, data->actualline, 1, (char *)&buffer->del.character, buffer, data);
         break;
-      case backspacechar:
-      case deletechar:
+
+      case ET_BACKSPACECHAR:
+      case ET_DELETECHAR:
         RemoveChars(data->CPos_X, data->actualline, 1, data);
         break;
-      case splitline:
+
+      case ET_SPLITLINE:
         SplitLine(data->CPos_X, data->actualline, TRUE, NULL, data);
         break;
-      case mergelines:
-      case backspacemerge:
+
+      case ET_MERGELINES:
+      case ET_BACKSPACEMERGE:
         MergeLines(data->actualline, data);
         break;
-      case pasteblock:
-        {
+
+      case ET_PASTEBLOCK:
+      {
           struct Hook *oldhook = data->ImportHook;
 
           data->ImportHook = &ImPlainHook;
@@ -250,11 +254,12 @@ long Redo(struct InstData *data)
 
           buffer->blk.x = data->CPos_X;
           buffer->blk.y = LineNr(data->actualline, data);
-        }
-        break;
-      case deleteblock_nomove:
-      case deleteblock:
-        {
+      }
+      break;
+
+      case ET_DELETEBLOCK_NOMOVE:
+      case ET_DELETEBLOCK:
+      {
             struct marking block =
             {
               TRUE,
@@ -267,12 +272,15 @@ long Redo(struct InstData *data)
 
           CutBlock2(data, FALSE, FALSE, &block, TRUE);
           buffer->clip = (unsigned char *)clip;
-        }
-        break;
+      }
+      break;
     }
+
     ScrollIntoDisplay(data);
+
     if(data->flags & FLG_Active)
       SetCursor(data->CPos_X, data->actualline, TRUE, data);
+
     if(*(short *)data->undopointer == 0xff)
       set(data->object, MUIA_TextEditor_RedoAvailable, FALSE);
 
@@ -298,20 +306,16 @@ void ResetUndoBuffer(struct InstData *data)
 
     while(buffer != data->undopointer)
     {
-      if(buffer->type == deleteblock)
-      {
+      if(buffer->type == ET_DELETEBLOCK)
         MyFreePooled(data->mypool, buffer->clip);
-      }
 
       buffer++;
     }
 
     while(buffer->type != 0xff)
     {
-      if(buffer->type == pasteblock)
-      {
+      if(buffer->type == ET_PASTEBLOCK)
         MyFreePooled(data->mypool, buffer->clip);
-      }
 
       buffer++;
     }
@@ -323,7 +327,7 @@ void ResetUndoBuffer(struct InstData *data)
   LEAVE();
 }
 
-long AddToUndoBuffer(long eventtype, char *eventdata, struct InstData *data)
+long AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData *data)
 {
   ENTER();
 
@@ -340,7 +344,7 @@ long AddToUndoBuffer(long eventtype, char *eventdata, struct InstData *data)
       for(c = 1; c <= 10; c++)
       {
         t_buffer = (struct UserAction *)t_undobuffer;
-        if(t_buffer->type == deleteblock)
+        if(t_buffer->type == ET_DELETEBLOCK)
           MyFreePooled(data->mypool, t_buffer->clip);
 
         t_undobuffer += sizeof(struct UserAction);
@@ -367,8 +371,8 @@ long AddToUndoBuffer(long eventtype, char *eventdata, struct InstData *data)
     buffer->type = eventtype;
     switch(eventtype)
     {
-      case backspacemerge:
-      case mergelines:
+      case ET_BACKSPACEMERGE:
+      case ET_MERGELINES:
       {
         buffer->del.style = data->actualline->next->line.Color;
         buffer->del.flow = data->actualline->next->line.Flow;
@@ -376,8 +380,8 @@ long AddToUndoBuffer(long eventtype, char *eventdata, struct InstData *data)
       }
       break;
 
-      case deletechar:
-      case backspacechar:
+      case ET_DELETECHAR:
+      case ET_BACKSPACECHAR:
       {
         buffer->del.character = *eventdata;
         buffer->del.style = GetStyle(data->CPos_X, data->actualline);
@@ -386,7 +390,7 @@ long AddToUndoBuffer(long eventtype, char *eventdata, struct InstData *data)
       }
       break;
 
-      case pasteblock:
+      case ET_PASTEBLOCK:
       {
         struct marking *block = (struct marking *)eventdata;
 
@@ -397,7 +401,7 @@ long AddToUndoBuffer(long eventtype, char *eventdata, struct InstData *data)
       }
       break;
 
-      case deleteblock:
+      case ET_DELETEBLOCK:
       {
         char *text;
         struct marking *block = (struct marking *)eventdata;
@@ -409,7 +413,7 @@ long AddToUndoBuffer(long eventtype, char *eventdata, struct InstData *data)
           buffer->clip = (unsigned char *)text;
 
           if(data->flags & FLG_FreezeCrsr)
-            buffer->type = deleteblock_nomove;
+            buffer->type = ET_DELETEBLOCK_NOMOVE;
         }
         else
         {

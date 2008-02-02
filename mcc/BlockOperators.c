@@ -622,9 +622,11 @@ LONG CutBlock(struct InstData *data, long Clipboard, long NoCut, BOOL update)
 
   ENTER();
 
+  //D(DBF_STARTUP, "CutBlock: %ld %ld %ld", Clipboard, NoCut, update);
+
   NiceBlock(&data->blockinfo, &newblock);
   if(!NoCut)
-    AddToUndoBuffer(deleteblock, (char *)&newblock, data);
+    AddToUndoBuffer(ET_DELETEBLOCK, (char *)&newblock, data);
 
   result = CutBlock2(data, Clipboard, NoCut, &newblock, update);
 
