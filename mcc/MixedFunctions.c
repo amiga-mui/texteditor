@@ -431,7 +431,9 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
                                                       0);
         }
         else
+        {
           RectFill(data->rport, cursorxplace, yplace, cursorxplace+cursor_width-1, yplace+data->height-1);
+        }
       }
       else
       {
@@ -731,7 +733,7 @@ void GetLine(LONG realline, struct pos_info *pos, struct InstData *data)
 
   ENTER();
 
-  while ((realline > line->visual) && (line->next))
+  while(realline > line->visual && line->next != NULL)
   {
     realline = realline - line->visual;
     line = line->next;
@@ -740,11 +742,15 @@ void GetLine(LONG realline, struct pos_info *pos, struct InstData *data)
   pos->line = line;
   pos->lines = realline;
 
-  if ((!line->next) && (realline > line->visual))
+  SHOWVALUE(DBF_ALWAYS, line->next);
+  SHOWVALUE(DBF_ALWAYS, realline);
+  SHOWVALUE(DBF_ALWAYS, line->visual);
+
+  if(line->next == NULL && realline > line->visual)
   {
     x = line->line.Length-1;
   }
-  else
+  else if(realline > 0)
   {
     while(--realline)
     {
@@ -759,7 +765,7 @@ void GetLine(LONG realline, struct pos_info *pos, struct InstData *data)
 /*----------------------------*
  * Find visual line on screen *
  *----------------------------*/
-LONG  LineToVisual  (struct line_node *line, struct InstData *data)
+LONG LineToVisual(struct line_node *line, struct InstData *data)
 {
   LONG  line_nr = 2 - data->visual_y;   // Top line!
   struct line_node *tline = data->firstline;
