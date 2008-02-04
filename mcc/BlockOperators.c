@@ -622,7 +622,7 @@ LONG CutBlock(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update)
 
   ENTER();
 
-  D(DBF_STARTUP, "CutBlock: %ld %ld %ld", Clipboard, NoCut, update);
+  //D(DBF_STARTUP, "CutBlock: %ld %ld %ld", Clipboard, NoCut, update);
 
   NiceBlock(&data->blockinfo, &newblock);
   if(!NoCut)
@@ -648,7 +648,7 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, struct marking
   startline = newblock->startline;
   stopline  = newblock->stopline;
 
-  D(DBF_STARTUP, "CutBlock2: %ld-%ld %lx-%lx", startx, stopx, startline, stopline);
+  //D(DBF_STARTUP, "CutBlock2: %ld-%ld %lx-%lx %ld %ld", startx, stopx, startline, stopline, Clipboard, NoCut);
 
   if(startline != stopline)
   {
@@ -681,13 +681,15 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, struct marking
 
       if(NoCut == FALSE)
       {
-        struct  line_node *cc_startline = c_startline;
+        struct line_node *cc_startline = c_startline;
 
         MyFreePooled(data->mypool, c_startline->line.Contents);
         if(c_startline->line.Styles != NULL)
           MyFreePooled(data->mypool, c_startline->line.Styles);
         data->totallines -= c_startline->visual;
         c_startline = c_startline->next;
+
+        //D(DBF_STARTUP, "FreeLine %08lx", cc_startline);
 
         FreeLine(cc_startline, data);
       }
@@ -708,11 +710,13 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, struct marking
       startline->next = stopline;
       stopline->previous = startline;
 
-      RemoveChars(startx, startline, startline->line.Length-startx-1, data);
+      //D(DBF_STARTUP, "RemoveChars: %ld %ld %08lx %ld", startx, stopx, startline, startline->line.Length);
+
+      if(startline->line.Length-startx-1 > 0)
+        RemoveChars(startx, startline, startline->line.Length-startx-1, data);
+
       if(stopx != 0)
-      {
         RemoveChars(0, stopline, stopx, data);
-      }
 
       data->CPos_X = startx;
       data->actualline = startline;
@@ -732,6 +736,7 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, struct marking
         ClipChars(startx, startline, stopx-startx, data);
         EndClipSession(data);
       }
+
       if(update == TRUE && NoCut == TRUE)
       {
         MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
@@ -751,12 +756,14 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, struct marking
   tvisual_y = LineToVisual(startline, data)-1;
   if(tvisual_y < 0 || tvisual_y > data->maxlines)
   {
+    //D(DBF_STARTUP, "ScrollIntoDisplay");
     ScrollIntoDisplay(data);
     tvisual_y = 0;
   }
 
   if(update == TRUE)
   {
+    //D(DBF_STARTUP, "DumpText! %ld %ld %ld", data->visual_y, tvisual_y, data->maxlines);
     data->update = TRUE;
     DumpText(data->visual_y+tvisual_y, tvisual_y, data->maxlines, TRUE, data);
   }
