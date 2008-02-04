@@ -875,16 +875,26 @@ void  strcpyback    (char *dest, char *src)
 /* ------------------------------------ *
  *  Functions which updates the display *
  * ------------------------------------ */
-void  OptimizedPrint  (LONG x, struct line_node *line, LONG line_nr, LONG width, struct InstData *data)
+void OptimizedPrint(LONG x, struct line_node *line, LONG line_nr, LONG width, struct InstData *data)
 {
-  LONG twidth = PrintLine(x, line, line_nr++, TRUE, data);
-
   ENTER();
 
-  if((twidth != width) && (x+twidth < (LONG)line->line.Length) && (line_nr <= data->maxlines))
+  do
   {
-    OptimizedPrint(x+twidth, line, line_nr, LineCharsWidth(line->line.Contents+x+width, data) + (width - twidth), data);
+    LONG twidth;
+
+    twidth = PrintLine(x, line, line_nr, TRUE, data);
+    line_nr++;
+
+    if(twidth != width && x+twidth < (LONG)line->line.Length && line_nr <= data->maxlines)
+    {
+      x += twidth;
+      width = LineCharsWidth(line->line.Contents+x+width, data) + width - twidth;
+    }
+    else
+      break;
   }
+  while(TRUE);
 
   LEAVE();
 }
@@ -924,7 +934,7 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
     if(buffer != NULL)
     {
       UWORD style = buffer->del.style;
-  
+
       AddStyleToLine(x, line, 1, (style & BOLD) ? BOLD : ~BOLD, data);
       AddStyleToLine(x, line, 1, (style & ITALIC) ? ITALIC : ~ITALIC, data);
       AddStyleToLine(x, line, 1, (style & UNDERLINE) ? UNDERLINE : ~UNDERLINE, data);
