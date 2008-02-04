@@ -7,6 +7,10 @@ $URL$
 
 2008-02-04 Jens Langner <Jens.Langner@light-speed.de>
 
+  * mcc/BlockOperators.c: fixed a bug in the CutBlock2() function where using
+    the RemoveChars() function on an empty top line caused a selected area to
+    remain selected, even after the cut operation. This should completely fix
+    bug #1884875 reported on the YAM bugtracker.
   * mcc/UndoFunctions.c: fixed a potential source for a memory leak where in case
     some redo operations where still left and the undo buffer was reset via a
     new char, the memory of the former paste operations was not properly freed.
