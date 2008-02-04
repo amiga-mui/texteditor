@@ -65,13 +65,14 @@ long Undo(struct InstData *data)
 {
   ENTER();
 
-  if(data->undosize != 0 && data->undobuffer != data->undopointer)
+  D(DBF_UNDO, "undolevel: %ld undocur: %ld undofill: %ld", data->undolevel, data->undocur, data->undofill);
+
+  // check if there is something in the undo
+  // buffer available
+  if(data->undolevel > 0 && data->undocur > 0)
   {
     struct UserAction *buffer;
     BOOL  crsr_move = TRUE;
-
-    if(*(short *)data->undopointer == 0xff)
-      set(data->object, MUIA_TextEditor_RedoAvailable, TRUE);
 
     if(Enabled(data))
     {
@@ -79,7 +80,15 @@ long Undo(struct InstData *data)
       MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
     }
 
+    // as the redo operation automatically
+    // becomes available when undo is used we just
+    // check here if we didn't yet set RedoAvailable
+    // as we only want to set it once
+    if(data->undocur == data->undofill)
+      set(data->object, MUIA_TextEditor_RedoAvailable, TRUE);
+
     data->undopointer -= sizeof(struct UserAction);
+    data->undocur--;
     buffer = (struct UserAction *)data->undopointer;
 
 //    if(data->actualline != LineNode(buffer->y, data) || data->CPos_X != buffer->x)
@@ -183,7 +192,9 @@ long Undo(struct InstData *data)
     if(data->flags & FLG_Active)
       SetCursor(data->CPos_X, data->actualline, TRUE, data);
 
-    if(data->undobuffer == data->undopointer)
+    // if there are no further undo levels we
+    // have to set UndoAvailable to FALSE
+    if(data->undocur == 0)
     {
       set(data->object, MUIA_TextEditor_UndoAvailable, FALSE);
 
@@ -207,12 +218,12 @@ long Redo(struct InstData *data)
 {
   ENTER();
 
-  if(data->undosize != 0 && *(short *)data->undopointer != 0xff)
+  D(DBF_UNDO, "undolevel: %ld undocur: %ld undofill: %ld", data->undolevel, data->undocur, data->undofill);
+
+  // check if there something to redo at all
+  if(data->undofill > 0 && data->undocur < data->undofill)
   {
     struct UserAction *buffer = (struct UserAction *)data->undopointer;
-
-    if(data->undopointer == data->undobuffer)
-      set(data->object, MUIA_TextEditor_UndoAvailable, TRUE);
 
     if(Enabled(data))
     {
@@ -220,7 +231,15 @@ long Redo(struct InstData *data)
       MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
     }
 
+    // in case undocur is equal zero then we have to
+    // set the undoavailable attribute to true to signal
+    // others that undo is available
+    if(data->undocur == 0)
+      set(data->object, MUIA_TextEditor_UndoAvailable, TRUE);
+
     data->undopointer += sizeof(struct UserAction);
+    data->undocur++;
+
 //    if(data->actualline != LineNode(buffer->y, data) || data->CPos_X != buffer->x)
     SetCursor(data->CPos_X, data->actualline, FALSE, data);
     data->CPos_X = buffer->x;
@@ -289,7 +308,9 @@ long Redo(struct InstData *data)
     if(data->flags & FLG_Active)
       SetCursor(data->CPos_X, data->actualline, TRUE, data);
 
-    if(*(short *)data->undopointer == 0xff)
+    // if undocur == undofill this signals that we
+    // don't have any things to redo anymore.
+    if(data->undocur == data->undofill)
       set(data->object, MUIA_TextEditor_RedoAvailable, FALSE);
 
     RETURN(TRUE);
@@ -304,79 +325,73 @@ long Redo(struct InstData *data)
   }
 }
 
-void ResetUndoBuffer(struct InstData *data)
-{
-  ENTER();
-
-  if(data->undosize != 0)
-  {
-    struct UserAction *buffer = (struct UserAction *)data->undobuffer;
-
-    while(buffer != data->undopointer)
-    {
-      if(buffer->type == ET_DELETEBLOCK)
-        MyFreePooled(data->mypool, buffer->clip);
-
-      buffer++;
-    }
-
-    while(buffer->type != 0xff)
-    {
-      if(buffer->type == ET_PASTEBLOCK)
-        MyFreePooled(data->mypool, buffer->clip);
-
-      buffer++;
-    }
-
-    data->undopointer = data->undobuffer;
-    *(short *)data->undopointer = 0xff;
-  }
-
-  LEAVE();
-}
-
 long AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData *data)
 {
   ENTER();
 
-  if(data->undosize != 0)
+  D(DBF_UNDO, "undolevel: %ld undocur: %ld undofill: %ld", data->undolevel, data->undocur, data->undofill);
+
+  if(data->undolevel > 0)
   {
     struct UserAction *buffer;
 
-    if((char *)data->undobuffer+data->undosize <= (char *)data->undopointer+sizeof(struct UserAction)+1)
+    // check if there is still enough space in our undo buffer
+    // and if not we clean it up a bit (10 entries)
+    if(data->undofill+1 > data->undolevel)
     {
-      LONG    c;
-      struct  UserAction *t_buffer;
-      char    *t_undobuffer = (char *)data->undobuffer;
+      ULONG c;
+      char *t_undobuffer = (char *)data->undobuffer;
 
-      for(c = 1; c <= 10; c++)
+      // cleanup at most the first 10 entries in our undobuffer
+      for(c=0; c < 10 && data->undofill > 0; c++)
       {
-        t_buffer = (struct UserAction *)t_undobuffer;
+        struct UserAction *t_buffer = (struct UserAction *)t_undobuffer;
+
         if(t_buffer->type == ET_DELETEBLOCK)
           MyFreePooled(data->mypool, t_buffer->clip);
 
         t_undobuffer += sizeof(struct UserAction);
+
+        data->undocur--;
+        data->undofill--;
       }
 
-      memcpy(data->undobuffer, t_undobuffer, data->undosize-(t_undobuffer-(char *)data->undobuffer));
+      D(DBF_UNDO, "undobuffer was filled up, cleaned up the first %ld entries", c+1);
 
-      data->undopointer -= t_undobuffer-(char *)data->undobuffer;
+      if(data->undofill > 0)
+      {
+        // copy everything from t_undobuffer to our start of the
+        // undobuffer and set the undopointer accordingly.
+        memcpy(data->undobuffer, t_undobuffer, data->undosize-(t_undobuffer-(char *)data->undobuffer));
+        data->undopointer -= t_undobuffer-(char *)data->undobuffer;
+      }
 
+      // signal the user that something in the
+      // undo buffer was lost.
       data->flags |= FLG_UndoLost;
     }
+
     buffer = data->undopointer;
-    if(*(short *)data->undopointer != 0xff)
+
+    // as we are about to set something new for an undo
+    // operation we have to signal that redo operation
+    // is cleared now.
+    if(data->undocur < data->undofill)
       set(data->object, MUIA_TextEditor_RedoAvailable, FALSE);
-    if(data->undopointer == data->undobuffer)
+
+    // if undocur is zero we have to send the undoavailable
+    // signal
+    if(data->undocur == 0)
       set(data->object, MUIA_TextEditor_UndoAvailable, TRUE);
 
     data->undopointer += sizeof(struct UserAction);
+    data->undocur++;
+    data->undofill = data->undocur;
 
-    *(short *)data->undopointer = 0xff;
     buffer->x  = data->CPos_X;
     buffer->y  = LineNr(data->actualline, data);
-
     buffer->type = eventtype;
+
     switch(eventtype)
     {
       case ET_BACKSPACEMERGE:
@@ -441,41 +456,75 @@ long AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData 
   return(TRUE);
 }
 
-void ResizeUndoBuffer(struct InstData *data, ULONG level)
+void ResetUndoBuffer(struct InstData *data)
 {
-  ULONG newSize;
-
   ENTER();
 
-  // calculate number of bytes from number of undo levels
-  newSize = (level * sizeof(struct UserAction)) + 1;
-
-  if(data->undosize != newSize)
+  if(data->undosize != 0)
   {
-    if(level == 0)
+    struct UserAction *buffer = (struct UserAction *)data->undobuffer;
+
+    while(data->undocur > 0)
     {
-      // if zero steps are requested then free everything
-      if(data->undobuffer != NULL)
-      {
-        ResetUndoBuffer(data);
-        MyFreePooled(data->mypool, data->undobuffer);
-        data->undobuffer = NULL;
-        data->undopointer = NULL;
-      }
-      data->undosize = 0;
+      if(buffer->type == ET_DELETEBLOCK)
+        MyFreePooled(data->mypool, buffer->clip);
+
+      buffer++;
+      data->undocur--;
+      data->undofill--;
     }
-    else
+
+    while(data->undofill > 0)
     {
+      if(buffer->type == ET_PASTEBLOCK)
+        MyFreePooled(data->mypool, buffer->clip);
+
+      buffer++;
+      data->undofill--;
+    }
+
+    data->undopointer = data->undobuffer;
+
+    ASSERT(data->undocur == 0);
+    ASSERT(data->undofill == 0);
+  }
+
+  LEAVE();
+}
+
+void ResizeUndoBuffer(struct InstData *data, ULONG level)
+{
+  ENTER();
+
+  if(data->undolevel != level)
+  {
+    D(DBF_UNDO, "resizing undo buffer for %ld undo levels", level);
+
+    if(data->undobuffer != NULL)
+    {
+      ResetUndoBuffer(data);
+      MyFreePooled(data->mypool, data->undobuffer);
+    }
+
+    data->undobuffer = NULL;
+    data->undopointer = NULL;
+    data->undosize = 0;
+    data->undofill = 0;
+    data->undocur = 0;
+    data->undolevel = level;
+
+    if(level > 0)
+    {
+      ULONG newSize;
+
+      // calculate number of bytes from number of undo levels
+      newSize = (level * sizeof(struct UserAction));
+
       // allocate a new undo buffer
       if((data->undobuffer = MyAllocPooled(data->mypool, newSize)) != NULL)
       {
         data->undopointer = data->undobuffer;
-        *(short *)data->undopointer = 0xff;
         data->undosize = newSize;
-      }
-      else
-      {
-        data->undosize = 0;
       }
     }
   }

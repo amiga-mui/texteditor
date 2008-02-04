@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-02-04 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcc/UndoFunctions.c: reworked the whole undo handling to not use any hackish
+    address flagging via 0xff to mark the end of an undo buffer. That whole
+    process was kinda strange. Now the whole undo level handling should be not
+    only more safe, but also more transparent.
+
 2008-02-04  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/UndoFunctions.c: added some "default: break;" statements to please GCC.
