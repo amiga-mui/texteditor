@@ -17,6 +17,7 @@ $URL$
 
 2008-02-04  Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/EditorStuff.c: replaced OptimizedPrint() by a non-recursive function.
   * mcc/MixedFunctions.c: fixed a possible endless loop. This partly fixes bug
     #1884875 of YAM.
   * mcc/UndoFunctions.c: added some "default: break;" statements to please GCC.
