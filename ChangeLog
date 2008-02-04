@@ -17,6 +17,8 @@ $URL$
 
 2008-02-04  Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/MixedFunctions.c: fixed a possible endless loop. This partly fixes bug
+    #1884875 of YAM.
   * mcc/UndoFunctions.c: added some "default: break;" statements to please GCC.
 
 2008-02-02 Jens Langner <Jens.Langner@light-speed.de>

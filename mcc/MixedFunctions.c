@@ -742,10 +742,6 @@ void GetLine(LONG realline, struct pos_info *pos, struct InstData *data)
   pos->line = line;
   pos->lines = realline;
 
-  SHOWVALUE(DBF_ALWAYS, line->next);
-  SHOWVALUE(DBF_ALWAYS, realline);
-  SHOWVALUE(DBF_ALWAYS, line->visual);
-
   if(line->next == NULL && realline > line->visual)
   {
     x = line->line.Length-1;
