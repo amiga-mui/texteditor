@@ -17,6 +17,8 @@ $URL$
 
 2008-02-04  Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/BlockOperators.c: adapted two parameters of CutBlock() to reflect their
+    true boolean nature.
   * mcc/EditorStuff.c: replaced OptimizedPrint() by a non-recursive function.
   * mcc/MixedFunctions.c: fixed a possible endless loop. This partly fixes bug
     #1884875 of YAM.

@@ -45,7 +45,7 @@ VOID RedrawArea(UWORD startx, struct line_node *startline, UWORD stopx, struct l
 
   if(stopx >= stopline->line.Length)
     stopx = stopline->line.Length-1;
-  
+
   OffsetToLines(stopx, stopline, &pos2, data);
 
   if((line_nr1 += pos1.lines-1) < 0)
@@ -292,7 +292,7 @@ void NiceBlock(struct marking *realblock, struct marking *newblock)
   {
     if(startx > stopx)
     {
-        LONG  c_x = startx;
+      LONG c_x = startx;
 
       startx = stopx;
       stopx = c_x;
@@ -615,7 +615,7 @@ void ClipLine(struct line_node *line, struct InstData *data)
   LEAVE();
 }
 
-LONG CutBlock(struct InstData *data, long Clipboard, long NoCut, BOOL update)
+LONG CutBlock(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update)
 {
   struct  marking newblock;
   LONG result;
@@ -634,7 +634,7 @@ LONG CutBlock(struct InstData *data, long Clipboard, long NoCut, BOOL update)
   return(result);
 }
 
-LONG CutBlock2(struct InstData *data, long Clipboard, long NoCut, struct marking *newblock, BOOL update)
+LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, struct marking *newblock, BOOL update)
 {
   LONG  tvisual_y, error;
   LONG  startx, stopx;
@@ -656,7 +656,7 @@ LONG CutBlock2(struct InstData *data, long Clipboard, long NoCut, struct marking
 
     data->update = FALSE;
 
-    if(Clipboard)
+    if(Clipboard == TRUE)
     {
       if(InitClipboard(data, IFFF_WRITE))
       {
@@ -674,41 +674,42 @@ LONG CutBlock2(struct InstData *data, long Clipboard, long NoCut, struct marking
 
     while(c_startline != stopline)
     {
-      if(Clipboard)
+      if(Clipboard == TRUE)
       {
         ClipLine(c_startline, data);
       }
 
-      if(!NoCut)
+      if(NoCut == FALSE)
       {
         struct  line_node *cc_startline = c_startline;
 
         MyFreePooled(data->mypool, c_startline->line.Contents);
-        if(c_startline->line.Styles)
+        if(c_startline->line.Styles != NULL)
           MyFreePooled(data->mypool, c_startline->line.Styles);
         data->totallines -= c_startline->visual;
         c_startline = c_startline->next;
 
         FreeLine(cc_startline, data);
       }
-      else  c_startline = c_startline->next;
+      else
+        c_startline = c_startline->next;
     }
 
-    if(Clipboard)
+    if(Clipboard == TRUE)
     {
-      if(stopx)
+      if(stopx != 0)
         ClipChars(0, stopline, stopx, data);
 
       EndClipSession(data);
     }
 
-    if(!NoCut)
+    if(NoCut == FALSE)
     {
       startline->next = stopline;
       stopline->previous = startline;
 
       RemoveChars(startx, startline, startline->line.Length-startx-1, data);
-      if(stopx)
+      if(stopx != 0)
       {
         RemoveChars(0, stopline, stopx, data);
       }
@@ -720,7 +721,7 @@ LONG CutBlock2(struct InstData *data, long Clipboard, long NoCut, struct marking
   }
   else
   {
-    if(Clipboard)
+    if(Clipboard == TRUE)
     {
       if(InitClipboard(data, IFFF_WRITE))
       {
@@ -731,18 +732,18 @@ LONG CutBlock2(struct InstData *data, long Clipboard, long NoCut, struct marking
         ClipChars(startx, startline, stopx-startx, data);
         EndClipSession(data);
       }
-      if(update && NoCut)
+      if(update == TRUE && NoCut == TRUE)
       {
         MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
           goto end;
       }
     }
 
-    if(!NoCut)
+    if(NoCut == FALSE)
     {
       data->CPos_X = startx;
       RemoveChars(startx, startline, stopx-startx, data);
-      if(update)
+      if(update == TRUE)
         goto end;
     }
   }
@@ -754,7 +755,7 @@ LONG CutBlock2(struct InstData *data, long Clipboard, long NoCut, struct marking
     tvisual_y = 0;
   }
 
-  if(update)
+  if(update == TRUE)
   {
     data->update = TRUE;
     DumpText(data->visual_y+tvisual_y, tvisual_y, data->maxlines, TRUE, data);

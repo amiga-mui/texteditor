@@ -437,7 +437,7 @@ void  MarkText        (LONG, struct line_node *, LONG, struct line_node *, struc
 
 VOID  RedrawArea        (UWORD, struct line_node *, UWORD, struct line_node *, struct InstData *);
 void  NiceBlock       (struct marking *, struct marking *);
-LONG  CutBlock        (struct InstData *, long, long, BOOL);
+LONG  CutBlock        (struct InstData *, BOOL, BOOL, BOOL);
 
 void  UpdateStyles      (struct InstData *);
 LONG  GetStyle        (LONG, struct line_node *);
@@ -464,7 +464,7 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
 struct  line_node *loadtext (void);
 unsigned short  *CheckStyles      (char *);
 
-LONG CutBlock2 (struct InstData *, long, long, struct marking *, BOOL);
+LONG CutBlock2 (struct InstData *, BOOL, BOOL, struct marking *, BOOL);
 char *GetBlock (struct marking *, struct InstData *);
 
 long AddToUndoBuffer(enum EventType, char *, struct InstData *);
