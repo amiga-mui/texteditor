@@ -172,6 +172,10 @@ long Undo(struct InstData *data)
         }
       }
       break;
+
+      default:
+        // nothing to do
+      break;
     }
 
     ScrollIntoDisplay(data);
@@ -273,6 +277,10 @@ long Redo(struct InstData *data)
           CutBlock2(data, FALSE, FALSE, &block, TRUE);
           buffer->clip = (unsigned char *)clip;
       }
+      break;
+
+      default:
+        // nothing to do
       break;
     }
 
@@ -421,6 +429,10 @@ long AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData 
           DoMethod(data->object, MUIM_TextEditor_HandleError, Error_NotEnoughUndoMem);
         }
       }
+      break;
+
+      default:
+        // nothing to do
       break;
     }
   }
