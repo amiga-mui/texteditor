@@ -73,11 +73,11 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
     break;
 
     case MUIA_TextEditor_UndoAvailable:
-      ti_Data = data->undosize != 0 && data->undobuffer != data->undopointer;
+      ti_Data = data->undolevel > 0 && data->undocur > 0;
     break;
 
     case MUIA_TextEditor_RedoAvailable:
-      ti_Data = data->undosize != 0 && *(short *)data->undopointer != 0xff;
+      ti_Data = data->undolevel > 0 && data->undofill > data->undocur;
     break;
 
     case MUIA_TextEditor_ActiveObjectOnClick:
@@ -185,7 +185,7 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
       break;
 
     case MUIA_TextEditor_UndoLevels:
-      ti_Data = (data->undosize != 0) ? ((data->undosize - 1) / sizeof(struct UserAction)) : 0;
+      ti_Data = data->undolevel;
       break;
 
     default:
@@ -660,6 +660,7 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
       case MUIA_TextEditor_TypeAndSpell:
         data->TypeAndSpell = ti_Data;
         break;
+
       case MUIA_TextEditor_UndoLevels:
         ResizeUndoBuffer(data, ti_Data);
         data->userUndoSize = TRUE;

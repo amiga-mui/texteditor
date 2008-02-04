@@ -622,7 +622,7 @@ LONG CutBlock(struct InstData *data, long Clipboard, long NoCut, BOOL update)
 
   ENTER();
 
-  //D(DBF_STARTUP, "CutBlock: %ld %ld %ld", Clipboard, NoCut, update);
+  D(DBF_STARTUP, "CutBlock: %ld %ld %ld", Clipboard, NoCut, update);
 
   NiceBlock(&data->blockinfo, &newblock);
   if(!NoCut)
@@ -647,9 +647,12 @@ LONG CutBlock2(struct InstData *data, long Clipboard, long NoCut, struct marking
   stopx     = newblock->stopx;
   startline = newblock->startline;
   stopline  = newblock->stopline;
+
+  D(DBF_STARTUP, "CutBlock2: %ld-%ld %lx-%lx", startx, stopx, startline, stopline);
+
   if(startline != stopline)
   {
-    struct  line_node *c_startline = startline->next;
+    struct line_node *c_startline = startline->next;
 
     data->update = FALSE;
 

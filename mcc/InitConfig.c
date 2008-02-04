@@ -297,28 +297,30 @@ void InitConfig(Object *obj, struct InstData *data)
     data->inactiveCursor = TRUE;
 
   {
-    long undolevel;
+    ULONG undolevel;
 
+    // get the saved undo size only if it was not yet set by the application
     if(data->userUndoSize == FALSE)
     {
-      // get the saved undo size only if it was not yet set by the application
       undolevel = 500;
 
       if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_UndoSize, &setting))
       {
         undolevel = *(long *)setting;
+
         // constrain the number of undo levels only if undo is enabled
         if(undolevel != 0 && undolevel < 20)
           undolevel = 20;
       }
+
       // add 5 levels only if undo is enabled at all
       if(undolevel != 0)
         undolevel += 5;
     }
     else
-      undolevel = data->undosize;
+      undolevel = data->undolevel;
 
-	ResizeUndoBuffer(data, undolevel);
+  	ResizeUndoBuffer(data, undolevel);
   }
 
   data->LookupSpawn = 0;
