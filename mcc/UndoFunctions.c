@@ -377,7 +377,29 @@ long AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData 
     // operation we have to signal that redo operation
     // is cleared now.
     if(data->undocur < data->undofill)
+    {
+      char *t_undobuffer = (char *)data->undopointer;
+
+      D(DBF_UNDO, "cleaning up %ld dropped undo nodes", data->undofill-data->undocur);
+
+      // we have to first cleanup each buffer of the ET_PASTEBLOCK
+      // event or otherwise we lost some memory.
+      while(data->undofill > data->undocur)
+      {
+        struct UserAction *t_buffer = (struct UserAction *)t_undobuffer;
+
+        if(t_buffer->type == ET_PASTEBLOCK)
+        {
+          D(DBF_UNDO, "cleaning uf paste buffer of user action %08lx", t_buffer);
+          MyFreePooled(data->mypool, t_buffer->clip);
+        }
+
+        t_undobuffer += sizeof(struct UserAction);
+        data->undofill--;
+      }
+
       set(data->object, MUIA_TextEditor_RedoAvailable, FALSE);
+    }
 
     // if undocur is zero we have to send the undoavailable
     // signal

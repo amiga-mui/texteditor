@@ -7,6 +7,9 @@ $URL$
 
 2008-02-04 Jens Langner <Jens.Langner@light-speed.de>
 
+  * mcc/UndoFunctions.c: fixed a potential source for a memory leak where in case
+    some redo operations where still left and the undo buffer was reset via a
+    new char, the memory of the former paste operations was not properly freed.
   * mcc/UndoFunctions.c: reworked the whole undo handling to not use any hackish
     address flagging via 0xff to mark the end of an undo buffer. That whole
     process was kinda strange. Now the whole undo level handling should be not
