@@ -1,11 +1,11 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.25 (20.12.2007)
+@$VER: TextEditor.Guide 15.26 (08.02.2008)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
 Welcome to the @{b}TextEditor @{ub}AmigaGuide(R) documentation.
 
-(C) 2005-2007 by the TextEditor.mcc Open Source team
+(C) 2005-2008 by the TextEditor.mcc Open Source team
 (C) 1997-2000 by Allan Odgaard
 
 
@@ -339,6 +339,15 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.26 (08.02.2008)
+
+- fixed a bug where cutting text on an empty first line ended up in an endless
+  loop or in a always marked first line.
+- fixed a potential memory leak in the undo/redo functionality.
+- reworked undo/redo functionality to be a bit more robust in future.
+- fixed a cosmetic bug when using small cursors (graphical traces left).
+- a doubleclick hook is now also aware of key qualifiers.
 
 15.25 (20.12.2007)
 

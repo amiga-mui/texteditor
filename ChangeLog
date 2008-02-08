@@ -5,6 +5,8 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.26 RELEASE ############################################################
+
 2008-02-04 Jens Langner <Jens.Langner@light-speed.de>
 
   * mcc/BlockOperators.c: fixed a bug in the CutBlock2() function where using

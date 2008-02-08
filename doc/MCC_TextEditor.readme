@@ -1,9 +1,9 @@
-Short:        TextEditor custom class for MUI, V15.25
+Short:        TextEditor custom class for MUI, V15.26
 Author:       TextEditor.mcc Open Source Team
 Uploader:     Jens Langner <Jens.Langner@light-speed.de>
 Type:         dev/mui
-Version:      15.25
-Replaces:     dev/mui/MCC_TextEditor-15.24.lha
+Version:      15.26
+Replaces:     dev/mui/MCC_TextEditor-15.25.lha
 Requires:     AmigaOS 3.0+ or MorphOS, MUI 3.8+, 68020+/PPC604e+
 Architecture: ppc-amigaos >= 4.0.0; m68k-amigaos >= 3.0; ppc-morphos >= 1.4.2
 
