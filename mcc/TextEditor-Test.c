@@ -374,7 +374,7 @@ int main(void)
                                     "You can extend your block by holding down shift while you press LMB where you want the block to end.\n"
                                     "While you drag to scroll, the farther away from the gadget your mouse pointer is, the faster the gadget will scroll.\n"
                                     "\n"
-                                    "\33c\33[s:2]\33u\33b Keybindigns \33n\n\33l"
+                                    "\33c\33[s:2]\33u\33b Keybindings \33n\n\33l"
                                     "\n"
                                     "Hold down shift and press a navigation key to mark. When something is marked you can use: LAmiga x, c to cut or copy. Delete or Backspace to erase. Or any other key to overwrite.\n"
                                     "LAmiga + z, Z, v = Undo, Redo, Paste.\n"
