@@ -161,6 +161,9 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
             Set(cl, obj, (struct opSet *)msg);
             data->visual_y = 1;
 
+            // start with an inactive cursor
+            data->currentCursorState = CS_INACTIVE;
+
             RETURN((ULONG)obj);
             return((ULONG)obj);
           }

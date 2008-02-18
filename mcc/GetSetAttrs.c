@@ -257,8 +257,9 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_TextEditor_AutoClip:
         if(ti_Data)
-            data->flags |= FLG_AutoClip;
-        else  data->flags &= ~FLG_AutoClip;
+          data->flags |= FLG_AutoClip;
+        else
+          data->flags &= ~FLG_AutoClip;
       break;
 
       case MUIA_TextEditor_ColorMap:
@@ -266,13 +267,16 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
         break;
       case MUIA_TextEditor_InVirtualGroup:
         if(ti_Data)
-            data->flags |= FLG_InVGrp;
-        else  data->flags &= ~FLG_InVGrp;
+          data->flags |= FLG_InVGrp;
+        else
+          data->flags &= ~FLG_InVGrp;
         break;
+
       case MUIA_TextEditor_CursorX:
         if(!data->NoNotify)
           crsr_x = ti_Data;
         break;
+
       case MUIA_TextEditor_CursorY:
         if(!data->NoNotify)
           crsr_y = ti_Data;
@@ -286,10 +290,10 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
       {
         if(((data->visual_y-1)*data->height+(data->realypos - data->ypos) != (LONG)ti_Data) && (data->shown))
         {
-            LONG     diff, smooth;
-            LONG     lastpixel = ((data->visual_y-1)*data->height) + (data->realypos - data->ypos);
-            struct   Hook  *oldhook;
-            void    *cliphandle;
+          LONG     diff, smooth;
+          LONG     lastpixel = ((data->visual_y-1)*data->height) + (data->realypos - data->ypos);
+          struct   Hook  *oldhook;
+          void    *cliphandle;
 
           diff = data->visual_y - ((ti_Data/data->height)+1);
 
@@ -297,14 +301,15 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
           smooth = ti_Data - lastpixel;
 
           if(smooth > 0)
-              data->scr_direction = 1;
-          else  data->scr_direction = 0;
+            data->scr_direction = 1;
+          else
+            data->scr_direction = 0;
 
           oldhook = InstallLayerHook(data->rport->Layer, LAYERS_NOBACKFILL);
           cliphandle = MUI_AddClipping(muiRenderInfo(data->object), data->xpos, data->realypos, data->innerwidth, data->maxlines*data->height);
           if(smooth > 0 && smooth < data->maxlines*data->height)
           {
-              LONG line_nr;
+            LONG line_nr;
 
             ScrollRasterBF(data->rport, 0, smooth,
                           data->xpos, data->realypos,
@@ -315,7 +320,7 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
             line_nr = data->maxlines-(smooth/data->height)-1;
 
             {
-                struct Layer *layer = data->rport->Layer;
+              struct Layer *layer = data->rport->Layer;
 
               if(layer->DamageList && layer->DamageList->RegionRectangle)
               {
@@ -333,7 +338,7 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
           {
             if(smooth < 0 && -smooth < data->maxlines*data->height)
             {
-                LONG lines;
+              LONG lines;
 
               ScrollRasterBF(data->rport, 0, smooth,
                             data->xpos, data->realypos,
@@ -342,7 +347,7 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
               data->ypos = data->realypos - ti_Data%data->height;
               lines = (-smooth/data->height)+2;
               {
-                  struct Layer *layer = data->rport->Layer;
+                struct Layer *layer = data->rport->Layer;
 
                 if(layer->DamageList && layer->DamageList->RegionRectangle)
                   if(MUI_BeginRefresh(muiRenderInfo(data->object),0))
@@ -453,17 +458,21 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
           data->flags &= ~FLG_Quiet;
           MUI_Redraw(obj, MADF_DRAWOBJECT);
           if(data->maxlines > data->totallines)
-              set(data->object, MUIA_TextEditor_Prop_Entries, data->maxlines*data->height);
-          else  set(data->object, MUIA_TextEditor_Prop_Entries, data->totallines*data->height);
+            set(data->object, MUIA_TextEditor_Prop_Entries, data->maxlines*data->height);
+          else
+            set(data->object, MUIA_TextEditor_Prop_Entries, data->totallines*data->height);
           set(data->object, MUIA_TextEditor_Prop_First, (data->visual_y-1)*data->height);
         }
         break;
+
       case MUIA_TextEditor_StyleBold:
         AddStyle(&data->blockinfo, BOLD, ti_Data, data);
         break;
+
       case MUIA_TextEditor_StyleItalic:
         AddStyle(&data->blockinfo, ITALIC, ti_Data, data);
         break;
+
       case MUIA_TextEditor_StyleUnderline:
         AddStyle(&data->blockinfo, UNDERLINE, ti_Data, data);
         break;
@@ -539,19 +548,24 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
       case MUIA_TextEditor_DoubleClickHook:
         data->DoubleClickHook = (struct Hook *)ti_Data;
         break;
+
       case MUIA_TextEditor_HasChanged:
         data->HasChanged = ti_Data;
         if(!ti_Data)
           data->flags &= ~FLG_UndoLost;
         break;
+
       case MUIA_TextEditor_HorizontalScroll:
         if(ti_Data)
-            data->flags |=  FLG_HScroll;
-        else  data->flags &= ~FLG_HScroll;
+          data->flags |=  FLG_HScroll;
+        else
+          data->flags &= ~FLG_HScroll;
         break;
+
       case MUIA_TextEditor_Contents:
         contents = (char *)ti_Data;
         break;
+
       case MUIA_TextEditor_ImportHook:
         switch(ti_Data)
         {
@@ -571,6 +585,7 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
             data->ImportHook = (struct Hook *)ti_Data;
         }
         break;
+
       case MUIA_TextEditor_ImportWrap:
         data->ImportWrap = ti_Data;
         break;
@@ -600,16 +615,17 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
       case MUIA_TextEditor_ExportWrap:
         data->ExportWrap = ti_Data;
         break;
+
       case MUIA_TextEditor_Flow:
         if(!data->NoNotify)
         {
-            LONG    start, lines = 0;
+          LONG    start, lines = 0;
 
           data->Flow = ti_Data;
           if(Enabled(data))
           {
-              struct marking newblock;
-              struct line_node *startline;
+            struct marking newblock;
+            struct line_node *startline;
 
             NiceBlock(&data->blockinfo, &newblock);
             startline = newblock.startline;
@@ -619,7 +635,8 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
               lines += startline->visual;
               startline->line.Flow = ti_Data;
               startline = startline->next;
-            } while(startline != newblock.stopline->next);
+            }
+            while(startline != newblock.stopline->next);
           }
           else
           {
@@ -685,20 +702,21 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
   if(crsr_x != 0xffff || crsr_y != 0xffff)
   {
     SetCursor(data->CPos_X, data->actualline, FALSE, data);
+
     if(crsr_y != 0xffff)
     {
       data->actualline = LineNode(crsr_y+1, data);
       if(data->actualline->line.Length < data->CPos_X)
         data->CPos_X = data->actualline->line.Length-1;
     }
-
     if(crsr_x != 0xffff)
     {
       data->CPos_X = (data->actualline->line.Length > (ULONG)crsr_x) ? (UWORD)crsr_x : (UWORD)data->actualline->line.Length-1;
     }
+
     ScrollIntoDisplay(data);
-    if(data->flags & FLG_Active)
-      SetCursor(data->CPos_X, data->actualline, TRUE, data);
+    SetCursor(data->CPos_X, data->actualline, TRUE, data);
+
     data->pixel_x = 0;
     result = TRUE;
   }
