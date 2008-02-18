@@ -409,30 +409,53 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
                                                     0);
       }
 
-      if(Set ||
-         (data->inactiveCursor == TRUE && (data->flags & FLG_Active) == 0 && (data->flags & FLG_Activated) == 0))
+      if(Set == TRUE ||
+         (data->inactiveCursor == TRUE && isFlagClear(data->flags, FLG_Active) && isFlagClear(data->flags, FLG_Activated)))
       {
         SetAPen(data->rport, data->cursorcolor);
         SetDrMd(data->rport, JAM2);
 
         // if the gadget is in inactive state we just draw a skeleton cursor instead
-        if((data->flags & FLG_Active) == 0 && (data->flags & FLG_Activated) == 0)
+        if(data->inactiveCursor == TRUE && isFlagClear(data->flags, FLG_Active) && isFlagClear(data->flags, FLG_Activated))
         {
           ULONG cwidth = cursor_width;
 
           if(data->CursorWidth != 6)
             cwidth = TextLength(&data->tmprp, chars[1] < ' ' ? (char *)" " : (char *)&chars[1], 1);
 
-          RectFill(data->rport, cursorxplace, yplace, cursorxplace+cwidth-1, yplace+data->height-1);
-          DoMethod(data->object, MUIM_DrawBackground, cursorxplace+1, yplace+1,
-                                                      cwidth-2, data->height-2,
-                                                      cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0),
-                                                      ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2),
-                                                      0);
+          if(Set == FALSE && data->currentCursorState == CS_INACTIVE)
+          {
+            // the cursor should be switched off, but the skeleton cursor has already been
+            // drawn before, hence we must erase this old one, but only for non-antialiased
+            // fonts. For antialiased fonts this has been done already
+            if(IS_ANTIALIASED(data->font) == FALSE)
+            {
+              DoMethod(data->object, MUIM_DrawBackground, cursorxplace, yplace,
+                                                          cwidth, data->height,
+                                                          cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0),
+                                                          ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2),
+                                                          0);
+            }
+          }
+          else
+          {
+            // draw a "new" skeleton cursor
+            RectFill(data->rport, cursorxplace, yplace, cursorxplace+cwidth-1, yplace+data->height-1);
+            DoMethod(data->object, MUIM_DrawBackground, cursorxplace+1, yplace+1,
+                                                        cwidth-2, data->height-2,
+                                                        cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0),
+                                                        ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2),
+                                                        0);
+          }
+
+          // remember the inactive state
+          data->currentCursorState = CS_INACTIVE;
         }
         else
         {
           RectFill(data->rport, cursorxplace, yplace, cursorxplace+cursor_width-1, yplace+data->height-1);
+          // remember the active state
+          data->currentCursorState = CS_ACTIVE;
         }
       }
       else
@@ -451,6 +474,9 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
                                                       ((data->flags & FLG_InVGrp) ? 0 : data->realypos) + data->height*(data->visual_y+line_nr+pos.lines-2),
                                                       0);
         }
+
+        // remember the off state
+        data->currentCursorState = CS_OFF;
       }
 
       SetDrMd(data->rport, JAM1);

@@ -5,6 +5,14 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-02-18  Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/MixedFunctions.c, mcc/Dispatcher.c, mcc/GetSetAttrs.c, mcc/private.h:
+    hopefully fixed the "phantom cursor" bug. The inactive cursor was not erased
+    properly in all cased leaving visible phantom cursors behind. Now TE.mcc
+    remembers the current state of the cursor (active, inactive, off) to perform
+    the correct state changes.
+
 #### v15.26 RELEASE ############################################################
 
 2008-02-04 Jens Langner <Jens.Langner@light-speed.de>

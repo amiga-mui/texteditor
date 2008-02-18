@@ -134,12 +134,12 @@
 #define MUIA_TextEditor_PopWindow_Open    (TextEditor_Dummy + 0x03)
 
 // special flagging macros
-#define isFlagSet(v,f)      (((v) & (f)) == (f))  // return TRUE if the flag is set
-#define hasFlag(v,f)        (((v) & (f)) != 0)    // return TRUE if one of the flags in f is set in v
-#define isFlagClear(v,f)    (((v) & (f)) == 0)    // return TRUE if flag f is not set in v
-#define SET_FLAG(v,f)       ((v) |= (f))          // set the flag f in v
-#define CLEAR_FLAG(v,f)     ((v) &= ~(f))         // clear the flag f in v
-#define MASK_FLAG(v,f)      ((v) &= (f))          // mask the variable v with flag f bitwise
+#define setFlag(mask, flag)             (mask) |= (flag)               // set the flag "flag" in "mask"
+#define clearFlag(mask, flag)           (mask) &= ~(flag)              // clear the flag "flag" in "mask"
+#define maskFlag(mask, flag)            (mask) &= (flag)               // mask the variable "mask" with flags "flag" bitwise
+#define isAnyFlagSet(mask, flag)        (((mask) & (flag)) != 0)       // return TRUE if at least one of the flags is set
+#define isFlagSet(mask, flag)           (((mask) & (flag)) == (flag))  // return TRUE if the flag is set
+#define isFlagClear(mask, flag)         (((mask) & (flag)) == 0)       // return TRUE if the flag is NOT set
 
 enum EventType
 {
@@ -158,6 +158,13 @@ enum EventType
   ET_STYLEUNITALIC,
   ET_STYLEUNDERLINE,
   ET_STYLEUNUNDERLINE,
+};
+
+enum CursorState
+{
+  CS_OFF = 0,
+  CS_INACTIVE,
+  CS_ACTIVE,
 };
 
 struct LineNode
@@ -373,6 +380,8 @@ struct InstData
   struct  MUI_InputHandlerNode blinkhandler;
 
   UBYTE   CtrlChar;
+
+  enum CursorState currentCursorState;
 };
 
 struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG), REG(d1, LONG), REG(d2, LONG), REG(d3, LONG flags), REG(a0, struct BitMap *));
