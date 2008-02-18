@@ -7,6 +7,7 @@ $URL$
 
 2008-02-18  Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/ExportBlock.c: make use of the new flag macros.
   * mcc/TextEditor-Test.c: fixed a typo.
   * mcc/Debug.c: the flag macros are now local to Debug.c as in our other
     classes.

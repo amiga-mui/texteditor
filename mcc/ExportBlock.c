@@ -78,7 +78,7 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
 
     // see if we have to skip some chars at the front or
     // back of the current line node
-    if(hasFlag(flags, MUIF_TextEditor_ExportBlock_FullLines) == FALSE)
+    if(isFlagClear(flags, MUIF_TextEditor_ExportBlock_FullLines))
     {
       if(node == newblock.startline)
         emsg.SkipFront = newblock.startx;
