@@ -7,6 +7,8 @@ $URL$
 
 2008-02-18  Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/Debug.c: the flag macros are now local to Debug.c as in our other
+    classes.
   * mcc/MixedFunctions.c, mcc/Dispatcher.c, mcc/GetSetAttrs.c, mcc/private.h:
     hopefully fixed the "phantom cursor" bug. The inactive cursor was not erased
     properly in all cased leaving visible phantom cursors behind. Now TE.mcc

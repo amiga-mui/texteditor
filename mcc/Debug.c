@@ -32,7 +32,6 @@
 #include "SDI_compiler.h"
 
 #include "Debug.h"
-#include "private.h"
 #include "rev.h"
 
 // redefinition section
@@ -51,6 +50,14 @@
     void STDARGS KPutFmt(const char *format, va_list arg);
   #endif
 #endif
+
+// special flagging macros
+#define isFlagSet(v,f)      (((v) & (f)) == (f))  // return TRUE if the flag is set
+#define hasFlag(v,f)        (((v) & (f)) != 0)    // return TRUE if one of the flags in f is set in v
+#define isFlagClear(v,f)    (((v) & (f)) == 0)    // return TRUE if flag f is not set in v
+#define SET_FLAG(v,f)       ((v) |= (f))          // set the flag f in v
+#define CLEAR_FLAG(v,f)     ((v) &= ~(f))         // clear the flag f in v
+#define MASK_FLAG(v,f)      ((v) &= (f))          // mask the variable v with flag f bitwise
 
 // our static variables with default values
 static int indent_level = 0;
