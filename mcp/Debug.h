@@ -113,7 +113,7 @@ void _DPRINTF(unsigned long dclass, unsigned long dflags, const char *file, int 
               __LINE__,         \
               "failed assertion '%s'", \
 	            #expression),     \
-	   abort(),                   \
+	   assert(#expression),       \
 	   0                          \
 	  )                           \
 	 )                            \
