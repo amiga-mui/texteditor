@@ -23,8 +23,6 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include <stdlib.h>
-
 // first we make sure all previously defined symbols are undefined now so
 // that no other debug system interferes with ours.
 #undef ENTER
@@ -42,6 +40,8 @@
 #undef ASSERT
 
 #if defined(DEBUG)
+
+#include <assert.h>
 
 // debug classes
 #define DBC_CTRACE    (1<<0) // call tracing (ENTER/LEAVE etc.)
