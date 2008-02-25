@@ -5,6 +5,14 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-02-25 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcc/HandleInput.c: changed the AmigaOS4 WheelX/WheelY scroll wheel
+    interpretation to respect the wheel acceleration factor rather than always
+    scrolling the same distance. This should increase the scroll wheel speed in
+    case the wheel is used more quickly and the wheel acceleration factor is
+    properly configured in the SYS:Prefs/Input configuration.
+
 2008-02-19  Thore Böckelmann <tboeckel@gmx.de>
 
   * Debug.h: replaced all abort() usages in our ASSERT() macros with the

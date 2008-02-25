@@ -22,13 +22,20 @@
 
 #include <libraries/mui.h>
 #include <intuition/classes.h>
+
+#if !defined(__amigaos4__)
 #include <clib/alib_protos.h>
+#endif
+#include <clib/macros.h>
+
 #include <proto/muimaster.h>
 #include <proto/intuition.h>
 #include <proto/keymap.h>
 #include <proto/locale.h>
 #include <proto/utility.h>
 #include <proto/layers.h>
+
+#include <stdlib.h>
 
 #include "private.h"
 
@@ -229,12 +236,15 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
               LONG delta = (visible + 3) / 6;
 
               // make sure that we scroll at least 1 line
-              if(delta < 1) delta = 1;
+              if(delta < 1)
+                delta = 1;
+
+              D(DBF_INPUT, "WheelX: %ld WheelY: %ld", iwd->WheelX, iwd->WheelY);
 
           		if(iwd->WheelY < 0 || iwd->WheelX < 0)
-                DoMethod(data->slider, MUIM_Prop_Decrease, delta);
+                DoMethod(data->slider, MUIM_Prop_Decrease, delta * abs(MIN(iwd->WheelX, iwd->WheelY)));
 	            else if(iwd->WheelY > 0 || iwd->WheelX > 0)
-                DoMethod(data->slider, MUIM_Prop_Increase, delta);
+                DoMethod(data->slider, MUIM_Prop_Increase, delta * abs(MAX(iwd->WheelX, iwd->WheelY)));
             }
 
             RETURN(MUI_EventHandlerRC_Eat);
