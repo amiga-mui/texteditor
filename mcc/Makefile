@@ -139,7 +139,7 @@ DEBUGSYM = -gstabs
 CFLAGS   = -I. -I../mcp -I../include $(CPU) $(WARN) $(OPTFLAGS) \
            $(DEBUG) $(DEBUGSYM) -c
 LDFLAGS  = $(CPU) $(DEBUGSYM)
-LDLIBS   = -lm
+LDLIBS   =
 
 # different options per target OS
 ifeq ($(OS), os4)
@@ -154,7 +154,7 @@ ifeq ($(OS), os4)
 
   # Compiler/Linker flags
   CRT      = newlib
-  CPU      = -mcpu=powerpc 
+  CPU      = -mcpu=powerpc
   CFLAGS   += -mcrt=$(CRT) -D__USE_INLINE__ -D__NEW_TIMEVAL_DEFINITION_USED__ \
               -DNO_PPCINLINE_STDARG -Wa,-mregnames
   LDFLAGS  += -mcrt=$(CRT)
@@ -317,6 +317,10 @@ $(OBJDIR)/library.o: library.c ../include/mccinit.c \
   ../include/mui/TextEditor_mcc.h private.h rev.h
 
 #
+
+.PHONY: dump
+dump:
+	-$(OBJDUMP) --section-headers --all-headers --reloc --disassemble-all $(MCCTARGET) > $(MCCTARGET).dump
 
 .PHONY: clean
 clean:
