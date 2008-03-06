@@ -1,6 +1,6 @@
 ## chunk AUTH Pär Boberg
 ## language svenska
-## version $VER: TextEditor_mcp.ct 2.5 (03.11.07)
+## version $VER: TextEditor_mcp.ct 2.6 (06.03.08)
 HelpBubble_BlockQual
 Håll nere tangenten som du har valt här\noch flytta markören för att markera text.
 ;#DEF Move the cursor key and hold down the qualifier\nthat you set here to mark text.
@@ -638,3 +638,7 @@ MSG_HELP_SPELLCHECKER_SUGGEST_CMD
 Specifiera här kommandot som kommer att\nanvändas för att föreslå ett alternativt ord.\nSom förklarat ovan, vanligtvis så bör du\nspecifiera ett skript här.
 ;#DEF Specify here the command that will be used\nto suggest an alternate word. As explained above,\nusually you should specify a script here.
 ;#SET (158//)
+MSG_UNDO_SLIDER_FORMAT
+%ld (± 5)
+;#DEF %ld (± 5)
+;#SET (159//)
