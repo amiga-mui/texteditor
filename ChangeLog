@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-03-17  Thore Böckelmann <tboeckel@gmx.de>
+
+  * #?/vastubs.c, #?/Makefile: added vararg stubs for OS3 to be able to link
+    against clib2 which misses these stubs.
+
 2008-03-06 Pär Boberg <pbobbenb@spray.se>
 
    * mcp/locale/swedish.ct: Updated according to changes.

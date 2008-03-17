@@ -246,7 +246,8 @@ MCCOBJS = $(OBJDIR)/library.o \
           $(OBJDIR)/Search.o \
           $(OBJDIR)/SpellChecker.o \
           $(OBJDIR)/StyleOperators.o \
-          $(OBJDIR)/UndoFunctions.o
+          $(OBJDIR)/UndoFunctions.o \
+          $(OBJDIR)/vastubs.o
 
 TESTOBJS= $(OBJDIR)/TextEditor-Test.o \
           $(OBJDIR)/AllocBitMap.o \
@@ -275,7 +276,8 @@ TESTOBJS= $(OBJDIR)/TextEditor-Test.o \
           $(OBJDIR)/Search.o \
           $(OBJDIR)/SpellChecker.o \
           $(OBJDIR)/StyleOperators.o \
-          $(OBJDIR)/UndoFunctions.o
+          $(OBJDIR)/UndoFunctions.o \
+          $(OBJDIR)/vastubs.o
 
 #
 
