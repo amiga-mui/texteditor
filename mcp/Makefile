@@ -227,7 +227,8 @@ MCPOBJS = $(OBJDIR)/library.o \
           $(OBJDIR)/Dispatcher.o \
           $(OBJDIR)/Keybindings.o \
           $(OBJDIR)/KeyStorage.o \
-          $(OBJDIR)/ObjectCreator.o
+          $(OBJDIR)/ObjectCreator.o \
+          $(OBJDIR)/vastubs.o
 
 PREFOBJS= $(OBJDIR)/locale.o \
           $(OBJDIR)/CreatePrefsGroup.o \
@@ -236,7 +237,8 @@ PREFOBJS= $(OBJDIR)/locale.o \
           $(OBJDIR)/Keybindings.o \
           $(OBJDIR)/KeyStorage.o \
           $(OBJDIR)/ObjectCreator.o \
-          $(OBJDIR)/Preference.o
+          $(OBJDIR)/Preference.o \
+          $(OBJDIR)/vastubs.o
 
 # available catalog translations
 CATALOGS = $(LOCALE)/german.catalog \
