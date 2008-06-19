@@ -182,7 +182,7 @@ LONG LineCharsWidth(char *text, struct InstData *data)
 
   ENTER();
 
-  textlen = strlen(text)-1; // the last char is always a "\n"
+  textlen = text != NULL ? strlen(text)-1 : 0; // the last char is always a "\n"
 
   // check the innerwidth as well. But we also check if we need to
   // take care of any of the word wrapping techniques we provide
