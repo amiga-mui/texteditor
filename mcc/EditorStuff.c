@@ -154,9 +154,12 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
               break;
 
             case ID_CHRS:
+            {
               D(DBF_CLIPBOARD, "reading CHRS");
               SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
+
               data->HasChanged = TRUE;
+
               if(cn->cn_Size > 0 && !ownclip)
               {
                 char *contents;
@@ -258,7 +261,8 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
                 separator = 0;
                 ownclip   = FALSE;
               }
-              break;
+            }
+            break;
           }
         }
       }
