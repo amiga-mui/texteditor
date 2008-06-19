@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-06-20 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcc/HandleInput.c: fixed the mouse pointer flickering which was present when
+    moving the mouse throughout a TE.mcc object.
+  * mcc/MixedFunctions.c: fixed a potential NUL pointer access which might have
+    caused some crashes.
+
 2008-03-17  Thore Böckelmann <tboeckel@gmx.de>
 
   * #?/vastubs.c, #?/Makefile: added vararg stubs for OS3 to be able to link
