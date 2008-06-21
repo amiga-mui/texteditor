@@ -128,10 +128,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
       }
 
       if(isOverObject == TRUE)
-      {
-        if(data->activeSelectPointer == FALSE)
-          ShowSelectPointer(obj, data);
-      }
+        ShowSelectPointer(obj, data);
       else
         HideSelectPointer(obj, data);
 

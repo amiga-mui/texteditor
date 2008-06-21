@@ -388,8 +388,13 @@ void ShowSelectPointer(Object *obj, struct InstData *data)
   {
     // try to identify the black/white colors
     // of the current screen colormap
-    IdentifyPointerColors(obj);
+    if(data->activeSelectPointer == FALSE)
+      IdentifyPointerColors(obj);
 
+    // now we set the actual new custom window pointer. Please note
+    // that we can't unfortunately check for data->activeSelectPointer
+    // here because otherwise we might end up with the standard
+    // window pointer when quickly switching pointer TE.mcc
     #if defined(__amigaos4__)
     SetWindowPointer(_window(obj), WA_Pointer, data->PointerObj, TAG_DONE);
     #elif defined(__MORPHOS__)

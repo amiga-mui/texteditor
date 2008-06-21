@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-06-21 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcc/HandleInput.c: slightly reverted the last change to achieve a flicker
+    free custom select pointer as otherwise a user might end up with the
+    standard mouse pointer under some circumstances.
+
 2008-06-20 Jens Langner <Jens.Langner@light-speed.de>
 
   * mcc/HandleInput.c: fixed the mouse pointer flickering which was present when
