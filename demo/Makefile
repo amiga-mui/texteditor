@@ -216,7 +216,8 @@ endif
 # Here starts all stuff that is common for all target platforms and
 # hosts.
 
-OBJS = $(OBJDIR)/TextEditor-Demo.o
+OBJS = $(OBJDIR)/TextEditor-Demo.o \
+       $(OBJDIR)/vastubs.o
 
 #
 

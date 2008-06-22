@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.27 RELEASE ############################################################
+
+2008-06-22 Jens Langner <Jens.Langner@light-speed.de>
+
+  * misc: final v15.27 release preparations
+
 2008-06-21 Jens Langner <Jens.Langner@light-speed.de>
 
   * mcc/HandleInput.c: slightly reverted the last change to achieve a flicker
