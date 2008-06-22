@@ -1,5 +1,5 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.26 (08.02.2008)
+@$VER: TextEditor.Guide 15.27 (22.06.2008)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
@@ -339,6 +339,16 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.27 (22.06.2008)
+
+- fixed OS3 build where soem floating point math was always present and may have caused
+  to crash on non-FPU machines.
+- the wheel scrolling routines now respect the absolute values of WheelX/WheelY under
+  AmigaOS4. This should make wheel acceleration finally work.
+- fixed a bug in the custom pointer setup which left "phantom cursors" under certain
+  circumstances.
+- minor bug fixes.
 
 15.26 (08.02.2008)
 

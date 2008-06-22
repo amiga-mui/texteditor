@@ -16,32 +16,30 @@
 
  TextEditor class Support Site:  http://www.sf.net/projects/texteditor-mcc
 
- $Id$
+ $Id: vastubs.c 468 2008-03-17 08:55:58Z thboeckel $
 
 ***************************************************************************/
 
-#define LIB_VERSION    15
-#define LIB_REVISION   27
+#if defined(__VBCC__) || defined(NO_INLINE_STDARG)
+#if !defined(__PPC__)
 
-#define LIB_REV_STRING "15.27"
-#define LIB_DATE       "22.06.2008"
+#include <exec/types.h>
 
-#if defined(__PPC__)
-  #if defined(__MORPHOS__)
-    #define CPU " [MOS/PPC]"
-  #else
-    #define CPU " [OS4/PPC]"
-  #endif
-#elif defined(_M68060) || defined(__M68060) || defined(__mc68060)
-  #define CPU " [060]"
-#elif defined(_M68040) || defined(__M68040) || defined(__mc68040)
-  #define CPU " [040]"
-#elif defined(_M68030) || defined(__M68030) || defined(__mc68030)
-  #define CPU " [030]"
-#elif defined(_M68020) || defined(__M68020) || defined(__mc68020)
-  #define CPU " [020]"
+/* FIX V45 breakage... */
+#if INCLUDE_VERSION < 45
+#define MY_CONST_STRPTR CONST_STRPTR
 #else
-  #define CPU ""
+#define MY_CONST_STRPTR CONST STRPTR
 #endif
 
-#define LIB_COPYRIGHT  "Copyright (c) 2005-2008 TextEditor.mcc Open Source Team"
+#include <proto/intuition.h>
+
+APTR NewObject( struct IClass *classPtr, CONST_STRPTR classID, Tag tag1, ... )
+{ return NewObjectA(classPtr, classID, (struct TagItem *)&tag1); }
+ULONG SetAttrs( APTR object, ULONG tag1, ... )
+{ return SetAttrsA(object, (struct TagItem *)&tag1); }
+
+#else
+  #error "VARGS stubs are only save on m68k systems!"
+#endif
+#endif
