@@ -16,7 +16,7 @@
 
  TextEditor class Support Site:  http://www.sf.net/projects/texteditor-mcc
 
- $Id: vastubs.c 468 2008-03-17 08:55:58Z thboeckel $
+ $Id$
 
 ***************************************************************************/
 
