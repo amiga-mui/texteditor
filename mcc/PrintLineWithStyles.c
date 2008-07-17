@@ -264,7 +264,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
     {
       LONG p_length = c_length;
 
-      SetSoftStyle(rp, convert(GetStyle(x, line)), ~0);
+      SetSoftStyle(rp, convert(GetStyle(x, line)), AskSoftStyle(rp));
       if(styles)
       {
         while(*styles-1 <= x)
