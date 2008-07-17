@@ -483,8 +483,7 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
       SetFont(data->rport, data->font);
       Move(data->rport, xplace, yplace+data->rport->TxBaseline);
 
-      if((data->font->tf_Flags & FPF_PROPORTIONAL) &&
-         ((LONG)(xplace + *((short *)data->font->tf_CharKern-data->font->tf_LoChar+chars[1+start])) < data->xpos))
+      if(data->font->tf_Flags & FPF_PROPORTIONAL)
       {
         clipping = TRUE;
         AddClipping(data);
@@ -493,7 +492,7 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
       for(c = start; c <= stop; c++)
       {
         SetAPen(data->rport, ConvertPen(colors[1+c], line->line.Color, data));
-        SetSoftStyle(data->rport, styles[1+c], ~0);
+        SetSoftStyle(data->rport, styles[1+c], AskSoftStyle(data->rport));
         Text(data->rport, (STRPTR)&chars[1+c], 1);
       }
 

@@ -5,6 +5,17 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-07-17  Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/MixedFunctions.c, mcc/PrintLineWithStyles.c: removed the kerning check
+    for proportional fonts upon setting the cursor to a new position. This
+    caused no clipping and hence some additional pixels left of the line's first
+    character when changing that character to be underlined and then setting the
+    cursor somewhere else. Now clipping will be enabled for all proportional
+    fonts regardless of any kerning information. This fixes bug #1896999.
+    Additonally setting any style (bold, italic, underlined) is now done with
+    help of AskSoftStyle() in case a certain font for example cannot be underlined.
+
 #### v15.27 RELEASE ############################################################
 
 2008-06-22 Jens Langner <Jens.Langner@light-speed.de>
