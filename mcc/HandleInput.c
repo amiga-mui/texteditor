@@ -113,18 +113,26 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 
       if(_isinobject(obj, msg->imsg->MouseX, msg->imsg->MouseY))
       {
-        struct Layer_Info *li = &(_screen(obj)->LayerInfo);
-        struct Layer *layer;
-
-        // get the layer that belongs to the current mouse coordinates
-        LockLayerInfo(li);
-        layer = WhichLayer(li, _window(obj)->LeftEdge + msg->imsg->MouseX, _window(obj)->TopEdge + msg->imsg->MouseY);
-        UnlockLayerInfo(li);
-
-        // if the mouse is currently over the object and over the object's
-        // window we go and change the pointer to show the selection pointer
-        if(layer != NULL && layer->Window == _window(obj))
+        #if defined(__MORPHOS__)
+        if (IS_MORPHOS2)
           isOverObject = TRUE;
+        #endif
+
+        if (isOverObject == FALSE)
+        {
+          struct Layer_Info *li = &(_screen(obj)->LayerInfo);
+          struct Layer *layer;
+
+          // get the layer that belongs to the current mouse coordinates
+          LockLayerInfo(li);
+          layer = WhichLayer(li, _window(obj)->LeftEdge + msg->imsg->MouseX, _window(obj)->TopEdge + msg->imsg->MouseY);
+          UnlockLayerInfo(li);
+ 
+          // if the mouse is currently over the object and over the object's
+          // window we go and change the pointer to show the selection pointer
+          if(layer != NULL && layer->Window == _window(obj))
+            isOverObject = TRUE;
+        }
       }
 
       if(isOverObject == TRUE)

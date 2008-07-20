@@ -296,7 +296,7 @@ void SetupSelectPointer(struct InstData *data)
   ENTER();
 
   #if defined(__MORPHOS__)
-  if(((struct Library *)IntuitionBase)->lib_Version >= 50 && ((struct Library *)IntuitionBase)->lib_Revision >= 86)
+  if(IS_MORPHOS2)
     data->PointerObj = (APTR)POINTERTYPE_SELECTTEXT;
   #endif
 
@@ -343,6 +343,11 @@ void CleanupSelectPointer(struct InstData *data)
 {
   ENTER();
 
+  #if defined(__MORPHOS__)
+  if (IS_MORPHOS2)
+    data->PointerObj = NULL;
+  #endif
+
   if(data->PointerObj != NULL)
   {
     #if defined(DEBUG)
@@ -350,11 +355,10 @@ void CleanupSelectPointer(struct InstData *data)
       E(DBF_ALWAYS, "pointer was still active upon MUIM_Cleanup!!");
     #endif
 
-    #if defined(__amigaos4__)
+    #if defined(__amigaos4__) || defined(__MORPHOS__)
     DisposeObject(data->PointerObj);
     #elif defined(__MORPHOS__)
-    if ((IPTR)data->PointerObj != POINTERTYPE_SELECTTEXT)
-      DisposeObject(data->PointerObj);
+    DisposeObject(data->PointerObj);
     #else
     if(((struct Library *)IntuitionBase)->lib_Version >= 39)
     {
@@ -398,10 +402,7 @@ void ShowSelectPointer(Object *obj, struct InstData *data)
     #if defined(__amigaos4__)
     SetWindowPointer(_window(obj), WA_Pointer, data->PointerObj, TAG_DONE);
     #elif defined(__MORPHOS__)
-    if(((struct Library *)IntuitionBase)->lib_Version >= 50 && ((struct Library *)IntuitionBase)->lib_Revision >= 86)
-      SetWindowPointer(_window(obj), WA_PointerType, data->PointerObj, TAG_DONE);
-    else
-      SetWindowPointer(_window(obj), WA_Pointer, data->PointerObj, TAG_DONE);
+    SetWindowPointer(_window(obj), IS_MORPHOS2 ? WA_PointerType : WA_Pointer, data->PointerObj, TAG_DONE);
     #else
     if(((struct Library *)IntuitionBase)->lib_Version >= 39)
       SetWindowPointer(_window(obj), WA_Pointer, data->PointerObj, TAG_DONE);
