@@ -49,7 +49,16 @@
 
 // define memory flags not existing on older platforms
 #ifndef MEMF_SHARED
+#if defined(__MORPHOS__)
+#define MEMF_SHARED MEMF_ANY
+#else
 #define MEMF_SHARED MEMF_PUBLIC
+#endif
+#endif
+
+#if defined(__MORPHOS__)
+#include <proto/exec.h>
+#define IS_MORPHOS2 (((struct Library *)SysBase)->lib_Version >= 51)
 #endif
 
 // proper RAWKEY_ defines were first introduced in OS4 and MorphOS
