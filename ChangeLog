@@ -5,6 +5,14 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-08-12  Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/HandleARexx.c: the GOTOLINE and GOTOCOLUMN commands now return the final
+    line/column number instead of the boolean value TRUE. This makes it possible
+    to immediately check if the cursor movement has been done correctly. This
+    fixes bug #2045395. Note: Don't forget to FreeVec() the returned string as
+    stated in the Autodocs!!!!!
+
 2008-07-20  Ilkka Lehtoranta <ilkleht@isoveli.org>
 
   * mcc/HandleInput.c, mcc/Pointer.c, mcc/private.h: simplified handling of

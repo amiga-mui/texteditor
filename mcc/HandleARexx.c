@@ -153,12 +153,33 @@ static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struc
 
       case GOTOLINE:
         if(*args)
-          set(data->object, MUIA_TextEditor_CursorY, *(ULONG *)*args);
+        {
+          STRPTR buffer;
+
+          if((buffer = AllocVec(16, MEMF_SHARED)))
+          {
+            set(data->object, MUIA_TextEditor_CursorY, *(ULONG *)*args);
+
+            // return the current line number, this may differ from the input value!
+            snprintf(buffer, 16, "%ld", xget(data->object, MUIA_TextEditor_CursorY));
+            result = (ULONG)buffer;
+          }
+        }
         break;
 
       case GOTOCOLUMN:
         if(*args)
-          set(data->object, MUIA_TextEditor_CursorX, *(ULONG *)*args);
+        {
+          STRPTR buffer;
+
+          if((buffer = AllocVec(16, MEMF_SHARED)))
+          {
+            set(data->object, MUIA_TextEditor_CursorX, *(ULONG *)*args);
+            // return the current column number, this may differ from the input value!
+            snprintf(buffer, 16, "%ld", xget(data->object, MUIA_TextEditor_CursorX));
+            result = (ULONG)buffer;
+          }
+        }
         break;
 
       case CURSOR:
@@ -275,7 +296,7 @@ static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struc
       {
         STRPTR buffer;
 
-        if((buffer = AllocVec(6, MEMF_SHARED)))
+        if((buffer = AllocVec(16, MEMF_SHARED)))
         {
           LONG pos = 0;
 
@@ -284,7 +305,7 @@ static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struc
           else
             pos = xget(data->object, MUIA_TextEditor_CursorX);
 
-          snprintf(buffer, 6, "%ld", pos);
+          snprintf(buffer, 16, "%ld", pos);
 
           result = (ULONG)buffer;
         }
