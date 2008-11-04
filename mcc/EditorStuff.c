@@ -222,7 +222,7 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
                   contents[length] = '\0';
 
                   #if defined(__MORPHOS__)
-                  if (codeset == UNICODE_UTF8)
+                  if (codeset == CODESET_UTF8)
                   {
                     if (IS_MORPHOS2)
                       utf8_to_ansi(contents, contents);
