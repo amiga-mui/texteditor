@@ -608,6 +608,7 @@ enum
 #define ID_SBAR    MAKE_ID('S','B','A','R')
 #define ID_COLS    MAKE_ID('C','O','L','S')
 #define ID_STYL    MAKE_ID('S','T','Y','L')
+#define ID_CSET    MAKE_ID('C','S','E','T')
 
 #include "amiga-align.h"
 struct te_key

@@ -37,6 +37,32 @@
 BOOL InitClipboard(struct InstData *data, ULONG flags);
 void EndClipSession(struct InstData *data);
 
+#if defined(__MORPHOS__)
+#include <proto/keymap.h>
+#include <proto/locale.h>
+
+static void utf8_to_ansi(CONST_STRPTR src, STRPTR dst)
+{
+   static struct KeyMap *keymap;
+   ULONG octets;
+
+   keymap = AskKeyMapDefault();
+
+   do
+   {
+      WCHAR wc;
+      UBYTE c;
+
+      octets = UTF8_Decode(src, &wc);
+      c = ToANSI(wc, keymap);
+
+      *dst++ = c;
+      src += octets;
+   }
+   while (octets > 0);
+}
+#endif
+
 /*----------------------*
  * Paste from Clipboard *
  *----------------------*/
@@ -60,9 +86,10 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
        StopChunk(data->iff, ID_FTXT, ID_HIGH) == 0 &&
        StopChunk(data->iff, ID_FTXT, ID_SBAR) == 0 &&
        StopChunk(data->iff, ID_FTXT, ID_COLS) == 0 &&
-       StopChunk(data->iff, ID_FTXT, ID_STYL) == 0)
+       StopChunk(data->iff, ID_FTXT, ID_STYL) == 0 &&
+       StopChunk(data->iff, ID_FTXT, ID_CSET) == 0)
     {
-      LONG error;
+      LONG error, codeset = 0;
       UWORD flow = MUIV_TextEditor_Flow_Left;
       UWORD color = FALSE;
       UWORD separator = 0;
@@ -84,6 +111,20 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
         {
           switch (cn->cn_ID)
           {
+            case ID_CSET:
+              D(DBF_CLIPBOARD, "reading FLOW");
+              SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
+              if(cn->cn_Size >= 4)
+              {
+                /* Only the first four bytes are interesting */
+                if(ReadChunkBytes(data->iff, &codeset, 4) != 4)
+                {
+                  codeset = 0;
+                }
+                SHOWVALUE(DBF_CLIPBOARD, codeset);
+              }
+              break;
+
             case ID_FLOW:
               D(DBF_CLIPBOARD, "reading FLOW");
               SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
@@ -179,6 +220,14 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
                     length--;
                   }
                   contents[length] = '\0';
+
+                  #if defined(__MORPHOS__)
+                  if (codeset == UNICODE_UTF8)
+                  {
+                    if (IS_MORPHOS2)
+                      utf8_to_ansi(contents, contents);
+                  }
+                  #endif
 
                   if((line = ImportText(contents, data, &ImPlainHook, data->ImportWrap)))
                   {
