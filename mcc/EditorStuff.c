@@ -41,25 +41,86 @@ void EndClipSession(struct InstData *data);
 #include <proto/keymap.h>
 #include <proto/locale.h>
 
-static void utf8_to_ansi(CONST_STRPTR src, STRPTR dst)
+static char *utf8_to_ansi(struct InstData *data, STRPTR src)
 {
    static struct KeyMap *keymap;
-   ULONG octets;
+	CONST_STRPTR ptr;
+   STRPTR dst;
+   ULONG octets, strlength;
 
    keymap = AskKeyMapDefault();
+
+	strlength = 0;
+	ptr = src;
 
    do
    {
       WCHAR wc;
       UBYTE c;
 
-      octets = UTF8_Decode(src, &wc);
+      ptr += (octets = UTF8_Decode(ptr, &wc));
       c = ToANSI(wc, keymap);
 
-      *dst++ = c;
-      src += octets;
+      strlength++;
+
+      /* ToANSI() returns '?' if there is not matching code point in the current keymap */
+      if (c == '?' && wc != '?')
+      {
+         /* If direct conversion fails try compatibility decomposition (but without recursion) */
+         CONST_WSTRPTR p = UCS4_Decompose(wc);
+
+         if (p)
+         {
+            while (p[1])
+            {
+               strlength++;
+               p++;
+            }
+         }
+      }
    }
    while (octets > 0);
+
+	dst = MyAllocPooled(data->mypool, strlength);
+
+	if (dst)
+	{
+      STRPTR bufptr = dst;
+
+      ptr = src;
+
+      do
+      {
+         WCHAR wc;
+         UBYTE c;
+
+         ptr += (octets = UTF8_Decode(ptr, &wc));
+         c = ToANSI(wc, keymap);
+
+         *bufptr++ = c;
+
+         if (c == '?' && wc != '?')
+         {
+            CONST_WSTRPTR p = UCS4_Decompose(wc);
+
+            if (p)
+            {
+               bufptr--;
+
+               while (*p)
+               {
+                  *bufptr++ = ToANSI(*p, keymap);
+                  p++;
+               }
+            }
+         }
+      }
+      while (octets > 0);
+
+      MyFreePooled(data->mypool, src);   // Free original buffer
+   }
+
+   return dst ? dst : src;
 }
 #endif
 
@@ -225,7 +286,7 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
                   if (codeset == CODESET_UTF8)
                   {
                     if (IS_MORPHOS2)
-                      utf8_to_ansi(contents, contents);
+                      contents = utf8_to_ansi(data, contents);
                   }
                   #endif
 
