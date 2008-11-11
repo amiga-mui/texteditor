@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-11-11  Ilkka Lehtoranta <ilkleht@isoveli.org>
+
+  * mcc/EditorStuff.c: when pasting UTF-8 try non-recursive compatibility
+    decomposition if equivalent mapping is not found from current keymap.
+
 2008-11-04  Ilkka Lehtoranta <ilkleht@isoveli.org>
 
   * mcc/EditorStuff.c: paste from clipboard now also reads CSET chunk and
