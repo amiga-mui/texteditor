@@ -44,14 +44,16 @@ void EndClipSession(struct InstData *data);
 static char *utf8_to_ansi(struct InstData *data, STRPTR src)
 {
    static struct KeyMap *keymap;
-	CONST_STRPTR ptr;
+   CONST_STRPTR ptr;
    STRPTR dst;
    ULONG octets, strlength;
 
+   ENTER();
+
    keymap = AskKeyMapDefault();
 
-	strlength = 0;
-	ptr = src;
+   strlength = 0;
+   ptr = src;
 
    do
    {
@@ -81,10 +83,10 @@ static char *utf8_to_ansi(struct InstData *data, STRPTR src)
    }
    while (octets > 0);
 
-	dst = MyAllocPooled(data->mypool, strlength);
+   dst = MyAllocPooled(data->mypool, strlength);
 
-	if (dst)
-	{
+   if (dst)
+   {
       STRPTR bufptr = dst;
 
       ptr = src;
@@ -120,7 +122,11 @@ static char *utf8_to_ansi(struct InstData *data, STRPTR src)
       MyFreePooled(data->mypool, src);   // Free original buffer
    }
 
-   return dst ? dst : src;
+   if(dst == NULL)
+     dst = src;
+
+   RETURN(dst);
+   return dst;
 }
 #endif
 

@@ -9,6 +9,8 @@ $URL$
 
   * mcc/EditorStuff.c: slightly reworked the obscure width calculation in the
     UpdateChange() function and added a missing LEAVE() macro call.
+  * mcc/EditorStuff.c: added the usual ENTER()/RETURN() macros the the UTF8
+    conversion function.
 
 2008-11-11  Ilkka Lehtoranta <ilkleht@isoveli.org>
 
