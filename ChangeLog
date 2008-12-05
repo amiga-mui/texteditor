@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-12-05  Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/EditorStuff.c: slightly reworked the obscure width calculation in the
+    UpdateChange() function and added a missing LEAVE() macro call.
+
 2008-11-11  Ilkka Lehtoranta <ilkleht@isoveli.org>
 
   * mcc/EditorStuff.c: when pasting UTF-8 try non-recursive compatibility

@@ -1027,9 +1027,10 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
   line_nr = LineToVisual(line, data);
   orgline_nr = line_nr;
 
-  while((skip + (width = LineCharsWidth(line->line.Contents+skip, data))) < x)
+  do
   {
-    if(width > 0)
+    width = LineCharsWidth(line->line.Contents + skip, data);
+    if(width > 0 && skip + width < x)
     {
       lineabove_width = width;
       skip += width;
@@ -1038,6 +1039,7 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
     else
       break;
   }
+  while(TRUE);
 
   if(characters != NULL)
   {
@@ -1096,7 +1098,10 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
       skip  += newwidth;
       width -= newwidth;
       if(skip >= (LONG)line->line.Length)
+      {
+        LEAVE();
         return;
+      }
     }
   }
   OptimizedPrint(skip, line, line_nr, width, data);
