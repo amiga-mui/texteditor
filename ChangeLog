@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-12-08  Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Dispatcher.c: added MEMF_CLEAR to the pool's memory flags to make sure
+    that every allocation is cleared, as it seems the most prominent crashes are
+    caused by unrestricted string accesses (i.e. by strlen() operating after the
+    trailing NUL byte).
+
 2008-12-05  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: slightly reworked the obscure width calculation in the
