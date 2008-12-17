@@ -7,6 +7,7 @@ $URL$
 
 2008-12-17  Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/ExportHook.c: added some missing NULL pointer checks.
   * mcc/SpellChecker.c: replaced the obsolete CreateMsgPortl() and
     DeleteMsgPort() calls with AllocSysObject() and FreeSysObject() call for the
     OS4 build.
