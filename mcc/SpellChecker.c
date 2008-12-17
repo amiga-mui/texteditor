@@ -100,7 +100,12 @@ static LONG SendRexx(char *word, const char *command, UNUSED struct InstData *da
 
   if(rexxport != NULL)
   {
-    if((clipport = CreateMsgPort()) != NULL)
+    #if defined(__amigaos4__)
+    clipport = AllocSysObjectTags(ASOT_PORT, TAG_DONE);
+    #else
+    clipport = CreateMsgPort();
+    #endif
+    if(clipport != NULL)
     {
       rxmsg = CreateRexxMsg(clipport, NULL, NULL);
       rxmsg->rm_Action = RXCOMM;
@@ -120,7 +125,11 @@ static LONG SendRexx(char *word, const char *command, UNUSED struct InstData *da
       }
       DeleteArgstring((APTR)rxmsg->rm_Args[0]);
       DeleteRexxMsg(rxmsg);
+      #if defined(__amigaos4__)
+      FreeSysObject(ASOT_PORT, clipport);
+      #else
       DeleteMsgPort(clipport);
+      #endif
     }
   }
 
@@ -341,7 +350,7 @@ void SuggestWord (struct InstData *data)
     {
       SetCursor(data->CPos_X, line, FALSE, data);
     }
-*/  
+*/
 
     while(data->CPos_X && (IsAlpha(data->mylocale, *(line->line.Contents+data->CPos_X-1)) || *(line->line.Contents+data->CPos_X-1) == '-' || (*(line->line.Contents+data->CPos_X-1) == '\'')))
     {
