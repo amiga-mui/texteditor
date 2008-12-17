@@ -129,11 +129,19 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
     struct InstData *data = INST_DATA(cl, obj);
     data->object = obj;
 
-    if((data->mypool = CreatePool(MEMF_SHARED|MEMF_CLEAR, 3*1024, 512)))
+    #if defined(__amigaos4__)
+    data->mypool = AllocSysObjectTags(ASOT_MEMPOOL, ASOPOOL_MFlags, MEMF_SHARED|MEMF_CLEAR,
+                                                    ASOPOOL_Puddle, 3*1024,
+                                                    ASOPOOL_Threshold, 512,
+                                                    TAG_DONE);
+    #else
+    data->mypool = CreatePool(MEMF_ANY|MEMF_CLEAR, 3*1024, 512);
+    #endif
+    if(data->mypool != NULL)
     {
-      if((data->mylocale = OpenLocale(NULL)))
+      if((data->mylocale = OpenLocale(NULL)) != NULL)
       {
-        if((data->firstline = AllocLine(data)))
+        if((data->firstline = AllocLine(data)) != NULL)
         {
           if(Init_LineNode(data->firstline, NULL, "\n", data))
           {
@@ -184,10 +192,20 @@ ULONG Dispose(struct IClass *cl, Object *obj, Msg msg)
   ENTER();
 
   ResizeUndoBuffer(data, 0);
-  if(data->mylocale)
+  if(data->mylocale != NULL)
+  {
     CloseLocale(data->mylocale);
-  if(data->mypool)
+    data->mylocale = NULL;
+  }
+  if(data->mypool != NULL)
+  {
+    #if defined(__amigaos4__)
+    FreeSysObject(ASOT_MEMPOOL, data->mypool);
+    #else
     DeletePool(data->mypool);
+    #endif
+    data->mypool = NULL;
+  }
 
   LEAVE();
   return(DoSuperMethodA(cl, obj, msg));
