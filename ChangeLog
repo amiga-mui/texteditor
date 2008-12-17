@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-12-17 Jens Langner <Jens.Langner@light-speed.de>
+
+  * Makefile: removed the printf usage with the ANSI codes and replaced them
+    by the more intuitive CC/LD echo output.
+
 2008-12-17  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ExportHook.c: added some missing NULL pointer checks.

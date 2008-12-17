@@ -279,40 +279,41 @@ TESTOBJS= $(OBJDIR)/TextEditor-Test.o \
           $(OBJDIR)/UndoFunctions.o \
           $(OBJDIR)/vastubs.o
 
-#
-
+# main target
+.PHONY: all
 all: $(BINDIR) $(OBJDIR) $(MCCTARGET) $(TESTTARGET)
 
 # make the object directories
 $(OBJDIR):
-	@printf '\033[33mGenerating $@ directory\033[0m\n'
+	@echo "  MK $@"
 	@$(MKDIR) $(OBJDIR)
 
 # make the binary directories
 $(BINDIR):
-	@printf '\033[33mGenerating $@ directory\033[0m\n'
+	@echo "  MK $@"
 	@$(MKDIR) $(BINDIR)
 
-#
-
+# for compiling single .c files
 $(OBJDIR)/%.o: %.c
-	@printf '\033[32mCompiling $<\033[0m\n'
+	@echo "  CC $<"
 	@$(CC) $(CFLAGS) $< -o $@
 
 $(OBJDIR)/mccclass_68k.o: ../include/mccclass_68k.c
-	@printf '\033[32mCompiling $<\033[0m\n'
+	@echo "  CC $<"
 	@$(CC) $(CFLAGS) $< -o $@
 
 #
 
 $(MCCTARGET): $(M68KSTUBS) $(MCCOBJS)
-	@printf '\033[32mLinking \033[1m$@\033[0m\n'
+	@echo "  LD $@.debug"
 	@$(CC) -nostartfiles $(LDFLAGS) -o $@.debug $(MCCOBJS) $(M68KSTUBS) $(LDLIBS) -Wl,-Map,$@.map
+	@echo "  LD $@"
 	@$(STRIP) --preserve-dates -R.comment -R.sdata2 -S -o $@ $@.debug
 
 $(TESTTARGET): $(TESTOBJS)
-	@printf '\033[32mLinking \033[1m$@\033[0m\n'
+	@echo "  LD $@.debug"
 	@$(CC) $(LDFLAGS) -o $@.debug $(TESTOBJS) $(LDLIBS) -Wl,-Map,$@.map
+	@echo "  LD $@"
 	@$(STRIP) --preserve-dates -R.comment -R.sdata2 -S -o $@ $@.debug
 
 $(OBJDIR)/library.o: library.c ../include/mccinit.c \
