@@ -7,6 +7,9 @@ $URL$
 
 2008-12-17  Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/SpellChecker.c: replaced the obsolete CreateMsgPortl() and
+    DeleteMsgPort() calls with AllocSysObject() and FreeSysObject() call for the
+    OS4 build.
   * mcc/Dispatcher.c: replaced the obsolete CreatePool() and DeletePool() calls
     with AllocSysObject() and FreeSysObject() call for the OS4 build. Also
     restored the old MEMF_ANY memory flags for the other platforms. For OS4
