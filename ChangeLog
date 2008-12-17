@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-12-17  Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Dispatcher.c: replaced the obsolete CreatePool() and DeletePool() calls
+    with AllocSysObject() and FreeSysObject() call for the OS4 build. Also
+    restored the old MEMF_ANY memory flags for the other platforms. For OS4
+    MEMF_SHARED will be used as before.
+
 2008-12-08  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Dispatcher.c: added MEMF_CLEAR to the pool's memory flags to make sure
