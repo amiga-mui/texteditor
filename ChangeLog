@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-12-21 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/AllocBitMap.c: replaced the OS3 specific part (and the deprecated
+    AllocMem and AllocVec calls) by simplified code.
+
 2008-12-17 Jens Langner <Jens.Langner@light-speed.de>
 
   * Makefile: removed the printf usage with the ANSI codes and replaced them

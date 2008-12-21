@@ -37,8 +37,13 @@
 
 struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG width), REG(d1, LONG height), REG(d2, LONG depth), REG(d3, LONG flags), REG(a0, struct BitMap *friend))
 {
+  struct BitMap *bm = NULL;
+
   ENTER();
 
+  #if defined(__amigaos4__)
+  bm = AllocBitMap(width,height,depth,flags,friend);
+  #else
   if(USE_OS3)
   {
     if(friend != NULL)
@@ -50,14 +55,11 @@ struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG width), REG(d1, LONG he
         friend = NULL;
     }
 
-    LEAVE();
-    return AllocBitMap(width,height,depth,flags,friend);
+    bm = AllocBitMap(width,height,depth,flags,friend);
   }
   else
   {
-    struct BitMap *bm = AllocMem(sizeof(struct BitMap), MEMF_SHARED|MEMF_CLEAR);
-
-    if(bm != NULL)
+    if((bm = (struct BitMap *)AllocMem(sizeof(*bm), MEMF_SHARED|MEMF_CLEAR);) != NULL)
     {
       int i, plsize=RASSIZE(width,height);
 
@@ -67,19 +69,18 @@ struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG width), REG(d1, LONG he
       {
         for(i=1;i<depth;i++)
           bm->Planes[i] = (PLANEPTR)(((ULONG)bm->Planes[i-1]) + plsize);
-
-        LEAVE();
-        return bm;
       }
       else
       {
-        FreeMem(bm,sizeof(struct BitMap));
+        FreeMem(bm,sizeof(*bm));
+        bm = NULL;
       }
     }
-
-    RETURN(NULL);
-    return NULL;
   }
+  #endif
+
+  RETURN(bm);
+  return bm;
 }
 
 
@@ -89,6 +90,9 @@ VOID SAVEDS ASM MUIG_FreeBitMap(REG(a0, struct BitMap *bm))
 
   WaitBlit();
 
+  #if defined(__amigaos4__)
+  FreeBitMap(bm);
+  #else
   if(USE_OS3)
   {
     FreeBitMap(bm);
@@ -98,6 +102,7 @@ VOID SAVEDS ASM MUIG_FreeBitMap(REG(a0, struct BitMap *bm))
     FreeVec(bm->Planes[0]);
     FreeMem(bm,sizeof(struct BitMap));
   }
+  #endif
 
   LEAVE();
 }
