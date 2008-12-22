@@ -59,7 +59,7 @@ struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG width), REG(d1, LONG he
   }
   else
   {
-    if((bm = (struct BitMap *)AllocMem(sizeof(*bm), MEMF_SHARED|MEMF_CLEAR);) != NULL)
+    if((bm = (struct BitMap *)AllocMem(sizeof(*bm), MEMF_SHARED|MEMF_CLEAR)) != NULL)
     {
       int i, plsize=RASSIZE(width,height);
 
