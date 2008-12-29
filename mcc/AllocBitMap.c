@@ -43,6 +43,8 @@ struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG width), REG(d1, LONG he
 
   #if defined(__amigaos4__)
   bm = AllocBitMap(width,height,depth,flags,friend);
+  #elif defined(__MORPHOS__)
+  bm = AllocBitMap(width,height,depth,flags | BMF_MINPLANES | BMF_DISPLAYABLE, friend);
   #else
   if(USE_OS3)
   {
@@ -59,7 +61,7 @@ struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG width), REG(d1, LONG he
   }
   else
   {
-    if((bm = (struct BitMap *)AllocMem(sizeof(*bm), MEMF_SHARED|MEMF_CLEAR)) != NULL)
+    if((bm = (struct BitMap *)AllocMem(sizeof(*bm), MEMF_CLEAR)) != NULL)
     {
       int i, plsize=RASSIZE(width,height);
 
@@ -88,11 +90,11 @@ VOID SAVEDS ASM MUIG_FreeBitMap(REG(a0, struct BitMap *bm))
 {
   ENTER();
 
-  WaitBlit();
-
-  #if defined(__amigaos4__)
+  #if defined(__amigaos4__) || defined(__MORPHOS__)
   FreeBitMap(bm);
   #else
+  WaitBlit();  /* OCS/AGA need this before FreeBitMap() call */
+
   if(USE_OS3)
   {
     FreeBitMap(bm);

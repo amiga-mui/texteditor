@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2008-12-29 Ilkka Lehtoranta <ilkleht@isoveli.org>
+
+  * mcc/AllocBitMap.c: Also MorphOS build is now using AllocBitMap()/FreeBitMap()
+    only. For maximum performance VMEM bitmap is used. WaitBlit() is now called
+    only for OS3 (CGX and P96 synchronise blitters automatically).
+
 2008-12-21 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/AllocBitMap.c: replaced the OS3 specific part (and the deprecated
