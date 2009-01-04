@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.28 RELEASE ############################################################
+
+2009-01-04 Jens Langner <Jens.Langner@light-speed.de>
+
+  * misc: final v15.28 release preparations
+
 2008-12-29 Ilkka Lehtoranta <ilkleht@isoveli.org>
 
   * mcc/AllocBitMap.c: Also MorphOS build is now using AllocBitMap()/FreeBitMap()
