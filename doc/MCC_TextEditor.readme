@@ -1,9 +1,9 @@
-Short:        TextEditor custom class for MUI, V15.27
+Short:        TextEditor custom class for MUI, V15.28
 Author:       TextEditor.mcc Open Source Team
 Uploader:     Jens Langner <Jens.Langner@light-speed.de>
 Type:         dev/mui
-Version:      15.27
-Replaces:     dev/mui/MCC_TextEditor-15.26.lha
+Version:      15.28
+Replaces:     dev/mui/MCC_TextEditor-15.27.lha
 Requires:     AmigaOS 3.0+ or MorphOS, MUI 3.8+, 68020+/PPC604e+
 Architecture: ppc-amigaos >= 4.0.0; m68k-amigaos >= 3.0; ppc-morphos >= 1.4.2
 
@@ -38,7 +38,7 @@ LEGALESE
 
 TextEditor.mcc was originally written in 1997 and is Copyright (C) 1997-2000
 by Allan Odgaard. As of version 15.10, released in April 2005, the gadget is
-maintained and Copyright (C) 2005-2007 by the TextEditor.mcc Open Source Team.
+maintained and Copyright (C) 2005-2009 by the TextEditor.mcc Open Source Team.
 
 TextEditor.mcc is distributed under the GNU Lesser General Public License
 (LGPL) and the development is hosted at SourceForge.net:
