@@ -1,5 +1,5 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.27 (22.06.2008)
+@$VER: TextEditor.Guide 15.28 (04.01.2009)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
@@ -339,6 +339,14 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.28 (04.01.2009)
+
+- the GOTOLINE and GOTOCOLUMN return the final line/column number intstead of the boolean
+  value TRUE. This allows to immediately check the cursor movement.
+- pasting UTF8 encoded text via MorphOS is possible now and will be converted to ASCII
+  immediately.
+- several minor bugfixes.
 
 15.27 (22.06.2008)
 
@@ -830,7 +838,7 @@ Modula-2:   Sönke Tesch (soenke.tesch@elmshorn.netsurf.de)
 
 MUI - Magic User Interface
 
-(C) 1992-2006 by Stefan Stuntz
+(C) 1992-2009 by Stefan Stuntz
 
 
 MUI is a system to generate and maintain graphical user interfaces. With the
