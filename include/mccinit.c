@@ -1,7 +1,7 @@
 /*******************************************************************************
 
         Name:           mccinit.c
-        Versionstring:  $VER: mccinit.c 1.12 (27.03.2009)
+        Versionstring:  $VER: mccinit.c 1.13 (01.04.2009)
         Author:         Jens Langner <Jens.Langner@light-speed.de>
         Distribution:   PD (public domain)
         Description:    library init file for easy generation of a MUI
@@ -44,6 +44,8 @@
                      MorphOS SDK.
   1.12  27.03.2009 : integrated some changes which should make mccinit usable
                      for AROS builds.
+  1.13  01.04.2009 : fixed the broken prototype for the assembler stackswap_call
+                     function.
 
  About:
 
@@ -529,11 +531,11 @@ const USED_VAR ULONG __abox__ = 1;
 
 /* generic StackSwap() function which calls function() surrounded by
    StackSwap() calls */
-extern REGARGS ULONG stackswap_call(struct StackSwapStruct *stack,
-                                    ULONG (*function)(struct LibraryHeader *),
-                                    struct LibraryHeader *arg);
-
 #if defined(__mc68000__)
+ULONG stackswap_call(struct StackSwapStruct *stack,
+                     ULONG (*function)(struct LibraryHeader *),
+                     struct LibraryHeader *arg);
+
 asm(".text                    \n\
      .even                    \n\
      .globl _stackswap_call   \n\
