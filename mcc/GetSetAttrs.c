@@ -32,7 +32,7 @@
 
 #include "private.h"
 
-#include "rev.h"
+#include "version.h"
 
 ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
 {

@@ -1,7 +1,7 @@
 /*******************************************************************************
 
         Name:           mccinit.c
-        Versionstring:  $VER: mccinit.c 1.11 (01.02.2008)
+        Versionstring:  $VER: mccinit.c 1.12 (27.03.2009)
         Author:         Jens Langner <Jens.Langner@light-speed.de>
         Distribution:   PD (public domain)
         Description:    library init file for easy generation of a MUI
@@ -42,6 +42,8 @@
                      is allocated from global memory now.
   1.11  01.02.2008 : fixed some minor compiler warnings when compiled using the
                      MorphOS SDK.
+  1.12  27.03.2009 : integrated some changes which should make mccinit usable
+                     for AROS builds.
 
  About:
 
@@ -160,6 +162,8 @@
 #include <proto/graphics.h>
 #include <proto/intuition.h>
 
+#include "SDI_compiler.h"
+
 #if defined(__amigaos4__)
 struct Library *MUIMasterBase = NULL;
 struct Library *SysBase       = NULL;
@@ -180,7 +184,11 @@ struct Interface *INewlib = NULL;
 #else
 struct Library        *MUIMasterBase = NULL;
 struct ExecBase       *SysBase       = NULL;
+#if defined(__AROS__)
+struct UtilityBase    *UtilityBase   = NULL;
+#else
 struct Library        *UtilityBase   = NULL;
+#endif
 struct DosLibrary     *DOSBase       = NULL;
 struct GfxBase        *GfxBase       = NULL;
 struct IntuitionBase  *IntuitionBase = NULL;
@@ -295,7 +303,7 @@ static ULONG                  LIBFUNC MCC_Query  (void);
 
 static struct LibraryHeader * LIBFUNC LibInit    (REG(d0, struct LibraryHeader *base), REG(a0, BPTR librarySegment), REG(a6, struct ExecBase *sb));
 static BPTR                   LIBFUNC LibExpunge (REG(a6, struct LibraryHeader *base));
-static struct LibraryHeader * LIBFUNC LibOpen    (REG(a6, struct LibraryHeader *base));
+static struct LibraryHeader * LIBFUNC LibOpen    (REG(d0, ULONG version), REG(a6, struct LibraryHeader *base));
 static BPTR                   LIBFUNC LibClose   (REG(a6, struct LibraryHeader *base));
 static LONG                   LIBFUNC LibNull    (void);
 static ULONG                  LIBFUNC MCC_Query  (REG(d0, LONG which));
@@ -461,12 +469,12 @@ STATIC CONST CONST_APTR LibVectors[] =
   (CONST_APTR)-1
 };
 
-STATIC CONST ULONG LibInitTab[] =
+STATIC CONST IPTR LibInitTab[] =
 {
   sizeof(struct LibraryHeader),
-  (ULONG)LibVectors,
-  (ULONG)NULL,
-  (ULONG)LibInit
+  (IPTR)LibVectors,
+  (IPTR)NULL,
+  (IPTR)LibInit
 };
 
 #endif
@@ -481,6 +489,8 @@ static const USED_VAR struct Resident ROMTag =
   RTF_AUTOINIT|RTF_NATIVE,      // The Library should be set up according to the given table.
   #elif defined(__MORPHOS__)
   RTF_AUTOINIT|RTF_PPC,
+  #elif defined(__AROS__)
+  RTF_AUTOINIT|RTF_EXTENDED,
   #else
   RTF_AUTOINIT,
   #endif
@@ -494,7 +504,7 @@ static const USED_VAR struct Resident ROMTag =
   #else
   (APTR)LibInitTab,
   #endif
-  #if defined(__MORPHOS__)
+  #if defined(__MORPHOS__) || defined(__AROS__)
   REVISION,
   0
   #endif
@@ -506,7 +516,6 @@ static const USED_VAR struct Resident ROMTag =
  * one for the ppc.library.
  * ** IMPORTANT **
  */
-const USED_VAR ULONG __amigappc__ = 1;
 const USED_VAR ULONG __abox__ = 1;
 
 #endif /* __MORPHOS__ */
@@ -520,9 +529,9 @@ const USED_VAR ULONG __abox__ = 1;
 
 /* generic StackSwap() function which calls function() surrounded by
    StackSwap() calls */
-extern ULONG stackswap_call(struct StackSwapStruct *stack,
-                            ULONG (*function)(struct LibraryHeader *),
-                            struct LibraryHeader *arg);
+extern REGARGS ULONG stackswap_call(struct StackSwapStruct *stack,
+                                    ULONG (*function)(struct LibraryHeader *),
+                                    struct LibraryHeader *arg);
 
 #if defined(__mc68000__)
 asm(".text                    \n\
@@ -546,15 +555,31 @@ asm(".text                    \n\
       movel d2,d0             \n\
       moveml sp@+,#0x440c     \n\
       rts");
-#elif !defined(__MORPHOS__)
+#elif defined(__MORPHOS__)
 ULONG stackswap_call(struct StackSwapStruct *stack,
                      ULONG (*function)(struct LibraryHeader *),
                      struct LibraryHeader *arg)
 {
+   struct PPCStackSwapArgs swapargs;
+
+   swapargs.Args[0] = (ULONG)arg;
+
+   return NewPPCStackSwap(stack, function, &swapargs);
+}
+#else
+/* FIXME: This does not work because it can't work. 'arg' variable is also on stack.
+          On AmigaOS v4 it ocassionally works because function's parameters are placed
+          in registers on PPC */
+ULONG REGARGS stackswap_call(struct StackSwapStruct *stack,
+                             ULONG (*function)(struct LibraryHeader *),
+                             struct LibraryHeader *arg)
+{
    register ULONG result;
+
    StackSwap(stack);
    result = function(arg);
    StackSwap(stack);
+
    return result;
 }
 #endif
@@ -575,7 +600,7 @@ static BOOL callMccFunction(ULONG (*function)(struct LibraryHeader *), struct Li
   NewGetTaskAttrsA(tc, &stacksize, sizeof(ULONG), TASKINFOTYPE_STACKSIZE, NULL);
   #else
   // on all other systems we query via SPUpper-SPLower calculation
-  stacksize = tc->tc_SPUpper - tc->tc_SPLower;
+  stacksize = (ULONG)tc->tc_SPUpper - (ULONG)tc->tc_SPLower;
   #endif
 
   // Swap stacks only if current stack is insufficient
@@ -587,21 +612,12 @@ static BOOL callMccFunction(ULONG (*function)(struct LibraryHeader *), struct Li
     {
       if((stack->stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
       {
-        #if defined(__MORPHOS__)
-        struct PPCStackSwapArgs swapargs;
-        #endif
-
         // perform the StackSwap
         stack->stk_Upper = (ULONG)stack->stk_Lower + MIN_STACKSIZE;
         stack->stk_Pointer = (APTR)stack->stk_Upper;
 
         // call routine but with embedding it into a [NewPPC]StackSwap()
-        #if defined(__MORPHOS__)
-        swapargs.Args[0] = (ULONG)arg;
-        success = NewPPCStackSwap(stack, function, &swapargs);
-        #else
         success = stackswap_call(stack, function, arg);
-        #endif
 
         FreeVec(stack->stk_Lower);
       }
@@ -1000,7 +1016,7 @@ static struct LibraryHeader *LibOpen(void)
 {
   struct LibraryHeader *base = (struct LibraryHeader *)REG_A6;
 #else
-static struct LibraryHeader * LIBFUNC LibOpen(REG(a6, struct LibraryHeader *base))
+static struct LibraryHeader * LIBFUNC LibOpen(REG(d0, UNUSED ULONG version), REG(a6, struct LibraryHeader *base))
 {
 #endif
   struct LibraryHeader *res = NULL;

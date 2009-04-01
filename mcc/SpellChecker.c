@@ -137,7 +137,7 @@ static LONG SendRexx(char *word, const char *command, UNUSED struct InstData *da
   return result;
 }
 
-#if !defined(__amigaos4__) && !defined(__MORPHOS__)
+#if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
 #undef WorkbenchControl
 BOOL WorkbenchControl(STRPTR name, ...)
 { BOOL ret;
