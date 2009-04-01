@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-04-01 Thore Böckelmann <tboeckel@gmx.de>
+
+  * UndoFunctions.c: fixed some compiler warnings about "void * used in arth-
+    metics"
+
 2009-04-01 Jens Langner <Jens.Langner@light-speed.de>
 
   * misc: adapted the whole environment to make TextEditor.mcc directly

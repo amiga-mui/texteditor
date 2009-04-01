@@ -87,7 +87,7 @@ long Undo(struct InstData *data)
     if(data->undocur == data->undofill)
       set(data->object, MUIA_TextEditor_RedoAvailable, TRUE);
 
-    data->undopointer -= sizeof(struct UserAction);
+    data->undopointer = (APTR)((char *)data->undopointer - sizeof(struct UserAction));
     data->undocur--;
     buffer = (struct UserAction *)data->undopointer;
 
@@ -237,7 +237,7 @@ long Redo(struct InstData *data)
     if(data->undocur == 0)
       set(data->object, MUIA_TextEditor_UndoAvailable, TRUE);
 
-    data->undopointer += sizeof(struct UserAction);
+    data->undopointer = (APTR)((char *)data->undopointer + sizeof(struct UserAction));
     data->undocur++;
 
 //    if(data->actualline != LineNode(buffer->y, data) || data->CPos_X != buffer->x)
@@ -363,7 +363,7 @@ long AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData 
         // copy everything from t_undobuffer to our start of the
         // undobuffer and set the undopointer accordingly.
         memcpy(data->undobuffer, t_undobuffer, data->undosize-(t_undobuffer-(char *)data->undobuffer));
-        data->undopointer -= t_undobuffer-(char *)data->undobuffer;
+        data->undopointer = (APTR)(t_undobuffer - (char *)data->undopointer);
       }
 
       // signal the user that something in the
@@ -406,7 +406,7 @@ long AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData 
     if(data->undocur == 0)
       set(data->object, MUIA_TextEditor_UndoAvailable, TRUE);
 
-    data->undopointer += sizeof(struct UserAction);
+    data->undopointer = (APTR)((char *)data->undopointer + sizeof(struct UserAction));
     data->undocur++;
     data->undofill = data->undocur;
 
