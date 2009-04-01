@@ -34,7 +34,7 @@
 
 #include "SDI_compiler.h"
 #include "Debug.h"
-#include "rev.h"
+#include "version.h"
 
 // special flagging macros
 #define isFlagSet(v,f)      (((v) & (f)) == (f))  // return TRUE if the flag is set

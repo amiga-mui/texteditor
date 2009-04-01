@@ -1,15 +1,22 @@
 #ifndef PROTO_MUIMASTER_H
 #define PROTO_MUIMASTER_H
 
-/*
-**	$Id$
-**	Includes Release 50.1
-**
-**	Prototype/inline/pragma header file combo
-**
-**	(C) Copyright 2003-2004 Amiga, Inc.
-**	    All Rights Reserved
-*/
+/***************************************************************************
+
+ Magic User Interface - MUI
+ Copyright (C) 1992-2008 by Stefan Stuntz <stefan@stuntz.com>
+ All Rights Reserved.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+ IN NO EVENT WILL THE AUTHORS BE LIABLE FOR DIRECT, INDIRECT, INCIDENTAL,
+ OR CONSEQUENTIAL DAMAGES RESULTING FROM ANY CLAIM ARISING OUT OF THE
+ INFORMATION PRESENTED HEREIN, EVEN IF IT HAS BEEN ADVISED OF THE
+ POSSIBILITIES OF SUCH DAMAGES.
+
+***************************************************************************/
 
 #ifndef EXEC_TYPES_H
 #include <exec/types.h>
@@ -48,11 +55,15 @@ extern struct Library * MUIMasterBase;
   #include <clib/muimaster_protos.h>
  #endif /* CLIB_MUIMASTER_PROTOS_H */
  #if defined(__GNUC__)
-  #ifndef __PPC__
-   #include <inline/muimaster.h>
+  #ifdef __AROS__
+   #include <defines/muimaster.h>
   #else
-   #include <ppcinline/muimaster.h>
-  #endif /* __PPC__ */
+   #ifndef __PPC__
+    #include <inline/muimaster.h>
+   #else
+    #include <ppcinline/muimaster.h>
+   #endif /* __PPC__ */
+  #endif /* __AROS__ */
  #elif defined(__VBCC__)
   #ifndef __PPC__
    #include <inline/muimaster_protos.h>

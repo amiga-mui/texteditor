@@ -36,7 +36,7 @@
 #include "private.h"
 #include "locale.h"
 #include "muiextra.h"
-#include "rev.h"
+#include "version.h"
 
 #include "SDI_hook.h"
 

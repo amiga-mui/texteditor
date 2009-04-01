@@ -404,7 +404,7 @@ long  CheckSep    (unsigned char, struct InstData *);
 long  CheckSent   (unsigned char, struct InstData *);
 void  NextLine    (struct InstData *);
 
-unsigned long convert (unsigned long);
+ULONG convert(ULONG style);
 LONG  PrintLine   (LONG, struct line_node *, LONG, BOOL, struct InstData *);
 void  ClearLine   (char *, LONG, LONG, struct InstData *);
 void  ScrollUp    (LONG, LONG, struct InstData *);
@@ -462,7 +462,7 @@ LONG  GetStyle        (LONG, struct line_node *);
 void  AddStyle        (struct marking *, unsigned short, long, struct InstData *);
 void  AddStyleToLine      (LONG, struct line_node *, LONG, UWORD, struct InstData *);
 
-void  *MyAllocPooled    (void *, unsigned long);
+APTR MyAllocPooled(APTR pool, ULONG length);
 void  MyFreePooled      (void *, void *);
 
 struct line_node  *AllocLine(struct InstData *data);

@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-04-01 Jens Langner <Jens.Langner@light-speed.de>
+
+  * misc: adapted the whole environment to make TextEditor.mcc directly
+    compileable for AROS. Now it is possible to compile TextEditor.mcc with
+    an AROS cross-compiler for i386,ppc and x86_64.
+
 #### v15.28 RELEASE ############################################################
 
 2009-01-04 Jens Langner <Jens.Langner@light-speed.de>

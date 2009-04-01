@@ -149,7 +149,11 @@ struct Library *LayersBase = NULL;
 struct Library *LocaleBase = NULL;
 struct Library *MUIMasterBase = NULL;
 struct Library *RexxSysBase = NULL;
+#if defined(__AROS__)
+struct UtilityBase *UtilityBase = NULL;
+#else
 struct Library *UtilityBase = NULL;
+#endif
 struct Library *IFFParseBase = NULL;
 struct Library *WorkbenchBase = NULL;
 #endif
