@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-04-17 Jens Langner <Jens.Langner@light-speed.de>
+
+  * include/defines/mccclass.h: updated the mccclass.h defines header with the
+    one generated with the latest sfdc 1.4 version.
+  * mcp/C_c.sd: replaced a (ULONG) cast by the more portable (IPTR) cast.
+
 2009-04-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mccinit.c: fixed broken stackswap_call() prototype for the assembler
