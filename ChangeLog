@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-04-30  Thore Böckelmann <tboeckel@gmx.de>
+
+  * updated the SDI headers to their latest fixed versions.
+
 2009-04-18 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/C_c.sd: added missing SDI_compiler.h include to make IPTR type known.
