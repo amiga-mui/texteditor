@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-05-04 Thore Böckelmann <tboeckel@gmx.de>
+
+  * include/SDI_lib.h: updated to the latest version.
+
 2009-05-02 Ilkka Lehtoranta <ilkleht@isoveli.org>
 
   * include/mccinit.c: RTF_EXTENDED was not set for the MorphOS build making
