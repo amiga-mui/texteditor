@@ -1,7 +1,7 @@
 /*******************************************************************************
 
         Name:           mccinit.c
-        Versionstring:  $VER: mccinit.c 1.13 (01.04.2009)
+        Versionstring:  $VER: mccinit.c 1.14 (02.05.2009)
         Author:         Jens Langner <Jens.Langner@light-speed.de>
         Distribution:   PD (public domain)
         Description:    library init file for easy generation of a MUI
@@ -46,6 +46,7 @@
                      for AROS builds.
   1.13  01.04.2009 : fixed the broken prototype for the assembler stackswap_call
                      function.
+  1.14  02.05.2009 : added RTF_EXTENDED for the MorphOS build as well
 
  About:
 
