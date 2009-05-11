@@ -238,7 +238,7 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 
             if(visible > 0)
             {
-          		struct IntuiWheelData *iwd = (struct IntuiWheelData *)imsg->IAddress;
+              struct IntuiWheelData *iwd = (struct IntuiWheelData *)imsg->IAddress;
 
               // we scroll about 1/6 of the displayed text by default
               LONG delta = (visible + 3) / 6;
@@ -249,9 +249,9 @@ ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 
               D(DBF_INPUT, "WheelX: %ld WheelY: %ld", iwd->WheelX, iwd->WheelY);
 
-          		if(iwd->WheelY < 0 || iwd->WheelX < 0)
+              if(iwd->WheelY < 0 || iwd->WheelX < 0)
                 DoMethod(data->slider, MUIM_Prop_Decrease, delta * abs(MIN(iwd->WheelX, iwd->WheelY)));
-	            else if(iwd->WheelY > 0 || iwd->WheelX > 0)
+              else if(iwd->WheelY > 0 || iwd->WheelX > 0)
                 DoMethod(data->slider, MUIM_Prop_Increase, delta * abs(MAX(iwd->WheelX, iwd->WheelY)));
             }
 

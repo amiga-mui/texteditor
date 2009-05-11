@@ -78,7 +78,7 @@ char *GetBlock(struct marking *block, struct InstData *data)
   data->actualline = startline;
 
   // clear the export message
-	memset(&emsg, 0, sizeof(struct ExportMessage));
+  memset(&emsg, 0, sizeof(struct ExportMessage));
 
   // fill it afterwards
   emsg.UserData = NULL;

@@ -320,7 +320,7 @@ void InitConfig(Object *obj, struct InstData *data)
     else
       undolevel = data->undolevel;
 
-  	ResizeUndoBuffer(data, undolevel);
+    ResizeUndoBuffer(data, undolevel);
   }
 
   data->LookupSpawn = 0;

@@ -202,15 +202,15 @@ int main(void)
   if((IFFParseBase = OpenLibrary("iffparse.library", 36)) &&
     GETINTERFACE(IIFFParse, IFFParseBase))
   {
-  	/* Open workbench.library (optional) */
-		if ((WorkbenchBase = OpenLibrary("workbench.library",0)))
-		{
-  		if (!(GETINTERFACE(IWorkbench, WorkbenchBase)))
-  		{
-  			CloseLibrary(WorkbenchBase);
-  			WorkbenchBase = NULL;
-  		}
-		}
+    /* Open workbench.library (optional) */
+    if ((WorkbenchBase = OpenLibrary("workbench.library",0)))
+    {
+      if (!(GETINTERFACE(IWorkbench, WorkbenchBase)))
+      {
+        CloseLibrary(WorkbenchBase);
+        WorkbenchBase = NULL;
+      }
+    }
 
     #if defined(DEBUG)
     SetupDebug();
@@ -333,7 +333,7 @@ int main(void)
                             End,
 */
                             Child, rgroup = RegisterGroup(page_titles),
-                            	MUIA_Register_Frame, TRUE,
+                              MUIA_Register_Frame, TRUE,
                               Child,HGroup,
                                 MUIA_Group_Spacing, 0,
                                 Child, editorgad = NewObject(mcc->mcc_Class, NULL,
@@ -396,10 +396,10 @@ int main(void)
                                 Child, slider = MUI_NewObject("Scrollbar.mui", End,
                               End,
                               Child, VGroup,
-	                              Child, TextObject,
-                              	  MUIA_Text_Contents, "TextEditor object is now hidden!!!",
-                            	  End,
-                            	End,
+                                Child, TextObject,
+                                  MUIA_Text_Contents, "TextEditor object is now hidden!!!",
+                                End,
+                              End,
                             End,
                           End,
 /*                          End,
@@ -439,40 +439,40 @@ int main(void)
             set(editorgad, MUIA_TextEditor_FixedFont, TRUE);
           }
 
-					if (argarray[0])
-					{
-	          if((fh = Open((char *)argarray[0], MODE_OLDFILE)))
-	          {
-	              char  *text = AllocVec(50*1024, 0L);
-	              char  *buffer = text;
-	              int size;
+          if (argarray[0])
+          {
+            if((fh = Open((char *)argarray[0], MODE_OLDFILE)))
+            {
+                char  *text = AllocVec(50*1024, 0L);
+                char  *buffer = text;
+                int size;
 
-	            size = Read(fh, text, (50*1024)-2);
-	            text[size] = '\0';
-	            Close(fh);
+              size = Read(fh, text, (50*1024)-2);
+              text[size] = '\0';
+              Close(fh);
 
-	            if(argarray[3])
-	            {
-	              while(*buffer != '\n' && buffer < &text[size])
-	              {
-	                while(*buffer++ != '\n');
-	              }
-	            }
+              if(argarray[3])
+              {
+                while(*buffer != '\n' && buffer < &text[size])
+                {
+                  while(*buffer++ != '\n');
+                }
+              }
 
-	            if(argarray[2])
-	              set(editorgad, MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_MIMEQuoted);
-	            else
-	              if(argarray[1])
-	                set(editorgad, MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_MIME);
-	              else
-	                if(argarray[5])
-	                  set(editorgad, MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_EMail);
+              if(argarray[2])
+                set(editorgad, MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_MIMEQuoted);
+              else
+                if(argarray[1])
+                  set(editorgad, MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_MIME);
+                else
+                  if(argarray[5])
+                    set(editorgad, MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_EMail);
 
-	            SetAttrs(editorgad, MUIA_TextEditor_Contents, buffer,
-	                          TAG_DONE);
-	            FreeVec(text);
-	          }
-					}
+              SetAttrs(editorgad, MUIA_TextEditor_Contents, buffer,
+                            TAG_DONE);
+              FreeVec(text);
+            }
+          }
 
           DoMethod(window, MUIM_Notify, MUIA_Window_CloseRequest, TRUE, app, 2, MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit);
 
@@ -606,11 +606,11 @@ int main(void)
     }
   }
 
-	if(WorkbenchBase)
-	{
-		DROPINTERFACE(IWorkbench);
-		WorkbenchBase = NULL;
-	}
+  if(WorkbenchBase)
+  {
+    DROPINTERFACE(IWorkbench);
+    WorkbenchBase = NULL;
+  }
   if(IFFParseBase)
   {
     DROPINTERFACE(IIFFParse);

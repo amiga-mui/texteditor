@@ -349,16 +349,16 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
   // may contain known bugs.
   if(data->hotkey != NULL)
   {
-  	ULONG version, revision;
+    ULONG version, revision;
 
-  	version = xget(data->hotkey, MUIA_Version);
-  	revision = xget(data->hotkey, MUIA_Revision);
+    version = xget(data->hotkey, MUIA_Version);
+    revision = xget(data->hotkey, MUIA_Revision);
     D(DBF_STARTUP, "found HotkeyString.mcc V%ld.%ld", version, revision);
 
-  	if(version > 12 || (version == 12 && revision >= 5))
+    if(version > 12 || (version == 12 && revision >= 5))
     {
       // everything is fine
-  	  hotkeystringOk = TRUE;
+      hotkeystringOk = TRUE;
     }
     else
     {

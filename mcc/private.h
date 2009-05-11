@@ -126,9 +126,9 @@
 #endif
 
 // some own usefull MUI-style macros to check mouse positions in objects
-#define _between(a,x,b) 					((x)>=(a) && (x)<=(b))
-#define _isinobject(o,x,y) 				(_between(_mleft(o),(x),_mright (o)) && _between(_mtop(o) ,(y),_mbottom(o)))
-#define _isinwholeobject(o,x,y) 	(_between(_left(o),(x),_right (o)) && _between(_top(o) ,(y),_bottom(o)))
+#define _between(a,x,b)           ((x)>=(a) && (x)<=(b))
+#define _isinobject(o,x,y)         (_between(_mleft(o),(x),_mright (o)) && _between(_mtop(o) ,(y),_mbottom(o)))
+#define _isinwholeobject(o,x,y)   (_between(_left(o),(x),_right (o)) && _between(_top(o) ,(y),_bottom(o)))
 
 // own common macros
 #define Enabled(data)   ((data)->blockinfo.enabled && \
@@ -193,7 +193,7 @@ struct line_node
   struct line_node *next;     // Pointer to next line
   struct line_node *previous; // Pointer to previous line
 
-	struct LineNode line;
+  struct LineNode line;
 
   UWORD visual;               // How many lines are this line wrapped over
   UWORD flags;                // Different flags...
