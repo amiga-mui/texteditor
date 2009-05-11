@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-05-11 Jens Langner <Jens.Langner@light-speed.de>
+
+  * misc: converted all tabs to spaces
+  * version.h: fixed the identification of a PowerPC processor as the AROS
+    compiler for ppc does not set __PPC__.
+
 2009-05-04 Thore Böckelmann <tboeckel@gmx.de>
 
   * include/SDI_lib.h: updated to the latest version.

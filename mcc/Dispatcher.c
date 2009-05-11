@@ -318,15 +318,15 @@ ULONG Cleanup(struct IClass *cl, Object *obj, Msg msg)
 ULONG AskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
-	struct MUI_MinMax *mi;
+  struct MUI_MinMax *mi;
   ULONG fontheight;
 
   ENTER();
 
-	// call the supermethod first
-	DoSuperMethodA(cl, obj, (Msg)msg);
+  // call the supermethod first
+  DoSuperMethodA(cl, obj, (Msg)msg);
 
-	mi = ((struct MUIP_AskMinMax *)msg)->MinMaxInfo;
+  mi = ((struct MUIP_AskMinMax *)msg)->MinMaxInfo;
 
   if(data->Columns)
   {
@@ -717,7 +717,7 @@ DISPATCHER(_Dispatcher)
       struct MUIP_TextEditor_InsertText *ins_msg = (struct MUIP_TextEditor_InsertText *)msg;
       struct marking block;
 
-  	  switch(ins_msg->pos)
+      switch(ins_msg->pos)
       {
         case MUIV_TextEditor_InsertText_Top:
         {

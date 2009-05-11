@@ -31,12 +31,12 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
   struct line_node *node;
   struct Hook *exportHook = data->ExportHook;
   ULONG wraplen = data->ExportWrap;
-	struct ExportMessage emsg;
+  struct ExportMessage emsg;
   struct marking newblock;
   ULONG flags = msg->flags;
-	void *user_data = NULL;
+  void *user_data = NULL;
 
-	ENTER();
+  ENTER();
 
   // get information about marked text
   if(data->blockinfo.enabled)
@@ -52,12 +52,12 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
   node = newblock.startline;
 
   // clear the export message
-	memset(&emsg, 0, sizeof(struct ExportMessage));
+  memset(&emsg, 0, sizeof(struct ExportMessage));
 
   // now we export all selected/marked lines with
   // the currently active export hook
-	while(node)
-	{
+  while(node)
+  {
     struct line_node *next_node = node->next;
 
     emsg.UserData = user_data;
@@ -103,6 +103,6 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
     node = next_node;
   }
 
-	RETURN(user_data);
-	return user_data;
+  RETURN(user_data);
+  return user_data;
 }
