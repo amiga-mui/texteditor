@@ -349,7 +349,7 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
   ULONG  xplace, yplace, cursorxplace;
   UWORD  cursor_width;
   BOOL   clipping = FALSE;
-  struct RastPort *rp = data->rp;
+  struct RastPort *rp = data->rport;
 
   UWORD styles[3] = {0, 0, 0};
   UWORD colors[3] = {0, 0, 0};
