@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-06-01 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/EditorStuff.c: added safety check before pasting new characters into a
+    line to prevent potential buffer overruns. Hopefully this fixes the still
+    happening random crashes on OS4.
+
 2009-05-11 Jens Langner <Jens.Langner@light-speed.de>
 
   * misc: converted all tabs to spaces

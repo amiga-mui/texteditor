@@ -133,7 +133,7 @@ static char *utf8_to_ansi(struct InstData *data, STRPTR src)
 /*----------------------*
  * Paste from Clipboard *
  *----------------------*/
-LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
+BOOL PasteClip (LONG x, struct line_node *actline, struct InstData *data)
 {
   struct line_node *line = NULL;
   struct line_node *startline = NULL;
@@ -141,8 +141,8 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
   UWORD   *styles = NULL;
   UWORD   *colors = NULL;
   STRPTR  textline;
-  BOOL    newline = TRUE;
-  LONG    res = FALSE;
+  BOOL newline = TRUE;
+  BOOL res = FALSE;
 
   ENTER();
 
@@ -435,8 +435,9 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
       DumpText(data->visual_y+updatefrom, updatefrom, data->maxlines, TRUE, data);
 
       if(data->update)
-          res = TRUE;
-      else  data->update = TRUE;
+        res = TRUE;
+      else
+        data->update = TRUE;
     }
 
     EndClipSession(data);
@@ -448,7 +449,7 @@ LONG PasteClip (LONG x, struct line_node *actline, struct InstData *data)
 /*--------------------------*
  * Merge two lines into one *
  *--------------------------*/
-long  MergeLines    (struct line_node *line, struct InstData *data)
+BOOL MergeLines(struct line_node *line, struct InstData *data)
 {
   struct line_node *next;
   char  *newbuffer;
@@ -470,21 +471,21 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
   }
   visual = line->visual + line->next->visual;
 
-  if((newbuffer = MyAllocPooled(data->mypool, line->line.Length+line->next->line.Length+1)))
+  if((newbuffer = MyAllocPooled(data->mypool, line->line.Length+line->next->line.Length+1)) != NULL)
   {
     memcpy(newbuffer, line->line.Contents, line->line.Length-1);
     memcpy(newbuffer+line->line.Length-1, line->next->line.Contents, line->next->line.Length+1);
     MyFreePooled(data->mypool, line->line.Contents);
     MyFreePooled(data->mypool, line->next->line.Contents);
 
-    if(emptyline)
+    if(emptyline == TRUE)
     {
-      if(line->line.Styles)
+      if(line->line.Styles != NULL)
         MyFreePooled(data->mypool, line->line.Styles);
 
       line->line.Styles = line->next->line.Styles;
 
-      if(line->line.Colors)
+      if(line->line.Colors != NULL)
         MyFreePooled(data->mypool, line->line.Colors);
 
       line->line.Colors = line->next->line.Colors;
@@ -499,12 +500,12 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
       UWORD *colors2 = line->next->line.Colors;
       UWORD length = 12;
 
-      if(styles1)
+      if(styles1 != NULL)
         length += *((long *)styles1-1) - 4;
-      if(styles2)
+      if(styles2 != NULL)
         length += *((long *)styles2-1) - 4;
 
-      if((styles = MyAllocPooled(data->mypool, length)))
+      if((styles = MyAllocPooled(data->mypool, length)) != NULL)
       {
         unsigned short* t_styles = styles;
         unsigned short  style = 0;
@@ -514,26 +515,26 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
         SHOWVALUE(DBF_CLIPBOARD, styles1);
         SHOWVALUE(DBF_CLIPBOARD, styles2);
 
-        if(styles2)
+        if(styles2 != NULL)
         {
           unsigned short* t_styles2 = styles2;
 
           while(*t_styles2++ == 1)
           {
             if(*t_styles2 > 0xff)
-                style &= *t_styles2++;
-            else  style |= *t_styles2++;
+              style &= *t_styles2++;
+            else
+              style |= *t_styles2++;
           }
         }
 
-        if(styles1)
+        if(styles1 != NULL)
         {
-
           while(*styles1 != EOS)
           {
             if((*styles1 == line->line.Length) && ((~*(styles1+1) & style) == (*(styles1+1)  ^ 0xffff)))
             {
-              style   &= *(styles1+1);
+              style &= *(styles1+1);
               styles1 += 2;
             }
             else
@@ -546,7 +547,7 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
           MyFreePooled(data->mypool, line->line.Styles);
         }
 
-        if(styles2)
+        if(styles2 != NULL)
         {
           while(*styles2 != EOS)
           {
@@ -569,12 +570,12 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
 
       length = 12;
 
-      if(colors1)
+      if(colors1 != NULL)
         length += *((long *)colors1-1) - 4;
-      if(colors2)
+      if(colors2 != NULL)
         length += *((long *)colors2-1) - 4;
 
-      if((colors = MyAllocPooled(data->mypool, length)))
+      if((colors = MyAllocPooled(data->mypool, length)) != NULL)
       {
         UWORD *t_colors = colors;
         UWORD end_color = 0;
@@ -584,7 +585,7 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
         SHOWVALUE(DBF_CLIPBOARD, colors1);
         SHOWVALUE(DBF_CLIPBOARD, colors2);
 
-        if(colors1)
+        if(colors1 != NULL)
         {
           while(*colors1 < line->line.Length && *colors1 != 0xffff)
           {
@@ -602,7 +603,7 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
           *colors++ = 0;
         }
 
-        if(colors2)
+        if(colors2 != NULL)
         {
           if(*colors2 == 1 && *(colors2+1) == end_color)
             colors2 += 2;
@@ -625,7 +626,7 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
 
     next = line->next;
     line->next = line->next->next;
-    if(line->next)
+    if(line->next != NULL)
       line->next->previous = line;
     oldvisual = line->visual;
     line->visual = VisualHeight(line, data);
@@ -651,13 +652,15 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
             ScrollUp(line_nr - 1, 1, data);
             SetCursor(data->CPos_X, data->actualline, TRUE, data);
           }
-          else  DumpText(data->visual_y+line_nr-1, line_nr-1, data->maxlines, TRUE, data);
+          else
+            DumpText(data->visual_y+line_nr-1, line_nr-1, data->maxlines, TRUE, data);
         }
         else
         {
           if(data->fastbackground)
-              ScrollUp(line_nr + line->visual - 1, 1, data);
-          else  DumpText(data->visual_y+line_nr+line->visual-1, line_nr+line->visual-1, data->maxlines, TRUE, data);
+            ScrollUp(line_nr + line->visual - 1, 1, data);
+          else
+            DumpText(data->visual_y+line_nr+line->visual-1, line_nr+line->visual-1, data->maxlines, TRUE, data);
         }
       }
     }
@@ -704,7 +707,7 @@ long  MergeLines    (struct line_node *line, struct InstData *data)
 /*---------------------*
  * Split line into two *
  *---------------------*/
-long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction *buffer, struct InstData *data)
+BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction *buffer, struct InstData *data)
 {
   struct line_node *newline;
   struct line_node *next;
@@ -720,7 +723,7 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
   lines = pos.lines;
 
   next = line->next;
-  if((newline = AllocLine(data)))
+  if((newline = AllocLine(data)) != NULL)
   {
     UWORD *styles = line->line.Styles;
     UWORD *newstyles = NULL;
@@ -732,14 +735,14 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
     newline->line.Color = line->line.Color;
     newline->line.Flow = line->line.Flow;
     newline->line.Separator = line->line.Separator;
-    if(buffer)
+    if(buffer != NULL)
     {
       newline->line.Color = buffer->del.style;
       newline->line.Flow = buffer->del.flow;
       newline->line.Separator = buffer->del.separator;
     }
 
-    if(styles)
+    if(styles != NULL)
     {
       LONG  style = 0;
       LONG  length = 0;
@@ -748,8 +751,9 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
       while(*styles++ <= x+1)
       {
         if(*styles > 0xff)
-            style &= *styles++;
-        else  style |= *styles++;
+          style &= *styles++;
+        else
+          style |= *styles++;
       }
       styles--;
       ostyles = styles;
@@ -757,16 +761,25 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
         length += 2;
       length = (length*2) + 16;
 
-      if((newstyles = MyAllocPooled(data->mypool, length)))
+      if((newstyles = MyAllocPooled(data->mypool, length)) != NULL)
       {
           UWORD *nstyles = newstyles;
 
-        if(style & BOLD)
-        { *nstyles++ = 1; *nstyles++ = BOLD; }
-        if(style & ITALIC)
-        { *nstyles++ = 1; *nstyles++ = ITALIC; }
-        if(style & UNDERLINE)
-        { *nstyles++ = 1; *nstyles++ = UNDERLINE; }
+        if(isFlagSet(style, BOLD))
+        {
+          *nstyles++ = 1;
+          *nstyles++ = BOLD;
+        }
+        if(isFlagSet(style, ITALIC))
+        {
+          *nstyles++ = 1;
+          *nstyles++ = ITALIC;
+        }
+        if(isFlagSet(style, UNDERLINE))
+        {
+          *nstyles++ = 1;
+          *nstyles++ = UNDERLINE;
+        }
 
         while(*styles != EOS)
         {
@@ -775,19 +788,29 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
         }
         *nstyles = EOS;
       }
-      if(style & BOLD)
-      { *ostyles++ = x+1; *ostyles++ = ~BOLD; }
-      if(style & ITALIC)
-      { *ostyles++ = x+1; *ostyles++ = ~ITALIC; }
-      if(style & UNDERLINE)
-      { *ostyles++ = x+1; *ostyles++ = ~UNDERLINE; }
-      if(!x)
+
+      if(isFlagSet(style, BOLD))
+      {
+        *ostyles++ = x+1;
+        *ostyles++ = ~BOLD;
+      }
+      if(isFlagSet(style, ITALIC))
+      {
+        *ostyles++ = x+1;
+        *ostyles++ = ~ITALIC;
+      }
+      if(isFlagSet(style, UNDERLINE))
+      {
+        *ostyles++ = x+1;
+        *ostyles++ = ~UNDERLINE;
+      }
+      if(x != 0)
         ostyles = line->line.Styles;
       *ostyles = EOS;
     }
     newline->line.Styles = newstyles;
 
-    if(colors)
+    if(colors != NULL)
     {
       UWORD color = GetColor(x, line);
       UWORD length = 0;
@@ -803,7 +826,7 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
         length += 2;
       length = (length*2) + 16;
 
-      if((newcolors = MyAllocPooled(data->mypool, length)))
+      if((newcolors = MyAllocPooled(data->mypool, length)) != NULL)
       {
         UWORD *ncolors = newcolors;
 
@@ -820,7 +843,7 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
         }
         *ncolors = 0xffff;
       }
-      if(!x)
+      if(x != 0)
         ocolors = line->line.Colors;
       *ocolors = 0xffff;
     }
@@ -828,7 +851,7 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
 
 
     newline->next = next;
-    if(next)
+    if(next != NULL)
       next->previous = newline;
 
     *(line->line.Contents+x) = '\n';
@@ -879,9 +902,9 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
       {
         data->visual_y++;
         data->totallines += 1;
-        if(!(data->flags & FLG_Quiet))
+        if(isFlagClear(data->flags, FLG_Quiet))
         {
-            struct  Hook  *oldhook;
+          struct Hook *oldhook;
 
           oldhook = InstallLayerHook(data->rport->Layer, LAYERS_NOBACKFILL);
           ScrollRasterBF(data->rport, 0, data->height,
@@ -904,7 +927,7 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
     if(x == (LONG)(line->line.Length + newline->line.Length - 2))
     {
       data->totallines += 1;
-      if(!buffer)
+      if(buffer == NULL)
       {
         line->next->line.Color = 0;
         line->next->line.Separator = 0;
@@ -969,12 +992,9 @@ long SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
 /*------------------------------------------------------------------*
  * Backwards string copy, please replace with some assembler stuff! *
  *------------------------------------------------------------------*/
-void  strcpyback    (char *dest, char *src)
+static void strcpyback(char *dest, char *src)
 {
-//  ULONG length = strlen(src)+1;
-//  memmove(dest, src, length);
-
-  LONG  length;
+  size_t length;
 
   ENTER();
 
@@ -983,11 +1003,8 @@ void  strcpyback    (char *dest, char *src)
   src = src + length;
 
   length++;
-  while (--length)
-  {
+  while(--length)
     *--dest = *--src;
-//    printf("%d, %d\n", *src, *dest);
-  }
 
   LEAVE();
 }
@@ -1035,6 +1052,10 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
 
   do
   {
+    // don't exceed the line length!
+    if(skip > (LONG)line->line.Length)
+      break;
+
     width = LineCharsWidth(line->line.Contents + skip, data);
     if(width > 0 && skip + width < x)
     {
@@ -1110,6 +1131,7 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
       }
     }
   }
+
   OptimizedPrint(skip, line, line_nr, width, data);
   ScrollIntoDisplay(data);
   data->HasChanged = TRUE;
@@ -1124,7 +1146,7 @@ BOOL PasteChars(LONG x, struct line_node *line, LONG length, const char *charact
 {
   ENTER();
 
-  if(line->line.Styles)
+  if(line->line.Styles != NULL)
   {
     if(*line->line.Styles != EOS)
     {
@@ -1140,7 +1162,7 @@ BOOL PasteChars(LONG x, struct line_node *line, LONG length, const char *charact
     }
   }
 
-  if(line->line.Colors)
+  if(line->line.Colors != NULL)
   {
     if(*line->line.Colors != 0xffff)
     {
@@ -1155,7 +1177,6 @@ BOOL PasteChars(LONG x, struct line_node *line, LONG length, const char *charact
       }
     }
   }
-
 
   if((*((long *)line->line.Contents-1))-4 < (LONG)(line->line.Length + length + 1))
   {
@@ -1174,11 +1195,11 @@ BOOL PasteChars(LONG x, struct line_node *line, LONG length, const char *charact
 /*----------------------------*
  * Remove n chars from a line *
  *----------------------------*/
-long  RemoveChars   (LONG x, struct line_node *line, LONG length, struct InstData *data)
+BOOL RemoveChars(LONG x, struct line_node *line, LONG length, struct InstData *data)
 {
   ENTER();
 
-  if(line->line.Styles)
+  if(line->line.Styles != NULL)
   {
     if(*line->line.Styles != EOS)
     {
@@ -1191,21 +1212,39 @@ long  RemoveChars   (LONG x, struct line_node *line, LONG length, struct InstDat
 
       if(start_style != end_style)
       {
-          UWORD turn_off = start_style & ~end_style,
-              turn_on  = end_style & ~start_style;
+        UWORD turn_off = start_style & ~end_style;
+        UWORD turn_on  = end_style & ~start_style;
 
-        if(turn_off & BOLD)
-        { *(line->line.Styles+c++) = x+1;  *(line->line.Styles+c++) = ~BOLD;  }
-        if(turn_off & ITALIC)
-        { *(line->line.Styles+c++) = x+1;  *(line->line.Styles+c++) = ~ITALIC;  }
-        if(turn_off & UNDERLINE)
-        { *(line->line.Styles+c++) = x+1;  *(line->line.Styles+c++) = ~UNDERLINE; }
-        if(turn_on & BOLD)
-        { *(line->line.Styles+c++) = x+1;  *(line->line.Styles+c++) = BOLD; }
-        if(turn_on & ITALIC)
-        { *(line->line.Styles+c++) = x+1;  *(line->line.Styles+c++) = ITALIC; }
-        if(turn_on & UNDERLINE)
-        { *(line->line.Styles+c++) = x+1;  *(line->line.Styles+c++) = UNDERLINE;  }
+        if(isFlagSet(turn_off, BOLD))
+        {
+          *(line->line.Styles+c++) = x+1;
+          *(line->line.Styles+c++) = ~BOLD;
+        }
+        if(isFlagSet(turn_off, ITALIC))
+        {
+          *(line->line.Styles+c++) = x+1;
+          *(line->line.Styles+c++) = ~ITALIC;
+        }
+        if(isFlagSet(turn_off, UNDERLINE))
+        {
+          *(line->line.Styles+c++) = x+1;
+          *(line->line.Styles+c++) = ~UNDERLINE;
+        }
+        if(isFlagSet(turn_on, BOLD))
+        {
+          *(line->line.Styles+c++) = x+1;
+          *(line->line.Styles+c++) = BOLD;
+        }
+        if(isFlagSet(turn_on, ITALIC))
+        {
+          *(line->line.Styles+c++) = x+1;
+          *(line->line.Styles+c++) = ITALIC;
+        }
+        if(isFlagSet(turn_on, UNDERLINE))
+        {
+          *(line->line.Styles+c++) = x+1;
+          *(line->line.Styles+c++) = UNDERLINE;
+        }
       }
 
       store = c;
@@ -1221,13 +1260,13 @@ long  RemoveChars   (LONG x, struct line_node *line, LONG length, struct InstDat
     }
   }
 
-  if(line->line.Colors)
+  if(line->line.Colors != NULL)
   {
     if(*line->line.Colors != 0xffff)
     {
-        UWORD start_color = x ? GetColor(x-1, line) : 0;
-        UWORD end_color = GetColor(x+length, line);
-        ULONG c = 0, store;
+      UWORD start_color = x ? GetColor(x-1, line) : 0;
+      UWORD end_color = GetColor(x+length, line);
+      ULONG c = 0, store;
 
       while(*(line->line.Colors+c) <= x)
         c += 2;
@@ -1256,3 +1295,4 @@ long  RemoveChars   (LONG x, struct line_node *line, LONG length, struct InstDat
   RETURN(TRUE);
   return(TRUE);
 }
+

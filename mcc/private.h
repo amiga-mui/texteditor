@@ -167,6 +167,7 @@ enum EventType
   ET_STYLEUNITALIC,
   ET_STYLEUNDERLINE,
   ET_STYLEUNUNDERLINE,
+  ET_REPLACEBLOCK,
 };
 
 enum CursorState
@@ -421,10 +422,10 @@ ULONG VisualHeight  (struct line_node *, struct InstData *);
 void  GetLine     (LONG, struct pos_info *, struct InstData *);
 LONG  LineToVisual  (struct line_node *, struct InstData *);
 
-LONG  PasteClip   (LONG x, struct line_node *line, struct InstData *);
-long  SplitLine   (LONG x, struct line_node *, BOOL, struct UserAction *, struct InstData *);
-long  MergeLines    (struct line_node *, struct InstData *);
-long  RemoveChars   (LONG, struct line_node *, LONG, struct InstData *);
+BOOL PasteClip(LONG x, struct line_node *line, struct InstData *);
+BOOL SplitLine(LONG x, struct line_node *, BOOL, struct UserAction *, struct InstData *);
+BOOL MergeLines(struct line_node *, struct InstData *);
+BOOL RemoveChars(LONG, struct line_node *, LONG, struct InstData *);
 BOOL PasteChars(LONG, struct line_node *, LONG, const char *, struct UserAction *, struct InstData *);
 
 void  SetBookmark       (UWORD, struct InstData *);
