@@ -10,6 +10,8 @@ $URL$
   * mcc/EditorStuff.c: added safety check before pasting new characters into a
     line to prevent potential buffer overruns. Hopefully this fixes the still
     happening random crashes on OS4.
+  * mcc/MixedFunctions.c, mcc/PrintWithStyle: the font soft style is reset after
+    each operation to avoid unwanted behaviour.
 
 2009-05-11 Jens Langner <Jens.Langner@light-speed.de>
 
