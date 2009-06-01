@@ -349,6 +349,7 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
   ULONG  xplace, yplace, cursorxplace;
   UWORD  cursor_width;
   BOOL   clipping = FALSE;
+  struct RastPort *rp = data->rp;
 
   UWORD styles[3] = {0, 0, 0};
   UWORD colors[3] = {0, 0, 0};
@@ -412,8 +413,8 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
       if(Set == TRUE ||
          (data->inactiveCursor == TRUE && isFlagClear(data->flags, FLG_Active) && isFlagClear(data->flags, FLG_Activated)))
       {
-        SetAPen(data->rport, data->cursorcolor);
-        SetDrMd(data->rport, JAM2);
+        SetAPen(rp, data->cursorcolor);
+        SetDrMd(rp, JAM2);
 
         // if the gadget is in inactive state we just draw a skeleton cursor instead
         if(data->inactiveCursor == TRUE && isFlagClear(data->flags, FLG_Active) && isFlagClear(data->flags, FLG_Activated))
@@ -440,7 +441,7 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
           else
           {
             // draw a "new" skeleton cursor
-            RectFill(data->rport, cursorxplace, yplace, cursorxplace+cwidth-1, yplace+data->height-1);
+            RectFill(rp, cursorxplace, yplace, cursorxplace+cwidth-1, yplace+data->height-1);
             DoMethod(data->object, MUIM_DrawBackground, cursorxplace+1, yplace+1,
                                                         cwidth-2, data->height-2,
                                                         cursorxplace - ((data->flags & FLG_InVGrp) ? data->xpos : 0),
@@ -453,7 +454,7 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
         }
         else
         {
-          RectFill(data->rport, cursorxplace, yplace, cursorxplace+cursor_width-1, yplace+data->height-1);
+          RectFill(rp, cursorxplace, yplace, cursorxplace+cursor_width-1, yplace+data->height-1);
           // remember the active state
           data->currentCursorState = CS_ACTIVE;
         }
@@ -479,9 +480,9 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
         data->currentCursorState = CS_OFF;
       }
 
-      SetDrMd(data->rport, JAM1);
-      SetFont(data->rport, data->font);
-      Move(data->rport, xplace, yplace+data->rport->TxBaseline);
+      SetDrMd(rp, JAM1);
+      SetFont(rp, data->font);
+      Move(rp, xplace, yplace + rp->TxBaseline);
 
       if(data->font->tf_Flags & FPF_PROPORTIONAL)
       {
@@ -491,10 +492,11 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
 
       for(c = start; c <= stop; c++)
       {
-        SetAPen(data->rport, ConvertPen(colors[1+c], line->line.Color, data));
-        SetSoftStyle(data->rport, styles[1+c], AskSoftStyle(data->rport));
-        Text(data->rport, (STRPTR)&chars[1+c], 1);
+        SetAPen(rp, ConvertPen(colors[1+c], line->line.Color, data));
+        SetSoftStyle(rp, styles[1+c], AskSoftStyle(rp));
+        Text(rp, (STRPTR)&chars[1+c], 1);
       }
+      SetSoftStyle(rp, FS_NORMAL, AskSoftStyle(rp));
 
       /* This is really bad code!!! */
       if(line->line.Separator)
@@ -525,9 +527,9 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
         }
         else
         {
-          DrawSeparator(data->rport, RightX, Y, RightWidth, Height, data);
+          DrawSeparator(rp, RightX, Y, RightWidth, Height, data);
         }
-        DrawSeparator(data->rport, LeftX, Y, LeftWidth, Height, data);
+        DrawSeparator(rp, LeftX, Y, LeftWidth, Height, data);
       }
 
       if(clipping)

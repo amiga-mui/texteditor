@@ -318,6 +318,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       x += p_length;
       c_length -= p_length;
     }
+    SetSoftStyle(rp, FS_NORMAL, AskSoftStyle(rp));
 
     if(line->line.Separator)
     {
