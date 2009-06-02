@@ -1042,7 +1042,7 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
   LONG skip=0;
   LONG line_nr;
   LONG orgline_nr;
-  LONG width;
+  LONG width=0;
   LONG lineabove_width=0;
 
   ENTER();

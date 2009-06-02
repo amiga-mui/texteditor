@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-06-02 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/EditorStuff.c: added missing variable initialization.
+
 2009-06-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: added safety check before pasting new characters into a
