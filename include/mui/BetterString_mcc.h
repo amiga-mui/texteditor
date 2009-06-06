@@ -2,7 +2,7 @@
 
  BetterString.mcc - A better String gadget MUI Custom Class
  Copyright (C) 1997-2000 Allan Odgaard
- Copyright (C) 2005-2007 by BetterString.mcc Open Source Team
+ Copyright (C) 2005-2009 by BetterString.mcc Open Source Team
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -27,20 +27,34 @@
 extern "C" {
 #endif
 
-#ifdef __GNUC__
-  #ifdef __PPC__
-    #pragma pack(2)
-  #endif
-#elif defined(__VBCC__)
-  #pragma amiga-align
-#endif
-
 #ifndef EXEC_TYPES_H
 #include <exec/types.h>
 #endif
 
-#define MUIC_BetterString     "BetterString.mcc"
-#define BetterStringObject    MUI_NewObject(MUIC_BetterString
+#if !defined(__AROS__) && defined(__PPC__)
+  #if defined(__GNUC__)
+    #pragma pack(2)
+  #elif defined(__VBCC__)
+    #pragma amiga-align
+  #endif
+#endif
+
+/***********************************************************************/
+
+// STACKED ensures proper alignment on AROS 64 bit systems
+#if !defined(__AROS__) && !defined(STACKED)
+#define STACKED
+#endif
+
+/***********************************************************************/
+
+#define MUIC_BetterString  "BetterString.mcc"
+
+#if defined(__AROS__) && !defined(NO_INLINE_STDARG)
+#define BetterStringObject MUIOBJMACRO_START(MUIC_BetterString)
+#else
+#define BetterStringObject MUI_NewObject(MUIC_BetterString
+#endif
 
 // attributes
 #define MUIA_BetterString_SelectSize            0xad001001
@@ -51,6 +65,7 @@ extern "C" {
 #define MUIA_BetterString_KeyDownFocus          0xad001009
 #define MUIA_BetterString_InactiveContents      0xad00100a
 #define MUIA_BetterString_NoShortcuts           0xad00100c
+#define MUIA_BetterString_SelectOnActive        0xad00100d
 
 // methods
 #define MUIM_BetterString_Insert                0xad001002
@@ -89,17 +104,17 @@ enum MUIV_BetterString_DoActions
 };
 
 // parameter structures for methods
-struct MUIP_BetterString_Insert        { ULONG MethodID; STRPTR text; LONG pos; };
-struct MUIP_BetterString_ClearSelected { ULONG MethodID; };
-struct MUIP_BetterString_FileNameStart { ULONG MethodID; STRPTR buffer; LONG pos; };
-struct MUIP_BetterString_DoAction      { ULONG MethodID; enum MUIV_BetterString_DoActions action; };
+struct MUIP_BetterString_Insert        { STACKED ULONG MethodID; STACKED STRPTR text; STACKED LONG pos; };
+struct MUIP_BetterString_ClearSelected { STACKED ULONG MethodID; };
+struct MUIP_BetterString_FileNameStart { STACKED ULONG MethodID; STACKED STRPTR buffer; STACKED LONG pos; };
+struct MUIP_BetterString_DoAction      { STACKED ULONG MethodID; STACKED enum MUIV_BetterString_DoActions action; };
 
-#ifdef __GNUC__
-  #ifdef __PPC__
+#if !defined(__AROS__) && defined(__PPC__)
+  #if defined(__GNUC__)
     #pragma pack()
+  #elif defined(__VBCC__)
+    #pragma default-align
   #endif
-#elif defined(__VBCC__)
-  #pragma default-align
 #endif
 
 #ifdef __cplusplus

@@ -23,6 +23,7 @@
 #include <libraries/mui.h>
 #include <proto/muimaster.h>
 #include <proto/exec.h>
+#include <proto/intuition.h>
 
 /******************************************************************************/
 /*                                                                            */

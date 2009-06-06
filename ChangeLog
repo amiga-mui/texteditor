@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-06-06 Jens Langner <Jens.Langner@light-speed.de>
+
+  * misc: revised the whole build system again to be somewhat more useable for
+    AROS compiles. Now everything should compile/link fine for all AROS
+    targets as well.
+
 2009-06-02 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: added missing variable initialization.

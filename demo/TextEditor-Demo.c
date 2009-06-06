@@ -70,7 +70,9 @@ struct MUIMasterIFace *IMUIMaster;
 struct RexxSysIFace *IRexxSys;
 #endif
 
+#ifndef MUIA_Application_UsedClasses 
 #define MUIA_Application_UsedClasses  0x8042e9a7  /* V20 STRPTR * i.. */
+#endif
 #define MUIV_RunARexxScript           0xad800000
 
 long __stack = 16384;
@@ -471,14 +473,14 @@ int main(VOID)
                 ULONG ReturnID;
                 BPTR  rxstdout = 0L;
 
-                while((LONG)(ReturnID = DoMethod(app, MUIM_Application_NewInput, &sigs)) != MUIV_Application_ReturnID_Quit)
+                while((LONG)(ReturnID = DoMethod(app, MUIM_Application_NewInput, &sigs)) != (LONG)MUIV_Application_ReturnID_Quit)
                 {
                   if(ReturnID == MUIV_RunARexxScript && !myport)
                   {
                     struct MsgPort *rexxport;
                     const char *script = "Rexx:TextEditor/Demo.Rexx";
 
-                    if((rexxport = FindPort("REXX")) && (myport = CreateMsgPort()))
+                    if((rexxport = FindPort((STRPTR)"REXX")) && (myport = CreateMsgPort()))
                     {
                       if(!rxstdout)
                         rxstdout = Open("CON://640/100/TextEditor-Demo, ARexx output:/Close/Wait/Auto/InActive", MODE_READWRITE);

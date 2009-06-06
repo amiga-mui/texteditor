@@ -152,10 +152,12 @@ OBJDIR   = .obj_$(OS)
 BINDIR   = bin_$(OS)
 VPATH    = $(OBJDIR)
 LOCALE	= locale
+DEPFILE  = Makefile.dep
+DESTDIR  = MUI:Libs/MUI
 
 # target definition
-MCPTARGET = $(BINDIR)/TextEditor.mcp
-PREFTARGET= $(BINDIR)/TextEditor-Prefs
+TARGET    = $(BINDIR)/TextEditor.mcp
+TESTTARGET= $(BINDIR)/TextEditor-Prefs
 
 # Common compiler/linker flags
 WARN     = -W -Wall -Wwrite-strings -Wpointer-arith -Wsign-compare
@@ -166,6 +168,34 @@ CFLAGS   = -I. -I../include $(CPU) $(WARN) $(OPTFLAGS) \
            $(DEBUG) $(DEBUGSYM) $(USER_CFLAGS) -c
 LDFLAGS  = $(CPU) $(DEBUGSYM)
 LDLIBS   =
+
+###########################################################################
+# object files definition
+#
+
+LOBJS = library.o
+
+COBJS = locale.o \
+        CreatePrefsGroup.o \
+        Dispatcher.o \
+        Keybindings.o \
+        KeyStorage.o \
+        ObjectCreator.o \
+        Debug.o \
+        vastubs.o
+
+TOBJS = Preference.o
+
+MCCOBJS  = $(addprefix $(OBJDIR)/,$(LOBJS)) $(addprefix $(OBJDIR)/,$(COBJS))
+TESTOBJS = $(addprefix $(OBJDIR)/,$(COBJS)) $(addprefix $(OBJDIR)/,$(TOBJS))
+
+# available catalog translations
+CATALOGS = $(LOCALE)/german.catalog \
+           $(LOCALE)/french.catalog \
+           $(LOCALE)/swedish.catalog \
+           $(LOCALE)/danish.catalog \
+           $(LOCALE)/russian.catalog \
+           $(LOCALE)/czech.catalog
 
 # different options per target OS
 ifeq ($(OS), os4)
@@ -284,41 +314,16 @@ endif
 endif
 endif
 
-###########################################################################
-# Here starts all stuff that is common for all target platforms and
-# hosts.
-
-MCPOBJS = $(OBJDIR)/library.o \
-          $(OBJDIR)/locale.o \
-          $(OBJDIR)/CreatePrefsGroup.o \
-          $(OBJDIR)/Debug.o \
-          $(OBJDIR)/Dispatcher.o \
-          $(OBJDIR)/Keybindings.o \
-          $(OBJDIR)/KeyStorage.o \
-          $(OBJDIR)/ObjectCreator.o \
-          $(OBJDIR)/vastubs.o
-
-PREFOBJS= $(OBJDIR)/locale.o \
-          $(OBJDIR)/CreatePrefsGroup.o \
-          $(OBJDIR)/Debug.o \
-          $(OBJDIR)/Dispatcher.o \
-          $(OBJDIR)/Keybindings.o \
-          $(OBJDIR)/KeyStorage.o \
-          $(OBJDIR)/ObjectCreator.o \
-          $(OBJDIR)/Preference.o \
-          $(OBJDIR)/vastubs.o
-
-# available catalog translations
-CATALOGS = $(LOCALE)/german.catalog \
-           $(LOCALE)/french.catalog \
-           $(LOCALE)/swedish.catalog \
-           $(LOCALE)/danish.catalog \
-           $(LOCALE)/russian.catalog \
-           $(LOCALE)/czech.catalog
-
 # main target
 .PHONY: all
-all: $(BINDIR) $(OBJDIR) locale.c $(MCPTARGET) $(PREFTARGET)
+ifeq ($(wildcard $(DEPFILE)),$(DEPFILE))
+# great, we have a dependecies file, let's make our target
+all: $(BINDIR) $(OBJDIR) $(M68KSTUBS) $(TARGET) $(TESTTARGET)
+else
+# no dependecies, create it and then call make again
+all: depend
+	@make --no-print-directory all
+endif
 
 # for making a release we compile ALL target with no debug
 release:
@@ -365,21 +370,18 @@ $(LOCALE)/%.catalog: $(LOCALE)/%.ct
 	@$(FC) $(LOCALE)/TextEditor_mcp.cd $< CATALOG $@
 
 # for linking the target
-$(MCPTARGET): $(M68KSTUBS) $(MCPOBJS)
+$(TARGET): $(M68KSTUBS) $(MCCOBJS)
 	@echo "  LD $@.debug"
-	@$(CC) -nostartfiles $(LDFLAGS) -o $@.debug $(MCPOBJS) $(M68KSTUBS) $(LDLIBS) -Wl,--cref,-M,-Map=$@.map
+	@$(CC) -nostartfiles $(LDFLAGS) -o $@.debug $(MCCOBJS) $(M68KSTUBS) $(LDLIBS) -Wl,--cref,-M,-Map=$@.map
 	@echo "  LD $@"
 	@$(STRIP) --preserve-dates -R.comment -R.sdata2 -S -o $@ $@.debug
 
 # for linking the target
-$(PREFTARGET): $(PREFOBJS) $(OBJDIR)/Preference.o
+$(TESTTARGET): $(TESTOBJS)
 	@echo "  LD $@.debug"
-	@$(CC) $(LDFLAGS) -o $@.debug $(PREFOBJS) $(LDLIBS) -Wl,--cref,-M,-Map=$@.map
+	@$(CC) $(LDFLAGS) -o $@.debug $(TESTOBJS) $(LDLIBS) -Wl,--cref,-M,-Map=$@.map
 	@echo "  LD $@"
 	@$(STRIP) --preserve-dates -R.comment -R.sdata2 -S -o $@ $@.debug
-
-$(OBJDIR)/library.o: library.c ../include/mccinit.c \
-  ../include/mui/TextEditor_mcc.h private.h icon.bh TextEditor_mcp.h version.h
 
 locale.h: locale.c
 locale.c: $(LOCALE)/TextEditor_mcp.cd C_h.sd C_c.sd
@@ -396,18 +398,15 @@ $(LOCALE)/%.catalog: $(LOCALE)/%.ct
 
 catalogs: $(CATALOGS)
 
-
-#
-
 .PHONY: dump
 dump:
-	-$(OBJDUMP) --section-headers --all-headers --reloc --disassemble-all $(MCPTARGET) > $(MCPTARGET).dump
+	-$(OBJDUMP) --section-headers --all-headers --reloc --disassemble-all $(TARGET) >$(TARGET).dump
 
 .PHONY: clean
 clean:
-	-$(RM) $(MCPTARGET) $(MCPTARGET).debug $(MCPTARGET).map
-	-$(RM) $(PREFTARGET) $(PREFTARGET).debug $(PREFTARGET).map
-	-$(RM) $(MCPOBJS) $(PREFOBJS) $(M68KSTUBS)
+	-$(RM) $(TARGET) $(TARGET).debug $(TARGET).map
+	-$(RM) $(TESTTARGET) $(TESTTARGET).debug $(TESTTARGET).map
+	-$(RM) $(MCCOBJS) $(TESTOBJS) $(M68KSTUBS)
 
 .PHONY: distclean
 distclean: clean
@@ -415,3 +414,39 @@ distclean: clean
 	-$(RM) $(LOCALE)/*.catalog
 	-$(RMDIR) $(OBJDIR)
 	-$(RMDIR) $(BINDIR)
+
+# install
+.PHONY: install
+install: all
+	@echo "  IN $(TARGET)"
+	@$(CP) $(TARGET) $(DESTDIR)
+
+.PHONY: help
+help:
+	@echo "Cleaning targets:"
+	@echo "  clean     - Cleanup working directory for clean compile"
+	@echo "  distclean - Also cleanup autogenerated files"
+	@echo ""
+	@echo "Other generic targets:"
+	@echo "  all      - Build $(TARGET)"
+	@echo "  catalogs - Build all available catalogs"
+	@echo ""
+	@echo "Install targets:"
+	@echo "  install  - Install $(TARGET) into $(DESTDIR)"
+	@echo ""
+	@echo "Parameters:"
+	@echo "  make OS=os3|os4|mos|aros-i386|aros-i686|aros-ppc|aros-x86_64"
+	@echo "  make DEBUG= : build $(TARGET) without debugging information"
+	@echo ""
+
+## DEPENDENCY GENERATION ##############
+
+.PHONY: depend
+depend: 
+	@echo "  MK $(DEPFILE)"
+	@echo "# AUTOGENERATED! DO NOT EDIT!!!" >$(DEPFILE)
+	@$(CC) -MM $(CFLAGS) $(patsubst %.o,%.c, $(LOBJS)) $(patsubst %.o,%.c, $(COBJS)) $(patsubst %.o,%.c, $(TOBJS)) >>$(DEPFILE)
+	@echo "# AUTOGENERATED! DO NOT EDIT!!!" >>$(DEPFILE)
+
+# include dependencies file
+-include $(DEPFILE)
