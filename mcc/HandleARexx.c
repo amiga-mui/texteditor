@@ -81,7 +81,7 @@ enum
 };
 #define MaxArgs 8
 
-static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struct InstData *data)
+static ULONG CallFunction(UWORD function, IPTR *args, const char *txtargs, struct InstData *data)
 {
   struct line_node *oldactualline = data->actualline;
   UWORD oldCPos_X = data->CPos_X;
@@ -305,7 +305,7 @@ static ULONG CallFunction(UWORD function, LONG *args, const char *txtargs, struc
           else
             pos = xget(data->object, MUIA_TextEditor_CursorX);
 
-          snprintf(buffer, 16, "%ld", pos);
+          snprintf(buffer, 16, "%d", (int)pos);
 
           result = (ULONG)buffer;
         }
@@ -462,7 +462,7 @@ ULONG HandleARexx(struct InstData *data, STRPTR command)
 
     if(Commands[function].Command && (*txtargs == '\0' || Commands[function].Template))
     {
-      LONG Args[MaxArgs];
+      IPTR Args[MaxArgs];
 
       memset(Args, 0, sizeof(Args));
 
@@ -492,7 +492,7 @@ ULONG HandleARexx(struct InstData *data, STRPTR command)
             myrdargs->RDA_Source.CS_CurChr = 0;
             myrdargs->RDA_Flags |= RDAF_NOPROMPT;
 
-            if((ra_result = ReadArgs(Commands[function].Template, Args, myrdargs)))
+            if((ra_result = ReadArgs(Commands[function].Template, (LONG *)Args, myrdargs)))
             {
               result = CallFunction(function, Args, NULL, data);
 

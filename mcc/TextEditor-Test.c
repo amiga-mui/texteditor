@@ -65,14 +65,13 @@ MakeStaticHook(URLHook, URLHookCode);
 
 HOOKPROTONHNONP(PosHookCode, void)
 {
-  ULONG x, y, sx, sy;
+  unsigned int x, y, sx, sy;
   struct Rectangle *crsr;
-  if(DoMethod(editorgad, MUIM_TextEditor_BlockInfo, &x, &y, &sx, &sy))
-  {
-    printf("%ld, %ld, %ld, %ld\n", x, y, sx, sy);
-  }
 
-  if(get(editorgad, MUIA_TextEditor_CursorPosition, (APTR)&crsr))
+  if(DoMethod(editorgad, MUIM_TextEditor_BlockInfo, &x, &y, &sx, &sy))
+    printf("%d, %d, %d, %d\n", x, y, sx, sy);
+
+  if((crsr = (APTR)xget(editorgad, MUIA_TextEditor_CursorPosition)))
     printf("Cursor: (%d, %d) - (%d, %d)\n", crsr->MinX, crsr->MinY, crsr->MaxX, crsr->MaxY);
 }
 MakeStaticHook(PosHook, PosHookCode);
@@ -197,7 +196,7 @@ int main(void)
     GETINTERFACE(ILocale, LocaleBase))
   if((RexxSysBase = OpenLibrary("rexxsyslib.library", 36)) &&
     GETINTERFACE(IRexxSys, RexxSysBase))
-  if((UtilityBase = OpenLibrary("utility.library", 38)) &&
+  if((UtilityBase = (APTR)OpenLibrary("utility.library", 38)) &&
     GETINTERFACE(IUtility, UtilityBase))
   if((IFFParseBase = OpenLibrary("iffparse.library", 36)) &&
     GETINTERFACE(IIFFParse, IFFParseBase))
@@ -552,7 +551,7 @@ int main(void)
           {
             ULONG changed;
 
-            while((LONG)DoMethod(app, MUIM_Application_NewInput, &sigs) != MUIV_Application_ReturnID_Quit)
+            while((LONG)DoMethod(app, MUIM_Application_NewInput, &sigs) != (LONG)MUIV_Application_ReturnID_Quit)
             {
               if(sigs)
               {
@@ -620,7 +619,7 @@ int main(void)
   if(UtilityBase)
   {
     DROPINTERFACE(IUtility);
-    CloseLibrary(UtilityBase);
+    CloseLibrary((struct Library *)UtilityBase);
   }
 
   if(RexxSysBase)

@@ -142,7 +142,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
     if(emsg->Separator)
     {
       if(hookType == MUIV_TextEditor_ExportHook_Plain)
-        snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033[s:%ld]", (LONG)emsg->Separator);
+        snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033[s:%d]", emsg->Separator);
       else
         strlcpy(buf->pointer, ((emsg->Separator & LNSF_Thick) ? "<tsb>" : "<sb>"), buf->size-(buf->pointer-buf->buffer));
 
@@ -233,7 +233,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
           {
             if(color)
             {
-              snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033p[%ld]", (LONG)style);
+              snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033p[%d]", style);
               buf->pointer += strlen(buf->pointer);
             }
             else

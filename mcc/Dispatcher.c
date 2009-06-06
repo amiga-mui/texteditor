@@ -498,7 +498,7 @@ ULONG mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
     // the gadget was flagged as being ghosted.
     if(data->flags & FLG_Ghosted)
     {
-      UWORD *oldPattern = data->rport->AreaPtrn;
+      UWORD *oldPattern = (UWORD *)data->rport->AreaPtrn;
       UBYTE oldSize = data->rport->AreaPtSz;
       UWORD newPattern[] = {0x1111, 0x4444};
 

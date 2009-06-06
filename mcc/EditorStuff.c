@@ -30,6 +30,7 @@
 #include <proto/layers.h>
 #include <proto/exec.h>
 #include <proto/iffparse.h>
+#include <proto/intuition.h>
 
 #include "private.h"
 #include "Debug.h"

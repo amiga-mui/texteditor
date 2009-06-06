@@ -95,7 +95,7 @@ DISPATCHER(SpeedSlider_Dispatcher)
     {
       static char buf[20];
 
-      snprintf(buf, sizeof(buf), "%ld ms", smsg->value*25);
+      snprintf(buf, sizeof(buf), "%d ms", (int)smsg->value*25);
 
       return (ULONG)buf;
     }

@@ -2,7 +2,7 @@
 
  BetterString.mcc - A better String gadget MUI Custom Class
  Copyright (C) 1997-2000 Allan Odgaard
- Copyright (C) 2005 by BetterString.mcc Open Source Team
+ Copyright (C) 2005-2009 by BetterString.mcc Open Source Team
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -27,8 +27,12 @@
 #include <exec/types.h>
 #endif
 
-#define MUIC_HotkeyString       "HotkeyString.mcc"
-#define HotkeyStringObject      MUI_NewObject(MUIC_HotkeyString
+#define MUIC_HotkeyString   "HotkeyString.mcc"
+#if defined(__AROS__) && !defined(NO_INLINE_STDARG)
+#define HotkeyStringObject  MUIOBJMACRO_START(MUIC_HotkeyString)
+#else
+#define HotkeyStringObject  MUI_NewObject(MUIC_HotkeyString
+#endif
 
 #define MUIA_HotkeyString_Snoop 0xad001000
 #define MUIA_HotkeyString_IX    0xad001002	/* V12 IS. */

@@ -151,9 +151,11 @@ PREFIX   = $(CDTHIS)
 OBJDIR   = .obj_$(OS)
 BINDIR   = bin_$(OS)
 VPATH    = $(OBJDIR)
+DEPFILE  = Makefile.dep
+DESTDIR  = MUI:Libs/MUI
 
 # target definition
-MCCTARGET = $(BINDIR)/TextEditor.mcc
+TARGET    = $(BINDIR)/TextEditor.mcc
 TESTTARGET= $(BINDIR)/TextEditor-Test
 
 # Common compiler/linker flags
@@ -165,6 +167,46 @@ CFLAGS   = -I. -I../mcp -I../include $(CPU) $(WARN) $(OPTFLAGS) \
            $(DEBUG) $(DEBUGSYM) $(USER_CFLAGS) -c
 LDFLAGS  = $(CPU) $(DEBUGSYM)
 LDLIBS   =
+
+###########################################################################
+# object files definition
+#
+
+LOBJS = library.o
+
+COBJS = AllocBitMap.o \
+        AllocFunctions.o \
+        BlockOperators.o \
+        CaseConversion.o \
+		  ColorOperators.o \
+        Dispatcher.o \
+        EditorStuff.o \
+        ExportHook.o \
+        ExportBlock.o \
+        ExportText.o \
+        GetSetAttrs.o \
+        HandleARexx.o \
+		  HandleInput.o \
+        InitConfig.o \
+        ImportHook.o \
+        ImportText.o \
+        Keybindings.o \
+        Methods.o \
+        MixedFunctions.o \
+        Navigation.o \
+        Pointer.o \
+        PrintLineWithStyles.o \
+        Search.o \
+        SpellChecker.o \
+        StyleOperators.o \
+        UndoFunctions.o \
+        Debug.o \
+        vastubs.o
+
+TOBJS = TextEditor-Test.o
+
+MCCOBJS  = $(addprefix $(OBJDIR)/,$(LOBJS)) $(addprefix $(OBJDIR)/,$(COBJS))
+TESTOBJS = $(addprefix $(OBJDIR)/,$(COBJS)) $(addprefix $(OBJDIR)/,$(TOBJS))
 
 # different options per target OS
 ifeq ($(OS), os4)
@@ -283,73 +325,16 @@ endif
 endif
 endif
 
-###########################################################################
-# Here starts all stuff that is common for all target platforms and
-# hosts.
-
-MCCOBJS = $(OBJDIR)/library.o \
-          $(OBJDIR)/AllocBitMap.o \
-          $(OBJDIR)/AllocFunctions.o \
-          $(OBJDIR)/BlockOperators.o \
-          $(OBJDIR)/CaseConversion.o \
-          $(OBJDIR)/ColorOperators.o \
-          $(OBJDIR)/Debug.o \
-          $(OBJDIR)/Dispatcher.o \
-          $(OBJDIR)/EditorStuff.o \
-          $(OBJDIR)/ExportHook.o \
-          $(OBJDIR)/ExportBlock.o \
-          $(OBJDIR)/ExportText.o \
-          $(OBJDIR)/GetSetAttrs.o \
-          $(OBJDIR)/HandleARexx.o \
-          $(OBJDIR)/HandleInput.o \
-          $(OBJDIR)/InitConfig.o \
-          $(OBJDIR)/ImportHook.o \
-          $(OBJDIR)/ImportText.o \
-          $(OBJDIR)/Keybindings.o \
-          $(OBJDIR)/Methods.o \
-          $(OBJDIR)/MixedFunctions.o \
-          $(OBJDIR)/Navigation.o \
-          $(OBJDIR)/Pointer.o \
-          $(OBJDIR)/PrintLineWithStyles.o \
-          $(OBJDIR)/Search.o \
-          $(OBJDIR)/SpellChecker.o \
-          $(OBJDIR)/StyleOperators.o \
-          $(OBJDIR)/UndoFunctions.o \
-          $(OBJDIR)/vastubs.o
-
-TESTOBJS= $(OBJDIR)/TextEditor-Test.o \
-          $(OBJDIR)/AllocBitMap.o \
-          $(OBJDIR)/AllocFunctions.o \
-          $(OBJDIR)/BlockOperators.o \
-          $(OBJDIR)/CaseConversion.o \
-          $(OBJDIR)/ColorOperators.o \
-          $(OBJDIR)/Debug.o \
-          $(OBJDIR)/Dispatcher.o \
-          $(OBJDIR)/EditorStuff.o \
-          $(OBJDIR)/ExportHook.o \
-          $(OBJDIR)/ExportBlock.o \
-          $(OBJDIR)/ExportText.o \
-          $(OBJDIR)/GetSetAttrs.o \
-          $(OBJDIR)/HandleARexx.o \
-          $(OBJDIR)/HandleInput.o \
-          $(OBJDIR)/InitConfig.o \
-          $(OBJDIR)/ImportHook.o \
-          $(OBJDIR)/ImportText.o \
-          $(OBJDIR)/Keybindings.o \
-          $(OBJDIR)/Methods.o \
-          $(OBJDIR)/MixedFunctions.o \
-          $(OBJDIR)/Navigation.o \
-          $(OBJDIR)/Pointer.o \
-          $(OBJDIR)/PrintLineWithStyles.o \
-          $(OBJDIR)/Search.o \
-          $(OBJDIR)/SpellChecker.o \
-          $(OBJDIR)/StyleOperators.o \
-          $(OBJDIR)/UndoFunctions.o \
-          $(OBJDIR)/vastubs.o
-
 # main target
 .PHONY: all
-all: $(BINDIR) $(OBJDIR) $(MCCTARGET) $(TESTTARGET)
+ifeq ($(wildcard $(DEPFILE)),$(DEPFILE))
+# great, we have a dependecies file, let's make our target
+all: $(BINDIR) $(OBJDIR) $(M68KSTUBS) $(TARGET) $(TESTTARGET)
+else
+# no dependecies, create it and then call make again
+all: depend
+	@make --no-print-directory all
+endif
 
 # for making a release we compile ALL target with no debug
 release:
@@ -392,7 +377,7 @@ $(OBJDIR)/mccclass_68k.o: ../include/mccclass_68k.c
 	@$(CC) $(CFLAGS) $< -o $@
 
 # for linking the target
-$(MCCTARGET): $(M68KSTUBS) $(MCCOBJS)
+$(TARGET): $(M68KSTUBS) $(MCCOBJS)
 	@echo "  LD $@.debug"
 	@$(CC) -nostartfiles $(LDFLAGS) -o $@.debug $(MCCOBJS) $(M68KSTUBS) $(LDLIBS) -Wl,--cref,-M,-Map=$@.map
 	@echo "  LD $@"
@@ -405,18 +390,13 @@ $(TESTTARGET): $(TESTOBJS)
 	@echo "  LD $@"
 	@$(STRIP) --preserve-dates -R.comment -R.sdata2 -S -o $@ $@.debug
 
-$(OBJDIR)/library.o: library.c ../include/mccinit.c \
-  ../include/mui/TextEditor_mcc.h private.h version.h
-
-#
-
 .PHONY: dump
 dump:
-	-$(OBJDUMP) --section-headers --all-headers --reloc --disassemble-all $(MCCTARGET) > $(MCCTARGET).dump
+	-$(OBJDUMP) --section-headers --all-headers --reloc --disassemble-all $(TARGET) > $(TARGET).dump
 
 .PHONY: clean
 clean:
-	-$(RM) $(MCCTARGET) $(MCCTARGET).debug $(MCCTARGET).map
+	-$(RM) $(TARGET) $(TARGET).debug $(TARGET).map
 	-$(RM) $(TESTTARGET) $(TESTTARGET).debug $(TESTTARGET).map
 	-$(RM) $(MCCOBJS) $(TESTOBJS) $(M68KSTUBS)
 
@@ -424,3 +404,39 @@ clean:
 distclean: clean
 	-$(RMDIR) $(OBJDIR)
 	-$(RMDIR) $(BINDIR)
+
+# install
+.PHONY: install
+install: all
+	@echo "  IN $(TARGET)"
+	@$(CP) $(TARGET) $(DESTDIR)
+
+.PHONY: help
+help:
+	@echo "Cleaning targets:"
+	@echo "  clean     - Cleanup working directory for clean compile"
+	@echo "  distclean - Also cleanup autogenerated files"
+	@echo ""
+	@echo "Other generic targets:"
+	@echo "  all      - Build $(TARGET)"
+	@echo "  catalogs - Build all available catalogs"
+	@echo ""
+	@echo "Install targets:"
+	@echo "  install  - Install $(TARGET) into $(DESTDIR)"
+	@echo ""
+	@echo "Parameters:"
+	@echo "  make OS=os3|os4|mos|aros-i386|aros-i686|aros-ppc|aros-x86_64"
+	@echo "  make DEBUG= : build $(TARGET) without debugging information"
+	@echo ""
+
+## DEPENDENCY GENERATION ##############
+
+.PHONY: depend
+depend: 
+	@echo "  MK $(DEPFILE)"
+	@echo "# AUTOGENERATED! DO NOT EDIT!!!" >$(DEPFILE)
+	@$(CC) -MM $(CFLAGS) $(patsubst %.o,%.c, $(LOBJS)) $(patsubst %.o,%.c, $(COBJS)) $(patsubst %.o,%.c, $(TOBJS)) >>$(DEPFILE)
+	@echo "# AUTOGENERATED! DO NOT EDIT!!!" >>$(DEPFILE)
+
+# include dependencies file
+-include $(DEPFILE)

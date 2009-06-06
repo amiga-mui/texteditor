@@ -23,9 +23,11 @@
 #include <intuition/classes.h>
 #include <utility/tagitem.h>
 #include <clib/alib_protos.h>
+
 #include <proto/graphics.h>
 #include <proto/utility.h>
 #include <proto/layers.h>
+#include <proto/intuition.h>
 
 #include <libraries/mui.h>
 #include <proto/muimaster.h>
@@ -224,7 +226,7 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
   }
 
   tags = msg->ops_AttrList;
-  while((tag = NextTagItem(&tags)))
+  while((tag = NextTagItem((APTR)&tags)))
   {
     ULONG ti_Data = tag->ti_Data;
 

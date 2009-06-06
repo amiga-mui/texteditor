@@ -95,7 +95,7 @@ static LONG SendRexx(char *word, const char *command, UNUSED struct InstData *da
   ENTER();
 
   Forbid();
-  rexxport = FindPort("REXX");
+  rexxport = FindPort((STRPTR)"REXX");
   Permit();
 
   if(rexxport != NULL)
@@ -185,7 +185,7 @@ static BPTR CloneSearchPath(void)
           struct PathNode *node;
 
           dir = lock->fl_Link;
-          dir2 = DupLock(lock->fl_Key);
+          dir2 = DupLock((BPTR)lock->fl_Key);
           if (!dir2) break;
 
           /* Use AllocVec(), because this memory is freed by FreeVec()

@@ -28,6 +28,7 @@
 #include <proto/graphics.h>
 #include <proto/layers.h>
 #include <proto/exec.h>
+#include <proto/intuition.h>
 
 #include <proto/muimaster.h>
 
@@ -578,7 +579,7 @@ void  DumpText(LONG visual_y, LONG line_nr, LONG lines, BOOL doublebuffer, struc
 
     if(drawbottom && (data->maxlines > (data->totallines-data->visual_y+1)))
     {
-        UWORD *oldPattern = data->rport->AreaPtrn;
+        UWORD *oldPattern = (UWORD *)data->rport->AreaPtrn;
         UBYTE oldSize = data->rport->AreaPtSz;
         UWORD newPattern[] = {0x1111, 0x4444};
 

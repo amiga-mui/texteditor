@@ -1,7 +1,7 @@
 /*******************************************************************************
 
         Name:           mccinit.c
-        Versionstring:  $VER: mccinit.c 1.14 (02.05.2009)
+        Versionstring:  $VER: mccinit.c 1.17 (02.06.2009)
         Author:         Jens Langner <Jens.Langner@light-speed.de>
         Distribution:   PD (public domain)
         Description:    library init file for easy generation of a MUI
@@ -47,6 +47,9 @@
   1.13  01.04.2009 : fixed the broken prototype for the assembler stackswap_call
                      function.
   1.14  02.05.2009 : added RTF_EXTENDED for the MorphOS build as well
+  1.15  24.05.2009 : fixed some compiler warnings appear on AROS compile
+  1.16  25.05.2009 : fixed some compiler warnings appear on OS3/MOS compile
+  1.17  02.06.2009 : more fixes to better comply for AROS compilation
 
  About:
 
@@ -291,7 +294,7 @@ static struct LibraryHeader * LIBFUNC LibInit    (struct LibraryHeader *base, BP
 static BPTR                   LIBFUNC LibExpunge (struct LibraryManagerInterface *Self);
 static struct LibraryHeader * LIBFUNC LibOpen    (struct LibraryManagerInterface *Self, ULONG version);
 static BPTR                   LIBFUNC LibClose   (struct LibraryManagerInterface *Self);
-static ULONG                  LIBFUNC MCC_Query  (UNUSED struct Interface *self, REG(d0, LONG which));
+static IPTR                   LIBFUNC MCC_Query  (UNUSED struct Interface *self, REG(d0, LONG which));
 
 #elif defined(__MORPHOS__)
 
@@ -300,7 +303,7 @@ static BPTR                   LIBFUNC LibExpunge (void);
 static struct LibraryHeader * LIBFUNC LibOpen    (void);
 static BPTR                   LIBFUNC LibClose   (void);
 static LONG                   LIBFUNC LibNull    (void);
-static ULONG                  LIBFUNC MCC_Query  (void);
+static IPTR                   LIBFUNC MCC_Query  (void);
 
 #else
 
@@ -309,7 +312,7 @@ static BPTR                   LIBFUNC LibExpunge (REG(a6, struct LibraryHeader *
 static struct LibraryHeader * LIBFUNC LibOpen    (REG(d0, ULONG version), REG(a6, struct LibraryHeader *base));
 static BPTR                   LIBFUNC LibClose   (REG(a6, struct LibraryHeader *base));
 static LONG                   LIBFUNC LibNull    (void);
-static ULONG                  LIBFUNC MCC_Query  (REG(d0, LONG which));
+static IPTR                   LIBFUNC MCC_Query  (REG(d0, LONG which));
 
 #endif
 
@@ -603,7 +606,7 @@ static BOOL callMccFunction(ULONG (*function)(struct LibraryHeader *), struct Li
   NewGetTaskAttrsA(tc, &stacksize, sizeof(ULONG), TASKINFOTYPE_STACKSIZE, NULL);
   #else
   // on all other systems we query via SPUpper-SPLower calculation
-  stacksize = (ULONG)tc->tc_SPUpper - (ULONG)tc->tc_SPLower;
+  stacksize = (IPTR)tc->tc_SPUpper - (IPTR)tc->tc_SPLower;
   #endif
 
   // Swap stacks only if current stack is insufficient
@@ -616,7 +619,13 @@ static BOOL callMccFunction(ULONG (*function)(struct LibraryHeader *), struct Li
       if((stack->stk_Lower = AllocVec(MIN_STACKSIZE, MEMF_PUBLIC)) != NULL)
       {
         // perform the StackSwap
+        #if defined(__AROS__)
+        // AROS uses an APTR type for stk_Upper
+        stack->stk_Upper = (APTR)((IPTR)stack->stk_Lower + MIN_STACKSIZE);
+        #else
+        // all other systems use ULONG
         stack->stk_Upper = (ULONG)stack->stk_Lower + MIN_STACKSIZE;
+        #endif
         stack->stk_Pointer = (APTR)stack->stk_Upper;
 
         // call routine but with embedding it into a [NewPPC]StackSwap()
@@ -657,7 +666,7 @@ static ULONG mccLibInit(struct LibraryHeader *base)
   if((DOSBase = (struct DosLibrary*)OpenLibrary("dos.library", 36)) &&
      (GfxBase = (struct GfxBase*)OpenLibrary("graphics.library", 36)) &&
      (IntuitionBase = (struct IntuitionBase*)OpenLibrary("intuition.library", 36)) &&
-     (UtilityBase = OpenLibrary("utility.library", 36)))
+     (UtilityBase = (APTR)OpenLibrary("utility.library", 36)))
   #endif
   {
     // we have to please the internal utilitybase
@@ -733,7 +742,7 @@ static ULONG mccLibInit(struct LibraryHeader *base)
     }
 
     DROPINTERFACE(IUtility);
-    CloseLibrary(UtilityBase);
+    CloseLibrary((struct Library *)UtilityBase);
     UtilityBase = NULL;
   }
 
@@ -806,7 +815,7 @@ static ULONG mccLibExpunge(UNUSED struct LibraryHeader *base)
   if(UtilityBase)
   {
     DROPINTERFACE(IUtility);
-    CloseLibrary(UtilityBase);
+    CloseLibrary((struct Library *)UtilityBase);
     UtilityBase = NULL;
   }
 
@@ -1149,14 +1158,14 @@ static BPTR LIBFUNC LibClose(REG(a6, struct LibraryHeader *base))
 /*****************************************************************************************************/
 
 #if defined(__amigaos4__)
-static ULONG LIBFUNC MCC_Query(UNUSED struct Interface *self, REG(d0, LONG which))
+static IPTR LIBFUNC MCC_Query(UNUSED struct Interface *self, REG(d0, LONG which))
 {
 #elif defined(__MORPHOS__)
-static ULONG MCC_Query(void)
+static IPTR MCC_Query(void)
 {
   LONG which = (LONG)REG_D0;
 #else
-static ULONG LIBFUNC MCC_Query(REG(d0, LONG which))
+static IPTR LIBFUNC MCC_Query(REG(d0, LONG which))
 {
 #endif
 
@@ -1165,18 +1174,18 @@ static ULONG LIBFUNC MCC_Query(REG(d0, LONG which))
   switch (which)
   {
     #ifdef SUPERCLASS
-    case 0: return((ULONG)ThisClass);
+    case 0: return((IPTR)ThisClass);
     #endif
 
     #ifdef SUPERCLASSP
-    case 1: return((ULONG)ThisClassP);
+    case 1: return((IPTR)ThisClassP);
     #endif
 
     #ifdef PREFSIMAGEOBJECT
     case 2:
     {
       Object *obj = PREFSIMAGEOBJECT;
-      return((ULONG)obj);
+      return((IPTR)obj);
     }
     #endif
 
@@ -1197,21 +1206,21 @@ static ULONG LIBFUNC MCC_Query(REG(d0, LONG which))
     #ifdef USEDCLASSES
     case 5:
     {
-      return((ULONG)USEDCLASSES);
+      return((IPTR)USEDCLASSES);
     }
     #endif
 
     #ifdef USEDCLASSESP
     case 6:
     {
-      return((ULONG)USEDCLASSESP);
+      return((IPTR)USEDCLASSESP);
     }
     #endif
 
     #ifdef SHORTHELP
     case 7:
     {
-      return((ULONG)SHORTHELP);
+      return((IPTR)SHORTHELP);
     }
     #endif
   }
