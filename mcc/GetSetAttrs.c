@@ -36,10 +36,10 @@
 
 #include "version.h"
 
-ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
+IPTR Get(struct IClass *cl, Object *obj, struct opGet *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
-  ULONG ti_Data;
+  IPTR ti_Data;
 
   ENTER();
 
@@ -70,7 +70,7 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
       data->CursorPosition.MinY = yplace;
       data->CursorPosition.MaxX = xplace + cursor_width - 1;
       data->CursorPosition.MaxY = yplace + data->height - 1;
-      ti_Data = (ULONG)&data->CursorPosition;
+      ti_Data = (IPTR)&data->CursorPosition;
     }
     break;
 
@@ -91,7 +91,7 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
     break;
 
     case MUIA_TextEditor_KeyUpFocus:
-      ti_Data = (ULONG)data->KeyUpFocus;
+      ti_Data = (IPTR)data->KeyUpFocus;
     break;
 
     case MUIA_Version:
@@ -103,7 +103,7 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
     break;
 
     case MUIA_ControlChar:
-      ti_Data = (ULONG)data->CtrlChar;
+      ti_Data = (IPTR)data->CtrlChar;
       break;
 
     case MUIA_TextEditor_AreaMarked:
@@ -183,7 +183,7 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
     break;
 
     case MUIA_Font:
-      ti_Data = (ULONG)data->font;
+      ti_Data = (IPTR)data->font;
       break;
 
     case MUIA_TextEditor_UndoLevels:
@@ -200,12 +200,12 @@ ULONG Get(struct IClass *cl, Object *obj, struct opGet *msg)
   return(TRUE);
 }
 
-ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
+IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
   struct TagItem *tags, *tag;
   char  *contents = NULL;
-  ULONG result = FALSE;
+  IPTR  result = FALSE;
   ULONG crsr_x = 0xffff, crsr_y = 0xffff;
 
   ENTER();
@@ -221,8 +221,8 @@ ULONG Set(struct IClass *cl, Object *obj, struct opSet *msg)
     data->UpdateInfo = msg;
     MUI_Redraw(obj, MADF_DRAWUPDATE);
 
-    RETURN((ULONG)data->UpdateInfo);
-    return((ULONG)data->UpdateInfo);
+    RETURN((IPTR)data->UpdateInfo);
+    return((IPTR)data->UpdateInfo);
   }
 
   tags = msg->ops_AttrList;

@@ -507,9 +507,9 @@ void *SuggestWindow (struct InstData *);
 void AddClipping    (struct InstData *);
 void RemoveClipping (struct InstData *);
 
-ULONG Get(struct IClass *, Object *, struct opGet *);
-ULONG Set(struct IClass *, Object *, struct opSet *);
-ULONG HandleInput(struct IClass *, Object *, struct MUIP_HandleEvent *);
+IPTR Get(struct IClass *, Object *, struct opGet *);
+IPTR Set(struct IClass *, Object *, struct opSet *);
+IPTR HandleInput(struct IClass *, Object *, struct MUIP_HandleEvent *);
 
 void Key_Backspace  (struct InstData *);
 void Key_Delete   (struct InstData *);
