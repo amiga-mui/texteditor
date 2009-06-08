@@ -120,7 +120,7 @@ void  RejectInput(struct InstData *data)
 }
 
 
-ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
+IPTR New(struct IClass *cl, Object *obj, struct opSet *msg)
 {
   ENTER();
 
@@ -172,8 +172,8 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
             // start with an inactive cursor
             data->currentCursorState = CS_INACTIVE;
 
-            RETURN((ULONG)obj);
-            return((ULONG)obj);
+            RETURN((IPTR)obj);
+            return((IPTR)obj);
           }
         }
       }
@@ -185,7 +185,7 @@ ULONG New(struct IClass *cl, Object *obj, struct opSet *msg)
   return(FALSE);
 }
 
-ULONG Dispose(struct IClass *cl, Object *obj, Msg msg)
+IPTR Dispose(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
 
@@ -211,7 +211,7 @@ ULONG Dispose(struct IClass *cl, Object *obj, Msg msg)
   return(DoSuperMethodA(cl, obj, msg));
 }
 
-ULONG Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
+IPTR Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
 {
   struct InstData *data = INST_DATA(cl, obj);
 
@@ -281,10 +281,10 @@ ULONG Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
   return(FALSE);
 }
 
-ULONG Cleanup(struct IClass *cl, Object *obj, Msg msg)
+IPTR Cleanup(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
-  ULONG result = 0;
+  IPTR result = 0;
 
   ENTER();
 
@@ -311,11 +311,15 @@ ULONG Cleanup(struct IClass *cl, Object *obj, Msg msg)
 
   result = DoSuperMethodA(cl, obj, msg);
 
+#ifdef __AROS__
+  DeinitRastPort(&data->tmprp);
+#endif
+
   RETURN(result);
   return result;
 }
 
-ULONG AskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
+IPTR AskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
   struct MUI_MinMax *mi;
@@ -440,7 +444,7 @@ ULONG Show(struct IClass *cl, Object *obj, Msg msg)
   return(TRUE);
 }
 
-ULONG Hide(struct IClass *cl, Object *obj, Msg msg)
+IPTR Hide(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
 
@@ -451,6 +455,9 @@ ULONG Hide(struct IClass *cl, Object *obj, Msg msg)
   nnset(data->SuggestWindow, MUIA_Window_Open, FALSE);
   set(_win(obj), MUIA_Window_DisableKeys, 0L);
   MUIG_FreeBitMap(data->doublebuffer);
+#ifdef __AROS__
+  DeinitRastPort(&data->doublerp);
+#endif
   data->doublerp.BitMap = NULL;
   data->rport = NULL;
 
@@ -458,7 +465,7 @@ ULONG Hide(struct IClass *cl, Object *obj, Msg msg)
   return(DoSuperMethodA(cl, obj, msg));
 }
 
-ULONG mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
+IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
 
@@ -527,7 +534,7 @@ DISPATCHER(_Dispatcher)
   BOOL t_haschanged;
   UWORD t_pen;
   BOOL areamarked;
-  ULONG result = 0;
+  IPTR result = 0;
 
   ENTER();
 
@@ -629,7 +636,7 @@ DISPATCHER(_Dispatcher)
 
     case MUIM_GoActive:
     {
-      ULONG result;
+      IPTR result;
 
       D(DBF_STARTUP, "MUIM_GoActive");
 
@@ -665,7 +672,7 @@ DISPATCHER(_Dispatcher)
 
     case MUIM_GoInactive:
     {
-      ULONG result;
+      IPTR result;
 
       D(DBF_STARTUP, "MUIM_GoInActive");
 

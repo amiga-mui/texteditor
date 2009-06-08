@@ -67,7 +67,7 @@ static ULONG RAWToANSI(struct IntuiMessage *imsg)
   return(code);
 }
 
-ULONG HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
+IPTR HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
   BOOL wasActivated;

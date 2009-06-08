@@ -129,28 +129,28 @@ struct MUIP_TextEditor_Search            { STACKED ULONG MethodID; STACKED STRPT
 struct MUIP_TextEditor_MarkText          { STACKED ULONG MethodID; STACKED ULONG start_crsr_x; STACKED ULONG start_crsr_y; STACKED ULONG stop_crsr_x; STACKED ULONG stop_crsr_y; };
 struct MUIP_TextEditor_QueryKeyAction    { STACKED ULONG MethodID; STACKED ULONG keyAction; };
 
-#define MUIV_TextEditor_ExportHook_Plain       0x00000000
-#define MUIV_TextEditor_ExportHook_EMail       0x00000001
-#define MUIV_TextEditor_ExportHook_NoStyle     0x00000002
+#define MUIV_TextEditor_ExportHook_Plain       0x00000000UL
+#define MUIV_TextEditor_ExportHook_EMail       0x00000001UL
+#define MUIV_TextEditor_ExportHook_NoStyle     0x00000002UL
 
-#define MUIV_TextEditor_Flow_Left              0x00000000
-#define MUIV_TextEditor_Flow_Center            0x00000001
-#define MUIV_TextEditor_Flow_Right             0x00000002
-#define MUIV_TextEditor_Flow_Justified         0x00000003
+#define MUIV_TextEditor_Flow_Left              0x00000000UL
+#define MUIV_TextEditor_Flow_Center            0x00000001UL
+#define MUIV_TextEditor_Flow_Right             0x00000002UL
+#define MUIV_TextEditor_Flow_Justified         0x00000003UL
 
-#define MUIV_TextEditor_ImportHook_Plain       0x00000000
-#define MUIV_TextEditor_ImportHook_EMail       0x00000002
-#define MUIV_TextEditor_ImportHook_MIME        0x00000003
-#define MUIV_TextEditor_ImportHook_MIMEQuoted  0x00000004
+#define MUIV_TextEditor_ImportHook_Plain       0x00000000UL
+#define MUIV_TextEditor_ImportHook_EMail       0x00000002UL
+#define MUIV_TextEditor_ImportHook_MIME        0x00000003UL
+#define MUIV_TextEditor_ImportHook_MIMEQuoted  0x00000004UL
 
-#define MUIV_TextEditor_InsertText_Cursor      0x00000000
-#define MUIV_TextEditor_InsertText_Top         0x00000001
-#define MUIV_TextEditor_InsertText_Bottom      0x00000002
+#define MUIV_TextEditor_InsertText_Cursor      0x00000000UL
+#define MUIV_TextEditor_InsertText_Top         0x00000001UL
+#define MUIV_TextEditor_InsertText_Bottom      0x00000002UL
 
 /* Values for MUIA_TextEditor_WrapMode */
-#define MUIV_TextEditor_WrapMode_NoWrap        0x00000000
-#define MUIV_TextEditor_WrapMode_SoftWrap      0x00000001
-#define MUIV_TextEditor_WrapMode_HardWrap      0x00000002
+#define MUIV_TextEditor_WrapMode_NoWrap        0x00000000UL
+#define MUIV_TextEditor_WrapMode_SoftWrap      0x00000001UL
+#define MUIV_TextEditor_WrapMode_HardWrap      0x00000002UL
 
 /* Values for MUIM_TextEditor_MarkText */
 #define MUIV_TextEditor_MarkText_All           -1

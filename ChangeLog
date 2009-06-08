@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-06-08 Matthias Rustler <mrustler@gmx.de>
+
+  * AROS metamakefiles added
+  * Re-added some fixes from previous AROS port
+  * Some 64-bit fixes.
+
 2009-06-06 Jens Langner <Jens.Langner@light-speed.de>
 
   * misc: revised the whole build system again to be somewhat more useable for
