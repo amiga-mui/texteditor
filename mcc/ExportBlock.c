@@ -49,31 +49,30 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
     newblock.stopx     = data->CPos_X;
   }
 
-  if(flags & MUIF_TextEditor_ExportBlock_TakeBlock)
+  if(isFlagSet(flags, MUIF_TextEditor_ExportBlock_TakeBlock))
   {
 
-    if (msg->starty <= (ULONG)data->totallines)
-        newblock.startline = LineNode(msg->starty+1, data);
+    if(msg->starty <= (ULONG)data->totallines)
+      newblock.startline = LineNode(msg->starty+1, data);
 
-    if (msg->startx <= (newblock.startline)->line.Length)
-        newblock.startx = msg->startx;
+    if(msg->startx <= (newblock.startline)->line.Length)
+      newblock.startx = msg->startx;
 
-    if (msg->stopx <= (newblock.startline)->line.Length)
-        newblock.stopx = msg->stopx;
+    if(msg->stopx <= (newblock.startline)->line.Length)
+      newblock.stopx = msg->stopx;
 
-    if (msg->starty <= (ULONG)data->totallines)
-        newblock.stopline = LineNode(msg->stopy+1, data);
+    if(msg->starty <= (ULONG)data->totallines)
+      newblock.stopline = LineNode(msg->stopy+1, data);
   }
 
   node = newblock.startline;
 
-
   // clear the export message
-  memset(&emsg, 0, sizeof(struct ExportMessage));
+  memset(&emsg, 0, sizeof(emsg));
 
   // now we export all selected/marked lines with
   // the currently active export hook
-  while(node)
+  while(node != NULL)
   {
     struct line_node *next_node = node->next;
 
@@ -124,3 +123,4 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
   RETURN(user_data);
   return user_data;
 }
+
