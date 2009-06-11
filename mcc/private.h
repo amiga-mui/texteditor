@@ -481,6 +481,8 @@ struct line_node *ImportText(char *, struct InstData *, struct Hook *, LONG);
 void *ExportText(struct MUIP_TextEditor_ExportText *msg, struct InstData *data);
 void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data);
 
+ULONG OM_SetBlock(struct MUIP_TextEditor_SetBlock *msg, struct InstData *data);
+
 struct  line_node *loadtext (void);
 unsigned short  *CheckStyles      (char *);
 
@@ -597,7 +599,6 @@ enum
 
   FLG_NumberOf
 };
-
 
 #define  MUIM_TextEditor_InputTrigger     0xad000101
 #define  MUIM_TextEditor_ToggleCursor     0xad000102
