@@ -481,8 +481,6 @@ struct line_node *ImportText(char *, struct InstData *, struct Hook *, LONG);
 void *ExportText(struct MUIP_TextEditor_ExportText *msg, struct InstData *data);
 void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data);
 
-ULONG OM_SetBlock(struct MUIP_TextEditor_SetBlock *msg, struct InstData *data);
-
 struct  line_node *loadtext (void);
 unsigned short  *CheckStyles      (char *);
 
@@ -536,6 +534,7 @@ ULONG OM_BlockInfo  (struct MUIP_TextEditor_BlockInfo *, struct InstData *);
 ULONG OM_Search   (struct MUIP_TextEditor_Search *, struct InstData *);
 ULONG OM_Replace    (Object *obj, struct MUIP_TextEditor_Replace *msg, struct InstData *data);
 ULONG OM_QueryKeyAction(struct IClass *cl, Object *obj, struct MUIP_TextEditor_QueryKeyAction *msg);
+ULONG OM_SetBlock(struct MUIP_TextEditor_SetBlock *msg, struct InstData *data);
 
 // Pointer.c
 void SetupSelectPointer(struct InstData *data);

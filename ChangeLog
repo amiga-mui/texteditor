@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-06-11 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcc/SetBlock.c, mcc/ExportBlock.c: fixed the SetBlock logic to check each
+    flag after another instead of allowing only one flag. This is exactly what
+    the autodoc for SetBlock suggests. In addition, several things have been
+    cleaned up to better match our general code layout.
+
 2009-06-11 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ExportBlock.c, mcc/SetBlock.c: replaced some hand crafted flag checks by
@@ -15,9 +22,8 @@ $URL$
 
 2009-06-11 Gianfranco Gignina <sh1nkur0@libero.it>
 
-  * Implemented MUIM_TextEditor_SetBlock and modified
-   MUIM_TextEditor_ExportBlock to get block giving to it coordinates, see
-   autodoc for more details.
+  * Implemented MUIM_TextEditor_SetBlock and modified MUIM_TextEditor_ExportBlock
+    to get block giving to it coordinates, see autodoc for more details.
 
 2009-06-08 Matthias Rustler <mrustler@gmx.de>
 

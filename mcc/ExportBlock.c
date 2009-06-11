@@ -107,7 +107,6 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
         emsg.SkipBack = 0;
     }
     
-
     // call the ExportHook and exit immediately if it returns NULL
     if((user_data = (void*)CallHookPkt(exportHook, NULL, &emsg)) == NULL)
       break;
