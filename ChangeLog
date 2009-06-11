@@ -7,6 +7,8 @@ $URL$
 
 2009-06-11 Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/ExportBlock.c, mcc/SetBlock.c: replaced some hand crafted flag checks by
+    our isFlag#?() macros.
   * mcc/Makefile, include/mui/TextEditor_mcc.h: fixed completely broken Makefile
     and include file. Gianfranco, please make sure to check in working files
     without any unfixed conflicts!
