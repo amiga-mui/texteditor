@@ -178,7 +178,7 @@ COBJS = AllocBitMap.o \
         AllocFunctions.o \
         BlockOperators.o \
         CaseConversion.o \
-		  ColorOperators.o \
+  		  ColorOperators.o \
         Dispatcher.o \
         EditorStuff.o \
         ExportHook.o \
@@ -186,7 +186,7 @@ COBJS = AllocBitMap.o \
         ExportText.o \
         GetSetAttrs.o \
         HandleARexx.o \
-		  HandleInput.o \
+	  	  HandleInput.o \
         InitConfig.o \
         ImportHook.o \
         ImportText.o \
@@ -197,6 +197,7 @@ COBJS = AllocBitMap.o \
         Pointer.o \
         PrintLineWithStyles.o \
         Search.o \
+        SetBlock.o \
         SpellChecker.o \
         StyleOperators.o \
         UndoFunctions.o \
@@ -325,75 +326,6 @@ endif
 endif
 endif
 
-<<<<<<< .mine
-###########################################################################
-# Here starts all stuff that is common for all target platforms and
-# hosts.
-
-MCCOBJS = $(OBJDIR)/library.o \
-          $(OBJDIR)/AllocBitMap.o \
-          $(OBJDIR)/AllocFunctions.o \
-          $(OBJDIR)/BlockOperators.o \
-          $(OBJDIR)/CaseConversion.o \
-          $(OBJDIR)/ColorOperators.o \
-          $(OBJDIR)/Debug.o \
-          $(OBJDIR)/Dispatcher.o \
-          $(OBJDIR)/EditorStuff.o \
-          $(OBJDIR)/ExportHook.o \
-          $(OBJDIR)/ExportBlock.o \
-          $(OBJDIR)/SetBlock.o \
-          $(OBJDIR)/ExportText.o \
-          $(OBJDIR)/GetSetAttrs.o \
-          $(OBJDIR)/HandleARexx.o \
-          $(OBJDIR)/HandleInput.o \
-          $(OBJDIR)/InitConfig.o \
-          $(OBJDIR)/ImportHook.o \
-          $(OBJDIR)/ImportText.o \
-          $(OBJDIR)/Keybindings.o \
-          $(OBJDIR)/Methods.o \
-          $(OBJDIR)/MixedFunctions.o \
-          $(OBJDIR)/Navigation.o \
-          $(OBJDIR)/Pointer.o \
-          $(OBJDIR)/PrintLineWithStyles.o \
-          $(OBJDIR)/Search.o \
-          $(OBJDIR)/SpellChecker.o \
-          $(OBJDIR)/StyleOperators.o \
-          $(OBJDIR)/UndoFunctions.o \
-          $(OBJDIR)/vastubs.o
-
-TESTOBJS= $(OBJDIR)/TextEditor-Test.o \
-          $(OBJDIR)/AllocBitMap.o \
-          $(OBJDIR)/AllocFunctions.o \
-          $(OBJDIR)/BlockOperators.o \
-          $(OBJDIR)/CaseConversion.o \
-          $(OBJDIR)/ColorOperators.o \
-          $(OBJDIR)/Debug.o \
-          $(OBJDIR)/Dispatcher.o \
-          $(OBJDIR)/EditorStuff.o \
-          $(OBJDIR)/ExportHook.o \
-          $(OBJDIR)/ExportBlock.o \
-          $(OBJDIR)/SetBlock.o \
-          $(OBJDIR)/ExportText.o \
-          $(OBJDIR)/GetSetAttrs.o \
-          $(OBJDIR)/HandleARexx.o \
-          $(OBJDIR)/HandleInput.o \
-          $(OBJDIR)/InitConfig.o \
-          $(OBJDIR)/ImportHook.o \
-          $(OBJDIR)/ImportText.o \
-          $(OBJDIR)/Keybindings.o \
-          $(OBJDIR)/Methods.o \
-          $(OBJDIR)/MixedFunctions.o \
-          $(OBJDIR)/Navigation.o \
-          $(OBJDIR)/Pointer.o \
-          $(OBJDIR)/PrintLineWithStyles.o \
-          $(OBJDIR)/Search.o \
-          $(OBJDIR)/SpellChecker.o \
-          $(OBJDIR)/StyleOperators.o \
-          $(OBJDIR)/UndoFunctions.o \
-          $(OBJDIR)/vastubs.o
-
-=======
->>>>>>> .r513
 # main target
 .PHONY: all
 ifeq ($(wildcard $(DEPFILE)),$(DEPFILE))

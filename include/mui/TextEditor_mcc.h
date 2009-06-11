@@ -118,23 +118,10 @@ extern "C" {
 #define MUIM_TextEditor_QueryKeyAction        (TextEditor_Dummy + 0x2d)
 #define MUIM_TextEditor_SetBlock              (TextEditor_Dummy + 0x2e)
 
-<<<<<<< .mine
-struct MUIP_TextEditor_ARexxCmd          { ULONG MethodID; STRPTR command; };
-struct MUIP_TextEditor_BlockInfo         { ULONG MethodID; ULONG *startx; ULONG *starty; ULONG *stopx; ULONG *stopy; };
-struct MUIP_TextEditor_ClearText         { ULONG MethodID; };
-struct MUIP_TextEditor_ExportBlock       { ULONG MethodID; ULONG flags; ULONG startx; ULONG starty; ULONG stopx; ULONG stopy;};
-struct MUIP_TextEditor_ExportText        { ULONG MethodID; };
-struct MUIP_TextEditor_HandleError       { ULONG MethodID; ULONG errorcode; }; /* See below for error codes */
-struct MUIP_TextEditor_InsertText        { ULONG MethodID; STRPTR text; LONG pos; }; /* See below for positions */
-struct MUIP_TextEditor_Replace           { ULONG MethodID; STRPTR NewString; ULONG Flags; };
-struct MUIP_TextEditor_Search            { ULONG MethodID; STRPTR SearchString; ULONG Flags; };
-struct MUIP_TextEditor_MarkText          { ULONG MethodID; ULONG start_crsr_x; ULONG start_crsr_y; ULONG stop_crsr_x; ULONG stop_crsr_y; };
-struct MUIP_TextEditor_QueryKeyAction    { ULONG MethodID; ULONG keyAction; };
-=======
 struct MUIP_TextEditor_ARexxCmd          { STACKED ULONG MethodID; STACKED STRPTR command; };
 struct MUIP_TextEditor_BlockInfo         { STACKED ULONG MethodID; STACKED ULONG *startx; STACKED ULONG *starty; STACKED ULONG *stopx; STACKED ULONG *stopy; };
 struct MUIP_TextEditor_ClearText         { STACKED ULONG MethodID; };
-struct MUIP_TextEditor_ExportBlock       { STACKED ULONG MethodID; STACKED ULONG flags; };
+struct MUIP_TextEditor_ExportBlock       { STACKED ULONG MethodID; STACKED ULONG flags; STACKED ULONG startx; STACKED ULONG starty; STACKED ULONG stopx; STACKED ULONG stopy; };
 struct MUIP_TextEditor_ExportText        { STACKED ULONG MethodID; };
 struct MUIP_TextEditor_HandleError       { STACKED ULONG MethodID; STACKED ULONG errorcode; }; /* See below for error codes */
 struct MUIP_TextEditor_InsertText        { STACKED ULONG MethodID; STACKED STRPTR text; STACKED LONG pos; }; /* See below for positions */
@@ -142,8 +129,7 @@ struct MUIP_TextEditor_Replace           { STACKED ULONG MethodID; STACKED STRPT
 struct MUIP_TextEditor_Search            { STACKED ULONG MethodID; STACKED STRPTR SearchString; STACKED ULONG Flags; };
 struct MUIP_TextEditor_MarkText          { STACKED ULONG MethodID; STACKED ULONG start_crsr_x; STACKED ULONG start_crsr_y; STACKED ULONG stop_crsr_x; STACKED ULONG stop_crsr_y; };
 struct MUIP_TextEditor_QueryKeyAction    { STACKED ULONG MethodID; STACKED ULONG keyAction; };
->>>>>>> .r513
-struct MUIP_TextEditor_SetBlock          { ULONG MethodID; ULONG startx; ULONG starty; ULONG stopx; ULONG stopy; ULONG operation; ULONG value;};
+struct MUIP_TextEditor_SetBlock          { STACKED ULONG MethodID; STACKED ULONG startx; STACKED ULONG starty; STACKED ULONG stopx; STACKED ULONG stopy; STACKED ULONG operation; STACKED ULONG value; };
 
 #define MUIV_TextEditor_ExportHook_Plain       0x00000000UL
 #define MUIV_TextEditor_ExportHook_EMail       0x00000001UL
@@ -287,3 +273,4 @@ struct MUIP_TextEditor_Keybinding
 #endif
 
 #endif /* TEXTEDITOR_MCC_H */
+
