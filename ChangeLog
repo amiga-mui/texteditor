@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-06-11 Gianfranco Gignina <sh1nkur0@libero.it>
+
+  *Implemented MUIM_TextEditor_SetBlock and modified
+   MUIM_TextEditor_ExportBlock to get block giving to it coordinates, see
+   autodoc for more details.
+
 2009-06-08 Matthias Rustler <mrustler@gmx.de>
 
   * AROS metamakefiles added
