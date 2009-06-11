@@ -43,6 +43,7 @@ TextEditor.mcc/MUIA_TextEditor_WrapMode
 TextEditor.mcc/MUIM_TextEditor_ARexxCmd
 TextEditor.mcc/MUIM_TextEditor_BlockInfo
 TextEditor.mcc/MUIM_TextEditor_ClearText
+TextEditor.mcc/MUIM_TextEditor_SetBlock
 TextEditor.mcc/MUIM_TextEditor_ExportBlock
 TextEditor.mcc/MUIM_TextEditor_ExportText
 TextEditor.mcc/MUIM_TextEditor_HandleError
@@ -1106,6 +1107,11 @@ TextEditor.mcc/MUIM_TextEditor_Search
     SYNOPSIS
         DoMethod(obj, MUIM_TextEditor_ExportBlock, ULONG flags);
 
+        DoMethod(obj, MUIM_TextEditor_ExportBlock, 
+                    MUIF_TextEditor_ExportBlock_TakeBlock, 
+                    ULONG startx, ULONG starty, 
+                    ULONG stopx, ULONG stopy);
+
     FUNCTION
         This method exports portions of the current text via the active
         export hook and returns it in an AllocVec() allocated string.
@@ -1122,6 +1128,13 @@ TextEditor.mcc/MUIM_TextEditor_Search
             non-marked characters as well. If no text is marked, then the
             line where the current cursor is on will be exported.
 
+          MUIF_TextEditor_ExportBlock_TakeBlock:
+            Passing this flag the method will accept 4 ULONG coordinates, 
+            startx, starty, stopx, stopy. Passing after this flag these 
+            coordinates permitts to retrieve a block of text without it is 
+            currently marked. useful to analize a block without user sees a 
+            similar behaviour marking a block.
+
     RESULT
         Depends on the export hook.  The built-in hooks will return
         a pointer to a NUL-terminated buffer containing all the text.
@@ -1132,6 +1145,69 @@ TextEditor.mcc/MUIM_TextEditor_Search
         MUIA_TextEditor_ExportHook
         MUIM_TextEditor_InsertText
         MUIM_TextEditor_ExportText
+
+ TextEditor.mcc/MUIM_TextEditor_SetBlock
+
+    NAME
+        MUIM_TextEditor_SetBlock (v15.29)
+
+    SYNOPSIS
+        DoMethod(obj, MUIM_TextEditor_SetBlock,
+                      ULONG startx, ULONG starty,
+                      ULONG stopx, ULONG stopy,
+                      ULONG operation, ULONG value);
+
+    FUNCTION
+        This method performs a specific operation on a text block that
+        is defined by four coordinates (startx,starty,stopx,stopy)
+        (see MUIM_TextEditor_BlockInfo). The types of operations that
+        can be performed are supplied via a flag variable 'operation'
+        and an optional value for all operations can be supplied via
+        'value'.
+
+        Possible flags for the 'operation' variable are:
+
+          MUIF_TextEditor_SetBlock_Color:
+            The text block will be assigned a text color in accordance
+            to the supplied color number in parameter 'value'.
+            (see MUIA_TextEditor_ColorMap and MUIA_TextEditor_Pen).
+
+          MUIF_TextEditor_SetBlock_StyleBold:
+            Depending on the content of the 'value' (TRUE/FALSE) the
+            selected text block will get the bold style added or
+            removed.
+
+          MUIF_TextEditor_SetBlock_StyleItalic:
+            Depending on the content of 'value' (TRUE/FALSE) the
+            selected text block will get the italic style added or
+            removed.
+
+          MUIF_TextEditor_SetBlock_StyleUnderline:
+            Depending on the content of 'value' (TRUE/FALSE) the
+            selected text block will get the underline style added or
+            removed.
+
+          MUIF_TextEditor_SetBlock_Flow:
+            Depending on the content of 'value' the selected text block
+            will change it's alignment.
+            (see MUIA_TextEditor_Flow for possible values)
+
+    RESULT
+        TRUE if operation succeeded, FALSE if it failed.
+
+    NOTE
+        When combining multiple operations via flags, care have to be
+        taken for the content of 'value'. E.g. it is not possible to
+        have bold style added and italic style removed because of the
+        global usage of the 'value' parameter. So for mutual exclusive
+        operations you will have to call this method multiple times.
+
+    SEE ALSO
+        MUIA_TextEditor_ExportBlock
+        MUIM_TextEditor_BlockInfo
+        MUIA_TextEditor_ColorMap
+        MUIA_TextEditor_Pen
+        MUIA_TextEditor_Flow
 
 TextEditor.mcc/MUIM_TextEditor_ExportText
 

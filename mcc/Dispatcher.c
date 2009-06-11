@@ -580,6 +580,7 @@ DISPATCHER(_Dispatcher)
       case MUIM_TextEditor_ToggleCursor:
       case MUIM_TextEditor_MarkText:
       case MUIM_TextEditor_ClearText:
+      case MUIM_TextEditor_SetBlock:
       case MUIM_HandleEvent:
       case MUIM_GoInactive:
       case MUIM_GoActive:
@@ -748,7 +749,7 @@ DISPATCHER(_Dispatcher)
     }
     break;
 
-    case MUIM_TextEditor_ExportBlock: result = (ULONG)ExportBlock((struct MUIP_TextEditor_ExportBlock *)msg, data); RETURN(result); return(result); break;
+    case MUIM_TextEditor_ExportBlock:      result = (ULONG)ExportBlock((struct MUIP_TextEditor_ExportBlock *)msg, data); RETURN(result); return(result); break;
     case MUIM_TextEditor_ExportText:  result = (ULONG)ExportText((struct MUIP_TextEditor_ExportText *)msg, data); RETURN(result); return(result); break;
     case MUIM_TextEditor_ARexxCmd:    result = HandleARexx(data, ((struct MUIP_TextEditor_ARexxCmd *)msg)->command); break;
     case MUIM_TextEditor_MarkText:    result = OM_MarkText((struct MUIP_TextEditor_MarkText *)msg, data); break;
@@ -756,6 +757,7 @@ DISPATCHER(_Dispatcher)
     case MUIM_TextEditor_Search:      result = OM_Search((struct MUIP_TextEditor_Search *)msg, data); break;
     case MUIM_TextEditor_Replace:     result = OM_Replace(obj, (struct MUIP_TextEditor_Replace *)msg, data); break;
     case MUIM_TextEditor_QueryKeyAction: result = OM_QueryKeyAction(cl, obj, (struct MUIP_TextEditor_QueryKeyAction *)msg); break;
+    case MUIM_TextEditor_SetBlock:      result = OM_SetBlock((struct MUIP_TextEditor_SetBlock *)msg, data); RETURN(result); return(result); break;
 
     case MUIM_Export:
     {

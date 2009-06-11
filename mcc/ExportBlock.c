@@ -49,7 +49,24 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
     newblock.stopx     = data->CPos_X;
   }
 
+  if(flags & MUIF_TextEditor_ExportBlock_TakeBlock)
+  {
+
+    if (msg->starty <= (ULONG)data->totallines)
+        newblock.startline = LineNode(msg->starty+1, data);
+
+    if (msg->startx <= (newblock.startline)->line.Length)
+        newblock.startx = msg->startx;
+
+    if (msg->stopx <= (newblock.startline)->line.Length)
+        newblock.stopx = msg->stopx;
+
+    if (msg->starty <= (ULONG)data->totallines)
+        newblock.stopline = LineNode(msg->stopy+1, data);
+  }
+
   node = newblock.startline;
+
 
   // clear the export message
   memset(&emsg, 0, sizeof(struct ExportMessage));
@@ -90,6 +107,7 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
       else
         emsg.SkipBack = 0;
     }
+    
 
     // call the ExportHook and exit immediately if it returns NULL
     if((user_data = (void*)CallHookPkt(exportHook, NULL, &emsg)) == NULL)
