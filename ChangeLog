@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-06-15 Matthias Rustler <mrustler@gmx.de>
+
+  * mmakefile.src : new file SetBlock added
+  * demo/mmakefile.src : created
+  * demo/TextEditor-Demo.c: some warnings removed
+
 2009-06-11 Jens Langner <Jens.Langner@light-speed.de>
 
   * mcc/SetBlock.c, mcc/ExportBlock.c: fixed the SetBlock logic to check each
