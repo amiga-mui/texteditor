@@ -1429,6 +1429,10 @@ TextEditor.mcc/MUIM_TextEditor_Search
          MUIF_TextEditor_Search_CaseSensitive
           If you want the search to be case sensitive, then set this flag.
 
+         MUIF_TextEditor_Search_Backwards
+          With this flag TextEditor will perform a backward search from 
+          cursor position.
+
     RESULT
         TRUE if the string was found, otherwise FALSE.
 

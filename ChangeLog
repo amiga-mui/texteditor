@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-06-18 Gianfranco Gignina <sh1nkur0 at libero.it>
+
+  * Implemented MUIF_TextEditor_Search_Backwards for MUIM_TextEditor_Search.
+
 2009-06-15 Matthias Rustler <mrustler@gmx.de>
 
   * mmakefile.src : new file SetBlock added
@@ -26,7 +30,7 @@ $URL$
     and include file. Gianfranco, please make sure to check in working files
     without any unfixed conflicts!
 
-2009-06-11 Gianfranco Gignina <sh1nkur0@libero.it>
+2009-06-11 Gianfranco Gignina <sh1nkur0  at libero.it>
 
   * Implemented MUIM_TextEditor_SetBlock and modified MUIM_TextEditor_ExportBlock
     to get block giving to it coordinates, see autodoc for more details.
