@@ -492,7 +492,7 @@ ULONG HandleARexx(struct InstData *data, STRPTR command)
             myrdargs->RDA_Source.CS_CurChr = 0;
             myrdargs->RDA_Flags |= RDAF_NOPROMPT;
 
-            if((ra_result = ReadArgs(Commands[function].Template, (LONG *)Args, myrdargs)))
+            if((ra_result = ReadArgs(Commands[function].Template, Args, myrdargs)))
             {
               result = CallFunction(function, Args, NULL, data);
 

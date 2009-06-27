@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-06-27 Matthias Rustler <mrustler@gmx.de>
+
+  * include/libraries/mui.h: backport of an AROS related fix.
+  * misc: some warnings removed
+
 2009-06-18 Gianfranco Gignina <sh1nkur0 at libero.it>
 
   * Implemented MUIF_TextEditor_Search_Backwards for MUIM_TextEditor_Search.

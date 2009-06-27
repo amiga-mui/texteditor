@@ -108,7 +108,7 @@ enum Keys
 
 void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage)
 {
-  LONG args[key_count];
+  IPTR args[key_count];
   struct RDArgs *ra_result;
   struct RDArgs *myrdargs;
 
