@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-06-30 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/HandleArexx.c, mcp/KeyStorage.c: fixed two warnings.
+
 2009-06-27 Matthias Rustler <mrustler@gmx.de>
 
   * include/libraries/mui.h: backport of an AROS related fix.
