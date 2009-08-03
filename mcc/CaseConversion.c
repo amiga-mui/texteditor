@@ -28,12 +28,12 @@ VOID MangleCharacters(UBYTE (*change)(UBYTE c), struct InstData *data)
 {
   LONG startx, stopx, _startx;
   struct line_node *startline, *stopline, *_startline;
+  struct marking newblock;
 
   ENTER();
 
   if(Enabled(data))
   {
-    struct marking newblock;
     NiceBlock(&data->blockinfo, &newblock);
     startx    = newblock.startx;
     stopx     = newblock.stopx;
@@ -46,7 +46,16 @@ VOID MangleCharacters(UBYTE (*change)(UBYTE c), struct InstData *data)
     stopx     = startx+1;
     startline = data->actualline;
     stopline  = startline;
+
+    newblock.enabled   = FALSE;
+    newblock.startline = startline;
+    newblock.stopline  = stopline;
+    newblock.startx    = startx;
+    newblock.stopx     = stopx;
   }
+
+  AddToUndoBuffer(ET_DELETEBLOCK, (char *)&newblock, data);
+  AddToUndoBuffer(ET_PASTEBLOCK, (char *)&newblock, data);
 
   _startx = startx;
   _startline = startline;
