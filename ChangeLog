@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-08-03 Gianfranco Gignina <sh1nkur0 at libero.it>
+
+  * mcc/CaseConversion.c : now ToUpper and ToLower operations 
+    are can be reverted by user;
+
 2009-06-30 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleArexx.c, mcp/KeyStorage.c: fixed two warnings.
