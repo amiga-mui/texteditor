@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-08-21 Gianfranco Gignina <sh1nkur0 at libero.it>
+
+  * mcc/all : Inserted special comment strings to better read 
+    sources on CubicIDE;
+
 2009-08-14 Thore Böckelmann <tboeckel@gmx.de>
 
   * Makefiles: added "-g" to the debug flags. It seems the OS3 GCC 2.95.3 cross
