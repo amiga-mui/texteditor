@@ -26,6 +26,7 @@
 
 #include "private.h"
 
+///SimpleMarkText()
 VOID SimpleMarkText (UWORD startx, struct line_node *startline, UWORD stopx, struct line_node *stopline, struct InstData *data)
 {
   ENTER();
@@ -51,10 +52,12 @@ VOID SimpleMarkText (UWORD startx, struct line_node *startline, UWORD stopx, str
 
   LEAVE();
 }
+///
 
 static LONG Native_strncmp (STRPTR str1, STRPTR str2, LONG len) { return strncmp(str1, str2, len); }
 static LONG Utility_strnicmp (STRPTR str1, STRPTR str2, LONG len) { return Strnicmp(str1, str2, len); }
 
+///OM_Search()
 ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
 {
   STRPTR str = msg->SearchString;
@@ -177,7 +180,9 @@ ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
   RETURN(FALSE);
   return FALSE;
 }
+///
 
+///OM_Replace()
 ULONG OM_Replace (Object *obj, struct MUIP_TextEditor_Replace *msg, struct InstData *data)
 {
   ULONG res = FALSE;
@@ -194,3 +199,4 @@ ULONG OM_Replace (Object *obj, struct MUIP_TextEditor_Replace *msg, struct InstD
   RETURN(res);
   return res;
 }
+///

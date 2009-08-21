@@ -24,6 +24,7 @@
 
 #include "private.h"
 
+///MangleCharacters()
 VOID MangleCharacters(UBYTE (*change)(UBYTE c), struct InstData *data)
 {
   LONG startx, stopx, _startx;
@@ -80,36 +81,50 @@ VOID MangleCharacters(UBYTE (*change)(UBYTE c), struct InstData *data)
 
   LEAVE();
 }
+///
 
+///ChangeToUpper()
 UBYTE ChangeToUpper(UBYTE c)
 {
   return ToUpper(c);
 }
+///
 
+///Key_ToUpper()
 VOID Key_ToUpper(struct InstData *data)
 {
   MangleCharacters(ChangeToUpper, data);
 }
+///
 
+///ChangeToLower()
 UBYTE ChangeToLower(UBYTE c)
 {
   return ToLower(c);
 }
+///
 
+///Key_ToLower()
 VOID Key_ToLower(struct InstData *data)
 {
   MangleCharacters(ChangeToLower, data);
 }
+///
 
-/*VOID ChangeToOtherCase (UBYTE &letter)
+/*
+///ChangeToOtherCase()
+VOID ChangeToOtherCase (UBYTE &letter)
 {
   if(isupper(letter))
       letter = ToLower(letter);
   else  letter = ToUpper(letter);
 }
+///
 
+///Key_ToOtherCase()
 VOID Key_ToOtherCase (struct InstData *data)
 {
   MangleCharacters(ChangeToOtherCase, data);
 }
+///
 */
