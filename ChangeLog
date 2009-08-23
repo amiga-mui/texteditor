@@ -5,10 +5,17 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.29 RELEASE ############################################################
+
+2009-08-23 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcp/library.c, misc: fixed the version string and prepared everything for a
+    new official release.
+
 2009-08-21 Gianfranco Gignina <sh1nkur0 at libero.it>
 
   * mcc/all : Inserted special comment strings to better read 
-    sources on CubicIDE;
+    sources on CubicIDE
 
 2009-08-14 Thore Böckelmann <tboeckel@gmx.de>
 
