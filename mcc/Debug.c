@@ -102,6 +102,7 @@ void SetupDebug(void)
       { "rexx",      DBF_REXX      },
       { "clipboard", DBF_CLIPBOARD },
       { "undo",      DBF_UNDO      },
+      { "dump",      DBF_DUMP      },
       { "all",       DBF_ALL       },
       { NULL,        0             }
     };

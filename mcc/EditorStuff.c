@@ -137,7 +137,7 @@ static char *utf8_to_ansi(struct InstData *data, STRPTR src)
 /*----------------------*
  * Paste from Clipboard *
  *----------------------*/
-BOOL PasteClip (LONG x, struct line_node *actline, struct InstData *data)
+BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
 {
   struct line_node *line = NULL;
   struct line_node *startline = NULL;
@@ -452,6 +452,43 @@ BOOL PasteClip (LONG x, struct line_node *actline, struct InstData *data)
 }
 ///
 
+///DumpLine()
+#if defined(DEBUG)
+static void DumpLine(struct line_node *line)
+{
+  ENTER();
+
+  D(DBF_DUMP, "length %3ld, contents '%s'", line->line.Length, line->line.Contents);
+
+  if(line->line.Styles != NULL)
+  {
+    UWORD *styles = line->line.Styles;
+
+    D(DBF_DUMP, "styles:");
+    while(*styles != EOS)
+    {
+      D(DBF_DUMP, "style %04lx starting at column %3ld", styles[1], styles[0]);
+      styles += 2;
+    }
+  }
+
+  if(line->line.Colors != NULL)
+  {
+    UWORD *colors = line->line.Colors;
+
+    D(DBF_DUMP, "colors:");
+    while(*colors != 0xffff)
+    {
+      D(DBF_DUMP, "color %3ld starting at column %3ld", colors[1], colors[0]);
+      colors += 2;
+    }
+  }
+
+  LEAVE();
+}
+#endif
+///
+
 ///MergeLines()
 /*--------------------------*
  * Merge two lines into one *
@@ -729,6 +766,11 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
 
   ENTER();
 
+  #if defined(DEBUG)
+  D(DBF_DUMP, "before split");
+  DumpLine(line);
+  #endif
+
   OffsetToLines(x, line, &pos, data);
   lines = pos.lines;
 
@@ -773,7 +815,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
 
       if((newstyles = MyAllocPooled(data->mypool, length)) != NULL)
       {
-          UWORD *nstyles = newstyles;
+        UWORD *nstyles = newstyles;
 
         if(isFlagSet(style, BOLD))
         {
@@ -814,7 +856,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
         *ostyles++ = x+1;
         *ostyles++ = ~UNDERLINE;
       }
-      if(x != 0)
+      if(x == 0)
         ostyles = line->line.Styles;
       *ostyles = EOS;
     }
@@ -853,7 +895,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
         }
         *ncolors = 0xffff;
       }
-      if(x != 0)
+      if(x == 0)
         ocolors = line->line.Colors;
       *ocolors = 0xffff;
     }
@@ -906,7 +948,8 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
             ScrollDown(line_nr, 1, data);
           }
         }
-        else  DumpText(data->visual_y+line_nr-1, line_nr-1, data->maxlines, TRUE, data);
+        else
+          DumpText(data->visual_y+line_nr-1, line_nr-1, data->maxlines, TRUE, data);
       }
       else
       {
@@ -930,6 +973,13 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
         }
       }
 
+      #if defined(DEBUG)
+      D(DBF_DUMP, "after split, old line");
+      DumpLine(line);
+      D(DBF_DUMP, "after split, new line");
+      DumpLine(newline);
+      #endif
+
       RETURN(TRUE);
       return(TRUE);
     }
@@ -951,8 +1001,16 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
           if(line_nr+1 <= data->maxlines)
             PrintLine(0, line->next, line_nr+1, FALSE, data);
         }
-        else  DumpText(data->visual_y+line_nr, line_nr, data->maxlines, TRUE, data);
+        else
+          DumpText(data->visual_y+line_nr, line_nr, data->maxlines, TRUE, data);
       }
+
+      #if defined(DEBUG)
+      D(DBF_DUMP, "after split, old line");
+      DumpLine(line);
+      D(DBF_DUMP, "after split, new line");
+      DumpLine(newline);
+      #endif
 
       RETURN(TRUE);
       return(TRUE);
@@ -989,6 +1047,13 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
     while((c < line->line.Length) && (line_nr <= data->maxlines))
       c = c + PrintLine(c, line, line_nr++, TRUE, data);
   /* Her printes !HELE! den nye linie, burde optimeres! */
+
+    #if defined(DEBUG)
+    D(DBF_DUMP, "after split, old line");
+    DumpLine(line);
+    D(DBF_DUMP, "after split, new line");
+    DumpLine(newline);
+    #endif
 
     RETURN(TRUE);
     return (TRUE);
@@ -1069,19 +1134,18 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
 
   do
   {
+    width = LineCharsWidth(line->line.Contents + skip, data);
+
     // don't exceed the line length!
     if(skip > (LONG)line->line.Length)
       break;
 
-    width = LineCharsWidth(line->line.Contents + skip, data);
-    if(width > 0 && skip + width < x)
-    {
-      lineabove_width = width;
-      skip += width;
-      line_nr++;
-    }
-    else
+    if(width <= 0 || skip + width >= x)
       break;
+
+    lineabove_width = width;
+    skip += width;
+    line_nr++;
   }
   while(TRUE);
 
@@ -1225,9 +1289,9 @@ BOOL RemoveChars(LONG x, struct line_node *line, LONG length, struct InstData *d
   {
     if(*line->line.Styles != EOS)
     {
-        UWORD start_style = GetStyle(x-1, line);
-        UWORD end_style = GetStyle(x+length, line);
-        ULONG c = 0, store;
+      UWORD start_style = GetStyle(x-1, line);
+      UWORD end_style = GetStyle(x+length, line);
+      ULONG c = 0, store;
 
       while(*(line->line.Styles+c) <= x)
         c += 2;
