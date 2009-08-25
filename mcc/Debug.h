@@ -60,6 +60,7 @@
 #define DBF_REXX      (1<<3)     // HandleARexx.c
 #define DBF_CLIPBOARD (1<<4)     // EditorStuff.c, BlockOperators.c
 #define DBF_UNDO      (1<<5)     // UndoFunctions.c
+#define DBF_DUMP      (1<<6)
 #define DBF_ALL       0xffffffff
 
 void SetupDebug(void);
