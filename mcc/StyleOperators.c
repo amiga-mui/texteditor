@@ -24,8 +24,8 @@
 
 #include "private.h"
 
-///UpdateStyles()
-void  UpdateStyles (struct InstData *data)
+/// UpdateStyles()
+void UpdateStyles(struct InstData *data)
 {
   UWORD style;
 
@@ -33,7 +33,7 @@ void  UpdateStyles (struct InstData *data)
 
   if(Enabled(data))
   {
-      struct marking newblock;
+    struct marking newblock;
 
     NiceBlock(&data->blockinfo, &newblock);
     style = GetStyle(data->blockinfo.stopx - ((newblock.startx == data->blockinfo.startx && newblock.startline == data->blockinfo.startline) ? 1 : 0), data->blockinfo.stopline);
@@ -45,146 +45,161 @@ void  UpdateStyles (struct InstData *data)
 
   if(style != data->style)
   {
-      UWORD oldstyle = data->style;
+    UWORD oldstyle = data->style;
 
     data->style = style;
 
-    if(style & BOLD)
+    if(isFlagSet(style, BOLD))
     {
-      if(!(oldstyle & BOLD))
+      if(isFlagClear(oldstyle, BOLD))
         set(data->object, MUIA_TextEditor_StyleBold, TRUE);
     }
     else
     {
-      if(oldstyle & BOLD)
+      if(isFlagClear(oldstyle, BOLD))
         set(data->object, MUIA_TextEditor_StyleBold, FALSE);
     }
-    if(style & ITALIC)
+    if(isFlagSet(style, ITALIC))
     {
-      if(!(oldstyle & ITALIC))
+      if(isFlagClear(oldstyle, ITALIC))
         set(data->object, MUIA_TextEditor_StyleItalic, TRUE);
     }
     else
     {
-      if(oldstyle & ITALIC)
+      if(isFlagClear(oldstyle, ITALIC))
         set(data->object, MUIA_TextEditor_StyleItalic, FALSE);
     }
-    if(style & UNDERLINE)
+    if(isFlagSet(style, UNDERLINE))
     {
-      if(!(oldstyle & UNDERLINE))
+      if(isFlagClear(oldstyle, UNDERLINE))
         set(data->object, MUIA_TextEditor_StyleUnderline, TRUE);
     }
     else
     {
-      if(oldstyle & UNDERLINE)
+      if(isFlagClear(oldstyle, UNDERLINE))
         set(data->object, MUIA_TextEditor_StyleUnderline, FALSE);
     }
   }
 
   LEAVE();
 }
-///
 
-///GetStyle()
-LONG  GetStyle (LONG x, struct line_node *line)
+///
+/// GetStyle()
+UWORD GetStyle(LONG x, struct line_node *line)
 {
-  LONG  style = 0;
+  UWORD style = 0;
 
   ENTER();
 
-  if(line->line.Styles)
+  if(line->line.Styles != NULL)
   {
-      unsigned short *styles = line->line.Styles;
+    struct LineStyle *styles = line->line.Styles;
 
-    while(*styles <= x+1)
+    while(styles->column <= x+1)
     {
-      if(*++styles > 0xff)
-          style &= *styles++;
-      else  style |= *styles++;
+      if(styles->style > 0xff)
+        style &= styles->style;
+      else
+        style |= styles->style;
+
+      styles++;
     }
   }
 
   RETURN(style);
   return(style);
 }
-///
 
-///AddStyleToLine()
-void  AddStyleToLine  (LONG x, struct line_node *line, LONG length, unsigned short style, struct InstData *data)
+///
+/// AddStyleToLine()
+void AddStyleToLine(LONG x, struct line_node *line, LONG length, UWORD style, struct InstData *data)
 {
-  unsigned short *styles    = line->line.Styles;
-  unsigned short *oldstyles = styles;
-  unsigned short *newstyles;
-  unsigned short cur_style = 0;
-  unsigned short end_style = GetStyle(x+length, line);
+  struct LineStyle *styles = line->line.Styles;
+  struct LineStyle *oldstyles = styles;
+  struct LineStyle *newstyles;
+  UWORD cur_style = 0;
+  UWORD end_style = GetStyle(x+length, line);
 
   ENTER();
 
   x++;
 
-  if(styles)
-      newstyles = MyAllocPooled(data->mypool, (*((long *)styles-1))+8);
-  else  newstyles = MyAllocPooled(data->mypool, 32);
+  if(styles != NULL)
+    newstyles = MyAllocPooled(data->mypool, GetAllocSize(styles)+sizeof(struct LineStyle)*4);
+  else
+    newstyles = MyAllocPooled(data->mypool, sizeof(struct LineStyle)*8);
 
-  if(newstyles)
+  if(newstyles != NULL)
   {
     line->line.Styles = newstyles;
-    if(styles)
+    if(styles != NULL)
     {
-      while(*styles != EOS && *styles < x)
+      while(styles->column != EOS && styles->column < x)
       {
-        *newstyles++ = *styles++;
-        if(*styles > 0xff)
-            cur_style &= *styles;
-        else  cur_style |= *styles;
-        *newstyles++ = *styles++;
+        newstyles->column = styles->column;
+        if(styles->style > 0xff)
+          cur_style &= styles->style;
+        else
+          cur_style |= styles->style;
+
+        newstyles->style = styles->style;
+
+        newstyles++;
+        styles++;
       }
     }
     if(style > 0xff)
     {
       if(cur_style & ~style)
       {
-        *newstyles++ = x;
-        *newstyles++ = style;
+        newstyles->column = x;
+        newstyles->style = style;
+        newstyles++;
       }
     }
     else
     {
       if(!(cur_style & style))
       {
-        *newstyles++ = x;
-        *newstyles++ = style;
+        newstyles->column = x;
+        newstyles->style = style;
+        newstyles++;
       }
     }
-    if(styles)
+    if(styles != NULL)
     {
-      while(*styles != EOS && *styles <= x+length)
+      while(styles->column != EOS && styles->column <= x+length)
       {
-        if((*(styles+1) != style) && (*(styles+1) != (unsigned short)~style))
+        if(styles->style != style && styles->style != (UWORD)~style)
         {
-          *newstyles++ = *styles++;
-          *newstyles++ = *styles++;
+          newstyles->column = styles->column;
+          newstyles->style = styles->style;
+          newstyles++;
         }
-        else  styles += 2;
+        styles++;
       }
     }
     if(!(((style > 0xff) && (!(end_style & ~style))) ||
         ((style < 0xff) && ((end_style & style)))))
     {
-      *newstyles++ = x+length;
-      *newstyles++ = ~style;
+      newstyles->column = x+length;
+      newstyles->style = ~style;
+      newstyles++;
     }
 
-    if(styles)
+    if(styles != NULL)
     {
-      while(*styles != EOS)
+      while(styles->column != EOS)
       {
-        *newstyles++ = *styles++;
-        *newstyles++ = *styles++;
+        newstyles->column = styles->column;
+        newstyles->style = styles->style;
+        newstyles++;
+        styles++;
       }
     }
-    *newstyles = EOS;
-    if(oldstyles)
+    newstyles->column = EOS;
+    if(oldstyles != NULL)
     {
       MyFreePooled(data->mypool, oldstyles);
     }
@@ -192,10 +207,10 @@ void  AddStyleToLine  (LONG x, struct line_node *line, LONG length, unsigned sho
 
   LEAVE();
 }
-///
 
-///AddStyle()
-void  AddStyle (struct marking *realblock, unsigned short style, long Set, struct InstData *data)
+///
+/// AddStyle()
+void AddStyle(struct marking *realblock, UWORD style, long Set, struct InstData *data)
 {
   struct  marking newblock;
   LONG  startx, stopx;
@@ -263,4 +278,6 @@ void  AddStyle (struct marking *realblock, unsigned short style, long Set, struc
 
   LEAVE();
 }
+
 ///
+

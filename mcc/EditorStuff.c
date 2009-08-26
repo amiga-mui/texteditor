@@ -130,10 +130,11 @@ static char *utf8_to_ansi(struct InstData *data, STRPTR src)
    RETURN(dst);
    return dst;
 }
+
 ///
 #endif
 
-///PasteClip()
+/// PasteClip()
 /*----------------------*
  * Paste from Clipboard *
  *----------------------*/
@@ -142,9 +143,9 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
   struct line_node *line = NULL;
   struct line_node *startline = NULL;
   struct line_node *previous = NULL;
-  UWORD   *styles = NULL;
-  UWORD   *colors = NULL;
-  STRPTR  textline;
+  struct LineStyle *styles = NULL;
+  struct LineColor *colors = NULL;
+  STRPTR textline;
   BOOL newline = TRUE;
   BOOL res = FALSE;
 
@@ -233,17 +234,17 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
             case ID_COLS:
               D(DBF_CLIPBOARD, "reading COLS");
               SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
-              if(colors)
+              if(colors != NULL)
               {
                 MyFreePooled(data->mypool, colors);
                 colors = NULL;
               }
               // allocate one word more than the chunk tell us, because we terminate the array with an additional value
-              if(cn->cn_Size > 0 && (colors = (UWORD *)MyAllocPooled(data->mypool, cn->cn_Size + sizeof(UWORD))) != NULL)
+              if(cn->cn_Size > 0 && (colors = (struct LineColor *)MyAllocPooled(data->mypool, cn->cn_Size + sizeof(struct LineColor))) != NULL)
               {
                 error = ReadChunkBytes(data->iff, colors, cn->cn_Size);
                 SHOWVALUE(DBF_CLIPBOARD, error);
-                colors[cn->cn_Size / 2] = 0xffff;
+                colors[cn->cn_Size / sizeof(struct LineColor)].column = 0xffff;
               }
               break;
 
@@ -251,17 +252,17 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
               D(DBF_CLIPBOARD, "reading STYL");
               SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
               ownclip = TRUE;
-              if(styles)
+              if(styles != NULL)
               {
                 MyFreePooled(data->mypool, styles);
                 styles = NULL;
               }
               // allocate one word more than the chunk tell us, because we terminate the array with an additional value
-              if(cn->cn_Size > 0 && (styles = (UWORD *)MyAllocPooled(data->mypool, cn->cn_Size + sizeof(UWORD))) != NULL)
+              if(cn->cn_Size > 0 && (styles = (struct LineStyle *)MyAllocPooled(data->mypool, cn->cn_Size + sizeof(struct LineStyle))) != NULL)
               {
                 error = ReadChunkBytes(data->iff, styles, cn->cn_Size);
                 SHOWVALUE(DBF_CLIPBOARD, error);
-                styles[cn->cn_Size / 2] = EOS;
+                styles[cn->cn_Size / sizeof(struct LineStyle)].column = EOS;
               }
               break;
 
@@ -361,18 +362,18 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
                   }
                   else
                   {
-                    if(styles)
-                      MyFreePooled(data->mypool, (void *)styles);
-                    if(colors)
-                      MyFreePooled(data->mypool, (void *)colors);
+                    if(styles != NULL)
+                      MyFreePooled(data->mypool, styles);
+                    if(colors != NULL)
+                      MyFreePooled(data->mypool, colors);
                   }
                 }
                 else
                 {
-                  if(styles)
+                  if(styles != NULL)
                     MyFreePooled(data->mypool, styles);
-                  if(colors)
-                    MyFreePooled(data->mypool, (void *)colors);
+                  if(colors != NULL)
+                    MyFreePooled(data->mypool, colors);
                 }
                 styles    = NULL;
                 colors    = NULL;
@@ -450,9 +451,9 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
   RETURN(res);
   return res;
 }
-///
 
-///DumpLine()
+///
+/// DumpLine()
 #if defined(DEBUG)
 static void DumpLine(struct line_node *line)
 {
@@ -462,34 +463,34 @@ static void DumpLine(struct line_node *line)
 
   if(line->line.Styles != NULL)
   {
-    UWORD *styles = line->line.Styles;
+    struct LineStyle *styles = line->line.Styles;
 
     D(DBF_DUMP, "styles:");
-    while(*styles != EOS)
+    while(styles->column != EOS)
     {
-      D(DBF_DUMP, "style %04lx starting at column %3ld", styles[1], styles[0]);
-      styles += 2;
+      D(DBF_DUMP, "style %04lx starting at column %3ld", styles->style, styles->column);
+      styles++;
     }
   }
 
   if(line->line.Colors != NULL)
   {
-    UWORD *colors = line->line.Colors;
+    struct LineColor *colors = line->line.Colors;
 
     D(DBF_DUMP, "colors:");
-    while(*colors != 0xffff)
+    while(colors->column != 0xffff)
     {
-      D(DBF_DUMP, "color %3ld starting at column %3ld", colors[1], colors[0]);
-      colors += 2;
+      D(DBF_DUMP, "color %3ld starting at column %3ld", colors->color, colors->column);
+      colors++;
     }
   }
 
   LEAVE();
 }
 #endif
-///
 
-///MergeLines()
+///
+/// MergeLines()
 /*--------------------------*
  * Merge two lines into one *
  *--------------------------*/
@@ -536,23 +537,23 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
     }
     else
     {
-      UWORD *styles;
-      UWORD *styles1 = line->line.Styles;
-      UWORD *styles2 = line->next->line.Styles;
-      UWORD *colors;
-      UWORD *colors1 = line->line.Colors;
-      UWORD *colors2 = line->next->line.Colors;
+      struct LineStyle *styles;
+      struct LineStyle *styles1 = line->line.Styles;
+      struct LineStyle *styles2 = line->next->line.Styles;
+      struct LineColor *colors;
+      struct LineColor *colors1 = line->line.Colors;
+      struct LineColor *colors2 = line->next->line.Colors;
       UWORD length = 12;
 
       if(styles1 != NULL)
-        length += *((long *)styles1-1) - 4;
+        length += GetAllocSize(styles1);
       if(styles2 != NULL)
-        length += *((long *)styles2-1) - 4;
+        length += GetAllocSize(styles2);
 
       if((styles = MyAllocPooled(data->mypool, length)) != NULL)
       {
-        unsigned short* t_styles = styles;
-        unsigned short  style = 0;
+        struct LineStyle* t_styles = styles;
+        UWORD style = 0;
 
         SHOWVALUE(DBF_CLIPBOARD, length);
         SHOWVALUE(DBF_CLIPBOARD, styles);
@@ -561,30 +562,34 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
 
         if(styles2 != NULL)
         {
-          unsigned short* t_styles2 = styles2;
+          struct LineStyle* t_styles2 = styles2;
 
-          while(*t_styles2++ == 1)
+          while(t_styles2->column == 1)
           {
-            if(*t_styles2 > 0xff)
-              style &= *t_styles2++;
+            if(t_styles->style > 0xff)
+              style &= t_styles2->style;
             else
-              style |= *t_styles2++;
+              style |= t_styles2->style;
+
+            t_styles2++;
           }
         }
 
         if(styles1 != NULL)
         {
-          while(*styles1 != EOS)
+          while(styles1->column != EOS)
           {
-            if((*styles1 == line->line.Length) && ((~*(styles1+1) & style) == (*(styles1+1)  ^ 0xffff)))
+            if(styles1->column == line->line.Length && ((~styles1->style & style) == (styles1->style  ^ 0xffff)))
             {
-              style &= *(styles1+1);
-              styles1 += 2;
+              style &= styles1->style;
+              styles1++;
             }
             else
             {
-              *styles++ = *styles1++;
-              *styles++ = *styles1++;
+              styles->column = styles1->column;
+              styles->style = styles1->style;
+              styles++;
+              styles1++;
             }
           }
           SHOWVALUE(DBF_CLIPBOARD, line->line.Styles);
@@ -593,35 +598,36 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
 
         if(styles2 != NULL)
         {
-          while(*styles2 != EOS)
+          while(styles2->column != EOS)
           {
-            if((*styles2 == 1)  && (!(*(styles2+1) & style)))
+            if(styles2->column == 1 && isFlagClear(styles2->style, style))
             {
-              styles2 += 2;
+              styles2++;
             }
             else
             {
-              *styles++ = *styles2++ + line->line.Length - 1;
-              *styles++ = *styles2++;
+              styles->column = styles2->column + line->line.Length - 1;
+              styles->style = styles2->style;
+              styles++;
             }
           }
           SHOWVALUE(DBF_CLIPBOARD, line->next->line.Styles);
           MyFreePooled(data->mypool, line->next->line.Styles);
         }
-        *styles = EOS;
+        styles->column = EOS;
         line->line.Styles = t_styles;
       }
 
       length = 12;
 
       if(colors1 != NULL)
-        length += *((long *)colors1-1) - 4;
+        length += GetAllocSize(colors1);
       if(colors2 != NULL)
-        length += *((long *)colors2-1) - 4;
+        length += GetAllocSize(colors2);
 
       if((colors = MyAllocPooled(data->mypool, length)) != NULL)
       {
-        UWORD *t_colors = colors;
+        struct LineColor *t_colors = colors;
         UWORD end_color = 0;
 
         SHOWVALUE(DBF_CLIPBOARD, length);
@@ -631,36 +637,41 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
 
         if(colors1 != NULL)
         {
-          while(*colors1 < line->line.Length && *colors1 != 0xffff)
+          while(colors1->column < line->line.Length && colors1->column != 0xffff)
           {
-            *colors++ = *colors1++;
-            end_color = *colors1;
-            *colors++ = *colors1++;
+            colors->column = colors1->column;
+            end_color = colors1->color;
+            colors->color = colors1->color;
+            colors++;
+            colors1++;
           }
           SHOWVALUE(DBF_CLIPBOARD, line->line.Colors);
           MyFreePooled(data->mypool, line->line.Colors);
         }
 
-        if(end_color && (colors2 == NULL || *colors2 != 1))
+        if(end_color && (colors2 == NULL || colors2->column != 1))
         {
-          *colors++ = line->line.Length;
-          *colors++ = 0;
+          colors->column = line->line.Length;
+          colors->color = 0;
+          colors++;
         }
 
         if(colors2 != NULL)
         {
-          if(*colors2 == 1 && *(colors2+1) == end_color)
-            colors2 += 2;
+          if(colors2->column == 1 && colors2->color == end_color)
+            colors2++;
 
-          while(*colors2 != 0xffff)
+          while(colors2->column != 0xffff)
           {
-            *colors++ = *colors2++ + line->line.Length - 1;
-            *colors++ = *colors2++;
+            colors->column = colors2->column + line->line.Length - 1;
+            colors->color = colors2->color;
+            colors++;
+            colors2++;
           }
           SHOWVALUE(DBF_CLIPBOARD, line->next->line.Colors);
           MyFreePooled(data->mypool, line->next->line.Colors);
         }
-        *colors = 0xffff;
+        colors->column = 0xffff;
         line->line.Colors = t_colors;
       }
     }
@@ -748,9 +759,9 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
     return(FALSE);
   }
 }
-///
 
-///SplitLine()
+///
+/// SplitLine()
 /*---------------------*
  * Split line into two *
  *---------------------*/
@@ -777,10 +788,10 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
   next = line->next;
   if((newline = AllocLine(data)) != NULL)
   {
-    UWORD *styles = line->line.Styles;
-    UWORD *newstyles = NULL;
-    UWORD *colors = line->line.Colors;
-    UWORD *newcolors = NULL;
+    struct LineStyle *styles = line->line.Styles;
+    struct LineStyle *newstyles = NULL;
+    struct LineColor *colors = line->line.Colors;
+    struct LineColor *newcolors = NULL;
 
     data->HasChanged = TRUE;
     Init_LineNode(newline, line, line->line.Contents+x, data);
@@ -796,108 +807,121 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
 
     if(styles != NULL)
     {
-      LONG  style = 0;
-      LONG  length = 0;
-      UWORD *ostyles;
+      UWORD style = 0;
+      LONG  numStyles = 0;
+      struct LineStyle *ostyles;
 
-      while(*styles++ <= x+1)
+      while(styles->column <= x+1)
       {
-        if(*styles > 0xff)
-          style &= *styles++;
+        if(styles->style > 0xff)
+          style &= styles->style;
         else
-          style |= *styles++;
+          style |= styles->style;
+
+        styles++;
       }
       styles--;
       ostyles = styles;
-      while(*(styles+length) != EOS)
-        length += 2;
-      length = (length*2) + 16;
+      while(styles[numStyles].column != EOS)
+        numStyles++;
+      // we can get up to 4 new style changes
+      numStyles += 4;
 
-      if((newstyles = MyAllocPooled(data->mypool, length)) != NULL)
+      if((newstyles = MyAllocPooled(data->mypool, numStyles * sizeof(struct LineStyle))) != NULL)
       {
-        UWORD *nstyles = newstyles;
+        struct LineStyle *nstyles = newstyles;
 
         if(isFlagSet(style, BOLD))
         {
-          *nstyles++ = 1;
-          *nstyles++ = BOLD;
+          nstyles->column = 1;
+          nstyles->style = BOLD;
+          nstyles++;
         }
         if(isFlagSet(style, ITALIC))
         {
-          *nstyles++ = 1;
-          *nstyles++ = ITALIC;
+          nstyles->column = 1;
+          nstyles->style = ITALIC;
+          nstyles++;
         }
         if(isFlagSet(style, UNDERLINE))
         {
-          *nstyles++ = 1;
-          *nstyles++ = UNDERLINE;
+          nstyles->column = 1;
+          nstyles->style = UNDERLINE;
+          nstyles++;
         }
 
-        while(*styles != EOS)
+        while(styles->column != EOS)
         {
-          *nstyles++ = (*styles++) - x;
-          *nstyles++ = *styles++;
+          nstyles->column = styles->column - x;
+          nstyles->style = styles->style;
+          nstyles++;
+          style++;
         }
-        *nstyles = EOS;
+        nstyles->column = EOS;
       }
 
       if(isFlagSet(style, BOLD))
       {
-        *ostyles++ = x+1;
-        *ostyles++ = ~BOLD;
+        ostyles->column = x+1;
+        ostyles->style = ~BOLD;
       }
       if(isFlagSet(style, ITALIC))
       {
-        *ostyles++ = x+1;
-        *ostyles++ = ~ITALIC;
+        ostyles->column = x+1;
+        ostyles->style = ~ITALIC;
       }
       if(isFlagSet(style, UNDERLINE))
       {
-        *ostyles++ = x+1;
-        *ostyles++ = ~UNDERLINE;
+        ostyles->column = x+1;
+        ostyles->style = ~UNDERLINE;
       }
       if(x == 0)
         ostyles = line->line.Styles;
-      *ostyles = EOS;
+
+      ostyles->column = EOS;
     }
     newline->line.Styles = newstyles;
 
     if(colors != NULL)
     {
       UWORD color = GetColor(x, line);
-      UWORD length = 0;
-      UWORD *ocolors;
+      ULONG numColors = 0;
+      struct LineColor *ocolors;
 
-      while(*colors <= x+1)
+      while(colors->column <= x+1)
       {
-        colors += 2;
+        colors++;
       }
       ocolors = colors;
 
-      while(*(colors+length) != 0xffff)
-        length += 2;
-      length = (length*2) + 16;
+      while(colors[numColors].column != 0xffff)
+        numColors++;
+      // we can get up to 4 new color changes
+      numColors += 4;
 
-      if((newcolors = MyAllocPooled(data->mypool, length)) != NULL)
+      if((newcolors = MyAllocPooled(data->mypool, numColors+sizeof(struct LineColor))) != NULL)
       {
-        UWORD *ncolors = newcolors;
+        struct LineColor *ncolors = newcolors;
 
-        if(color && *colors-x != 1)
+        if(color && colors->column-x != 1)
         {
-          *ncolors++ = 1;
-          *ncolors++ = color;
+          ncolors->column = 1;
+          ncolors->color = color;
+          ncolors++;
         }
 
-        while(*colors != 0xffff)
+        while(colors->column != 0xffff)
         {
-          *ncolors++ = (*colors++) - x;
-          *ncolors++ = *colors++;
+          ncolors->column = colors->column - x;
+          ncolors->color = colors->color;
+          ncolors++;
+          colors++;
         }
-        *ncolors = 0xffff;
+        ncolors->column = 0xffff;
       }
       if(x == 0)
         ocolors = line->line.Colors;
-      *ocolors = 0xffff;
+      ocolors->column = 0xffff;
     }
     newline->line.Colors = newcolors;
 
@@ -906,8 +930,8 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
     if(next != NULL)
       next->previous = newline;
 
-    *(line->line.Contents+x) = '\n';
-    *(line->line.Contents+x+1) = '\0';
+    line->line.Contents[x] = '\n';
+    line->line.Contents[x+1] = '\0';
     line->line.Length = x+1;
 
 /*------------------*/
@@ -1064,9 +1088,9 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
     return (FALSE);
   }
 }
-///
 
-///strcpyback()
+///
+/// strcpyback()
 /*------------------------------------------------------------------*
  * Backwards string copy, please replace with some assembler stuff! *
  *------------------------------------------------------------------*/
@@ -1086,9 +1110,9 @@ static void strcpyback(char *dest, char *src)
 
   LEAVE();
 }
-///
 
-///OptimizedPrint()
+///
+/// OptimizedPrint()
 /* ------------------------------------ *
  *  Functions which updates the display *
  * ------------------------------------ */
@@ -1115,9 +1139,9 @@ void OptimizedPrint(LONG x, struct line_node *line, LONG line_nr, LONG width, st
 
   LEAVE();
 }
-///
 
-///UpdateChange()
+///
+/// UpdateChange()
 static void UpdateChange(LONG x, struct line_node *line, LONG length, const char *characters, struct UserAction *buffer, struct InstData *data)
 {
   LONG diff;
@@ -1219,9 +1243,9 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
 
   LEAVE();
 }
-///
 
-///PasteChars()
+///
+/// PasteChars()
 /*------------------------------*
  * Paste n characters to a line *
  *------------------------------*/
@@ -1231,37 +1255,37 @@ BOOL PasteChars(LONG x, struct line_node *line, LONG length, const char *charact
 
   if(line->line.Styles != NULL)
   {
-    if(*line->line.Styles != EOS)
+    if(line->line.Styles[0].column != EOS)
     {
       ULONG c = 0;
 
-      while(*(line->line.Styles+c) <= x+1)
-        c += 2;
-      while(*(line->line.Styles+c) != EOS)
+      while(line->line.Styles[c].column <= x+1)
+        c++;
+      while(line->line.Styles[c].column != EOS)
       {
-        *(line->line.Styles+c) += length;
-        c += 2;
+        line->line.Styles[c].column += length;
+        c++;
       }
     }
   }
 
   if(line->line.Colors != NULL)
   {
-    if(*line->line.Colors != 0xffff)
+    if(line->line.Colors[0].column != 0xffff)
     {
-        ULONG c = 0;
+      ULONG c = 0;
 
-      while(*(line->line.Colors+c) <= x+1)
-        c += 2;
-      while(*(line->line.Colors+c) != 0xffff)
+      while(line->line.Colors[c].column <= x+1)
+        c++;
+      while(line->line.Colors[c].column != 0xffff)
       {
-        *(line->line.Colors+c) += length;
-        c += 2;
+        line->line.Colors[c].column += length;
+        c++;
       }
     }
   }
 
-  if((*((long *)line->line.Contents-1))-4 < (LONG)(line->line.Length + length + 1))
+  if(GetAllocSize(line->line.Contents) < line->line.Length + length + 1)
   {
     if(ExpandLine(line, length, data) == FALSE)
     {
@@ -1275,9 +1299,9 @@ BOOL PasteChars(LONG x, struct line_node *line, LONG length, const char *charact
   RETURN(TRUE);
   return(TRUE);
 }
-///
 
-///RemoveChars()
+///
+/// RemoveChars()
 /*----------------------------*
  * Remove n chars from a line *
  *----------------------------*/
@@ -1287,14 +1311,14 @@ BOOL RemoveChars(LONG x, struct line_node *line, LONG length, struct InstData *d
 
   if(line->line.Styles != NULL)
   {
-    if(*line->line.Styles != EOS)
+    if(line->line.Styles[0].column != EOS)
     {
       UWORD start_style = GetStyle(x-1, line);
       UWORD end_style = GetStyle(x+length, line);
       ULONG c = 0, store;
 
-      while(*(line->line.Styles+c) <= x)
-        c += 2;
+      while(line->line.Styles[c].column <= x)
+        c++;
 
       if(start_style != end_style)
       {
@@ -1303,76 +1327,86 @@ BOOL RemoveChars(LONG x, struct line_node *line, LONG length, struct InstData *d
 
         if(isFlagSet(turn_off, BOLD))
         {
-          *(line->line.Styles+c++) = x+1;
-          *(line->line.Styles+c++) = ~BOLD;
+          line->line.Styles[c].column = x+1;
+          line->line.Styles[c].style = ~BOLD;
+          c++;
         }
         if(isFlagSet(turn_off, ITALIC))
         {
-          *(line->line.Styles+c++) = x+1;
-          *(line->line.Styles+c++) = ~ITALIC;
+          line->line.Styles[c].column = x+1;
+          line->line.Styles[c].style = ~ITALIC;
+          c++;
         }
         if(isFlagSet(turn_off, UNDERLINE))
         {
-          *(line->line.Styles+c++) = x+1;
-          *(line->line.Styles+c++) = ~UNDERLINE;
+          line->line.Styles[c].column = x+1;
+          line->line.Styles[c].style = ~UNDERLINE;
+          c++;
         }
         if(isFlagSet(turn_on, BOLD))
         {
-          *(line->line.Styles+c++) = x+1;
-          *(line->line.Styles+c++) = BOLD;
+          line->line.Styles[c].column = x+1;
+          line->line.Styles[c].style = BOLD;
+          c++;
         }
         if(isFlagSet(turn_on, ITALIC))
         {
-          *(line->line.Styles+c++) = x+1;
-          *(line->line.Styles+c++) = ITALIC;
+          line->line.Styles[c].column = x+1;
+          line->line.Styles[c].style = ITALIC;
+          c++;
         }
         if(isFlagSet(turn_on, UNDERLINE))
         {
-          *(line->line.Styles+c++) = x+1;
-          *(line->line.Styles+c++) = UNDERLINE;
+          line->line.Styles[c].column = x+1;
+          line->line.Styles[c].style = UNDERLINE;
+          c++;
         }
       }
 
       store = c;
-      while(*(line->line.Styles+c) <= x+length+1)
-        c += 2;
+      while(line->line.Styles[c].column <= x+length+1)
+        c++;
 
-      while(*(line->line.Styles+c) != EOS)
+      while(line->line.Styles[c].column != EOS)
       {
-        *(line->line.Styles+store++) = *(line->line.Styles+c++)-length;
-        *(line->line.Styles+store++) = *(line->line.Styles+c++);
+        line->line.Styles[store].column = line->line.Styles[c].column-length;
+        line->line.Styles[store].style = line->line.Styles[c].style;
+        c++;
+        store++;
       }
-      *(line->line.Styles+store) = EOS;
+      line->line.Styles[store].column = EOS;
     }
   }
 
   if(line->line.Colors != NULL)
   {
-    if(*line->line.Colors != 0xffff)
+    if(line->line.Colors[0].column != 0xffff)
     {
       UWORD start_color = x ? GetColor(x-1, line) : 0;
       UWORD end_color = GetColor(x+length, line);
       ULONG c = 0, store;
 
-      while(*(line->line.Colors+c) <= x)
-        c += 2;
+      while(line->line.Colors[c].column <= x)
+        c++;
 
       if(start_color != end_color)
       {
-        *(line->line.Colors+c++) = x+1;
-        *(line->line.Colors+c++) = end_color;
+        line->line.Colors[c].column = x+1;
+        line->line.Colors[c].column = end_color;
+        c++;
       }
 
       store = c;
-      while(*(line->line.Colors+c) <= x+length+1)
-        c += 2;
+      while(line->line.Colors[c].column <= x+length+1)
+        c++;
 
-      while(*(line->line.Colors+c) != 0xffff)
+      while(line->line.Colors[c].column != 0xffff)
       {
-        *(line->line.Colors+store++) = *(line->line.Colors+c++)-length;
-        *(line->line.Colors+store++) = *(line->line.Colors+c++);
+        line->line.Colors[store].column = line->line.Colors[c].column-length;
+        line->line.Colors[store].column = line->line.Colors[c].column;
+        store++;
       }
-      *(line->line.Colors+store) = 0xffff;
+      line->line.Colors[store].column = 0xffff;
     }
   }
 
@@ -1381,5 +1415,6 @@ BOOL RemoveChars(LONG x, struct line_node *line, LONG length, struct InstData *d
   RETURN(TRUE);
   return(TRUE);
 }
+
 ///
 

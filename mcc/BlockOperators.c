@@ -33,7 +33,7 @@
 
 #include "private.h"
 
-///RedrawArea()
+/// RedrawArea()
 VOID RedrawArea(UWORD startx, struct line_node *startline, UWORD stopx, struct line_node *stopline, struct InstData *data)
 {
   struct pos_info pos1, pos2;
@@ -60,9 +60,9 @@ VOID RedrawArea(UWORD startx, struct line_node *startline, UWORD stopx, struct l
 
   LEAVE();
 }
-///
 
-///GetBlock()
+///
+/// GetBlock()
 char *GetBlock(struct marking *block, struct InstData *data)
 {
   LONG    startx, stopx;
@@ -93,43 +93,52 @@ char *GetBlock(struct marking *block, struct InstData *data)
   {
     /* Create a firstline look-a-like */
     emsg.Contents = (STRPTR)MyAllocPooled(data->mypool, startline->line.Length-startx);
-    if(startline->line.Styles && *startline->line.Styles != EOS)
+    if(startline->line.Styles != NULL && startline->line.Styles[0].column != EOS)
     {
-        ULONG startstyle = GetStyle(startx, startline);
+      UWORD startstyle = GetStyle(startx, startline);
 
-      if((emsg.Styles = (UWORD *)MyAllocPooled(data->mypool, *((ULONG *)startline->line.Styles-1)+16)))
+      if((emsg.Styles = (struct LineStyle *)MyAllocPooled(data->mypool, GetAllocSize(startline->line.Styles)+sizeof(struct LineStyle)*5)))
       {
-          UWORD *styles = emsg.Styles,
-              *oldstyles = startline->line.Styles;
+        struct LineStyle *styles = emsg.Styles;
+        struct LineStyle *oldstyles = startline->line.Styles;
 
-        if(startstyle & BOLD)
+        if(isFlagSet(startstyle, BOLD))
         {
-          *styles++ = 1;  *styles++ = BOLD;
+          styles->column = 1;
+          styles->style = BOLD;
+          styles++;
         }
-        if(startstyle & ITALIC)
+        if(isFlagSet(startstyle, ITALIC))
         {
-          *styles++ = 1;  *styles++ = ITALIC;
+          styles->column = 1;
+          styles->style = ITALIC;
+          styles++;
         }
-        if(startstyle & UNDERLINE)
+        if(isFlagSet(startstyle, UNDERLINE))
         {
-          *styles++ = 1;  *styles++ = UNDERLINE;
+          styles->column = 1;
+          styles->style = UNDERLINE;
+          styles++;
         }
 
-        while(*oldstyles <= startx)
-          oldstyles += 2;
+        while(oldstyles->column <= startx)
+          oldstyles++;
 
-        while(*oldstyles != EOS)
+        while(oldstyles->column != EOS)
         {
-          *styles++ = *oldstyles++ - startx;  *styles++ = *oldstyles++;
+          styles->column = oldstyles->column - startx;
+          styles->style = oldstyles->style;
+          styles++;
+          oldstyles++;
         }
-        *styles = EOS;
+        styles->column = EOS;
       }
     }
     else
       emsg.Styles = NULL;
 
     emsg.Colors = NULL;
-    if(emsg.Contents)
+    if(emsg.Contents != NULL)
     {
       memcpy(emsg.Contents, startline->line.Contents + startx, startline->line.Length - startx);
       emsg.Length = startline->line.Length - startx;
@@ -140,7 +149,7 @@ char *GetBlock(struct marking *block, struct InstData *data)
       MyFreePooled(data->mypool, emsg.Contents);
     }
 
-    if(emsg.Styles)
+    if(emsg.Styles != NULL)
       MyFreePooled(data->mypool, emsg.Styles);
 
     /* Start iterating... */
@@ -160,40 +169,49 @@ char *GetBlock(struct marking *block, struct InstData *data)
 
     /* Create a Lastline look-a-like */
     emsg.Contents = (STRPTR)MyAllocPooled(data->mypool, stopx);
-    if(stopline->line.Styles && *stopline->line.Styles != EOS)
+    if(stopline->line.Styles != NULL && stopline->line.Styles->column != EOS)
     {
-        ULONG stopstyle = GetStyle(stopx, stopline);
+      UWORD stopstyle = GetStyle(stopx, stopline);
 
-      if((emsg.Styles = (UWORD *)MyAllocPooled(data->mypool, *((ULONG *)stopline->line.Styles-1)+16)))
+      if((emsg.Styles = (struct LineStyle *)MyAllocPooled(data->mypool, GetAllocSize(stopline->line.Styles) + sizeof(struct LineStyle)*5)))
       {
-          UWORD *styles = emsg.Styles,
-              *oldstyles = stopline->line.Styles;
+        struct LineStyle *styles = emsg.Styles;
+        struct LineStyle *oldstyles = stopline->line.Styles;
 
-        while(*oldstyles <= stopx)
+        while(oldstyles->column <= stopx)
         {
-          *styles++ = *oldstyles++; *styles++ = *oldstyles++;
+          styles->column = oldstyles->column;
+          styles->style = oldstyles->style;
+          styles++;
+          oldstyles++;
         }
 
-        if(stopstyle & BOLD)
+        if(isFlagSet(stopstyle, BOLD))
         {
-          *styles++ = stopx+1;  *styles++ = ~BOLD;
+          styles->column = stopx+1;
+          styles->style = ~BOLD;
+          styles++;
         }
-        if(stopstyle & ITALIC)
+        if(isFlagSet(stopstyle, ITALIC))
         {
-          *styles++ = stopx+1;  *styles++ = ~ITALIC;
+          styles->column = stopx+1;
+          styles->style = ~ITALIC;
+          styles++;
         }
-        if(stopstyle & UNDERLINE)
+        if(isFlagSet(stopstyle, UNDERLINE))
         {
-          *styles++ = stopx+1;  *styles++ = ~UNDERLINE;
+          styles->column = stopx+1;
+          styles->style = ~UNDERLINE;
+          styles++;
         }
-        *styles = EOS;
+        styles->column = EOS;
       }
     }
     else
       emsg.Styles = NULL;
 
     emsg.Colors = NULL;
-    if(emsg.Contents)
+    if(emsg.Contents != NULL)
     {
       memcpy(emsg.Contents, stopline->line.Contents, stopx);
       emsg.Length = stopx;
@@ -205,65 +223,79 @@ char *GetBlock(struct marking *block, struct InstData *data)
       MyFreePooled(data->mypool, emsg.Contents);
     }
 
-    if(emsg.Styles)
+    if(emsg.Styles != NULL)
       MyFreePooled(data->mypool, emsg.Styles);
   }
   else
   {
     /* Create a single line */
     emsg.Contents = (STRPTR)MyAllocPooled(data->mypool, stopx-startx);
-    if(startline->line.Styles && *startline->line.Styles != EOS)
+    if(startline->line.Styles != NULL && startline->line.Styles->column != EOS)
     {
-        ULONG startstyle = GetStyle(startx, startline);
-        ULONG stopstyle = GetStyle(stopx, stopline);
+      UWORD startstyle = GetStyle(startx, startline);
+      UWORD stopstyle = GetStyle(stopx, stopline);
 
-      if((emsg.Styles = (UWORD *)MyAllocPooled(data->mypool, *((ULONG *)startline->line.Styles-1))))
+      if((emsg.Styles = (struct LineStyle *)MyAllocPooled(data->mypool, GetAllocSize(startline->line.Styles) + sizeof(struct LineStyle)*5)))
       {
-          UWORD *styles = emsg.Styles,
-              *oldstyles = startline->line.Styles;
+        struct LineStyle *styles = emsg.Styles;
+        struct LineStyle *oldstyles = startline->line.Styles;
 
-        if(startstyle & BOLD)
+        if(isFlagSet(startstyle, BOLD))
         {
-          *styles++ = 1;  *styles++ = BOLD;
+          styles->column = 1;
+          styles->style = BOLD;
+          styles++;
         }
-        if(startstyle & ITALIC)
+        if(isFlagSet(startstyle, ITALIC))
         {
-          *styles++ = 1;  *styles++ = ITALIC;
+          styles->column = 1;
+          styles->style = ITALIC;
+          styles++;
         }
-        if(startstyle & UNDERLINE)
+        if(isFlagSet(startstyle, UNDERLINE))
         {
-          *styles++ = 1;  *styles++ = UNDERLINE;
-        }
-
-        while(*oldstyles <= startx)
-          oldstyles += 2;
-
-        while(*oldstyles <= stopx)
-        {
-          *styles++ = *oldstyles++ - startx;
-          *styles++ = *oldstyles++;
+          styles->column = 1;
+          styles->style = UNDERLINE;
+          styles++;
         }
 
-        if(stopstyle & BOLD)
+        while(oldstyles->column <= startx)
+          oldstyles++;
+
+        while(oldstyles->column <= stopx)
         {
-          *styles++ = stopx-startx+1; *styles++ = ~BOLD;
+          styles->column = oldstyles->column - startx;
+          styles->style = oldstyles->style;
+          styles++;
+          oldstyles++;
         }
-        if(stopstyle & ITALIC)
+
+        if(isFlagSet(stopstyle, BOLD))
         {
-          *styles++ = stopx-startx+1; *styles++ = ~ITALIC;
+          styles->column = stopx-startx+1;
+          styles->style = ~BOLD;
+          styles++;
         }
-        if(stopstyle & UNDERLINE)
+        if(isFlagSet(stopstyle, ITALIC))
         {
-          *styles++ = stopx-startx+1; *styles++ = ~UNDERLINE;
+          styles->column = stopx-startx+1;
+          styles->style = ~ITALIC;
+          styles++;
         }
-        *styles = EOS;
+        if(isFlagSet(stopstyle, UNDERLINE))
+        {
+          styles->column = stopx-startx+1;
+          styles->style = ~UNDERLINE;
+          styles++;
+        }
+        styles->column = EOS;
       }
     }
     else
       emsg.Styles = NULL;
 
     emsg.Colors = NULL;
-    if(emsg.Contents)
+    if(emsg.Contents != NULL)
     {
       memcpy(emsg.Contents, startline->line.Contents+startx, stopx-startx);
       emsg.Length = stopx-startx;
@@ -275,16 +307,16 @@ char *GetBlock(struct marking *block, struct InstData *data)
       MyFreePooled(data->mypool, emsg.Contents);
     }
 
-    if(emsg.Styles)
+    if(emsg.Styles != NULL)
       MyFreePooled(data->mypool, emsg.Styles);
   }
 
   RETURN(text);
   return(text);
 }
-///
 
-///NiceBlock()
+///
+/// NiceBlock()
 void NiceBlock(struct marking *realblock, struct marking *newblock)
 {
   LONG  startx = realblock->startx, stopx = realblock->stopx;
@@ -335,9 +367,9 @@ void NiceBlock(struct marking *realblock, struct marking *newblock)
 
   LEAVE();
 }
-///
 
-///InitClipboard()
+///
+/// InitClipboard()
 BOOL InitClipboard(struct InstData *data, ULONG flags)
 {
   struct IFFHandle *iff;
@@ -371,9 +403,9 @@ BOOL InitClipboard(struct InstData *data, ULONG flags)
   RETURN(FALSE);
   return(FALSE);
 }
-///
 
-///EndClipSession()
+///
+/// EndClipSession()
 void EndClipSession(struct InstData *data)
 {
   ENTER();
@@ -390,9 +422,9 @@ void EndClipSession(struct InstData *data)
 
   LEAVE();
 }
-///
 
-///ClipInfo()
+///
+/// ClipInfo()
 void ClipInfo(struct line_node *line, struct InstData *data)
 {
   LONG error;
@@ -434,14 +466,14 @@ void ClipInfo(struct line_node *line, struct InstData *data)
 
   LEAVE();
 }
-///
 
-///ClipChars()
+///
+/// ClipChars()
 void ClipChars(LONG x, struct line_node *line, LONG length, struct InstData *data)
 {
-  UWORD style[2] = {1, GetStyle(x-1, line)};
-  UWORD color[2] = {1, 0};
-  UWORD *colors = line->line.Colors;
+  struct LineStyle style = {1, GetStyle(x-1, line)};
+  struct LineColor color = {1, 0};
+  struct LineColor *colors = line->line.Colors;
   LONG error;
 
   ENTER();
@@ -456,26 +488,27 @@ void ClipChars(LONG x, struct line_node *line, LONG length, struct InstData *dat
     error = PushChunk(data->iff, 0, ID_COLS, IFFSIZE_UNKNOWN);
     SHOWVALUE(DBF_CLIPBOARD, error);
 
-    while((*colors <= x) && (*colors != 0xffff))
+    while(colors->column <= x && colors->column != 0xffff)
     {
-      color[1] = *(colors+1);
-      colors += 2;
+      color.color = colors->color;
+      colors++;
     }
 
-    if(color[1] != 0 && *colors-x != 1)
+    if(color.color != 0 && colors->column-x != 1)
     {
-      error = WriteChunkBytes(data->iff, color, 4);
+      error = WriteChunkBytes(data->iff, &color, sizeof(color));
       SHOWVALUE(DBF_CLIPBOARD, error);
     }
 
-    if(*colors != 0xffff)
+    if(colors->column != 0xffff)
     {
-      while(*colors <= x+length)
+      while(colors->column <= x+length)
       {
-        color[0] = *colors++ - x;
-        color[1] = *colors++;
+        color.column = colors->column - x;
+        color.color = colors->color;
+        colors++;
 
-        error = WriteChunkBytes(data->iff, color, 4);
+        error = WriteChunkBytes(data->iff, &color, sizeof(color));
         SHOWVALUE(DBF_CLIPBOARD, error);
       }
     }
@@ -488,69 +521,70 @@ void ClipChars(LONG x, struct line_node *line, LONG length, struct InstData *dat
   error = PushChunk(data->iff, 0, ID_STYL, IFFSIZE_UNKNOWN);
   SHOWVALUE(DBF_CLIPBOARD, error);
 
-  if(style[1] != 0)
+  if(style.style != 0)
   {
-    unsigned short t_style = style[1];
+    UWORD t_style = style.style;
 
-    if(t_style & BOLD)
+    if(isFlagSet(t_style, BOLD))
     {
-      style[1] = BOLD;
-      error = WriteChunkBytes(data->iff, style, 4);
+      style.style = BOLD;
+      error = WriteChunkBytes(data->iff, &style, sizeof(style));
       SHOWVALUE(DBF_CLIPBOARD, error);
     }
-    if(t_style & ITALIC)
+    if(isFlagSet(t_style, ITALIC))
     {
-      style[1] = ITALIC;
-      error = WriteChunkBytes(data->iff, style, 4);
+      style.style = ITALIC;
+      error = WriteChunkBytes(data->iff, &style, sizeof(style));
       SHOWVALUE(DBF_CLIPBOARD, error);
     }
-    if(t_style & UNDERLINE)
+    if(isFlagSet(t_style, UNDERLINE))
     {
-      style[1] = UNDERLINE;
-      error = WriteChunkBytes(data->iff, style, 4);
+      style.style = UNDERLINE;
+      error = WriteChunkBytes(data->iff, &style, sizeof(style));
       SHOWVALUE(DBF_CLIPBOARD, error);
     }
   }
 
-  if(line->line.Styles)
+  if(line->line.Styles != NULL)
   {
-    unsigned short *styles = line->line.Styles;
+    struct LineStyle *styles = line->line.Styles;
 
-    while((*styles <= x) && (*styles != EOS))
-      styles += 2;
+    while(styles->column <= x && styles->column != EOS)
+      styles++;
 
-    if(*styles != EOS)
+    if(styles->column != EOS)
     {
-      while(*styles <= x+length)
+      while(styles->column <= x+length)
       {
-        style[0] = *styles++ - x;
-        style[1] = *styles++;
-        error = WriteChunkBytes(data->iff, style, 4);
+        style.column = styles->column - x;
+        style.style = styles->style;
+        styles++;
+        error = WriteChunkBytes(data->iff, &style, sizeof(style));
         SHOWVALUE(DBF_CLIPBOARD, error);
       }
 
-      style[0] = length+1;
-      style[1] = GetStyle(x+length-1, line);
-      if(style[1] != 0)
+      style.column = length+1;
+      style.style = GetStyle(x+length-1, line);
+      if(style.style != 0)
       {
-        unsigned short t_style = style[1];
+        UWORD t_style = style.style;
 
-        if(t_style & BOLD)
+        if(isFlagSet(t_style, BOLD))
         {
-          style[1] = ~BOLD;
-          error = WriteChunkBytes(data->iff, style, 4);
+          style.style = ~BOLD;
+          error = WriteChunkBytes(data->iff, &style, sizeof(style));
           SHOWVALUE(DBF_CLIPBOARD, error);
         }
-        if(t_style & ITALIC)
+        if(isFlagSet(t_style, ITALIC))
         {
-          style[1] = ~ITALIC;
-          error = WriteChunkBytes(data->iff, style, 4);
+          style.style = ~ITALIC;
+          error = WriteChunkBytes(data->iff, &style, sizeof(style));
           SHOWVALUE(DBF_CLIPBOARD, error);
         }
-        if(t_style & UNDERLINE)
+        if(isFlagSet(t_style, UNDERLINE))
         {
-          style[1] = ~UNDERLINE;
-          error = WriteChunkBytes(data->iff, style, 4);
+          style.style = ~UNDERLINE;
+          error = WriteChunkBytes(data->iff, &style, sizeof(style));
           SHOWVALUE(DBF_CLIPBOARD, error);
         }
       }
@@ -570,13 +604,13 @@ void ClipChars(LONG x, struct line_node *line, LONG length, struct InstData *dat
 
   LEAVE();
 }
-///
 
-///ClipLine()
+///
+/// ClipLine()
 void ClipLine(struct line_node *line, struct InstData *data)
 {
-  UWORD *styles = line->line.Styles;
-  UWORD *colors = line->line.Colors;
+  struct LineStyle *styles = line->line.Styles;
+  struct LineColor *colors = line->line.Colors;
   LONG error;
 
   ENTER();
@@ -585,35 +619,41 @@ void ClipLine(struct line_node *line, struct InstData *data)
 
   ClipInfo(line, data);
 
-  if(colors)
+  if(colors != NULL)
   {
+    LONG numColors = 0;
+
     D(DBF_CLIPBOARD, "writing COLS");
     error = PushChunk(data->iff, 0, ID_COLS, IFFSIZE_UNKNOWN);
     SHOWVALUE(DBF_CLIPBOARD, error);
 
-    while(*colors != 0xffff)
+    while(colors->column != 0xffff)
     {
-      colors += 2;
+      colors++;
+      numColors++;
     }
 
-    error = WriteChunkBytes(data->iff, line->line.Colors, colors - line->line.Colors);
+    error = WriteChunkBytes(data->iff, line->line.Colors, numColors * sizeof(*colors));
     SHOWVALUE(DBF_CLIPBOARD, error);
     error = PopChunk(data->iff);
     SHOWVALUE(DBF_CLIPBOARD, error);
   }
 
-  if(styles)
+  if(styles != NULL)
   {
+    LONG numStyles = 0;
+
     D(DBF_CLIPBOARD, "writing STYL");
     error = PushChunk(data->iff, 0, ID_STYL, IFFSIZE_UNKNOWN);
     SHOWVALUE(DBF_CLIPBOARD, error);
 
-    while(*styles != EOS)
+    while(styles->column != EOS)
     {
-      styles += 2;
+      styles++;
+      numStyles++;
     }
 
-    error = WriteChunkBytes(data->iff, line->line.Styles, styles - line->line.Styles);
+    error = WriteChunkBytes(data->iff, line->line.Styles, numStyles * sizeof(*styles));
     SHOWVALUE(DBF_CLIPBOARD, error);
     error = PopChunk(data->iff);
     SHOWVALUE(DBF_CLIPBOARD, error);
@@ -629,9 +669,9 @@ void ClipLine(struct line_node *line, struct InstData *data)
 
   LEAVE();
 }
-///
 
-///CutBlock()
+///
+/// CutBlock()
 LONG CutBlock(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update)
 {
   struct  marking newblock;
@@ -650,9 +690,9 @@ LONG CutBlock(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update)
   RETURN(result);
   return(result);
 }
-///
 
-///CutBlock2()
+///
+/// CutBlock2()
 LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, struct marking *newblock, BOOL update)
 {
   LONG  tvisual_y, error;
@@ -793,4 +833,6 @@ end:
   RETURN(res);
   return res;
 }
+
 ///
+

@@ -21,86 +21,94 @@
 ***************************************************************************/
 
 #include "private.h"
-///GetColor()
-UWORD GetColor (UWORD x, struct line_node *line)
+
+/// GetColor()
+UWORD GetColor(UWORD x, struct line_node *line)
 {
   UWORD color = 0;
-  UWORD *colors = line->line.Colors;
+  struct LineColor *colors = line->line.Colors;
 
   ENTER();
 
-  if(colors)
+  if(colors != NULL)
   {
-    while(*colors <= x+1)
+    while(colors->column <= x+1)
     {
-      color = *(colors+1);
-      colors += 2;
+      color = colors->color;
+      colors++;
     }
   }
 
   RETURN(color);
   return(color);
 }
-///
 
-///AddColorToLine()
-void  AddColorToLine (UWORD x, struct line_node *line, UWORD length, UWORD color, struct InstData *data)
+///
+/// AddColorToLine()
+void AddColorToLine(UWORD x, struct line_node *line, UWORD length, UWORD color, struct InstData *data)
 {
-  UWORD *colors   = line->line.Colors;
-  UWORD *oldcolors  = colors;
-  UWORD *newcolors;
+  struct LineColor *colors = line->line.Colors;
+  struct LineColor *oldcolors = colors;
+  struct LineColor *newcolors;
 
   ENTER();
 
   x++;
 
-  if(colors)
-      newcolors = MyAllocPooled(data->mypool, (*((long *)colors-1))+4);
-  else  newcolors = MyAllocPooled(data->mypool, 32);
+  if(colors != NULL)
+    newcolors = MyAllocPooled(data->mypool, GetAllocSize(colors)+sizeof(struct LineColor)*4);
+  else
+    newcolors = MyAllocPooled(data->mypool, sizeof(struct LineColor)*8);
 
-  if(newcolors)
+  if(newcolors != NULL)
   {
     UWORD oldcol = 0;
 
     line->line.Colors = newcolors;
-    if(colors)
+    if(colors != NULL)
     {
-      while(*colors != 0xffff && *colors < x)
+      while(colors->column != 0xffff && colors->column < x)
       {
-        *newcolors++ = *colors++;
-        oldcol = *colors;
-        *newcolors++ = *colors++;
+        newcolors->column = colors->column;
+        oldcol = colors->color;
+        newcolors->color = colors->color;
+        newcolors++;
+        colors++;
       }
     }
     if(color != oldcol)
     {
-      *newcolors++ = x;
-      *newcolors++ = color;
+      newcolors->column = x;
+      newcolors->color = color;
+      newcolors++;
     }
-    if(colors)
+    if(colors != NULL)
     {
-      while(*colors != 0xffff && *colors <= x+length)
+      while(colors->column != 0xffff && colors->column <= x+length)
       {
-        oldcol = *(colors+1);
-        colors += 2;
+        oldcol = colors->color;
+        colors++;
       }
     }
     if(color != oldcol)
     {
-      *newcolors++ = x+length;
-      *newcolors++ = oldcol;
+      newcolors->column = x+length;
+      newcolors->color = oldcol;
+      newcolors++;
     }
-    if(colors)
+    if(colors != NULL)
     {
-      while(*colors != 0xffff)
+      while(colors->column != 0xffff)
       {
-        *newcolors++ = *colors++;
-        *newcolors++ = *colors++;
+        newcolors->column = colors->column;
+        newcolors->color = colors->color;
+        newcolors++;
+        colors++;
       }
     }
-    *newcolors = 0xffff;
+    newcolors->column = 0xffff;
 
-    if(oldcolors)
+    if(oldcolors != NULL)
     {
       MyFreePooled(data->mypool, oldcolors);
     }
@@ -109,9 +117,8 @@ void  AddColorToLine (UWORD x, struct line_node *line, UWORD length, UWORD color
   LEAVE();
 }
 ///
-
-///AddColor()
-VOID AddColor (struct marking *realblock, UWORD color, struct InstData *data)
+/// AddColor()
+VOID AddColor(struct marking *realblock, UWORD color, struct InstData *data)
 {
   struct marking    newblock;
   struct line_node  *startline, *stopline;
@@ -142,7 +149,7 @@ VOID AddColor (struct marking *realblock, UWORD color, struct InstData *data)
   }
   else
   {
-      struct  line_node *line = startline->next;
+    struct  line_node *line = startline->next;
 
     AddColorToLine(startx, startline, startline->line.Length-startx-1, color, data);
     while(line != stopline)
@@ -156,4 +163,6 @@ VOID AddColor (struct marking *realblock, UWORD color, struct InstData *data)
 
   LEAVE();
 }
+
 ///
+

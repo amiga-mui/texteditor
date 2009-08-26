@@ -26,7 +26,7 @@
 
 #include "Debug.h"
 
-///MyAllocPooled()
+/// MyAllocPooled()
 APTR MyAllocPooled(APTR pool, ULONG length)
 {
   ULONG *mem;
@@ -43,9 +43,9 @@ APTR MyAllocPooled(APTR pool, ULONG length)
   RETURN(mem);
   return(mem);
 }
-///
 
-///MyFreePooled()
+///
+/// MyFreePooled()
 VOID MyFreePooled(APTR pool, APTR mem)
 {
   ULONG *memptr, length;
@@ -59,9 +59,9 @@ VOID MyFreePooled(APTR pool, APTR mem)
 
   LEAVE();
 }
-///
 
-///AllocLine()
+///
+/// AllocLine()
 struct line_node *AllocLine(struct InstData *data)
 {
   struct line_node *newline;
@@ -73,9 +73,9 @@ struct line_node *AllocLine(struct InstData *data)
   RETURN(newline);
   return newline;
 }
-///
 
-///FreeLine()
+///
+/// FreeLine()
 void FreeLine(struct line_node* line, struct InstData *data)
 {
   ENTER();
@@ -109,4 +109,22 @@ void FreeLine(struct line_node* line, struct InstData *data)
 
   LEAVE();
 }
+
 ///
+/// GetAllocSize()
+ULONG GetAllocSize(void *ptr)
+{
+  ULONG *memptr;
+  ULONG size;
+
+  ENTER();
+
+  memptr = &((ULONG *)ptr)[-1];
+  size = *memptr - sizeof(ULONG);
+
+  RETURN(size);
+  return size;
+}
+
+///
+

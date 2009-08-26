@@ -51,8 +51,8 @@
 VOID DrawSeparator (struct RastPort *rp, WORD X, WORD Y, WORD Width, WORD Height, struct InstData *data);
 ULONG ConvertPen(UWORD, BOOL, struct InstData *);
 
-///AddClipping()
-void  AddClipping (struct InstData *data)
+/// AddClipping()
+void AddClipping (struct InstData *data)
 {
   ENTER();
 
@@ -63,10 +63,10 @@ void  AddClipping (struct InstData *data)
 
   LEAVE();
 }
-///
 
-///RemoveClipping()
-void  RemoveClipping (struct InstData *data)
+///
+/// RemoveClipping()
+void RemoveClipping (struct InstData *data)
 {
   ENTER();
 
@@ -76,7 +76,7 @@ void  RemoveClipping (struct InstData *data)
   LEAVE();
 }
 
-void  FreeTextMem(struct line_node *line, struct InstData *data)
+void FreeTextMem(struct line_node *line, struct InstData *data)
 {
   ENTER();
 
@@ -85,7 +85,7 @@ void  FreeTextMem(struct line_node *line, struct InstData *data)
     struct  line_node *tline = line;
 
     MyFreePooled(data->mypool, line->line.Contents);
-    if(line->line.Styles)
+    if(line->line.Styles != NULL)
       MyFreePooled(data->mypool, line->line.Styles);
 
     line = line->next;
@@ -95,9 +95,9 @@ void  FreeTextMem(struct line_node *line, struct InstData *data)
 
   LEAVE();
 }
-///
 
-///Init_LineNode()
+///
+/// Init_LineNode()
 /*-----------------------------------*
  * Initializes a line_node structure *
  *-----------------------------------*/
@@ -138,9 +138,9 @@ BOOL Init_LineNode(struct line_node *line, struct line_node *previous, const cha
   RETURN(success);
   return(success);
 }
-///
 
-///ExpandLine()
+///
+/// ExpandLine()
 BOOL ExpandLine(struct line_node *line, LONG length, struct InstData *data)
 {
   BOOL result = FALSE;
@@ -159,9 +159,9 @@ BOOL ExpandLine(struct line_node *line, LONG length, struct InstData *data)
   RETURN(result);
   return result;
 }
-///
 
-///CompressLine()
+///
+/// CompressLine()
 BOOL CompressLine(struct line_node *line, struct InstData *data)
 {
   BOOL result = FALSE;
@@ -182,8 +182,7 @@ BOOL CompressLine(struct line_node *line, struct InstData *data)
   return result;
 }
 ///
-
-///LineCharsWidth()
+/// LineCharsWidth()
 /*-----------------------------------------------------*
  * Returns the number of chars that will fit on a line *
  *-----------------------------------------------------*/
@@ -245,9 +244,9 @@ LONG LineCharsWidth(char *text, struct InstData *data)
   RETURN(c);
   return c;
 }
-///
 
-///VisualHeight()
+///
+/// VisualHeight()
 /*-------------------------------------------------------*
  * Return the number of visual lines that the line fills *
  *-------------------------------------------------------*/
@@ -277,13 +276,13 @@ ULONG VisualHeight(struct line_node *line, struct InstData *data)
   RETURN(lines);
   return(lines);
 }
+
 ///
 
-
 /*
-///ClearLine()
+/// ClearLine()
 //Clear from EOL to end of window
-void  ClearLine   (char *text, int printed, int line_nr, struct InstData *data)
+void ClearLine(char *text, int printed, int line_nr, struct InstData *data)
 {
       int textlength;
 
@@ -313,10 +312,11 @@ void  ClearLine   (char *text, int printed, int line_nr, struct InstData *data)
               data->xpos+textlength, data->realypos+data->height * (data->visual_y+line_nr-2));
   }
 }
+
 ///
 */
 
-///OffsetToLines()
+/// OffsetToLines()
 /*-----------------------------------------*
  * Convert an xoffset to a number of lines *
  *-----------------------------------------*/
@@ -360,9 +360,9 @@ void OffsetToLines(LONG x, struct line_node *line, struct pos_info *pos, struct 
 
   LEAVE();
 }
-///
 
-///SetCursor()
+///
+/// SetCursor()
 /*------------------*
  * Place the cursor *
  *------------------*/
@@ -564,13 +564,13 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
 
   LEAVE();
 }
-///
 
-///DumpText()
+///
+/// DumpText()
 /*-----------------------------------------*
  * Dump text from buffer and out to screen *
  *-----------------------------------------*/
-void  DumpText(LONG visual_y, LONG line_nr, LONG lines, BOOL doublebuffer, struct InstData *data)
+void DumpText(LONG visual_y, LONG line_nr, LONG lines, BOOL doublebuffer, struct InstData *data)
 {
   struct  pos_info    pos;
   struct  line_node *line;
@@ -648,13 +648,13 @@ void  DumpText(LONG visual_y, LONG line_nr, LONG lines, BOOL doublebuffer, struc
 
   LEAVE();
 }
-///
 
-///ScrollUp()
+///
+/// ScrollUp()
 /*-----------------------*
  * Scroll up the display *
  *-----------------------*/
-void  ScrollUp(LONG line_nr, LONG lines, struct InstData *data)
+void ScrollUp(LONG line_nr, LONG lines, struct InstData *data)
 {
   struct pos_info pos;
 
@@ -726,13 +726,13 @@ void  ScrollUp(LONG line_nr, LONG lines, struct InstData *data)
 
   LEAVE();
 }
-///
 
-///ScrollDown()
+///
+/// ScrollDown()
 /*-------------------------*
  * Scroll down the display *
  *-------------------------*/
-void  ScrollDown(LONG line_nr, LONG lines, struct InstData *data)
+void ScrollDown(LONG line_nr, LONG lines, struct InstData *data)
 {
   ENTER();
 
@@ -784,9 +784,9 @@ void  ScrollDown(LONG line_nr, LONG lines, struct InstData *data)
 
   LEAVE();
 }
-///
 
-///GetLine()
+///
+/// GetLine()
 /*----------------------------------------------*
  * Find a line and fillout a pos_info structure *
  *----------------------------------------------*/
@@ -822,9 +822,9 @@ void GetLine(LONG realline, struct pos_info *pos, struct InstData *data)
 
   LEAVE();
 }
-///
 
-///LineToVisual()
+///
+/// LineToVisual()
 /*----------------------------*
  * Find visual line on screen *
  *----------------------------*/
@@ -844,4 +844,6 @@ LONG LineToVisual(struct line_node *line, struct InstData *data)
   RETURN(line_nr);
   return(line_nr);
 }
+
 ///
+
