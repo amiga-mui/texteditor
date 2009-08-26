@@ -178,12 +178,24 @@ enum CursorState
   CS_ACTIVE,
 };
 
+struct LineStyle
+{
+  UWORD column;
+  UWORD style;
+};
+
+struct LineColor
+{
+  UWORD column;
+  UWORD color;
+};
+
 struct LineNode
 {
   STRPTR   Contents;      // Set this to the linecontents (allocated via the poolhandle)
   ULONG    Length;        // The length of the line (including the '\n')
-  UWORD    *Styles;       // Set this to the styles used for this line (allocated via the poolhandle) the format is: pos,style,pos,style,...,-1,0
-  UWORD    *Colors;       // The colors to use (allocated via the poolhandle) the format is: pos,color,pos,color,...,-1,-0
+  struct LineStyle *Styles; // Set this to the styles used for this line (allocated via the poolhandle). The array is terminated by an (EOS,0) marker
+  struct LineColor *Colors; // The colors to use (allocated via the poolhandle). The array is terminated by an (0xffff,0) marker
   BOOL     Color;         // Set this to TRUE if you want the line to be highlighted
   UWORD    Flow;          // Use the MUIV_TextEditor_Flow_xxx values...
   UWORD    Separator;     // See definitions below
@@ -254,8 +266,8 @@ struct ExportMessage
   ULONG  Length;       // Length of Contents, including the '\n' character
   ULONG  SkipFront;    // amount of chars to skip at the front of the current line
   ULONG  SkipBack;     // amount of chars to skip at the back of the current line
-  UWORD  *Styles;      // Pointer to array of words with style definition
-  UWORD  *Colors;      // pointer to array of words with color definitions
+  struct LineStyle *Styles;      // Pointer to array of words with style definition
+  struct LineColor *Colors;      // pointer to array of words with color definitions
   BOOL   Highlight;    // is the current line highlighted?
   UWORD  Flow;         // Current lines textflow
   UWORD  Separator;    // Current line contains a separator bar? see below
@@ -460,12 +472,13 @@ void  NiceBlock       (struct marking *, struct marking *);
 LONG  CutBlock        (struct InstData *, BOOL, BOOL, BOOL);
 
 void  UpdateStyles      (struct InstData *);
-LONG  GetStyle        (LONG, struct line_node *);
+UWORD GetStyle        (LONG, struct line_node *);
 void  AddStyle        (struct marking *, unsigned short, long, struct InstData *);
 void  AddStyleToLine      (LONG, struct line_node *, LONG, UWORD, struct InstData *);
 
 APTR MyAllocPooled(APTR pool, ULONG length);
 void  MyFreePooled      (void *, void *);
+ULONG GetAllocSize(void *);
 
 struct line_node  *AllocLine(struct InstData *data);
 void FreeLine(struct line_node *line, struct InstData *data);

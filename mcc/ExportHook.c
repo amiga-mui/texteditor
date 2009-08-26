@@ -36,13 +36,13 @@ struct Buffer
   ULONG   size;
 };
 
-///ExportHookFunc()
+/// ExportHookFunc()
 HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
 {
   struct Buffer *buf = emsg->UserData;
   LONG length;
-  UWORD *styles = emsg->Styles;
-  UWORD *colors = emsg->Colors;
+  struct LineStyle *styles = emsg->Styles;
+  struct LineColor *colors = emsg->Colors;
   UWORD lastpos = 0;
   UWORD currentstyle = 0;
   STRPTR result = NULL;
@@ -155,7 +155,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
     length = emsg->Length-emsg->SkipFront-emsg->SkipBack;
     lastpos = emsg->SkipFront;
 
-    if((styles || colors) &&
+    if((styles != NULL || colors != NULL) &&
        (hookType == MUIV_TextEditor_ExportHook_EMail || hookType == MUIV_TextEditor_ExportHook_Plain))
     {
       UWORD pos;
@@ -163,21 +163,23 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
       BOOL coloured = FALSE;
       UWORD colour_state = 7;
 
-      while(length > 0 && ((styles && *styles != 0xffff) || (colors && *colors != 0xffff)))
+      while(length > 0 && ((styles != NULL && styles[0].column != 0xffff) || (colors != NULL && colors[0].column != 0xffff)))
       {
         BOOL color;
         LONG len;
 
-        if(colors == NULL || (styles && (coloured ? *styles < *colors : *styles <= *colors)))
+        if(colors == NULL || (styles != NULL && (coloured ? styles[0].column < colors[0].column : styles[0].column <= colors[0].column)))
         {
-          pos = *styles++ - 1;
-          style = *styles++;
+          pos = styles->column - 1;
+          style = styles->style;
+          styles++;
           color = FALSE;
         }
         else
         {
-          pos = *colors++ - 1;
-          style = *colors++;
+          pos = colors->column - 1;
+          style = colors->color;
+          colors++;
           color = TRUE;
         }
 
@@ -271,24 +273,24 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
                 {
                   currentstyle &= style;
 
-                  if(pos+1 != *styles || *(styles+1) < 0x8000)
+                  if(pos+1 != styles->column || styles->style < 0x8000)
                   {
                     *buf->pointer++ = '\033';
                     *buf->pointer++ = 'n';
 
-                    if(currentstyle & UNDERLINE)
+                    if(isFlagSet(currentstyle, UNDERLINE))
                     {
                       *buf->pointer++ = '\033';
                       *buf->pointer++ = 'u';
                     }
 
-                    if(currentstyle & BOLD)
+                    if(isFlagSet(currentstyle, BOLD))
                     {
                       *buf->pointer++ = '\033';
                       *buf->pointer++ = 'b';
                     }
 
-                    if(currentstyle & ITALIC)
+                    if(isFlagSet(currentstyle, ITALIC))
                     {
                       *buf->pointer++ = '\033';
                       *buf->pointer++ = 'i';
@@ -376,4 +378,6 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
 MakeHookWithData(ExportHookPlain, ExportHookFunc, MUIV_TextEditor_ExportHook_Plain);
 MakeHookWithData(ExportHookEMail, ExportHookFunc, MUIV_TextEditor_ExportHook_EMail);
 MakeHookWithData(ExportHookNoStyle, ExportHookFunc, MUIV_TextEditor_ExportHook_NoStyle);
+
 ///
+

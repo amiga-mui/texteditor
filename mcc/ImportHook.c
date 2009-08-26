@@ -43,7 +43,7 @@ struct grow
 
 
 /*************************************************************************/
-///GetHex()
+/// GetHex()
 STATIC LONG GetHex(char *src)
 {
   if ((src[0] >= '0' && src[0] <= '9')) return src[0] - '0';
@@ -51,9 +51,9 @@ STATIC LONG GetHex(char *src)
   if ((src[0] >= 'A' && src[0] <= 'F')) return src[0] - 'A' + 10;
   return -1;
 }
-///
 
-///GetQP()
+///
+/// GetQP()
 /************************************************************************
  Convert a =XX string to it's value (into *val). Returns TRUE if
  conversion was successfull in that case *src_ptr will advanved as well.
@@ -80,8 +80,9 @@ STATIC BOOL GetQP(char **src_ptr, unsigned char *val)
   }
   return FALSE;
 }
+
 ///
-///GetLong()
+/// GetLong()
 /************************************************************************
  Reads out the next value at *src_ptr and advances src_ptr.
  Returns TRUE if succedded else FALSE
@@ -96,8 +97,9 @@ STATIC BOOL GetLong(char **src_ptr, LONG *val)
   }
   return FALSE;
 }
+
 ///
-///FindEOL()
+/// FindEOL()
 /************************************************************************
  Returns the end of line in the current line (pointing at the linefeed).
  If a 0 byte is encountered it returns the pointer to the 0 byte.
@@ -123,8 +125,9 @@ STATIC char *FindEOL(char *src, int *tabs_ptr)
   if (tabs_ptr) *tabs_ptr = tabs;
   return eol;
 }
+
 ///
-///AddToGrow()
+/// AddToGrow()
 /************************************************************************
  Adds two new values to the given grow. This function guarantees
  that there is at least space for 2 additional values.
@@ -135,10 +138,10 @@ STATIC VOID AddToGrow(struct grow *grow, UWORD val1, UWORD val2)
   {
     UWORD *new_array;
 
-    if ((new_array = MyAllocPooled(grow->pool, sizeof(grow->array[0])*2*(grow->max+9)))) /* we reserve one more for the ending */
+    if((new_array = MyAllocPooled(grow->pool, sizeof(grow->array[0])*2*(grow->max+9)))) /* we reserve one more for the ending */
     {
       /* Copy old contents into new array */
-      if (grow->array)
+      if(grow->array)
       {
         memcpy(new_array,grow->array,sizeof(grow->array[0])*2*grow->current);
         MyFreePooled(grow->pool,grow->array);
@@ -155,9 +158,9 @@ STATIC VOID AddToGrow(struct grow *grow, UWORD val1, UWORD val2)
     grow->current++;
   }
 }
-///
 
-///ContainsText()
+///
+/// ContainsText()
 /************************************************************************
  searches through a string and returns TRUE if the string contains
  any text (except newlines) until the stopchar is found
@@ -181,8 +184,9 @@ static BOOL ContainsText(char *str, char stopchar)
 
   return FALSE;
 }
+
 ///
-///PlainImportHookFunc()
+/// PlainImportHookFunc()
 /************************************************************************
  The plain import hook. It supports following escape sequences:
 
@@ -366,21 +370,21 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 
     } /* while (src < eol) */
 
-    line->Colors = color_grow.array;
-    line->Styles = style_grow.array;
+    line->Colors = (struct LineColor *)color_grow.array;
+    line->Styles = (struct LineStyle *)style_grow.array;
 
     /* Mark the end of the color array (space is ensured) */
-    if (line->Colors)
+    if(line->Colors != NULL)
     {
-      line->Colors[color_grow.current*2] = ~0;
-      line->Colors[color_grow.current*2+1] = 0;
+      line->Colors[color_grow.current].column = ~0;
+      line->Colors[color_grow.current].color = 0;
     }
 
     /* Mark the end of the style array (space is ensured) */
-    if (line->Styles)
+    if(line->Styles != NULL)
     {
-      line->Styles[style_grow.current*2] = ~0;
-      line->Styles[style_grow.current*2+1] = 0;
+      line->Styles[style_grow.current].column = ~0;
+      line->Styles[style_grow.current].style = 0;
     }
 
     *dest++ = '\n';
@@ -393,9 +397,9 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
   return eol + 1;
 }
 MakeHook(ImPlainHook, PlainImportHookFunc);
-///
 
-///MimeImport()
+///
+/// MimeImport()
 /************************************************************************
  The MIME import hook. It supports following escape sequences:
 
@@ -746,21 +750,21 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
       *dest++ = c;
     } /* while (src < eol) */
 
-    line->Colors = color_grow.array;
-    line->Styles = style_grow.array;
+    line->Colors = (struct LineColor *)color_grow.array;
+    line->Styles = (struct LineStyle *)style_grow.array;
 
     /* Mark the end of the color array (space is ensured) */
-    if (line->Colors)
+    if(line->Colors)
     {
-      line->Colors[color_grow.current*2] = ~0;
-      line->Colors[color_grow.current*2+1] = 0;
+      line->Colors[color_grow.current].column = ~0;
+      line->Colors[color_grow.current].color = 0;
     }
 
     /* Mark the end of the style array (space is ensured) */
-    if (line->Styles)
+    if(line->Styles != NULL)
     {
-      line->Styles[style_grow.current*2] = ~0;
-      line->Styles[style_grow.current*2+1] = 0;
+      line->Styles[style_grow.current].column = ~0;
+      line->Styles[style_grow.current].style = 0;
     }
 
     *dest++ = '\n';
@@ -772,28 +776,30 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
   if (!eol || eol[0] == 0) return NULL;
   return eol + 1;
 }
-///
 
-///EMailImportHookFunc()
+///
+/// EMailImportHookFunc()
 HOOKPROTONHNO(EMailImportHookFunc, STRPTR , struct ImportMessage *msg)
 {
   return MimeImport(msg,0);
 }
 MakeHook(ImEMailHook, EMailImportHookFunc);
-///
 
-///MIMEImportHookFunc()
+///
+/// MIMEImportHookFunc()
 HOOKPROTONHNO(MIMEImportHookFunc, STRPTR, struct ImportMessage *msg)
 {
   return MimeImport(msg,1);
 }
 MakeHook(ImMIMEHook, MIMEImportHookFunc);
-///
 
-///MIMEQuoteImportHookFunc()
+///
+/// MIMEQuoteImportHookFunc()
 HOOKPROTONHNO(MIMEQuoteImportHookFunc, STRPTR, struct ImportMessage *msg)
 {
   return MimeImport(msg,2);
 }
 MakeHook(ImMIMEQuoteHook, MIMEQuoteImportHookFunc);
+
 ///
+

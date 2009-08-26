@@ -5,6 +5,16 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-08-27 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/misc: replaced the complete array based style and color stuff by proper
+    structures which carry the starting column and style/color information
+    around. This makes the whole stuff much better understandable and by far
+    better maintainable. I really hope I did all the conversions right and
+    didn't mix up anything. So far all tests have been successful.
+    Also replaced the absolutely ugly peeking into the ULONG ahead of an
+    allocation to obtain the allocation size in bytes by a proper function call.
+
 2009-08-25 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: fixed a bad bug which made TE.mcc loose track about the

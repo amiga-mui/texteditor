@@ -27,7 +27,7 @@
 
 #include "private.h"
 
-///convert()
+/// convert()
 ULONG convert(ULONG style)
 {
     unsigned long result = FS_NORMAL;
@@ -41,16 +41,16 @@ ULONG convert(ULONG style)
 
   return(result);
 }
-///
 
-///ConvertPen()
+///
+/// ConvertPen()
 ULONG ConvertPen (UWORD color, BOOL highlight, struct InstData *data)
 {
   return(color ? (ULONG)(data->colormap ? (ULONG)data->colormap[color-1] : (ULONG)((color <= 8) ? _pens(data->object)[color-1] : color-9)) : (ULONG)(highlight ? (ULONG)data->highlightcolor : (ULONG)data->textcolor));
 }
-///
 
-///DrawSeparator()
+///
+/// DrawSeparator()
 VOID DrawSeparator (struct RastPort *rp, WORD X, WORD Y, WORD Width, WORD Height, struct InstData *data)
 {
   ENTER();
@@ -68,9 +68,9 @@ VOID DrawSeparator (struct RastPort *rp, WORD X, WORD Y, WORD Width, WORD Height
 
   LEAVE();
 }
-///
 
-///PrintLine()
+///
+/// PrintLine()
 LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, struct InstData *data)
 {
   STRPTR text = line->line.Contents;
@@ -90,8 +90,8 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
     LONG startx = 0, stopx = 0;
     LONG starty = 0, xoffset = ((data->height-rp->TxBaseline+1)>>1)+1;
     LONG flow = 0;
-    UWORD *styles = line->line.Styles;
-    UWORD *colors = line->line.Colors;
+    struct LineStyle *styles = line->line.Styles;
+    struct LineColor *colors = line->line.Colors;
     struct marking block;
     BOOL cursor = FALSE;
 
@@ -273,29 +273,25 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       LONG p_length = c_length;
 
       SetSoftStyle(rp, convert(GetStyle(x, line)), AskSoftStyle(rp));
-      if(styles)
+      if(styles != NULL)
       {
-        while(*styles-1 <= x)
-        {
-          styles += 2;
-        }
-        if(*styles-x-1 < p_length)
-        {
-          p_length = *styles-x-1;
-        }
+        while(styles->column-1 <= x)
+          styles++;
+
+        if(styles->column-x-1 < p_length)
+          p_length = styles->column-x-1;
       }
 
-      if(colors)
+      if(colors != NULL)
       {
-        while(*colors-1 <= x)
+        while(colors->column-1 <= x)
         {
-          SetAPen(rp, ConvertPen(*(colors+1), line->line.Color, data));
-          colors += 2;
+          SetAPen(rp, ConvertPen(colors->color, line->line.Color, data));
+          colors++;
         }
-        if(*colors-x-1 < p_length)
-        {
-          p_length = *colors-x-1;
-        }
+
+        if(colors->column-x-1 < p_length)
+          p_length = colors->column-x-1;
       }
 
 /*      if(stopx)
@@ -435,4 +431,6 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
   RETURN(length);
   return(length);
 }
+
 ///
+

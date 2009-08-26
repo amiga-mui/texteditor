@@ -42,7 +42,7 @@
 
 DISPATCHERPROTO(_Dispatcher);
 
-///ResetDisplay()
+/// ResetDisplay()
 void ResetDisplay(struct InstData *data)
 {
   struct  line_node *line = data->firstline;
@@ -99,9 +99,9 @@ void ResetDisplay(struct InstData *data)
 
   LEAVE();
 }
-///
 
-///RequestInput()
+///
+/// RequestInput()
 void  RequestInput(struct InstData *data)
 {
   ENTER();
@@ -111,9 +111,9 @@ void  RequestInput(struct InstData *data)
 
   LEAVE();
 }
-///
 
-///RejectInput()
+///
+/// RejectInput()
 void  RejectInput(struct InstData *data)
 {
   ENTER();
@@ -123,9 +123,9 @@ void  RejectInput(struct InstData *data)
 
   LEAVE();
 }
-///
 
-///OM_NEW()
+///
+/// OM_NEW()
 IPTR New(struct IClass *cl, Object *obj, struct opSet *msg)
 {
   ENTER();
@@ -190,9 +190,9 @@ IPTR New(struct IClass *cl, Object *obj, struct opSet *msg)
   RETURN(FALSE);
   return(FALSE);
 }
-///
 
-///OM_DISPOSE()
+///
+/// OM_DISPOSE()
 IPTR Dispose(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
@@ -218,9 +218,9 @@ IPTR Dispose(struct IClass *cl, Object *obj, Msg msg)
   LEAVE();
   return(DoSuperMethodA(cl, obj, msg));
 }
-///
 
-///MUIM_Setup()
+///
+/// MUIM_Setup()
 IPTR Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
 {
   struct InstData *data = INST_DATA(cl, obj);
@@ -290,9 +290,9 @@ IPTR Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
   RETURN(FALSE);
   return(FALSE);
 }
-///
 
-///MUIM_Cleanup
+///
+/// MUIM_Cleanup
 IPTR Cleanup(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
@@ -330,9 +330,9 @@ IPTR Cleanup(struct IClass *cl, Object *obj, Msg msg)
   RETURN(result);
   return result;
 }
-///
 
-///MUIM_AskMinMax()
+///
+/// MUIM_AskMinMax()
 IPTR AskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
@@ -381,9 +381,9 @@ IPTR AskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
   RETURN(0);
   return(0);
 }
-///
 
-///MUIM_Show()
+///
+/// MUIM_Show()
 IPTR Show(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
@@ -459,9 +459,9 @@ IPTR Show(struct IClass *cl, Object *obj, Msg msg)
   RETURN(TRUE);
   return(TRUE);
 }
-///
 
-///MUIM_Hide()
+///
+/// MUIM_Hide()
 IPTR Hide(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
@@ -482,9 +482,9 @@ IPTR Hide(struct IClass *cl, Object *obj, Msg msg)
   LEAVE();
   return(DoSuperMethodA(cl, obj, msg));
 }
-///
 
-///MUIM_Draw()
+///
+/// MUIM_Draw()
 IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
@@ -545,9 +545,9 @@ IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
   RETURN(0);
   return(0);
 }
-///
 
-///_Dispatcher()
+///
+/// _Dispatcher()
 DISPATCHER(_Dispatcher)
 {
   struct InstData *data;
@@ -887,4 +887,6 @@ DISPATCHER(_Dispatcher)
   RETURN(result);
   return(result);
 }
+
 ///
+
