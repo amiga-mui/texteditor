@@ -495,16 +495,16 @@ void *ExportText(struct MUIP_TextEditor_ExportText *msg, struct InstData *data);
 void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data);
 
 struct  line_node *loadtext (void);
-unsigned short  *CheckStyles      (char *);
+unsigned short  *CheckStyles(char *);
 
 LONG CutBlock2 (struct InstData *, BOOL, BOOL, struct marking *, BOOL);
 char *GetBlock (struct marking *, struct InstData *);
 
-long AddToUndoBuffer(enum EventType, char *, struct InstData *);
+BOOL AddToUndoBuffer(enum EventType, char *, struct InstData *);
 void ResetUndoBuffer(struct InstData *);
 void ResizeUndoBuffer(struct InstData *, ULONG);
-long Undo       (struct InstData *);
-long Redo       (struct InstData *);
+BOOL Undo(struct InstData *);
+BOOL Redo(struct InstData *);
 
 ULONG ClearText   (struct InstData *);
 ULONG ToggleCursor  (struct InstData *);

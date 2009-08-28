@@ -29,7 +29,7 @@
 
 #include "private.h"
 
-///LineNr()
+/// LineNr()
 unsigned short LineNr(struct line_node *line, struct InstData *data)
 {
   unsigned short result = 1;
@@ -46,9 +46,9 @@ unsigned short LineNr(struct line_node *line, struct InstData *data)
   RETURN(result);
   return(result);
 }
-///
 
-///LineNode()
+///
+/// LineNode()
 struct line_node *LineNode(unsigned short linenr, struct InstData *data)
 {
   struct line_node *actual = data->firstline;
@@ -63,11 +63,13 @@ struct line_node *LineNode(unsigned short linenr, struct InstData *data)
   RETURN(actual);
   return(actual);
 }
-///
 
-///Undo()
-long Undo(struct InstData *data)
+///
+/// Undo()
+BOOL Undo(struct InstData *data)
 {
+  BOOL success = FALSE;
+
   ENTER();
 
   D(DBF_UNDO, "undolevel: %ld undocur: %ld undofill: %ld", data->undolevel, data->undocur, data->undofill);
@@ -77,7 +79,7 @@ long Undo(struct InstData *data)
   if(data->undolevel > 0 && data->undocur > 0)
   {
     struct UserAction *buffer;
-    BOOL  crsr_move = TRUE;
+    BOOL crsr_move = TRUE;
 
     if(Enabled(data))
     {
@@ -194,7 +196,7 @@ long Undo(struct InstData *data)
 
     ScrollIntoDisplay(data);
 
-    if(data->flags & FLG_Active)
+    if(isFlagSet(data->flags, FLG_Active))
       SetCursor(data->CPos_X, data->actualline, TRUE, data);
 
     // if there are no further undo levels we
@@ -203,26 +205,26 @@ long Undo(struct InstData *data)
     {
       set(data->object, MUIA_TextEditor_UndoAvailable, FALSE);
 
-      if(!(data->flags & FLG_UndoLost))
+      if(isFlagClear(data->flags, FLG_UndoLost))
         data->HasChanged = FALSE;
     }
 
-    RETURN(TRUE);
-    return(TRUE);
+    success = TRUE;
   }
   else
   {
     DoMethod(data->object, MUIM_TextEditor_HandleError, Error_NothingToUndo);
-
-    RETURN(FALSE);
-    return(FALSE);
   }
+
+  RETURN(success);
+  return success;
 }
 ///
-
-///Redo()
-long Redo(struct InstData *data)
+/// Redo()
+BOOL Redo(struct InstData *data)
 {
+  BOOL success = FALSE;
+
   ENTER();
 
   D(DBF_UNDO, "undolevel: %ld undocur: %ld undofill: %ld", data->undolevel, data->undocur, data->undofill);
@@ -312,7 +314,7 @@ long Redo(struct InstData *data)
 
     ScrollIntoDisplay(data);
 
-    if(data->flags & FLG_Active)
+    if(isFlagSet(data->flags, FLG_Active))
       SetCursor(data->CPos_X, data->actualline, TRUE, data);
 
     // if undocur == undofill this signals that we
@@ -320,21 +322,20 @@ long Redo(struct InstData *data)
     if(data->undocur == data->undofill)
       set(data->object, MUIA_TextEditor_RedoAvailable, FALSE);
 
-    RETURN(TRUE);
-    return(TRUE);
+    success = TRUE;
   }
   else
   {
     DoMethod(data->object, MUIM_TextEditor_HandleError, Error_NothingToRedo);
-
-    RETURN(FALSE);
-    return(FALSE);
   }
-}
-///
 
-///AddToUndoBuffer()
-long AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData *data)
+  RETURN(success);
+  return success;
+}
+
+///
+/// AddToUndoBuffer()
+BOOL AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData *data)
 {
   ENTER();
 
@@ -377,7 +378,7 @@ long AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData 
 
       // signal the user that something in the
       // undo buffer was lost.
-      data->flags |= FLG_UndoLost;
+      setFlag(data->flags, FLG_UndoLost);
     }
 
     buffer = data->undopointer;
@@ -466,7 +467,7 @@ long AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData 
           buffer->y = LineNr(block->startline, data);
           buffer->clip = (unsigned char *)text;
 
-          if(data->flags & FLG_FreezeCrsr)
+          if(isFlagSet(data->flags, FLG_FreezeCrsr))
             buffer->type = ET_DELETEBLOCK_NOMOVE;
         }
         else
@@ -486,9 +487,9 @@ long AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData 
   RETURN(TRUE);
   return(TRUE);
 }
-///
 
-///ResetUndoBuffer()
+///
+/// ResetUndoBuffer()
 void ResetUndoBuffer(struct InstData *data)
 {
   ENTER();
@@ -524,9 +525,9 @@ void ResetUndoBuffer(struct InstData *data)
 
   LEAVE();
 }
-///
 
-///ResizeUndoBuffer()
+///
+/// ResizeUndoBuffer()
 void ResizeUndoBuffer(struct InstData *data, ULONG level)
 {
   ENTER();
@@ -566,4 +567,6 @@ void ResizeUndoBuffer(struct InstData *data, ULONG level)
 
   LEAVE();
 }
+
 ///
+
