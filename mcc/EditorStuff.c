@@ -827,7 +827,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
       // we can get up to 4 new style changes
       numStyles += 4;
 
-      if((newstyles = MyAllocPooled(data->mypool, numStyles * sizeof(struct LineStyle))) != NULL)
+      if((newstyles = MyAllocPooled(data->mypool, numStyles*sizeof(struct LineStyle))) != NULL)
       {
         struct LineStyle *nstyles = newstyles;
 
@@ -899,7 +899,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
       // we can get up to 4 new color changes
       numColors += 4;
 
-      if((newcolors = MyAllocPooled(data->mypool, numColors+sizeof(struct LineColor))) != NULL)
+      if((newcolors = MyAllocPooled(data->mypool, numColors*sizeof(struct LineColor))) != NULL)
       {
         struct LineColor *ncolors = newcolors;
 
