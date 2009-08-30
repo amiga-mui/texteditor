@@ -1,5 +1,5 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.Guide 15.29 (23.08.2009)
+@$VER: TextEditor.Guide 15.30 (30.08.2009)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
@@ -339,6 +339,11 @@ History
 list of changes since 15.9)
 
 Quick summary:
+
+15.30 (30.08.2009)
+
+- fixed a bug which made TE.mcc loose track about the styles and colors being in use
+- changed internals to more easily handle styles&colors
 
 15.29 (23.08.2009)
 
