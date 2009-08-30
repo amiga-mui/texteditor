@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-08-30 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/EditorStuff.c: replaced accidental "+" by "*". This might have caused
+    the recent crashes in case there were lots of different colors in one line.
+
 #### v15.30 RELEASE ############################################################
 
 2009-08-30 Jens Langner <Jens.Langner@light-speed.de>
