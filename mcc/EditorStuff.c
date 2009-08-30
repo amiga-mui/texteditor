@@ -848,7 +848,6 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
 
         styles++;
       }
-      //styles--;
       ostyles = styles;
 
       // count the remaining number of style changes on this line
@@ -925,7 +924,6 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
       ostyles->column = EOS;
     }
     newline->line.Styles = newstyles;
-#endif
 
     if(colors != NULL)
     {
