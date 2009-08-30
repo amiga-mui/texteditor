@@ -103,6 +103,7 @@ void SetupDebug(void)
       { "clipboard", DBF_CLIPBOARD },
       { "undo",      DBF_UNDO      },
       { "dump",      DBF_DUMP      },
+      { "style",     DBF_STYLE     },
       { "all",       DBF_ALL       },
       { NULL,        0             }
     };

@@ -5,6 +5,14 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-08-31 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/EditorStuff.c: fixed another recently introduced bug which caused random
+    crashes because a pointer was not handled correctly. It seems at least the
+    crashes are gone now, but there are still issues when pasting text with
+    styles. This only works in the first column or if the text is pasted twice.
+    The good news is that this also happened with the old style handling.
+
 2009-08-30 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: replaced accidental "+" by "*". This might have caused
