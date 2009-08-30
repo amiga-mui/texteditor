@@ -820,7 +820,7 @@ void Key_Normal(UBYTE key, struct InstData *data)
     CheckWord(data);
 
   // add the pastechar to the undobuffer and paste the current
-  // key immediatly.
+  // key immediately.
   AddToUndoBuffer(ET_PASTECHAR, NULL, data);
   PasteChars(data->CPos_X++, data->actualline, 1, (char *)&key, NULL, data);
 
@@ -832,7 +832,6 @@ void Key_Normal(UBYTE key, struct InstData *data)
   {
     ULONG xpos = data->WrapBorder+1;
     D(DBF_INPUT, "must wrap");
-
 
     // now we make sure to wrap *exactly* at the WrapBorder the user
     // specified instead of wrapping right where we are.
