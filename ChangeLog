@@ -7,6 +7,8 @@ $URL$
 
 2009-08-31 Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/EditorStuff.c: fixed another style handling bug which lost some styles
+    when pasting a text with styles from the clipboard.
   * mcc/EditorStuff.c: fixed another recently introduced bug which caused random
     crashes because a pointer was not handled correctly. It seems at least the
     crashes are gone now, but there are still issues when pasting text with

@@ -168,6 +168,8 @@ static void DumpLine(struct line_node *line)
 
   LEAVE();
 }
+#else
+#define DumpLine(line) ((void)0)
 #endif
 
 ///
@@ -356,9 +358,7 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
 
                   if((line = ImportText(contents, data, &ImPlainHook, data->ImportWrap)) != NULL)
                   {
-                    #if defined(DEBUG)
                     DumpLine(line);
-                    #endif
 
                     if(startline == NULL)
                       startline = line;
@@ -410,9 +410,7 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
                     line->line.Colors = colors;
                     data->totallines += line->visual;
 
-                    #if defined(DEBUG)
                     DumpLine(line);
-                    #endif
 
                     if(startline == NULL)
                       startline = line;
@@ -464,12 +462,17 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
           data->CPos_X += actline->line.Length-1;
           oneline = TRUE;
         }
-        if(!newline)
+        if(newline == FALSE)
+        {
+          D(DBF_CLIPBOARD, "merging line");
           MergeLines(line, data);
+        }
+        D(DBF_CLIPBOARD, "merging actline");
         MergeLines(actline, data);
-        if(oneline)
+
+        if(oneline == TRUE)
           line = actline;
-        if(newline)
+        if(newline == TRUE)
         {
           line = line->next;
           data->CPos_X = 0;
@@ -530,6 +533,9 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
 
   ENTER();
 
+  D(DBF_DUMP, "before merge");
+  DumpLine(line);
+
   data->HasChanged = TRUE;
   if(line->line.Length == 1)
   {
@@ -567,7 +573,9 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
       struct LineColor *colors;
       struct LineColor *colors1 = line->line.Colors;
       struct LineColor *colors2 = line->next->line.Colors;
-      UWORD length = 12;
+      ULONG length;
+
+      length = sizeof(*styles) * 3;
 
       if(styles1 != NULL)
         length += GetAllocSize(styles1);
@@ -576,20 +584,17 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
 
       if((styles = MyAllocPooled(data->mypool, length)) != NULL)
       {
-        struct LineStyle* t_styles = styles;
+        struct LineStyle *t_styles = styles;
         UWORD style = 0;
-
-        SHOWVALUE(DBF_CLIPBOARD, length);
-        SHOWVALUE(DBF_CLIPBOARD, styles);
-        SHOWVALUE(DBF_CLIPBOARD, styles1);
-        SHOWVALUE(DBF_CLIPBOARD, styles2);
 
         if(styles2 != NULL)
         {
-          struct LineStyle* t_styles2 = styles2;
+          struct LineStyle *t_styles2 = styles2;
 
+          // collect all styles which start at the beginning of the line to be appended
           while(t_styles2->column == 1)
           {
+            D(DBF_STYLE, "appending style 0x%04lx", t_styles->style);
             if(t_styles->style > 0xff)
               style &= t_styles2->style;
             else
@@ -603,20 +608,21 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
         {
           while(styles1->column != EOS)
           {
-            if(styles1->column == line->line.Length && ((~styles1->style & style) == (styles1->style  ^ 0xffff)))
+            if(styles1->column == line->line.Length && ((~styles1->style & style) == (styles1->style ^ 0xffff)))
             {
+              D(DBF_STYLE, "ignoring style 0x%04lx at column %ld (1)", styles1->style, styles1->column);
               style &= styles1->style;
               styles1++;
             }
             else
             {
+              D(DBF_STYLE, "prepending style 0x%04lx at column %ld", styles1->style, styles1->column);
               styles->column = styles1->column;
               styles->style = styles1->style;
               styles++;
               styles1++;
             }
           }
-          SHOWVALUE(DBF_CLIPBOARD, line->line.Styles);
           MyFreePooled(data->mypool, line->line.Styles);
         }
 
@@ -624,26 +630,27 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
         {
           while(styles2->column != EOS)
           {
-            if(styles2->column == 1 && (styles2->style & style) != 0)
+            if(styles2->column == 1 && (styles2->style & style) == 0)
             {
+              D(DBF_STYLE, "ignoring style 0x%04lx at column %ld (2)", styles2->style, styles2->column);
               styles2++;
             }
             else
             {
+              D(DBF_STYLE, "appending style 0x%04lx at column %ld from column %ld", styles2->style, styles2->column + line->line.Length - 1, styles2->column);
               styles->column = styles2->column + line->line.Length - 1;
               styles->style = styles2->style;
               styles++;
               styles2++;
             }
           }
-          SHOWVALUE(DBF_CLIPBOARD, line->next->line.Styles);
           MyFreePooled(data->mypool, line->next->line.Styles);
         }
         styles->column = EOS;
         line->line.Styles = t_styles;
       }
 
-      length = 12;
+      length = sizeof(*colors) * 3;
 
       if(colors1 != NULL)
         length += GetAllocSize(colors1);
@@ -655,11 +662,6 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
         struct LineColor *t_colors = colors;
         UWORD end_color = 0;
 
-        SHOWVALUE(DBF_CLIPBOARD, length);
-        SHOWVALUE(DBF_CLIPBOARD, colors);
-        SHOWVALUE(DBF_CLIPBOARD, colors1);
-        SHOWVALUE(DBF_CLIPBOARD, colors2);
-
         if(colors1 != NULL)
         {
           while(colors1->column < line->line.Length && colors1->column != 0xffff)
@@ -670,7 +672,6 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
             colors++;
             colors1++;
           }
-          SHOWVALUE(DBF_CLIPBOARD, line->line.Colors);
           MyFreePooled(data->mypool, line->line.Colors);
         }
 
@@ -693,7 +694,6 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
             colors++;
             colors2++;
           }
-          SHOWVALUE(DBF_CLIPBOARD, line->next->line.Colors);
           MyFreePooled(data->mypool, line->next->line.Colors);
         }
         colors->column = 0xffff;
@@ -713,6 +713,9 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
     line->line.Color = color;
     line->line.Flow = flow;
     line->line.Separator = separator;
+
+    D(DBF_DUMP, "after merge");
+    DumpLine(line);
 
     FreeLine(next, data);
 
@@ -802,10 +805,8 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
 
   ENTER();
 
-  #if defined(DEBUG)
   D(DBF_DUMP, "before split, x=%ld",x);
   DumpLine(line);
-  #endif
 
   OffsetToLines(x, line, &pos, data);
   lines = pos.lines;
@@ -1045,12 +1046,10 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
         }
       }
 
-      #if defined(DEBUG)
       D(DBF_DUMP, "after split, old line");
       DumpLine(line);
       D(DBF_DUMP, "after split, new line");
       DumpLine(newline);
-      #endif
 
       RETURN(TRUE);
       return(TRUE);
@@ -1077,12 +1076,10 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
           DumpText(data->visual_y+line_nr, line_nr, data->maxlines, TRUE, data);
       }
 
-      #if defined(DEBUG)
       D(DBF_DUMP, "after split, old line");
       DumpLine(line);
       D(DBF_DUMP, "after split, new line");
       DumpLine(newline);
-      #endif
 
       RETURN(TRUE);
       return(TRUE);
@@ -1120,12 +1117,10 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
       c = c + PrintLine(c, line, line_nr++, TRUE, data);
   /* Her printes !HELE! den nye linie, burde optimeres! */
 
-    #if defined(DEBUG)
     D(DBF_DUMP, "after split, old line");
     DumpLine(line);
     D(DBF_DUMP, "after split, new line");
     DumpLine(newline);
-    #endif
 
     RETURN(TRUE);
     return (TRUE);
