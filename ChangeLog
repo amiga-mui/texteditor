@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-09-04 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/EditorStuff.c: fixed yet another crash when removing lines. This old
+    handling was a *real* *big* *mess*. Exploiting features of the C language
+    is cool, as long as other persons understand it without asking more than
+    twice. This stuff really was *far* beyond!! :(
+
 2009-08-31 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: fixed another style handling bug which lost some styles
