@@ -1447,6 +1447,7 @@ BOOL RemoveChars(LONG x, struct line_node *line, LONG length, struct InstData *d
       {
         line->line.Colors[store].column = line->line.Colors[c].column-length;
         line->line.Colors[store].column = line->line.Colors[c].column;
+        c++;
         store++;
       }
       line->line.Colors[store].column = 0xffff;
