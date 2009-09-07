@@ -163,12 +163,12 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
       BOOL coloured = FALSE;
       UWORD colour_state = 7;
 
-      while(length > 0 && ((styles != NULL && styles[0].column != 0xffff) || (colors != NULL && colors[0].column != 0xffff)))
+      while(length > 0 && ((styles != NULL && styles->column != EOS) || (colors != NULL && colors->column != EOC)))
       {
         BOOL color;
         LONG len;
 
-        if(colors == NULL || (styles != NULL && (coloured ? styles[0].column < colors[0].column : styles[0].column <= colors[0].column)))
+        if(colors == NULL || (styles != NULL && (coloured ? styles->column < colors->column : styles->column <= colors->column)))
         {
           pos = styles->column - 1;
           style = styles->style;

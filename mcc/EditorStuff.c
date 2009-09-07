@@ -159,7 +159,7 @@ static void DumpLine(struct line_node *line)
     struct LineColor *colors = line->line.Colors;
 
     D(DBF_DUMP, "colors:");
-    while(colors->column != 0xffff)
+    while(colors->column != EOC)
     {
       D(DBF_DUMP, "color %3ld starting at column %3ld", colors->color, colors->column);
       colors++;
@@ -294,7 +294,7 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
               {
                 error = ReadChunkBytes(data->iff, colors, numColors * sizeof(struct LineColor));
                 SHOWVALUE(DBF_CLIPBOARD, error);
-                colors[numColors].column = 0xffff;
+                colors[numColors].column = EOC;
               }
             }
             break;
@@ -664,7 +664,7 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
 
         if(colors1 != NULL)
         {
-          while(colors1->column < line->line.Length && colors1->column != 0xffff)
+          while(colors1->column < line->line.Length && colors1->column != EOC)
           {
             colors->column = colors1->column;
             end_color = colors1->color;
@@ -687,7 +687,7 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
           if(colors2->column == 1 && colors2->color == end_color)
             colors2++;
 
-          while(colors2->column != 0xffff)
+          while(colors2->column != EOC)
           {
             colors->column = colors2->column + line->line.Length - 1;
             colors->color = colors2->color;
@@ -696,7 +696,7 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
           }
           MyFreePooled(data->mypool, line->next->line.Colors);
         }
-        colors->column = 0xffff;
+        colors->column = EOC;
         line->line.Colors = t_colors;
       }
     }
@@ -940,7 +940,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
       ocolors = colors;
 
       // count the number of remaining color changes on this line
-      while(colors[numColors].column != 0xffff)
+      while(colors[numColors].column != EOC)
         numColors++;
       // we can get up to 4 new color changes
       numColors += 4;
@@ -958,19 +958,19 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
         }
 
         // add the remaining color changes to the new line
-        while(colors->column != 0xffff)
+        while(colors->column != EOC)
         {
           ncolors->column = colors->column - x;
           ncolors->color = colors->color;
           ncolors++;
           colors++;
         }
-        ncolors->column = 0xffff;
+        ncolors->column = EOC;
       }
       if(x == 0)
         ocolors = line->line.Colors;
       // terminate the color changes of the old line
-      ocolors->column = 0xffff;
+      ocolors->column = EOC;
     }
     newline->line.Colors = newcolors;
 
@@ -1314,13 +1314,13 @@ BOOL PasteChars(LONG x, struct line_node *line, LONG length, const char *charact
 
   if(line->line.Colors != NULL)
   {
-    if(line->line.Colors[0].column != 0xffff)
+    if(line->line.Colors[0].column != EOC)
     {
       ULONG c = 0;
 
       while(line->line.Colors[c].column <= x+1)
         c++;
-      while(line->line.Colors[c].column != 0xffff)
+      while(line->line.Colors[c].column != EOC)
       {
         line->line.Colors[c].column += length;
         c++;
@@ -1423,7 +1423,7 @@ BOOL RemoveChars(LONG x, struct line_node *line, LONG length, struct InstData *d
 
   if(line->line.Colors != NULL)
   {
-    if(line->line.Colors[0].column != 0xffff)
+    if(line->line.Colors[0].column != EOC)
     {
       UWORD start_color = x ? GetColor(x-1, line) : 0;
       UWORD end_color = GetColor(x+length, line);
@@ -1443,14 +1443,14 @@ BOOL RemoveChars(LONG x, struct line_node *line, LONG length, struct InstData *d
       while(line->line.Colors[c].column <= x+length+1)
         c++;
 
-      while(line->line.Colors[c].column != 0xffff)
+      while(line->line.Colors[c].column != EOC)
       {
         line->line.Colors[store].column = line->line.Colors[c].column-length;
         line->line.Colors[store].column = line->line.Colors[c].column;
         c++;
         store++;
       }
-      line->line.Colors[store].column = 0xffff;
+      line->line.Colors[store].column = EOC;
     }
   }
 

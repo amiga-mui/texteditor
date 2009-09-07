@@ -36,7 +36,7 @@
 
 #include "version.h"
 
-///OM_GET()
+/// OM_GET()
 IPTR Get(struct IClass *cl, Object *obj, struct opGet *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
@@ -200,9 +200,9 @@ IPTR Get(struct IClass *cl, Object *obj, struct opGet *msg)
   RETURN(TRUE);
   return(TRUE);
 }
-///
 
-///OM_SET()
+///
+/// OM_SET()
 IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
@@ -729,4 +729,6 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
   RETURN(result);
   return result;
 }
+
 ///
+

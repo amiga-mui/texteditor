@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-09-07 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/misc: replaced all custom "end of color" markers by a proper definition.
+
 2009-09-04 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: fixed yet another crash when removing lines. This old
