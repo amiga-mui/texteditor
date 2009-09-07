@@ -67,7 +67,7 @@ void AddColorToLine(UWORD x, struct line_node *line, UWORD length, UWORD color, 
     line->line.Colors = newcolors;
     if(colors != NULL)
     {
-      while(colors->column != 0xffff && colors->column < x)
+      while(colors->column != EOC && colors->column < x)
       {
         newcolors->column = colors->column;
         oldcol = colors->color;
@@ -84,7 +84,7 @@ void AddColorToLine(UWORD x, struct line_node *line, UWORD length, UWORD color, 
     }
     if(colors != NULL)
     {
-      while(colors->column != 0xffff && colors->column <= x+length)
+      while(colors->column != EOC && colors->column <= x+length)
       {
         oldcol = colors->color;
         colors++;
@@ -98,7 +98,7 @@ void AddColorToLine(UWORD x, struct line_node *line, UWORD length, UWORD color, 
     }
     if(colors != NULL)
     {
-      while(colors->column != 0xffff)
+      while(colors->column != EOC)
       {
         newcolors->column = colors->column;
         newcolors->color = colors->color;
@@ -106,7 +106,7 @@ void AddColorToLine(UWORD x, struct line_node *line, UWORD length, UWORD color, 
         colors++;
       }
     }
-    newcolors->column = 0xffff;
+    newcolors->column = EOC;
 
     if(oldcolors != NULL)
     {

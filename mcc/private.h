@@ -42,6 +42,7 @@
 #define CONFIG_VERSION 4
 
 #define EOS        (unsigned short)-1
+#define EOC        (unsigned short)0xffff
 
 #define UNDERLINE 0x01
 #define BOLD      0x02
@@ -195,7 +196,7 @@ struct LineNode
   STRPTR   Contents;      // Set this to the linecontents (allocated via the poolhandle)
   ULONG    Length;        // The length of the line (including the '\n')
   struct LineStyle *Styles; // Set this to the styles used for this line (allocated via the poolhandle). The array is terminated by an (EOS,0) marker
-  struct LineColor *Colors; // The colors to use (allocated via the poolhandle). The array is terminated by an (0xffff,0) marker
+  struct LineColor *Colors; // The colors to use (allocated via the poolhandle). The array is terminated by an (EOC,0) marker
   BOOL     Color;         // Set this to TRUE if you want the line to be highlighted
   UWORD    Flow;          // Use the MUIV_TextEditor_Flow_xxx values...
   UWORD    Separator;     // See definitions below

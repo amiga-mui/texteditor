@@ -488,7 +488,7 @@ void ClipChars(LONG x, struct line_node *line, LONG length, struct InstData *dat
     error = PushChunk(data->iff, 0, ID_COLS, IFFSIZE_UNKNOWN);
     SHOWVALUE(DBF_CLIPBOARD, error);
 
-    while(colors->column <= x && colors->column != 0xffff)
+    while(colors->column <= x && colors->column != EOC)
     {
       color.color = colors->color;
       colors++;
@@ -500,7 +500,7 @@ void ClipChars(LONG x, struct line_node *line, LONG length, struct InstData *dat
       SHOWVALUE(DBF_CLIPBOARD, error);
     }
 
-    if(colors->column != 0xffff)
+    if(colors->column != EOC)
     {
       while(colors->column <= x+length)
       {
@@ -627,7 +627,7 @@ void ClipLine(struct line_node *line, struct InstData *data)
     error = PushChunk(data->iff, 0, ID_COLS, IFFSIZE_UNKNOWN);
     SHOWVALUE(DBF_CLIPBOARD, error);
 
-    while(colors->column != 0xffff)
+    while(colors->column != EOC)
     {
       colors++;
       numColors++;
