@@ -369,8 +369,8 @@ void NiceBlock(struct marking *realblock, struct marking *newblock)
 }
 
 ///
-/// InitClipboard()
-BOOL InitClipboard(struct InstData *data, ULONG flags)
+/// StartClipSession()
+BOOL StartClipSession(struct InstData *data, ULONG flags)
 {
   struct IFFHandle *iff;
 
@@ -717,7 +717,7 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, struct marking
 
     if(Clipboard == TRUE)
     {
-      if(InitClipboard(data, IFFF_WRITE))
+      if(StartClipSession(data, IFFF_WRITE) == TRUE)
       {
         D(DBF_CLIPBOARD, "writing FORM");
         error = PushChunk(data->iff, ID_FTXT, ID_FORM, IFFSIZE_UNKNOWN);
@@ -786,7 +786,7 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, struct marking
   {
     if(Clipboard == TRUE)
     {
-      if(InitClipboard(data, IFFF_WRITE))
+      if(StartClipSession(data, IFFF_WRITE) == TRUE)
       {
         D(DBF_CLIPBOARD, "writing FORM");
         error = PushChunk(data->iff, ID_FTXT, ID_FORM, IFFSIZE_UNKNOWN);

@@ -498,6 +498,8 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
 struct  line_node *loadtext (void);
 unsigned short  *CheckStyles(char *);
 
+BOOL StartClipSession(struct InstData *data, ULONG flags);
+void EndClipSession(struct InstData *data);
 LONG CutBlock2 (struct InstData *, BOOL, BOOL, struct marking *, BOOL);
 char *GetBlock (struct marking *, struct InstData *);
 

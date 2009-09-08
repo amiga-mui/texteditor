@@ -35,9 +35,6 @@
 #include "private.h"
 #include "Debug.h"
 
-BOOL InitClipboard(struct InstData *data, ULONG flags);
-void EndClipSession(struct InstData *data);
-
 #if defined(__MORPHOS__)
 #include <proto/keymap.h>
 #include <proto/locale.h>
@@ -190,7 +187,7 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
 
   ENTER();
 
-  if(InitClipboard(data, IFFF_READ))
+  if(StartClipSession(data, IFFF_READ) == TRUE)
   {
     if(StopChunk(data->iff, ID_FTXT, ID_CHRS) == 0 &&
        StopChunk(data->iff, ID_FTXT, ID_FLOW) == 0 &&
