@@ -139,6 +139,7 @@ IPTR New(struct IClass *cl, Object *obj, struct opSet *msg)
     data->mypool = AllocSysObjectTags(ASOT_MEMPOOL, ASOPOOL_MFlags, MEMF_SHARED|MEMF_CLEAR,
                                                     ASOPOOL_Puddle, 3*1024,
                                                     ASOPOOL_Threshold, 512,
+                                                    ASOPOOL_Name, "TextEditor.mcc pool",
                                                     TAG_DONE);
     #else
     data->mypool = CreatePool(MEMF_ANY|MEMF_CLEAR, 3*1024, 512);

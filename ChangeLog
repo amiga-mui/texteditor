@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-09-21 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Dispatcher.c: added a name the memory pool for the OS4 build.
+
 2009-09-07 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: replaced all custom "end of color" markers by a proper definition.
