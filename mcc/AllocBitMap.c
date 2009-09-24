@@ -62,7 +62,7 @@ struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG width), REG(d1, LONG he
   }
   else
   {
-    if((bm = (struct BitMap *)AllocMem(sizeof(*bm), MEMF_CLEAR)) != NULL)
+    if((bm = (struct BitMap *)AllocVec(sizeof(*bm), MEMF_CLEAR)) != NULL)
     {
       int i, plsize=RASSIZE(width,height);
 
@@ -104,7 +104,7 @@ VOID SAVEDS ASM MUIG_FreeBitMap(REG(a0, struct BitMap *bm))
   else
   {
     FreeVec(bm->Planes[0]);
-    FreeMem(bm,sizeof(struct BitMap));
+    FreeVec(bm);
   }
   #endif
 

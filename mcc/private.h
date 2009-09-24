@@ -478,8 +478,10 @@ void  AddStyle        (struct marking *, unsigned short, long, struct InstData *
 void  AddStyleToLine      (LONG, struct line_node *, LONG, UWORD, struct InstData *);
 
 APTR MyAllocPooled(APTR pool, ULONG length);
-void  MyFreePooled      (void *, void *);
-ULONG GetAllocSize(void *);
+void MyFreePooled(APTR, APTR);
+APTR MyAlloc(ULONG length);
+void MyFree(APTR);
+ULONG GetAllocSize(APTR);
 
 struct line_node  *AllocLine(struct InstData *data);
 void FreeLine(struct line_node *line, struct InstData *data);
@@ -557,6 +559,15 @@ void SetupSelectPointer(struct InstData *data);
 void CleanupSelectPointer(struct InstData *data);
 void ShowSelectPointer(Object *obj, struct InstData *data);
 void HideSelectPointer(Object *obj, struct InstData *data);
+
+// ClipboardServer.c
+BOOL StartClipboardServer(void);
+void ShutdownClipboardServer(void);
+IPTR ClientStartSession(ULONG mode);
+void ClientEndSession(IPTR session);
+void ClientWriteChars(IPTR session, struct line_node *line, LONG start, LONG length);
+void ClientWriteLine(IPTR session, struct line_node *line);
+LONG ClientReadLine(IPTR session, struct line_node **line, ULONG *cset);
 
 extern struct Hook ImPlainHook;
 extern struct Hook ImEMailHook;

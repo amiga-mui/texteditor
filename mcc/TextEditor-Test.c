@@ -27,17 +27,15 @@
 
 #include <exec/tasks.h>
 #include <libraries/mui.h>
-#include <devices/clipboard.h>
-#include <libraries/iffparse.h>
 
 #include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/muimaster.h>
 #include <proto/intuition.h>
-#include <proto/iffparse.h>
 #include <proto/utility.h>
 
 #include "private.h"
+#include "version.h"
 
 #include "SDI_hook.h"
 
@@ -125,7 +123,6 @@ struct Library *LocaleBase = NULL;
 struct Library *MUIMasterBase = NULL;
 struct Library *RexxSysBase = NULL;
 struct Library *UtilityBase = NULL;
-struct Library *IFFParseBase = NULL;
 struct Library *WorkbenchBase = NULL;
 #elif defined(__MORPHOS__)
 struct Library *DiskfontBase = NULL;
@@ -137,7 +134,6 @@ struct Library *LocaleBase = NULL;
 struct Library *MUIMasterBase = NULL;
 struct Library *RexxSysBase = NULL;
 struct Library *UtilityBase = NULL;
-struct Library *IFFParseBase = NULL;
 struct Library *WorkbenchBase = NULL;
 #else
 struct Library *DiskfontBase = NULL;
@@ -153,7 +149,6 @@ struct UtilityBase *UtilityBase = NULL;
 #else
 struct Library *UtilityBase = NULL;
 #endif
-struct Library *IFFParseBase = NULL;
 struct Library *WorkbenchBase = NULL;
 #endif
 
@@ -167,7 +162,6 @@ struct LocaleIFace *ILocale = NULL;
 struct MUIMasterIFace *IMUIMaster = NULL;
 struct RexxSysIFace *IRexxSys = NULL;
 struct UtilityIFace *IUtility = NULL;
-struct IFFParseIFace *IIFFParse = NULL;
 struct WorkbenchIFace *IWorkbench = NULL;
 #endif
 
@@ -198,8 +192,7 @@ int main(void)
     GETINTERFACE(IRexxSys, RexxSysBase))
   if((UtilityBase = (APTR)OpenLibrary("utility.library", 38)) &&
     GETINTERFACE(IUtility, UtilityBase))
-  if((IFFParseBase = OpenLibrary("iffparse.library", 36)) &&
-    GETINTERFACE(IIFFParse, IFFParseBase))
+  if(StartClipboardServer())
   {
     /* Open workbench.library (optional) */
     if ((WorkbenchBase = OpenLibrary("workbench.library",0)))
@@ -224,6 +217,7 @@ int main(void)
                  *bold, *italic, *underline, *ischanged, *undo, *redo, *string,
                  *xslider, *yslider, *flow, *search, *replace, *wrapmode, *wrapborder,
                  *rgroup, *isdisabled, *isreadonly;
+                 Object *lower,*upper;
           const char *flow_text[] = { "Left", "Center", "Right", NULL };
           const char *wrap_modes[] = { "NoWrap", "SoftWrap", "HardWrap", NULL };
           const char *classes[] = { "TextEditor.mcc", NULL };
@@ -234,7 +228,7 @@ int main(void)
         app = MUI_NewObject("Application.mui",
               MUIA_Application_Author,      "TextEditor.mcc Open Source Team",
               MUIA_Application_Base,        "TextEditor-Test",
-              MUIA_Application_Copyright,   "(c) 2000-2009 TextEditor.mcc Open Source Team",
+              MUIA_Application_Copyright,   LIB_COPYRIGHT,
               MUIA_Application_Description, "TextEditor.mcc test program",
               MUIA_Application_Title,       "TextEditor-Test",
               MUIA_Application_Version,     "$VER: TextEditor-Test (" __DATE__ ")",
@@ -258,6 +252,8 @@ int main(void)
                       Child, redo = MUI_MakeObject(MUIO_Button, "_Redo"),
                       Child, search = MUI_MakeObject(MUIO_Button, "Search"),
                       Child, replace = MUI_MakeObject(MUIO_Button, "Replace"),
+                      Child, lower = MUI_MakeObject(MUIO_Button, "lower"),
+                      Child, upper = MUI_MakeObject(MUIO_Button, "upper"),
 
                     End,
 
@@ -361,9 +357,11 @@ int main(void)
                                   MUIA_ControlChar, 'a',
                                   MUIA_TextEditor_Contents,
 
+                                    "\n"
                                     "\33r\33b" __DATE__ "\33n\n"
-                                    "\n\33cTextEditor.gadget V15.0ß\n"
-                                    "Copyright 1997 by Allan Odgaard\n"
+                                    "\n\33cTextEditor.mcc " LIB_REV_STRING " test program\n"
+                                    "Copyright (C) 1997 by Allan Odgaard\n"
+                                    LIB_COPYRIGHT "\n"
                                     "\33l\n\33[s:9]\n"
                                     "For feedback write to: Duff@DIKU.DK\n"
                                     "For the latest version, try: \33p[7]\33uhttp://www.DIKU.dk/students/duff/texteditor/\33n\n"
@@ -512,6 +510,8 @@ int main(void)
           DoMethod(redo,  MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "Redo");
           DoMethod(search,  MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 3, MUIM_TextEditor_Search, "is not", 0);//MUIF_TextEditor_Search_CaseSensitive);
           DoMethod(replace, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 3, MUIM_TextEditor_Replace, "replaced", 0);
+          DoMethod(lower, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "ToLower");
+          DoMethod(upper, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "ToUpper");
 
           DoMethod(bold,      MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_StyleBold, MUIV_TriggerValue);
           DoMethod(italic,    MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_StyleItalic, MUIV_TriggerValue);
@@ -605,17 +605,14 @@ int main(void)
     }
   }
 
+  ShutdownClipboardServer();
+
   if(WorkbenchBase)
   {
     DROPINTERFACE(IWorkbench);
     WorkbenchBase = NULL;
   }
-  if(IFFParseBase)
-  {
-    DROPINTERFACE(IIFFParse);
-    CloseLibrary(IFFParseBase);
-    IFFParseBase = NULL;
-  }
+
   if(UtilityBase)
   {
     DROPINTERFACE(IUtility);

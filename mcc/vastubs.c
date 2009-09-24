@@ -44,6 +44,8 @@ VOID SetWindowPointer( struct Window *win, Tag tag1, ... )
 #include <proto/dos.h>
 LONG SystemTags( CONST_STRPTR command, ULONG tag1type, ... )
 { return SystemTagList(command, (struct TagItem *)&tag1type); }
+struct Process *CreateNewProcTags( ULONG tag1, ... )
+{ return CreateNewProc((struct TagItem *)&tag1); }
 
 #else
   #error "VARGS stubs are only save on m68k systems!"

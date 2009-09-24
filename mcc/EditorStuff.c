@@ -29,7 +29,6 @@
 #include <proto/graphics.h>
 #include <proto/layers.h>
 #include <proto/exec.h>
-#include <proto/iffparse.h>
 #include <proto/intuition.h>
 
 #include "private.h"
@@ -176,322 +175,220 @@ static void DumpLine(struct line_node *line)
  *----------------------*/
 BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
 {
-  struct line_node *line = NULL;
-  struct line_node *startline = NULL;
-  struct line_node *previous = NULL;
-  struct LineStyle *styles = NULL;
-  struct LineColor *colors = NULL;
-  STRPTR textline;
-  BOOL newline = TRUE;
   BOOL res = FALSE;
+  IPTR clipSession;
 
   ENTER();
 
-  if(StartClipSession(data, IFFF_READ) == TRUE)
+  if((clipSession = ClientStartSession(IFFF_READ)) != (IPTR)NULL)
   {
-    if(StopChunk(data->iff, ID_FTXT, ID_CHRS) == 0 &&
-       StopChunk(data->iff, ID_FTXT, ID_FLOW) == 0 &&
-       StopChunk(data->iff, ID_FTXT, ID_HIGH) == 0 &&
-       StopChunk(data->iff, ID_FTXT, ID_SBAR) == 0 &&
-       StopChunk(data->iff, ID_FTXT, ID_COLS) == 0 &&
-       StopChunk(data->iff, ID_FTXT, ID_STYL) == 0 &&
-       StopChunk(data->iff, ID_FTXT, ID_CSET) == 0)
+    LONG error;
+    BOOL newline = TRUE;
+    struct line_node *importedLines = NULL;
+    struct line_node *importedLine = NULL;
+    struct line_node *previous = NULL;
+
+    do
     {
-      LONG error, codeset = 0;
-      UWORD flow = MUIV_TextEditor_Flow_Left;
-      UWORD color = FALSE;
-      UWORD separator = 0;
-      BOOL ownclip = FALSE;
-      LONG updatefrom;
+      struct line_node *line = NULL;
+      ULONG codeset = 0;
 
-      while(TRUE)
+      error = ClientReadLine(clipSession, &line, &codeset);
+      SHOWVALUE(DBF_CLIPBOARD, error);
+      SHOWVALUE(DBF_CLIPBOARD, line);
+      SHOWVALUE(DBF_CLIPBOARD, codeset);
+
+      if(error == 0 && line != NULL)
       {
-        struct ContextNode *cn;
+        struct LineStyle *styles = NULL;
+        struct LineColor *colors = NULL;
+        BOOL ownclip = FALSE;
 
-        error = ParseIFF(data->iff, IFFPARSE_SCAN);
-        SHOWVALUE(DBF_CLIPBOARD, error);
-        if(error == IFFERR_EOC)
-          continue;
-        else if(error)
-          break;
-
-        if((cn = CurrentChunk(data->iff)) != NULL)
+        SHOWVALUE(DBF_CLIPBOARD, line->line.Styles);
+        if(line->line.Styles != NULL)
         {
-          switch (cn->cn_ID)
+          ULONG size = GetAllocSize(line->line.Styles);
+
+          if((styles = MyAllocPooled(data->mypool, size)) != NULL)
+            memcpy(styles, line->line.Styles, size);
+
+          MyFree(line->line.Styles);
+          line->line.Styles = NULL;
+
+          // we found styles, this mean the clip was created by ourselves
+          ownclip = TRUE;
+        }
+
+        SHOWVALUE(DBF_CLIPBOARD, line->line.Colors);
+        if(line->line.Colors != NULL)
+        {
+          ULONG size = GetAllocSize(line->line.Colors);
+
+          if((colors = MyAllocPooled(data->mypool, size)) != NULL)
+            memcpy(colors, line->line.Colors, size);
+
+          MyFree(line->line.Colors);
+          line->line.Colors = NULL;
+
+          // we found colors, this mean the clip was created by ourselves
+          ownclip = TRUE;
+        }
+
+        SHOWVALUE(DBF_CLIPBOARD, line->line.Contents);
+        if(line->line.Contents != NULL)
+        {
+          STRPTR contents = line->line.Contents;
+          ULONG length = line->line.Length;
+
+          if(ownclip == FALSE)
           {
-            case ID_CSET:
+            // this is a foreign clip
+            D(DBF_CLIPBOARD, "importing foreign clip");
+
+            if(contents[length-1] != '\n')
+              newline = FALSE;
+            else
+              length--;
+            contents[length] = '\0';
+
+            #if defined(__MORPHOS__)
+            if(codeset == CODESET_UTF8 && IS_MORPHOS2)
+              contents = utf8_to_ansi(data, contents);
+            #endif
+
+            SHOWSTRING(DBF_CLIPBOARD, contents);
+
+            if((importedLine = ImportText(contents, data, &ImPlainHook, data->ImportWrap)) != NULL)
             {
-              D(DBF_CLIPBOARD, "reading CSET");
-              SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
-              if(cn->cn_Size >= 4)
+              DumpLine(importedLine);
+
+              if(importedLines == NULL)
+                importedLines = importedLine;
+              if(previous != NULL)
+                previous->next = importedLine;
+
+              importedLine->previous = previous;
+              importedLine->visual = VisualHeight(importedLine, data);
+              while(importedLine->next != NULL)
               {
-                /* Only the first four bytes are interesting */
-                if(ReadChunkBytes(data->iff, &codeset, 4) != 4)
-                {
-                  codeset = 0;
-                }
-                SHOWVALUE(DBF_CLIPBOARD, codeset);
+                importedLine = importedLine->next;
+                importedLine->visual = VisualHeight(importedLine, data);
+                DumpLine(importedLine);
               }
+
+              previous = importedLine;
             }
-            break;
+          }
+          else
+          {
+            // this is one of our own clips
+            D(DBF_CLIPBOARD, "importing TextEditor.mcc clip");
 
-            case ID_FLOW:
+            if(contents[length-1] != '\n')
             {
-              D(DBF_CLIPBOARD, "reading FLOW");
-              SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
-              if(cn->cn_Size == 2)
-              {
-                if(ReadChunkBytes(data->iff, &flow, 2) == 2)
-                  if(flow > MUIV_TextEditor_Flow_Right)
-                    flow = MUIV_TextEditor_Flow_Left;
-                SHOWVALUE(DBF_CLIPBOARD, flow);
-              }
+              newline = FALSE;
+              contents[length] = '\n';
+              length++;
             }
-            break;
+            contents[length] = '\0';
 
-            case ID_HIGH:
+            SHOWSTRING(DBF_CLIPBOARD, contents);
+
+            if((importedLine = AllocLine(data)) != NULL)
             {
-              D(DBF_CLIPBOARD, "reading HIGH");
-              SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
-              if (cn->cn_Size == 2)
+              if((contents = MyAllocPooled(data->mypool, length+1)) != NULL)
               {
-                error = ReadChunkBytes(data->iff, &color, 2);
-                SHOWVALUE(DBF_CLIPBOARD, color);
-                SHOWVALUE(DBF_CLIPBOARD, error);
-              }
-            }
-            break;
+                strcpy(contents, line->line.Contents);
+                importedLine->previous = previous;
+                importedLine->line.Contents = contents;
+                importedLine->line.Length = length;
+                importedLine->visual = VisualHeight(line, data);
+                importedLine->line.Color = line->line.Color;
+                importedLine->line.Flow = line->line.Flow;
+                importedLine->line.Separator = line->line.Separator;
+                importedLine->line.Styles = styles;
+                importedLine->line.Colors = colors;
 
-            case ID_SBAR:
-            {
-              D(DBF_CLIPBOARD, "reading SBAR");
-              SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
-              if (cn->cn_Size == 2)
-              {
-                error = ReadChunkBytes(data->iff, &separator, 2);
-                SHOWVALUE(DBF_CLIPBOARD, separator);
-                SHOWVALUE(DBF_CLIPBOARD, error);
-              }
-            }
-            break;
+                DumpLine(importedLine);
 
-            case ID_COLS:
-            {
-              ULONG numColors = cn->cn_Size / sizeof(struct LineColor);
+                if(importedLines == NULL)
+                  importedLines = importedLine;
+                if(previous != NULL)
+                  previous->next = importedLine;
 
-              D(DBF_CLIPBOARD, "reading COLS");
-              SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
-              if(colors != NULL)
-              {
-                MyFreePooled(data->mypool, colors);
-                colors = NULL;
-              }
-              // allocate one word more than the chunk tell us, because we terminate the array with an additional value
-              if(numColors > 0 && (colors = (struct LineColor *)MyAllocPooled(data->mypool, (numColors+1) * sizeof(struct LineColor))) != NULL)
-              {
-                error = ReadChunkBytes(data->iff, colors, numColors * sizeof(struct LineColor));
-                SHOWVALUE(DBF_CLIPBOARD, error);
-                colors[numColors].column = EOC;
-              }
-            }
-            break;
-
-            case ID_STYL:
-            {
-              ULONG numStyles = cn->cn_Size / sizeof(struct LineStyle);
-
-              D(DBF_CLIPBOARD, "reading STYL");
-              SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
-              ownclip = TRUE;
-              if(styles != NULL)
-              {
-                MyFreePooled(data->mypool, styles);
-                styles = NULL;
-              }
-              // allocate one word more than the chunk tell us, because we terminate the array with an additional value
-              if(numStyles > 0 && (styles = (struct LineStyle *)MyAllocPooled(data->mypool, (numStyles+1) * sizeof(struct LineStyle))) != NULL)
-              {
-                error = ReadChunkBytes(data->iff, styles, numStyles * sizeof(struct LineStyle));
-                SHOWVALUE(DBF_CLIPBOARD, error);
-                styles[numStyles].column = EOS;
-              }
-            }
-            break;
-
-            case ID_CHRS:
-            {
-              D(DBF_CLIPBOARD, "reading CHRS");
-              SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
-
-              data->HasChanged = TRUE;
-
-              if(cn->cn_Size > 0 && !ownclip)
-              {
-                char *contents;
-                ULONG length = cn->cn_Size;
-
-                if((contents = (char *)MyAllocPooled(data->mypool, length + 1)) != NULL)
-                {
-                  error = ReadChunkBytes(data->iff, contents, length);
-                  SHOWVALUE(DBF_CLIPBOARD, error);
-
-                  if(contents[length - 1] != '\n')
-                  {
-                    newline = FALSE;
-                  }
-                  else
-                  {
-                    length--;
-                  }
-                  contents[length] = '\0';
-
-                  #if defined(__MORPHOS__)
-                  if (codeset == CODESET_UTF8)
-                  {
-                    if (IS_MORPHOS2)
-                      contents = utf8_to_ansi(data, contents);
-                  }
-                  #endif
-
-                  if((line = ImportText(contents, data, &ImPlainHook, data->ImportWrap)) != NULL)
-                  {
-                    DumpLine(line);
-
-                    if(startline == NULL)
-                      startline = line;
-                    if(previous != NULL)
-                      previous->next  = line;
-
-                    line->previous = previous;
-                    line->visual = VisualHeight(line, data);
-                    data->totallines += line->visual;
-                    while(line->next != NULL)
-                    {
-                      line = line->next;
-                      line->visual = VisualHeight(line, data);
-                      data->totallines += line->visual;
-                    }
-                    previous = line;
-                  }
-                  MyFreePooled(data->mypool, contents);
-                }
+                previous = importedLine;
               }
               else
               {
-                ULONG length = cn->cn_Size;
-
-                if(length > 0 && (textline = (char *)MyAllocPooled(data->mypool, length + 2)) != NULL)
-                {
-                  error = ReadChunkBytes(data->iff, textline, length);
-                  SHOWVALUE(DBF_CLIPBOARD, error);
-
-                  if (textline[length - 1] != '\n')
-                  {
-                    newline = FALSE;
-                    textline[length] = '\n';
-                    length++;
-                  }
-                  textline[length] = '\0';
-
-                  if((line = AllocLine(data)) != NULL)
-                  {
-                    line->next = NULL;
-                    line->previous = previous;
-                    line->line.Contents = textline;
-                    line->line.Length = length;
-                    line->visual = VisualHeight(line, data);
-                    line->line.Color = color;
-                    line->line.Flow = flow;
-                    line->line.Separator = separator;
-                    line->line.Styles = styles;
-                    line->line.Colors = colors;
-                    data->totallines += line->visual;
-
-                    DumpLine(line);
-
-                    if(startline == NULL)
-                      startline = line;
-                    if(previous != NULL)
-                      previous->next  = line;
-
-                    previous = line;
-                  }
-                  else
-                  {
-                    if(styles != NULL)
-                      MyFreePooled(data->mypool, styles);
-                    if(colors != NULL)
-                      MyFreePooled(data->mypool, colors);
-                  }
-                }
-                else
-                {
-                  if(styles != NULL)
-                    MyFreePooled(data->mypool, styles);
-                  if(colors != NULL)
-                    MyFreePooled(data->mypool, colors);
-                }
-                styles    = NULL;
-                colors    = NULL;
-                flow      = MUIV_TextEditor_Flow_Left;
-                color     = FALSE;
-                separator = 0;
-                ownclip   = FALSE;
+                FreeLine(importedLine, data);
+                importedLine = NULL;
               }
             }
-            break;
           }
-        }
-      }
 
-      if(line != NULL)
-      {
-        BOOL oneline = FALSE;
+          MyFree(line->line.Contents);
+          line->line.Contents = NULL;
+        }
 
-        SplitLine(x, actline, FALSE, NULL, data);
-        line->next = actline->next;
-        actline->next->previous = line;
-        actline->next = startline;
-        startline->previous = actline;
-        data->CPos_X = line->line.Length-1;
-        if(actline->next == line)
-        {
-          data->CPos_X += actline->line.Length-1;
-          oneline = TRUE;
-        }
-        if(newline == FALSE)
-        {
-          D(DBF_CLIPBOARD, "merging line");
-          MergeLines(line, data);
-        }
-        D(DBF_CLIPBOARD, "merging actline");
-        MergeLines(actline, data);
-
-        if(oneline == TRUE)
-          line = actline;
-        if(newline == TRUE)
-        {
-          line = line->next;
-          data->CPos_X = 0;
-        }
-        data->actualline = line;
+        MyFree(line);
+        line = NULL;
       }
       else
       {
-        switch(error)
-        {
-          case IFFERR_MANGLED:
-          case IFFERR_SYNTAX:
-          case IFFERR_NOTIFF:
-            D(DBF_CLIPBOARD, "no FTXT clip!");
-            DoMethod(data->object, MUIM_TextEditor_HandleError, Error_ClipboardIsNotFTXT);
-            break;
-          default:
-            D(DBF_CLIPBOARD, "clipboard is empty!");
-            DoMethod(data->object, MUIM_TextEditor_HandleError, Error_ClipboardIsEmpty);
-            break;
-        }
+        // we either encountered an error or we just finished importing the complete clip
+        break;
       }
+    }
+    while(error == 0 || error != IFFERR_EOF);
+
+    ClientEndSession(clipSession);
+    //error = 42;
+
+    SHOWVALUE(DBF_CLIPBOARD, error);
+    SHOWVALUE(DBF_CLIPBOARD, IFFERR_EOF);
+    SHOWVALUE(DBF_CLIPBOARD, importedLines);
+    if(error == IFFERR_EOF && importedLines != NULL)
+    {
+      BOOL oneline = FALSE;
+      struct line_node *line;
+      LONG updatefrom;
+
+      // sum up the visual heights of all imported lines
+      line = importedLines;
+      while(line != NULL)
+      {
+        data->totallines += line->visual;
+        line = line->next;
+      }
+
+      SplitLine(x, actline, FALSE, NULL, data);
+      importedLine->next = actline->next;
+      actline->next->previous = importedLine;
+      actline->next = importedLines;
+      importedLines->previous = actline;
+      data->CPos_X = importedLine->line.Length-1;
+      if(actline->next == importedLine)
+      {
+        data->CPos_X += actline->line.Length-1;
+        oneline = TRUE;
+      }
+      if(newline == FALSE)
+      {
+        D(DBF_CLIPBOARD, "merging line");
+        MergeLines(importedLine, data);
+      }
+      D(DBF_CLIPBOARD, "merging actline");
+      MergeLines(actline, data);
+
+      if(oneline == TRUE)
+        importedLine = actline;
+      if(newline == TRUE)
+      {
+        importedLine = importedLine->next;
+        data->CPos_X = 0;
+      }
+      data->actualline = importedLine;
+
       data->update = TRUE;
 
       ScrollIntoDisplay(data);
@@ -505,8 +402,44 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
       else
         data->update = TRUE;
     }
+    else
+    {
+      struct line_node *line = importedLines;
 
-    EndClipSession(data);
+      // in case of an error we free all imported lines so far
+      while(line != NULL)
+      {
+        struct line_node *next = line->next;
+
+        D(DBF_CLIPBOARD, "freeing colors");
+        if(line->line.Colors != NULL)
+          MyFreePooled(data->mypool, line->line.Colors);
+        D(DBF_CLIPBOARD, "freeing styles");
+        if(line->line.Styles != NULL)
+          MyFreePooled(data->mypool, line->line.Styles);
+        D(DBF_CLIPBOARD, "freeing contents");
+        if(line->line.Contents != NULL)
+          MyFreePooled(data->mypool, line->line.Contents);
+        D(DBF_CLIPBOARD, "freeing line");
+        FreeLine(line, data);
+        line = next;
+      }
+
+      switch(error)
+      {
+        case IFFERR_MANGLED:
+        case IFFERR_SYNTAX:
+        case IFFERR_NOTIFF:
+          D(DBF_CLIPBOARD, "no FTXT clip!");
+          DoMethod(data->object, MUIM_TextEditor_HandleError, Error_ClipboardIsNotFTXT);
+          break;
+
+        default:
+          D(DBF_CLIPBOARD, "clipboard is empty!");
+          DoMethod(data->object, MUIM_TextEditor_HandleError, Error_ClipboardIsEmpty);
+          break;
+      }
+    }
   }
 
   RETURN(res);
