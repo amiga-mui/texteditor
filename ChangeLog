@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-09-24 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/misc: replaced the complete embedded clipboard stuff by a server process
+    which does the dirty stuff. This fixes the issue that opening two write
+    windows in YAM made pasting text impossible.
+
 2009-09-21 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Dispatcher.c: added a name the memory pool for the OS4 build.

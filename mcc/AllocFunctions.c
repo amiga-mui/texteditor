@@ -26,6 +26,12 @@
 
 #include "Debug.h"
 
+#if defined(__amigaos4__)
+#define SHARED_MEMFLAG			MEMF_SHARED
+#else
+#define SHARED_MEMFLAG			MEMF_ANY
+#endif
+
 /// MyAllocPooled()
 APTR MyAllocPooled(APTR pool, ULONG length)
 {
@@ -35,10 +41,7 @@ APTR MyAllocPooled(APTR pool, ULONG length)
 
   length += sizeof(ULONG);
   if((mem = AllocPooled(pool, length)))
-  {
-    *mem = length;
-    mem += 1;
-  }
+    *mem++ = length;
 
   RETURN(mem);
   return(mem);
@@ -56,6 +59,38 @@ VOID MyFreePooled(APTR pool, APTR mem)
   length = *memptr;
 
   FreePooled(pool, memptr, length);
+
+  LEAVE();
+}
+
+///
+/// MyAlloc()
+APTR MyAlloc(ULONG length)
+{
+  ULONG *mem;
+
+  ENTER();
+
+  length += sizeof(ULONG);
+  if((mem = AllocMem(length, SHARED_MEMFLAG)))
+    *mem++ = length;
+
+  RETURN(mem);
+  return(mem);
+}
+
+///
+/// MyFree()
+VOID MyFree(APTR mem)
+{
+  ULONG *memptr, length;
+
+  ENTER();
+
+  memptr = &((ULONG *)mem)[-1];
+  length = *memptr;
+
+  FreeMem(memptr, length);
 
   LEAVE();
 }
@@ -80,7 +115,7 @@ void FreeLine(struct line_node* line, struct InstData *data)
 {
   ENTER();
 
-  // we make sure the line is not references by other
+  // we make sure the line is not referenced by other
   // structures as well such as the global blockinfo structure.
   if(data->blockinfo.startline == line)
   {
