@@ -412,7 +412,7 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
 ///
 
 ///InsertText()
-ULONG InsertText (struct InstData *data, STRPTR text, BOOL movecursor)
+ULONG InsertText(struct InstData *data, STRPTR text, BOOL movecursor)
 {
   struct line_node *line, *actline = data->actualline;
   UWORD x = data->CPos_X;
@@ -422,8 +422,8 @@ ULONG InsertText (struct InstData *data, STRPTR text, BOOL movecursor)
 
   if((line = ImportText(text, data, data->ImportHook, data->ImportWrap)))
   {
-    long  oneline = FALSE;
-    long  newline = FALSE;
+    BOOL oneline = FALSE;
+    BOOL newline = FALSE;
     struct line_node *startline = line;
 
     line->visual = VisualHeight(line, data);

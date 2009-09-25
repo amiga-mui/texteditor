@@ -87,13 +87,13 @@ MakeStaticHook(SelectHook, SelectCode);
 ///
 
 ///SendRexx()
-static LONG SendRexx(char *word, const char *command, UNUSED struct InstData *data)
+static BOOL SendRexx(char *word, const char *command, UNUSED struct InstData *data)
 {
   struct MsgPort *rexxport;
   struct MsgPort *clipport;
   struct RexxMsg *rxmsg;
   char buffer[512];
-  LONG result = FALSE;
+  BOOL result = FALSE;
 
   ENTER();
 
@@ -250,10 +250,10 @@ static VOID FreeSearchPath(BPTR path)
 ///
 
 ///SendCLI()
-static LONG SendCLI(char *word, const char *command, UNUSED struct InstData *data)
+static BOOL SendCLI(char *word, const char *command, UNUSED struct InstData *data)
 {
   char buffer[512];
-  LONG result;
+  BOOL result;
   BPTR path;
 
   snprintf(buffer, sizeof(buffer), command, word);
@@ -261,11 +261,12 @@ static LONG SendCLI(char *word, const char *command, UNUSED struct InstData *dat
   /* path maybe 0, which is allowed */
   path = CloneSearchPath();
 
-  if (SystemTags(buffer, NP_Path, path, TAG_DONE) == -1)
+  if(SystemTags(buffer, NP_Path, path, TAG_DONE) == -1)
   {
     FreeSearchPath(path);
     result = FALSE;
-  } else
+  }
+  else
   {
     result = TRUE;
   }
@@ -326,25 +327,26 @@ void *SuggestWindow (struct InstData *data)
 ///
 
 ///LookupWord()
-BOOL LookupWord(STRPTR word, struct InstData *data)
+static BOOL LookupWord(STRPTR word, struct InstData *data)
 {
-  char buf[4];
-  LONG res;
+  BOOL res;
 
   if(data->LookupSpawn)
     res = SendRexx(word, data->LookupCmd, data);
   else
     res = SendCLI(word, data->LookupCmd, data);
 
-  if(res)
+  if(res == TRUE)
   {
+    char buf[4];
+
+    buf[0] = '\0';
     GetVar("Found", &buf[0], sizeof(buf), GVF_GLOBAL_ONLY);
     if(buf[0] == '0')
-    {
-      return(FALSE);
-    }
+      res = FALSE;
   }
-  return(TRUE);
+
+  return res;
 }
 ///
 
@@ -409,7 +411,7 @@ void SuggestWord (struct InstData *data)
 
       set(_win(data->object), MUIA_Window_Sleep, TRUE);
 
-      if((data->flags & FLG_CheckWords) && LookupWord(word, data))
+      if(isFlagSet(data->flags, FLG_CheckWords) && LookupWord(word, data) == TRUE)
       {
         Object *group = (Object *)xget(data->SuggestWindow, MUIA_Window_RootObject);
 
@@ -468,7 +470,7 @@ void SuggestWord (struct InstData *data)
 ///
 
 ///CheckWord()
-void CheckWord (struct InstData *data)
+void CheckWord(struct InstData *data)
 {
   if(data->TypeAndSpell && data->CPos_X && IsAlpha(data->mylocale, *(data->actualline->line.Contents+data->CPos_X-1)))
   {
@@ -491,7 +493,7 @@ void CheckWord (struct InstData *data)
 
       strlcpy(word, data->actualline->line.Contents+start, end-start+1);
 
-      if(!LookupWord(word, data))
+      if(LookupWord(word, data) == FALSE)
         DisplayBeep(NULL);
     }
     else

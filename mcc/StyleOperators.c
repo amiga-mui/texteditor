@@ -138,12 +138,12 @@ void AddStyleToLine(LONG x, struct line_node *line, LONG length, UWORD style, st
       while(styles->column != EOS && styles->column < x)
       {
         newstyles->column = styles->column;
+        newstyles->style = styles->style;
+
         if(styles->style > 0xff)
           cur_style &= styles->style;
         else
           cur_style |= styles->style;
-
-        newstyles->style = styles->style;
 
         newstyles++;
         styles++;

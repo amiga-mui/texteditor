@@ -95,7 +95,8 @@ char *GetBlock(struct marking *block, struct InstData *data)
     {
       UWORD startstyle = GetStyle(startx, startline);
 
-      if((emsg.Styles = (struct LineStyle *)MyAllocPooled(data->mypool, GetAllocSize(startline->line.Styles)+sizeof(struct LineStyle)*5)))
+      // allocate space for all old styles and up to 4 new styles
+      if((emsg.Styles = (struct LineStyle *)MyAllocPooled(data->mypool, GetAllocSize(startline->line.Styles)+sizeof(struct LineStyle)*4)))
       {
         struct LineStyle *styles = emsg.Styles;
         struct LineStyle *oldstyles = startline->line.Styles;
@@ -171,7 +172,8 @@ char *GetBlock(struct marking *block, struct InstData *data)
     {
       UWORD stopstyle = GetStyle(stopx, stopline);
 
-      if((emsg.Styles = (struct LineStyle *)MyAllocPooled(data->mypool, GetAllocSize(stopline->line.Styles) + sizeof(struct LineStyle)*5)))
+      // allocate space for all old styles and up to 4 new styles
+      if((emsg.Styles = (struct LineStyle *)MyAllocPooled(data->mypool, GetAllocSize(stopline->line.Styles) + sizeof(struct LineStyle)*4)))
       {
         struct LineStyle *styles = emsg.Styles;
         struct LineStyle *oldstyles = stopline->line.Styles;
@@ -233,7 +235,8 @@ char *GetBlock(struct marking *block, struct InstData *data)
       UWORD startstyle = GetStyle(startx, startline);
       UWORD stopstyle = GetStyle(stopx, stopline);
 
-      if((emsg.Styles = (struct LineStyle *)MyAllocPooled(data->mypool, GetAllocSize(startline->line.Styles) + sizeof(struct LineStyle)*5)))
+      // allocate space for all old styles and up to 4 new styles
+      if((emsg.Styles = (struct LineStyle *)MyAllocPooled(data->mypool, GetAllocSize(startline->line.Styles) + sizeof(struct LineStyle)*4)))
       {
         struct LineStyle *styles = emsg.Styles;
         struct LineStyle *oldstyles = startline->line.Styles;
