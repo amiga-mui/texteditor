@@ -1282,106 +1282,100 @@ BOOL RemoveChars(LONG x, struct line_node *line, LONG length, struct InstData *d
 {
   ENTER();
 
-  if(line->line.Styles != NULL)
+  if(line->line.Styles != NULL && line->line.Styles[0].column != EOS)
   {
-    if(line->line.Styles[0].column != EOS)
+    UWORD start_style = GetStyle(x-1, line);
+    UWORD end_style = GetStyle(x+length, line);
+    ULONG c = 0, store;
+
+    while(line->line.Styles[c].column <= x)
+      c++;
+
+    if(start_style != end_style)
     {
-      UWORD start_style = GetStyle(x-1, line);
-      UWORD end_style = GetStyle(x+length, line);
-      ULONG c = 0, store;
+      UWORD turn_off = start_style & ~end_style;
+      UWORD turn_on  = end_style & ~start_style;
 
-      while(line->line.Styles[c].column <= x)
-        c++;
-
-      if(start_style != end_style)
+      if(isFlagSet(turn_off, BOLD))
       {
-        UWORD turn_off = start_style & ~end_style;
-        UWORD turn_on  = end_style & ~start_style;
-
-        if(isFlagSet(turn_off, BOLD))
-        {
-          line->line.Styles[c].column = x+1;
-          line->line.Styles[c].style = ~BOLD;
-          c++;
-        }
-        if(isFlagSet(turn_off, ITALIC))
-        {
-          line->line.Styles[c].column = x+1;
-          line->line.Styles[c].style = ~ITALIC;
-          c++;
-        }
-        if(isFlagSet(turn_off, UNDERLINE))
-        {
-          line->line.Styles[c].column = x+1;
-          line->line.Styles[c].style = ~UNDERLINE;
-          c++;
-        }
-        if(isFlagSet(turn_on, BOLD))
-        {
-          line->line.Styles[c].column = x+1;
-          line->line.Styles[c].style = BOLD;
-          c++;
-        }
-        if(isFlagSet(turn_on, ITALIC))
-        {
-          line->line.Styles[c].column = x+1;
-          line->line.Styles[c].style = ITALIC;
-          c++;
-        }
-        if(isFlagSet(turn_on, UNDERLINE))
-        {
-          line->line.Styles[c].column = x+1;
-          line->line.Styles[c].style = UNDERLINE;
-          c++;
-        }
-      }
-
-      store = c;
-      while(line->line.Styles[c].column <= x+length+1)
+        line->line.Styles[c].column = x+1;
+        line->line.Styles[c].style = ~BOLD;
         c++;
-
-      while(line->line.Styles[c].column != EOS)
+      }
+      if(isFlagSet(turn_off, ITALIC))
       {
-        line->line.Styles[store].column = line->line.Styles[c].column-length;
-        line->line.Styles[store].style = line->line.Styles[c].style;
+        line->line.Styles[c].column = x+1;
+        line->line.Styles[c].style = ~ITALIC;
         c++;
-        store++;
       }
-      line->line.Styles[store].column = EOS;
+      if(isFlagSet(turn_off, UNDERLINE))
+      {
+        line->line.Styles[c].column = x+1;
+        line->line.Styles[c].style = ~UNDERLINE;
+        c++;
+      }
+      if(isFlagSet(turn_on, BOLD))
+      {
+        line->line.Styles[c].column = x+1;
+        line->line.Styles[c].style = BOLD;
+        c++;
+      }
+      if(isFlagSet(turn_on, ITALIC))
+      {
+        line->line.Styles[c].column = x+1;
+        line->line.Styles[c].style = ITALIC;
+        c++;
+      }
+      if(isFlagSet(turn_on, UNDERLINE))
+      {
+        line->line.Styles[c].column = x+1;
+        line->line.Styles[c].style = UNDERLINE;
+        c++;
+      }
     }
+
+    store = c;
+    while(line->line.Styles[c].column <= x+length+1)
+      c++;
+
+    while(line->line.Styles[c].column != EOS)
+    {
+      line->line.Styles[store].column = line->line.Styles[c].column-length;
+      line->line.Styles[store].style = line->line.Styles[c].style;
+      c++;
+      store++;
+    }
+    line->line.Styles[store].column = EOS;
   }
 
-  if(line->line.Colors != NULL)
+  if(line->line.Colors != NULL && line->line.Colors[0].column != EOC)
   {
-    if(line->line.Colors[0].column != EOC)
+    UWORD start_color = (x != 0) ? GetColor(x-1, line) : 0;
+    UWORD end_color = GetColor(x+length, line);
+    ULONG c = 0, store;
+
+    while(line->line.Colors[c].column <= x)
+      c++;
+
+    if(start_color != end_color)
     {
-      UWORD start_color = (x != 0) ? GetColor(x-1, line) : 0;
-      UWORD end_color = GetColor(x+length, line);
-      ULONG c = 0, store;
-
-      while(line->line.Colors[c].column <= x)
-        c++;
-
-      if(start_color != end_color)
-      {
-        line->line.Colors[c].column = x+1;
-        line->line.Colors[c].column = end_color;
-        c++;
-      }
-
-      store = c;
-      while(line->line.Colors[c].column <= x+length+1)
-        c++;
-
-      while(line->line.Colors[c].column != EOC)
-      {
-        line->line.Colors[store].column = line->line.Colors[c].column-length;
-        line->line.Colors[store].column = line->line.Colors[c].column;
-        c++;
-        store++;
-      }
-      line->line.Colors[store].column = EOC;
+      line->line.Colors[c].column = x+1;
+      line->line.Colors[c].color = end_color;
+      c++;
     }
+
+    store = c;
+    while(line->line.Colors[c].column <= x+length+1)
+      c++;
+
+    while(line->line.Colors[c].column != EOC)
+    {
+      line->line.Colors[store].column = line->line.Colors[c].column-length;
+      line->line.Colors[store].color = line->line.Colors[c].color;
+      c++;
+      store++;
+    }
+    line->line.Colors[store].column = EOC;
   }
 
   UpdateChange(x, line, length, NULL, NULL, data);
