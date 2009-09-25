@@ -31,7 +31,7 @@
 struct grow
 {
   UWORD *array;
-  
+
   int current;
   int max;
 
@@ -376,14 +376,14 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
     /* Mark the end of the color array (space is ensured) */
     if(line->Colors != NULL)
     {
-      line->Colors[color_grow.current].column = ~0;
+      line->Colors[color_grow.current].column = EOC;
       line->Colors[color_grow.current].color = 0;
     }
 
     /* Mark the end of the style array (space is ensured) */
     if(line->Styles != NULL)
     {
-      line->Styles[style_grow.current].column = ~0;
+      line->Styles[style_grow.current].column = EOS;
       line->Styles[style_grow.current].style = 0;
     }
 
@@ -451,7 +451,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
     unsigned char *dest = dest_start;
     unsigned char *dest_word_start = dest_start;
     unsigned char *src_word_start = (unsigned char *)src;
-    
+
     /* Style and color state */
     int state = 0;
     int escstate = 0;
@@ -471,7 +471,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
     {
       if (src[1] == 's' && src[2] == 'b' && src[3] == '>')
       {
-        line->Separator = 2;  
+        line->Separator = 2;
         src+= 4;
         line->Flow = MUIV_TextEditor_Flow_Center;
         line->clearFlow = TRUE;
@@ -503,13 +503,13 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
       else if(c == '\t')
       {
         int i;
-        
+
         for(i=(dest - dest_start)% 4; i < 4; i++)
           *dest++ = ' ';
 
         lastWasSeparator = TRUE;
 
-        continue;       
+        continue;
       }
       else if(c == '/')
       {
@@ -597,7 +597,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
         if(type > 0 && !GetQP(&src,&c))
         {
           int i;
-          
+
           i = 0;
           if (src[0] == '\r') i++;
 
@@ -612,7 +612,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 
             /* The size of the dest buffer has to be increased now */
             len += eol - src + 4 * tabs;
-            
+
             if (!(new_dest_start = (unsigned char*)MyAllocPooled(msg->PoolHandle, len + 4)))
               break;
 
@@ -652,7 +652,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
           case 'h':
             line->Color = TRUE;
           break;
-          
+
           case 'n':
             if(state & BOLD)      AddToGrow(&style_grow, dest - dest_start + 1, ~BOLD);
             if(state & ITALIC)    AddToGrow(&style_grow, dest - dest_start + 1, ~ITALIC);
@@ -671,7 +671,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
             {
               LONG pen;
               src++;
-              
+
               if(GetLong(&src,&pen))
               {
                 if(*src == ']')
@@ -689,7 +689,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
             }
           }
           break;
-          
+
           case '[':
           {
             if(*src == 's')
@@ -698,7 +698,7 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
               {
                 LONG flags;
                 src++;
-                
+
                 if(GetLong(&src,&flags))
                 {
                   if(*src == ']')
@@ -756,14 +756,14 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
     /* Mark the end of the color array (space is ensured) */
     if(line->Colors)
     {
-      line->Colors[color_grow.current].column = ~0;
+      line->Colors[color_grow.current].column = EOC;
       line->Colors[color_grow.current].color = 0;
     }
 
     /* Mark the end of the style array (space is ensured) */
     if(line->Styles != NULL)
     {
-      line->Styles[style_grow.current].column = ~0;
+      line->Styles[style_grow.current].column = EOS;
       line->Styles[style_grow.current].style = 0;
     }
 

@@ -454,10 +454,10 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
 BOOL MergeLines(struct line_node *line, struct InstData *data)
 {
   struct line_node *next;
-  char  *newbuffer;
-  LONG  visual, oldvisual, line_nr;
-  LONG  emptyline = FALSE;
-  LONG  color = line->line.Color;
+  char *newbuffer;
+  LONG visual, oldvisual, line_nr;
+  BOOL emptyline = FALSE;
+  LONG color = line->line.Color;
   UWORD flow = line->line.Flow;
   UWORD separator = line->line.Separator;
 
@@ -1156,9 +1156,9 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
     {
       UWORD style = buffer->del.style;
 
-      AddStyleToLine(x, line, 1, (style & BOLD) ? BOLD : ~BOLD, data);
-      AddStyleToLine(x, line, 1, (style & ITALIC) ? ITALIC : ~ITALIC, data);
-      AddStyleToLine(x, line, 1, (style & UNDERLINE) ? UNDERLINE : ~UNDERLINE, data);
+      AddStyleToLine(x, line, 1, isFlagSet(style, BOLD) ? BOLD : ~BOLD, data);
+      AddStyleToLine(x, line, 1, isFlagSet(style, ITALIC) ? ITALIC : ~ITALIC, data);
+      AddStyleToLine(x, line, 1, isFlagSet(style, UNDERLINE) ? UNDERLINE : ~UNDERLINE, data);
       line->line.Flow = buffer->del.flow;
       line->line.Separator = buffer->del.separator;
     }
@@ -1355,7 +1355,7 @@ BOOL RemoveChars(LONG x, struct line_node *line, LONG length, struct InstData *d
   {
     if(line->line.Colors[0].column != EOC)
     {
-      UWORD start_color = x ? GetColor(x-1, line) : 0;
+      UWORD start_color = (x != 0) ? GetColor(x-1, line) : 0;
       UWORD end_color = GetColor(x+length, line);
       ULONG c = 0, store;
 
