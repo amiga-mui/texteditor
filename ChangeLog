@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-09-29 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/ClipboardServer.c: added the missing NP_CodeType=CODETYPE_PPC tag for
+    the MOS build.
+
 2009-09-25 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: fixed a bug which treated columns numbers as color
