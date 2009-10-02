@@ -132,7 +132,7 @@ static char *utf8_to_ansi(struct InstData *data, STRPTR src)
 
 /// DumpLine()
 #if defined(DEBUG)
-static void DumpLine(struct line_node *line)
+void DumpLine(struct line_node *line)
 {
   ENTER();
 
@@ -201,16 +201,18 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
       if(error == 0 && line != NULL)
       {
         struct LineStyle *styles = NULL;
+        ULONG allocatedStyles = 0;
         struct LineColor *colors = NULL;
+        ULONG allocatedColors = 0;
         BOOL ownclip = FALSE;
 
         SHOWVALUE(DBF_CLIPBOARD, line->line.Styles);
         if(line->line.Styles != NULL)
         {
-          ULONG size = GetAllocSize(line->line.Styles);
+          allocatedStyles = line->line.allocatedStyles;
 
-          if((styles = MyAllocPooled(data->mypool, size)) != NULL)
-            memcpy(styles, line->line.Styles, size);
+          if((styles = MyAllocPooled(data->mypool, allocatedStyles * sizeof(*styles))) != NULL)
+            memcpy(styles, line->line.Styles, allocatedStyles * sizeof(*styles));
 
           MyFree(line->line.Styles);
           line->line.Styles = NULL;
@@ -222,10 +224,10 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
         SHOWVALUE(DBF_CLIPBOARD, line->line.Colors);
         if(line->line.Colors != NULL)
         {
-          ULONG size = GetAllocSize(line->line.Colors);
+          allocatedColors = line->line.allocatedColors;
 
-          if((colors = MyAllocPooled(data->mypool, size)) != NULL)
-            memcpy(colors, line->line.Colors, size);
+          if((colors = MyAllocPooled(data->mypool, allocatedColors * sizeof(*colors))) != NULL)
+            memcpy(colors, line->line.Colors, allocatedColors * sizeof(*colors));
 
           MyFree(line->line.Colors);
           line->line.Colors = NULL;
@@ -307,7 +309,11 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
                 importedLine->line.Flow = line->line.Flow;
                 importedLine->line.Separator = line->line.Separator;
                 importedLine->line.Styles = styles;
+                importedLine->line.allocatedStyles = allocatedStyles;
+                importedLine->line.usedStyles = allocatedStyles;
                 importedLine->line.Colors = colors;
+                importedLine->line.allocatedColors = allocatedColors;
+                importedLine->line.usedColors = allocatedColors;
 
                 DumpLine(importedLine);
 
@@ -411,10 +417,10 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
       {
         struct line_node *next = line->next;
 
-        D(DBF_CLIPBOARD, "freeing colors");
+        D(DBF_CLIPBOARD, "freeing %ld colors", line->line.allocatedColors);
         if(line->line.Colors != NULL)
           MyFreePooled(data->mypool, line->line.Colors);
-        D(DBF_CLIPBOARD, "freeing styles");
+        D(DBF_CLIPBOARD, "freeing %ld styles", line->line.allocatedStyles);
         if(line->line.Styles != NULL)
           MyFreePooled(data->mypool, line->line.Styles);
         D(DBF_CLIPBOARD, "freeing contents");
@@ -489,11 +495,15 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
         MyFreePooled(data->mypool, line->line.Styles);
 
       line->line.Styles = line->next->line.Styles;
+      line->line.allocatedStyles = line->next->line.allocatedStyles;
+      line->line.usedStyles = line->next->line.usedStyles;
 
       if(line->line.Colors != NULL)
         MyFreePooled(data->mypool, line->line.Colors);
 
       line->line.Colors = line->next->line.Colors;
+      line->line.allocatedColors = line->next->line.allocatedColors;
+      line->line.usedColors = line->next->line.usedColors;
     }
     else
     {
@@ -503,18 +513,15 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
       struct LineColor *colors;
       struct LineColor *colors1 = line->line.Colors;
       struct LineColor *colors2 = line->next->line.Colors;
-      ULONG length;
+      ULONG allocStyles;
+      ULONG allocColors;
 
-      length = sizeof(*styles) * 3;
+      allocStyles = 3 + line->line.usedStyles + line->next->line.usedStyles;
 
-      if(styles1 != NULL)
-        length += GetAllocSize(styles1);
-      if(styles2 != NULL)
-        length += GetAllocSize(styles2);
-
-      if((styles = MyAllocPooled(data->mypool, length)) != NULL)
+      if((styles = MyAllocPooled(data->mypool, allocStyles * sizeof(*styles))) != NULL)
       {
         struct LineStyle *t_styles = styles;
+        ULONG usedStyles = 0;
         UWORD style = 0;
 
         if(styles2 != NULL)
@@ -549,8 +556,9 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
               D(DBF_STYLE, "prepending style 0x%04lx at column %ld", styles1->style, styles1->column);
               styles->column = styles1->column;
               styles->style = styles1->style;
-              styles++;
               styles1++;
+              styles++;
+              usedStyles++;
             }
           }
           MyFreePooled(data->mypool, line->line.Styles);
@@ -570,26 +578,32 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
               D(DBF_STYLE, "appending style 0x%04lx at column %ld from column %ld", styles2->style, styles2->column + line->line.Length - 1, styles2->column);
               styles->column = styles2->column + line->line.Length - 1;
               styles->style = styles2->style;
-              styles++;
               styles2++;
+              styles++;
+              usedStyles++;
             }
           }
           MyFreePooled(data->mypool, line->next->line.Styles);
         }
         styles->column = EOS;
+        usedStyles++;
+
         line->line.Styles = t_styles;
+        line->line.allocatedStyles = allocStyles;
+        line->line.usedStyles = usedStyles;
+        if(usedStyles > allocStyles)
+        {
+          E(DBF_STYLE, "used styles (%ld) > allocated styles (%ld)", usedStyles, allocStyles);
+          DumpLine(line);
+        }
       }
 
-      length = sizeof(*colors) * 3;
+      allocColors = 3 + line->line.usedColors + line->next->line.usedColors;
 
-      if(colors1 != NULL)
-        length += GetAllocSize(colors1);
-      if(colors2 != NULL)
-        length += GetAllocSize(colors2);
-
-      if((colors = MyAllocPooled(data->mypool, length)) != NULL)
+      if((colors = MyAllocPooled(data->mypool, allocColors * sizeof(*colors))) != NULL)
       {
         struct LineColor *t_colors = colors;
+        ULONG usedColors = 0;
         UWORD end_color = 0;
 
         if(colors1 != NULL)
@@ -599,8 +613,9 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
             colors->column = colors1->column;
             end_color = colors1->color;
             colors->color = colors1->color;
-            colors++;
             colors1++;
+            colors++;
+            usedColors++;
           }
           MyFreePooled(data->mypool, line->line.Colors);
         }
@@ -610,6 +625,7 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
           colors->column = line->line.Length;
           colors->color = 0;
           colors++;
+          usedColors++;
         }
 
         if(colors2 != NULL)
@@ -621,13 +637,23 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
           {
             colors->column = colors2->column + line->line.Length - 1;
             colors->color = colors2->color;
-            colors++;
             colors2++;
+            colors++;
+            usedColors++;
           }
           MyFreePooled(data->mypool, line->next->line.Colors);
         }
         colors->column = EOC;
+        usedColors++;
+
         line->line.Colors = t_colors;
+        line->line.allocatedColors = allocColors;
+        line->line.usedColors = usedColors;
+        if(usedColors > allocColors)
+        {
+          E(DBF_STYLE, "used colors (%ld) > allocated colors (%ld)", usedColors, allocColors);
+          DumpLine(line);
+        }
       }
     }
 
@@ -748,6 +774,12 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
     struct LineStyle *newstyles = NULL;
     struct LineColor *colors = line->line.Colors;
     struct LineColor *newcolors = NULL;
+    ULONG numStyles = 0;
+    ULONG usedOldStyles = 0;
+    ULONG usedNewStyles = 0;
+    ULONG numColors = 0;
+    ULONG usedOldColors = 0;
+    ULONG usedNewColors = 0;
 
     data->HasChanged = TRUE;
     Init_LineNode(newline, line, line->line.Contents+x, data);
@@ -764,7 +796,6 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
     if(styles != NULL)
     {
       UWORD style = 0;
-      LONG  numStyles = 0;
       struct LineStyle *ostyles;
 
       // collect the applied styles up to the given position
@@ -778,6 +809,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
         SHOWVALUE(DBF_STYLE, style);
 
         styles++;
+        usedOldStyles++;
       }
       ostyles = styles;
 
@@ -788,7 +820,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
       numStyles += 4;
       D(DBF_STYLE, "allocating space for %ld styles", numStyles);
 
-      if((newstyles = MyAllocPooled(data->mypool, numStyles * sizeof(struct LineStyle))) != NULL)
+      if((newstyles = MyAllocPooled(data->mypool, numStyles * sizeof(*newstyles))) != NULL)
       {
         struct LineStyle *nstyles = newstyles;
 
@@ -798,6 +830,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
           nstyles->column = 1;
           nstyles->style = BOLD;
           nstyles++;
+          usedNewStyles++;
         }
         if(isFlagSet(style, ITALIC))
         {
@@ -805,6 +838,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
           nstyles->column = 1;
           nstyles->style = ITALIC;
           nstyles++;
+          usedNewStyles++;
         }
         if(isFlagSet(style, UNDERLINE))
         {
@@ -812,6 +846,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
           nstyles->column = 1;
           nstyles->style = UNDERLINE;
           nstyles++;
+          usedNewStyles++;
         }
 
         // add the remaining style changes to the new line
@@ -821,9 +856,11 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
           nstyles->column = styles->column - x;
           nstyles->style = styles->style;
           nstyles++;
+          usedNewStyles++;
           styles++;
         }
         nstyles->column = EOS;
+        usedNewStyles++;
       }
 
       // if there was any style active at the end of the old line we remove that style here
@@ -833,6 +870,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
         ostyles->column = x+1;
         ostyles->style = ~BOLD;
         ostyles++;
+        usedOldStyles++;
       }
       if(isFlagSet(style, ITALIC))
       {
@@ -840,6 +878,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
         ostyles->column = x+1;
         ostyles->style = ~ITALIC;
         ostyles++;
+        usedOldStyles++;
       }
       if(isFlagSet(style, UNDERLINE))
       {
@@ -847,25 +886,41 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
         ostyles->column = x+1;
         ostyles->style = ~UNDERLINE;
         ostyles++;
+        usedOldStyles++;
       }
       if(x == 0)
         ostyles = line->line.Styles;
 
       // terminate the style changes of the old line
       ostyles->column = EOS;
+      usedOldStyles++;
+
+      line->line.usedStyles = usedOldStyles;
+      if(usedOldStyles > line->line.allocatedStyles)
+      {
+        E(DBF_STYLE, "used styles (%ld) > allocated styles (%ld)", usedOldStyles, line->line.allocatedStyles);
+        DumpLine(line);
+      }
     }
     newline->line.Styles = newstyles;
+    newline->line.allocatedStyles = numStyles;
+    newline->line.usedStyles = usedNewStyles;
+    if(usedNewStyles > numStyles)
+    {
+      E(DBF_STYLE, "used styles (%ld) > allocated styles (%ld)", usedNewStyles, numStyles);
+      DumpLine(newline);
+    }
 
     if(colors != NULL)
     {
       UWORD color = GetColor(x, line);
-      ULONG numColors = 0;
       struct LineColor *ocolors;
 
       // ignore all color changes up to the given position
       while(colors->column <= x+1)
       {
         colors++;
+        usedOldColors++;
       }
       ocolors = colors;
 
@@ -876,7 +931,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
       numColors += 4;
       D(DBF_STYLE, "allocating space for %ld colors", numColors);
 
-      if((newcolors = MyAllocPooled(data->mypool, numColors * sizeof(struct LineColor))) != NULL)
+      if((newcolors = MyAllocPooled(data->mypool, numColors * sizeof(*newcolors))) != NULL)
       {
         struct LineColor *ncolors = newcolors;
 
@@ -885,6 +940,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
           ncolors->column = 1;
           ncolors->color = color;
           ncolors++;
+          usedNewColors++;
         }
 
         // add the remaining color changes to the new line
@@ -893,17 +949,33 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
           ncolors->column = colors->column - x;
           ncolors->color = colors->color;
           ncolors++;
+          usedNewColors++;
           colors++;
         }
         ncolors->column = EOC;
+        usedNewColors++;
       }
       if(x == 0)
         ocolors = line->line.Colors;
       // terminate the color changes of the old line
       ocolors->column = EOC;
+      usedOldColors++;
+
+      line->line.usedColors = usedOldColors;
+      if(usedOldColors > line->line.allocatedColors)
+      {
+        E(DBF_STYLE, "used colors (%ld) > allocated colors (%ld)", usedOldColors, line->line.allocatedColors);
+        DumpLine(line);
+      }
     }
     newline->line.Colors = newcolors;
-
+    newline->line.allocatedColors = numColors;
+    newline->line.usedColors = usedNewColors;
+    if(usedNewColors > numColors)
+    {
+      E(DBF_STYLE, "used colors (%ld) > allocated colors (%ld)", usedNewColors, numColors);
+      DumpLine(newline);
+    }
 
     newline->next = next;
     if(next != NULL)

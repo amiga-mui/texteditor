@@ -196,7 +196,11 @@ struct LineNode
   STRPTR   Contents;      // Set this to the linecontents (allocated via the poolhandle)
   ULONG    Length;        // The length of the line (including the '\n')
   struct LineStyle *Styles; // Set this to the styles used for this line (allocated via the poolhandle). The array is terminated by an (EOS,0) marker
+  ULONG allocatedStyles;
+  ULONG usedStyles;
   struct LineColor *Colors; // The colors to use (allocated via the poolhandle). The array is terminated by an (EOC,0) marker
+  ULONG allocatedColors;
+  ULONG usedColors;
   BOOL     Color;         // Set this to TRUE if you want the line to be highlighted
   UWORD    Flow;          // Use the MUIV_TextEditor_Flow_xxx values...
   UWORD    Separator;     // See definitions below
@@ -568,6 +572,12 @@ void ClientEndSession(IPTR session);
 void ClientWriteChars(IPTR session, struct line_node *line, LONG start, LONG length);
 void ClientWriteLine(IPTR session, struct line_node *line);
 LONG ClientReadLine(IPTR session, struct line_node **line, ULONG *cset);
+
+#if defined(DEBUG)
+void DumpLine(struct line_node *line);
+#else
+#define DumpLine(line) ((void)0)
+#endif
 
 extern struct Hook ImPlainHook;
 extern struct Hook ImEMailHook;

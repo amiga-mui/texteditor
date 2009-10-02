@@ -395,7 +395,9 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
   struct IFFHandle *iff = (struct IFFHandle *)session;
   struct line_node *line = NULL;
   struct LineStyle *styles = NULL;
+  ULONG allocatedStyles = 0;
   struct LineColor *colors = NULL;
+  ULONG allocatedColors = 0;
   STRPTR textline;
   LONG codeset = 0;
   UWORD flow = MUIV_TextEditor_Flow_Left;
@@ -491,11 +493,12 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
             colors = NULL;
           }
           // allocate one word more than the chunk tell us, because we terminate the array with EOC
-          if(numColors > 0 && (colors = MyAlloc((numColors+1) * sizeof(struct LineColor))) != NULL)
+          if(numColors > 0 && (colors = MyAlloc((numColors+1) * sizeof(*colors))) != NULL)
           {
             error = ReadChunkBytes(iff, colors, numColors * sizeof(struct LineColor));
             SHOWVALUE(DBF_CLIPBOARD, error);
             colors[numColors].column = EOC;
+            allocatedColors = numColors+1;
           }
         }
         break;
@@ -518,6 +521,7 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
             error = ReadChunkBytes(iff, styles, numStyles * sizeof(struct LineStyle));
             SHOWVALUE(DBF_CLIPBOARD, error);
             styles[numStyles].column = EOS;
+            allocatedStyles = numStyles+1;
           }
         }
         break;
@@ -551,7 +555,11 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
               line->line.Flow = flow;
               line->line.Separator = separator;
               line->line.Styles = styles;
+              line->line.allocatedStyles = allocatedStyles;
+              line->line.usedStyles = allocatedStyles;
               line->line.Colors = colors;
+              line->line.allocatedColors = allocatedColors;
+              line->line.usedColors = allocatedColors;
 
               lineFinished = TRUE;
               error = 0;
@@ -567,7 +575,9 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
             }
 
             styles    = NULL;
+            allocatedStyles = 0;
             colors    = NULL;
+            allocatedColors = 0;
             flow      = MUIV_TextEditor_Flow_Left;
             color     = FALSE;
             separator = 0;

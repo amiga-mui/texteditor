@@ -47,6 +47,7 @@ UWORD GetColor(UWORD x, struct line_node *line)
 /// AddColorToLine()
 void AddColorToLine(UWORD x, struct line_node *line, UWORD length, UWORD color, struct InstData *data)
 {
+  ULONG numColors;
   struct LineColor *colors = line->line.Colors;
   struct LineColor *oldcolors = colors;
   struct LineColor *newcolors;
@@ -56,15 +57,17 @@ void AddColorToLine(UWORD x, struct line_node *line, UWORD length, UWORD color, 
   x++;
 
   if(colors != NULL)
-    newcolors = MyAllocPooled(data->mypool, GetAllocSize(colors)+sizeof(struct LineColor)*4);
+    numColors = line->line.allocatedColors + 4;
   else
-    newcolors = MyAllocPooled(data->mypool, sizeof(struct LineColor)*8);
+    numColors = 8;
 
-  if(newcolors != NULL)
+  if((newcolors = MyAllocPooled(data->mypool, numColors * sizeof(struct LineColor))) != NULL)
   {
+    ULONG usedColors = 0;
     UWORD oldcol = 0;
 
     line->line.Colors = newcolors;
+
     if(colors != NULL)
     {
       while(colors->column != EOC && colors->column < x)
@@ -72,8 +75,9 @@ void AddColorToLine(UWORD x, struct line_node *line, UWORD length, UWORD color, 
         newcolors->column = colors->column;
         oldcol = colors->color;
         newcolors->color = colors->color;
-        newcolors++;
         colors++;
+        newcolors++;
+        usedColors++;
       }
     }
     if(color != oldcol)
@@ -81,6 +85,7 @@ void AddColorToLine(UWORD x, struct line_node *line, UWORD length, UWORD color, 
       newcolors->column = x;
       newcolors->color = color;
       newcolors++;
+      usedColors++;
     }
     if(colors != NULL)
     {
@@ -95,6 +100,7 @@ void AddColorToLine(UWORD x, struct line_node *line, UWORD length, UWORD color, 
       newcolors->column = x+length;
       newcolors->color = oldcol;
       newcolors++;
+      usedColors++;
     }
     if(colors != NULL)
     {
@@ -102,11 +108,21 @@ void AddColorToLine(UWORD x, struct line_node *line, UWORD length, UWORD color, 
       {
         newcolors->column = colors->column;
         newcolors->color = colors->color;
-        newcolors++;
         colors++;
+        newcolors++;
+        usedColors++;
       }
     }
     newcolors->column = EOC;
+    usedColors++;
+
+    line->line.allocatedColors = numColors;
+    line->line.usedColors = usedColors;
+    if(usedColors > numColors)
+    {
+      E(DBF_STYLE, "used colors (%ld) > allocated colors (%ld)", usedColors, numColors);
+      DumpLine(line);
+    }
 
     if(oldcolors != NULL)
     {
