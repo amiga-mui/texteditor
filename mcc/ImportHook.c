@@ -30,10 +30,11 @@
 
 struct grow
 {
-  UWORD *array;
+  char *array;
 
-  int current;
-  int max;
+  int itemSize;
+  int itemCount;
+  int maxItemCount;
 
   APTR pool;
 };
@@ -132,30 +133,30 @@ STATIC char *FindEOL(char *src, int *tabs_ptr)
  Adds two new values to the given grow. This function guarantees
  that there is at least space for 2 additional values.
 *************************************************************************/
-STATIC VOID AddToGrow(struct grow *grow, UWORD val1, UWORD val2)
+STATIC VOID AddToGrow(struct grow *grow, void *newItem)
 {
-  if (grow->current >= grow->max)
+  if(grow->itemCount >= grow->maxItemCount-1)
   {
-    UWORD *new_array;
+    char *new_array;
 
-    if((new_array = MyAllocPooled(grow->pool, sizeof(grow->array[0])*2*(grow->max+9)))) /* we reserve one more for the ending */
+    // we reserve 8 new items
+    if((new_array = MyAllocPooled(grow->pool, (grow->maxItemCount+8) * grow->itemSize)) != NULL)
     {
-      /* Copy old contents into new array */
-      if(grow->array)
+      // Copy old contents into new array
+      if(grow->array != NULL)
       {
-        memcpy(new_array,grow->array,sizeof(grow->array[0])*2*grow->current);
-        MyFreePooled(grow->pool,grow->array);
+        memcpy(new_array, grow->array, grow->itemCount * grow->itemSize);
+        MyFreePooled(grow->pool, grow->array);
       }
       grow->array = new_array;
-      grow->max += 8;
+      grow->maxItemCount += 8;
     }
   }
 
-  if (grow->current < grow->max)
+  if(grow->itemCount < grow->maxItemCount)
   {
-    grow->array[grow->current*2] = val1;
-    grow->array[grow->current*2+1] = val2;
-    grow->current++;
+    memcpy(&grow->array[grow->itemCount * grow->itemSize], newItem, grow->itemSize);
+    grow->itemCount++;
   }
 }
 
@@ -244,10 +245,17 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
     struct grow style_grow;
     struct grow color_grow;
 
+    struct LineStyle newStyle;
+    struct LineColor newColor;
+
     memset(&color_grow,0,sizeof(color_grow));
     memset(&style_grow,0,sizeof(style_grow));
 
-    color_grow.pool = style_grow.pool = msg->PoolHandle;
+    color_grow.pool = msg->PoolHandle;
+    color_grow.itemSize = sizeof(newColor);
+
+    style_grow.pool = msg->PoolHandle;
+    style_grow.itemSize = sizeof(newStyle);
 
     /* Copy loop */
     while (src < eol)
@@ -266,18 +274,24 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
         switch(*src++)
         {
           case 'b':
-            AddToGrow(&style_grow, dest - dest_start + 1, BOLD);
-            state |= BOLD;
+            newStyle.column = dest - dest_start + 1;
+            newStyle.style = BOLD;
+            AddToGrow(&style_grow, &newStyle);
+            setFlag(state, BOLD);
           break;
 
           case 'i':
-            AddToGrow(&style_grow, dest - dest_start + 1, ITALIC);
-            state |= ITALIC;
+            newStyle.column = dest - dest_start + 1;
+            newStyle.style = ITALIC;
+            AddToGrow(&style_grow, &newStyle);
+            setFlag(state, ITALIC);
           break;
 
           case 'u':
-            AddToGrow(&style_grow, dest - dest_start + 1, UNDERLINE);
-            state |= UNDERLINE;
+            newStyle.column = dest - dest_start + 1;
+            newStyle.style = UNDERLINE;
+            AddToGrow(&style_grow, &newStyle);
+            setFlag(state, UNDERLINE);
           break;
 
           case 'h':
@@ -285,10 +299,27 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
           break;
 
           case 'n':
-            if(state & BOLD)      AddToGrow(&style_grow, dest - dest_start + 1, ~BOLD);
-            if(state & ITALIC)    AddToGrow(&style_grow, dest - dest_start + 1, ~ITALIC);
-            if(state & UNDERLINE) AddToGrow(&style_grow, dest - dest_start + 1, ~UNDERLINE);
-            state ^= ~(BOLD | ITALIC | UNDERLINE);
+            if(isFlagSet(state, BOLD))
+            {
+              newStyle.column = dest - dest_start + 1;
+              newStyle.style = ~BOLD;
+              AddToGrow(&style_grow, &newStyle);
+              clearFlag(state, BOLD);
+            }
+            if(isFlagSet(state, ITALIC))
+            {
+              newStyle.column = dest - dest_start + 1;
+              newStyle.style = ~ITALIC;
+              AddToGrow(&style_grow, &newStyle);
+              clearFlag(state, ITALIC);
+            }
+            if(isFlagSet(state, UNDERLINE))
+            {
+              newStyle.column = dest - dest_start + 1;
+              newStyle.style = ~UNDERLINE;
+              AddToGrow(&style_grow, &newStyle);
+              clearFlag(state, UNDERLINE);
+            }
           break;
 
           case 'l': line->Flow = MUIV_TextEditor_Flow_Left; break; // left
@@ -302,11 +333,13 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
               LONG pen;
               src++;
 
-              if(GetLong(&src,&pen))
+              if(GetLong(&src, &pen))
               {
                 if(*src == ']')
                 {
-                  AddToGrow(&color_grow, dest - dest_start + 1, pen);
+                  newColor.column = dest - dest_start + 1;
+                  newColor.color = pen;
+                  AddToGrow(&color_grow, &newColor);
 
                   if(pen == 0)
                     state ^= COLOURED;
@@ -353,11 +386,11 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
         dest_word_start = dest;
       }
 
-      if (wrap && ((ULONG)(dest - dest_start)) >= wrap)
+      if(wrap && ((ULONG)(dest - dest_start)) >= wrap)
       {
         /* Only leave the loop, if we really have added some characters
          * (at least one word) to the line */
-        if (dest_word_start != dest_start)
+        if(dest_word_start != dest_start)
         {
           /* src points to the real word start, but we add one when we return eol */
           eol = (char *)(src_word_start - 1);
@@ -370,22 +403,29 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 
     } /* while (src < eol) */
 
+    // terminate the color array, but only if there are any colors at all
+    if(color_grow.itemCount > 0)
+    {
+      newColor.column = EOC;
+      newColor.color = 0;
+      AddToGrow(&color_grow, &newColor);
+    }
+
     line->Colors = (struct LineColor *)color_grow.array;
+    line->allocatedColors = color_grow.maxItemCount;
+    line->usedColors = color_grow.itemCount;
+
+    // terminate the style array, but only if there are any styles at all
+    if(style_grow.itemCount > 0)
+    {
+      newStyle.column = EOS;
+      newStyle.style = 0;
+      AddToGrow(&style_grow, &newStyle);
+    }
+
     line->Styles = (struct LineStyle *)style_grow.array;
-
-    /* Mark the end of the color array (space is ensured) */
-    if(line->Colors != NULL)
-    {
-      line->Colors[color_grow.current].column = EOC;
-      line->Colors[color_grow.current].color = 0;
-    }
-
-    /* Mark the end of the style array (space is ensured) */
-    if(line->Styles != NULL)
-    {
-      line->Styles[style_grow.current].column = EOS;
-      line->Styles[style_grow.current].style = 0;
-    }
+    line->allocatedStyles = style_grow.maxItemCount;
+    line->usedStyles = style_grow.itemCount;
 
     *dest++ = '\n';
     *dest = 0;
@@ -393,7 +433,9 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
     line->Length = dest - dest_start; /* this excludes \n */
   }
 
-  if (!eol || eol[0] == 0) return NULL;
+  if (!eol || eol[0] == 0)
+    return NULL;
+
   return eol + 1;
 }
 MakeHook(ImPlainHook, PlainImportHookFunc);
@@ -460,10 +502,17 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
     struct grow style_grow;
     struct grow color_grow;
 
+    struct LineStyle newStyle;
+    struct LineColor newColor;
+
     memset(&color_grow,0,sizeof(color_grow));
     memset(&style_grow,0,sizeof(style_grow));
 
-    color_grow.pool = style_grow.pool = msg->PoolHandle;
+    color_grow.pool = msg->PoolHandle;
+    color_grow.itemSize = sizeof(newColor);
+
+    style_grow.pool = msg->PoolHandle;
+    style_grow.itemSize = sizeof(newStyle);
 
     if (src[0] == '>')
       line->Color = TRUE;
@@ -519,7 +568,9 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
             shownext ^= ITALIC;
           else if((state & ITALIC) || (lastWasSeparator && ContainsText(src, '/')))
           {
-            AddToGrow(&style_grow, dest - dest_start + 1, (state & ITALIC) ? ~ITALIC : ITALIC);
+            newStyle.column = dest - dest_start + 1;
+            newStyle.style = isFlagSet(state, ITALIC) ? ~ITALIC : ITALIC;
+            AddToGrow(&style_grow, &newStyle);
             state ^= ITALIC;
 
             lastWasSeparator = TRUE;
@@ -539,7 +590,9 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
             shownext ^= BOLD;
           else if((state & BOLD) || (lastWasSeparator && ContainsText(src, '*')))
           {
-            AddToGrow(&style_grow, dest - dest_start + 1, (state & BOLD) ? ~BOLD : BOLD);
+            newStyle.column = dest - dest_start + 1;
+            newStyle.style = isFlagSet(state, BOLD) ? ~BOLD : BOLD;
+            AddToGrow(&style_grow, &newStyle);
             state ^= BOLD;
 
             lastWasSeparator = TRUE;
@@ -559,7 +612,9 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
             shownext ^= UNDERLINE;
           else if((state & UNDERLINE) || (lastWasSeparator && ContainsText(src, '_')))
           {
-            AddToGrow(&style_grow, dest - dest_start + 1, (state & UNDERLINE) ? ~UNDERLINE : UNDERLINE);
+            newStyle.column = dest - dest_start + 1;
+            newStyle.style = isFlagSet(state, UNDERLINE) ? ~UNDERLINE : UNDERLINE;
+            AddToGrow(&style_grow, &newStyle);
             state ^= UNDERLINE;
 
             lastWasSeparator = TRUE;
@@ -579,7 +634,9 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
             shownext ^= COLOURED;
           else if((state & COLOURED) || (lastWasSeparator && ContainsText(src, '#')))
           {
-            AddToGrow(&color_grow, dest - dest_start + 1, (state & COLOURED) ? 0 : 7);
+            newColor.column = dest - dest_start + 1;
+            newColor.color = (state & COLOURED) ? 0 : 7;
+            AddToGrow(&style_grow, &newStyle);
             state ^= COLOURED;
 
             lastWasSeparator = TRUE;
@@ -635,18 +692,24 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
         switch(*src++)
         {
           case 'b':
-            AddToGrow(&style_grow, dest - dest_start + 1, BOLD);
-            escstate |= BOLD;
+            newStyle.column = dest - dest_start + 1;
+            newStyle.style = BOLD;
+            AddToGrow(&style_grow, &newStyle);
+            setFlag(escstate, BOLD);
           break;
 
           case 'i':
-            AddToGrow(&style_grow, dest - dest_start + 1, ITALIC);
-            escstate |= ITALIC;
+            newStyle.column = dest - dest_start + 1;
+            newStyle.style = ITALIC;
+            AddToGrow(&style_grow, &newStyle);
+            setFlag(escstate, ITALIC);
           break;
 
           case 'u':
-            AddToGrow(&style_grow, dest - dest_start + 1, UNDERLINE);
-            escstate |= UNDERLINE;
+            newStyle.column = dest - dest_start + 1;
+            newStyle.style = UNDERLINE;
+            AddToGrow(&style_grow, &newStyle);
+            setFlag(escstate, UNDERLINE);
           break;
 
           case 'h':
@@ -654,11 +717,30 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
           break;
 
           case 'n':
-            if(state & BOLD)      AddToGrow(&style_grow, dest - dest_start + 1, ~BOLD);
-            if(state & ITALIC)    AddToGrow(&style_grow, dest - dest_start + 1, ~ITALIC);
-            if(state & UNDERLINE) AddToGrow(&style_grow, dest - dest_start + 1, ~UNDERLINE);
-            state ^= ~(BOLD | ITALIC | UNDERLINE);
-            escstate ^= ~(BOLD | ITALIC | UNDERLINE);
+            if(isFlagSet(state, BOLD))
+            {
+              newStyle.column = dest - dest_start + 1;
+              newStyle.style = ~BOLD;
+              AddToGrow(&style_grow, &newStyle);
+              clearFlag(state, BOLD);
+              clearFlag(escstate, BOLD);
+            }
+            if(isFlagSet(state, ITALIC))
+            {
+              newStyle.column = dest - dest_start + 1;
+              newStyle.style = ~ITALIC;
+              AddToGrow(&style_grow, &newStyle);
+              clearFlag(state, ITALIC);
+              clearFlag(escstate, ITALIC);
+            }
+            if(isFlagSet(state, UNDERLINE))
+            {
+              newStyle.column = dest - dest_start + 1;
+              newStyle.style = ~UNDERLINE;
+              AddToGrow(&style_grow, &newStyle);
+              clearFlag(state, UNDERLINE);
+              clearFlag(escstate, UNDERLINE);
+            }
           break;
 
           case 'l': line->Flow = MUIV_TextEditor_Flow_Left; break; // left
@@ -676,7 +758,9 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
               {
                 if(*src == ']')
                 {
-                  AddToGrow(&color_grow, dest - dest_start + 1, pen);
+                  newColor.column = dest - dest_start + 1;
+                  newColor.color = pen;
+                  AddToGrow(&color_grow, &newColor);
 
                   if(pen == 0)
                     escstate ^= COLOURED;
@@ -750,22 +834,29 @@ STATIC STRPTR MimeImport(struct ImportMessage *msg, LONG type)
       *dest++ = c;
     } /* while (src < eol) */
 
+    // terminate the color array, but only if there are any colors at all
+    if(color_grow.itemCount > 0)
+    {
+      newColor.column = EOC;
+      newColor.color = 0;
+      AddToGrow(&color_grow, &newColor);
+    }
+
     line->Colors = (struct LineColor *)color_grow.array;
+    line->allocatedColors = color_grow.maxItemCount;
+    line->usedColors = color_grow.itemCount;
+
+    // terminate the style array, but only if there are any styles at all
+    if(style_grow.itemCount > 0)
+    {
+      newStyle.column = EOS;
+      newStyle.style = 0;
+      AddToGrow(&style_grow, &newStyle);
+    }
+
     line->Styles = (struct LineStyle *)style_grow.array;
-
-    /* Mark the end of the color array (space is ensured) */
-    if(line->Colors)
-    {
-      line->Colors[color_grow.current].column = EOC;
-      line->Colors[color_grow.current].color = 0;
-    }
-
-    /* Mark the end of the style array (space is ensured) */
-    if(line->Styles != NULL)
-    {
-      line->Styles[style_grow.current].column = EOS;
-      line->Styles[style_grow.current].style = 0;
-    }
+    line->allocatedStyles = style_grow.maxItemCount;
+    line->usedStyles = style_grow.itemCount;
 
     *dest++ = '\n';
     *dest = 0;

@@ -115,6 +115,7 @@ UWORD GetStyle(LONG x, struct line_node *line)
 /// AddStyleToLine()
 void AddStyleToLine(LONG x, struct line_node *line, LONG length, UWORD style, struct InstData *data)
 {
+  ULONG numStyles;
   struct LineStyle *styles = line->line.Styles;
   struct LineStyle *oldstyles = styles;
   struct LineStyle *newstyles;
@@ -126,13 +127,16 @@ void AddStyleToLine(LONG x, struct line_node *line, LONG length, UWORD style, st
   x++;
 
   if(styles != NULL)
-    newstyles = MyAllocPooled(data->mypool, GetAllocSize(styles)+sizeof(struct LineStyle)*4);
+    numStyles = line->line.allocatedStyles + 4;
   else
-    newstyles = MyAllocPooled(data->mypool, sizeof(struct LineStyle)*8);
+    numStyles = 8;
 
-  if(newstyles != NULL)
+  if((newstyles = MyAllocPooled(data->mypool, numStyles * sizeof(struct LineStyle))) != NULL)
   {
+    ULONG usedStyles = 0;
+
     line->line.Styles = newstyles;
+
     if(styles != NULL)
     {
       while(styles->column != EOS && styles->column < x)
@@ -145,8 +149,9 @@ void AddStyleToLine(LONG x, struct line_node *line, LONG length, UWORD style, st
         else
           cur_style |= styles->style;
 
-        newstyles++;
         styles++;
+        newstyles++;
+        usedStyles++;
       }
     }
     if(style > 0xff)
@@ -156,6 +161,7 @@ void AddStyleToLine(LONG x, struct line_node *line, LONG length, UWORD style, st
         newstyles->column = x;
         newstyles->style = style;
         newstyles++;
+        usedStyles++;
       }
     }
     else
@@ -165,6 +171,7 @@ void AddStyleToLine(LONG x, struct line_node *line, LONG length, UWORD style, st
         newstyles->column = x;
         newstyles->style = style;
         newstyles++;
+        usedStyles++;
       }
     }
     if(styles != NULL)
@@ -176,6 +183,7 @@ void AddStyleToLine(LONG x, struct line_node *line, LONG length, UWORD style, st
           newstyles->column = styles->column;
           newstyles->style = styles->style;
           newstyles++;
+          usedStyles++;
         }
         styles++;
       }
@@ -186,6 +194,7 @@ void AddStyleToLine(LONG x, struct line_node *line, LONG length, UWORD style, st
       newstyles->column = x+length;
       newstyles->style = ~style;
       newstyles++;
+      usedStyles++;
     }
 
     if(styles != NULL)
@@ -194,11 +203,22 @@ void AddStyleToLine(LONG x, struct line_node *line, LONG length, UWORD style, st
       {
         newstyles->column = styles->column;
         newstyles->style = styles->style;
-        newstyles++;
         styles++;
+        newstyles++;
+        usedStyles++;
       }
     }
     newstyles->column = EOS;
+    usedStyles++;
+
+    line->line.allocatedStyles = numStyles;
+    line->line.usedStyles = usedStyles;
+    if(usedStyles > numStyles)
+    {
+      E(DBF_STYLE, "used styles (%ld) > allocated styles (%ld)", usedStyles, numStyles);
+      DumpLine(line);
+    }
+
     if(oldstyles != NULL)
     {
       MyFreePooled(data->mypool, oldstyles);
@@ -273,8 +293,9 @@ void AddStyle(struct marking *realblock, UWORD style, long Set, struct InstData 
   RedrawArea(startx, startline, stopx, stopline, data);
 
   if(style > 0xff)
-      data->style &= style;
-  else  data->style |= style;
+    data->style &= style;
+  else
+    data->style |= style;
 
   LEAVE();
 }

@@ -130,7 +130,7 @@ IPTR HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
           LockLayerInfo(li);
           layer = WhichLayer(li, _window(obj)->LeftEdge + msg->imsg->MouseX, _window(obj)->TopEdge + msg->imsg->MouseY);
           UnlockLayerInfo(li);
- 
+
           // if the mouse is currently over the object and over the object's
           // window we go and change the pointer to show the selection pointer
           if(layer != NULL && layer->Window == _window(obj))
@@ -699,7 +699,8 @@ void Key_Backspace(struct InstData *data)
   {
     if(data->CPos_X > 0)
     {
-      AddToUndoBuffer(ET_BACKSPACECHAR, data->actualline->line.Contents+--data->CPos_X, data);
+      data->CPos_X--;
+      AddToUndoBuffer(ET_BACKSPACECHAR, data->actualline->line.Contents+data->CPos_X, data);
       RemoveChars(data->CPos_X, data->actualline, 1, data);
     }
     else
@@ -722,7 +723,7 @@ void Key_Backspace(struct InstData *data)
 ///
 
 ///Key_Delete()
-void Key_Delete (struct InstData *data)
+void Key_Delete(struct InstData *data)
 {
   ENTER();
 

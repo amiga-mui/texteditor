@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-10-02 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/misc: added some house keeping variables to the style and color handling
+    to detect possible buffer overruns. These also make it possible to get rid
+    of peeking around to get the size of a previous allocation.
+
 2009-09-29 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ClipboardServer.c: added the missing NP_CodeType=CODETYPE_PPC tag for
