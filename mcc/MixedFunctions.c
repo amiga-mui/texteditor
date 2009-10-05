@@ -366,6 +366,42 @@ void OffsetToLines(LONG x, struct line_node *line, struct pos_info *pos, struct 
 }
 
 ///
+/// LineNr()
+unsigned short LineNr(struct line_node *line, struct InstData *data)
+{
+  unsigned short result = 1;
+  struct line_node *actual = data->firstline;
+
+  ENTER();
+
+  while(line != actual)
+  {
+    result++;
+    actual = actual->next;
+  }
+
+  RETURN(result);
+  return(result);
+}
+
+///
+/// LineNode()
+struct line_node *LineNode(unsigned short linenr, struct InstData *data)
+{
+  struct line_node *actual = data->firstline;
+
+  ENTER();
+
+  while(--linenr && actual->next != NULL)
+  {
+    actual = actual->next;
+  }
+
+  RETURN(actual);
+  return(actual);
+}
+
+///
 /// SetCursor()
 /*------------------*
  * Place the cursor *

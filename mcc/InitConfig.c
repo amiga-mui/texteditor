@@ -304,30 +304,26 @@ void InitConfig(Object *obj, struct InstData *data)
   }
 
   {
-    ULONG undolevel;
+    ULONG undoSteps;
 
     // get the saved undo size only if it was not yet set by the application
-    if(data->userUndoSize == FALSE)
+    if(data->userUndoBufferSize == FALSE)
     {
-      undolevel = 500;
+      undoSteps = 500;
 
       if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_UndoSize, &setting))
       {
-        undolevel = *(long *)setting;
+        undoSteps = *(long *)setting;
 
         // constrain the number of undo levels only if undo is enabled
-        if(undolevel != 0 && undolevel < 20)
-          undolevel = 20;
+        if(undoSteps != 0 && undoSteps < 20)
+          undoSteps = 20;
       }
-
-      // add 5 levels only if undo is enabled at all
-      if(undolevel != 0)
-        undolevel += 5;
     }
     else
-      undolevel = data->undolevel;
+      undoSteps = data->maxUndoSteps;
 
-    ResizeUndoBuffer(data, undolevel);
+    ResizeUndoBuffer(data, undoSteps);
   }
 
   data->LookupSpawn = 0;
