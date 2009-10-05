@@ -82,7 +82,7 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
     emsg.Length = node->line.Length;
     emsg.Styles = node->line.Styles;
     emsg.Colors = node->line.Colors;
-    emsg.Highlight = node->line.Color;
+    emsg.Highlight = node->line.Highlight;
     emsg.Flow = node->line.Flow;
     emsg.Separator = node->line.Separator;
     emsg.ExportWrap = wraplen;
@@ -107,7 +107,7 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
       else
         emsg.SkipBack = 0;
     }
-    
+
     // call the ExportHook and exit immediately if it returns NULL
     if((user_data = (void*)CallHookPkt(exportHook, NULL, &emsg)) == NULL)
       break;

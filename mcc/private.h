@@ -201,7 +201,7 @@ struct LineNode
   struct LineColor *Colors; // The colors to use (allocated via the poolhandle). The array is terminated by an (EOC,0) marker
   ULONG allocatedColors;
   ULONG usedColors;
-  BOOL     Color;         // Set this to TRUE if you want the line to be highlighted
+  BOOL     Highlight;     // Set this to TRUE if you want the line to be highlighted
   UWORD    Flow;          // Use the MUIV_TextEditor_Flow_xxx values...
   UWORD    Separator;     // See definitions below
   BOOL     clearFlow;     // if the flow definition should be cleared on the next line
@@ -252,6 +252,7 @@ struct UserAction
     UBYTE   style;
     UBYTE   flow;
     UBYTE   separator;
+    UBYTE   highlight;
   } del;
 
   UBYTE   *clip;       // deleteblock
@@ -369,7 +370,6 @@ struct InstData
   ULONG           ExportWrap;
   UWORD           ImportWrap;
   BOOL            HasChanged;
-  BOOL            Smooth;
   UWORD           TabSize;
   ULONG           WrapBorder;
   ULONG           WrapMode;
@@ -423,8 +423,10 @@ long  CheckSep    (unsigned char, struct InstData *);
 long  CheckSent   (unsigned char, struct InstData *);
 void  NextLine    (struct InstData *);
 
-ULONG convert(ULONG style);
-LONG  PrintLine   (LONG, struct line_node *, LONG, BOOL, struct InstData *);
+ULONG convert(UWORD style);
+LONG PrintLine(LONG, struct line_node *, LONG, BOOL, struct InstData *);
+ULONG ConvertPen(UWORD, BOOL, struct InstData *);
+
 void  ClearLine   (char *, LONG, LONG, struct InstData *);
 void  ScrollUp    (LONG, LONG, struct InstData *);
 void  ScrollDown    (LONG, LONG, struct InstData *);
@@ -611,27 +613,27 @@ struct KeyAction
 
 enum
 {
-  FLG_HScroll       = 1L << 0,
-  FLG_NumLock       = 1L << 1,
-  FLG_ReadOnly      = 1L << 2,
-  FLG_FastCursor    = 1L << 3,
-  FLG_CheckWords    = 1L << 4,
-  FLG_InsertMode    = 1L << 5,
-  FLG_Quiet         = 1L << 6,
-  FLG_PopWindow     = 1L << 7,
-  FLG_UndoLost      = 1L << 8,
-  FLG_Draw          = 1L << 9,
-  FLG_InVGrp        = 1L << 10,
-  FLG_Ghosted       = 1L << 11,
-  FLG_OwnBkgn       = 1L << 12,
-  FLG_FreezeCrsr    = 1L << 13,
-  FLG_Active        = 1L << 14,
-  FLG_OwnFrame      = 1L << 15,
-  FLG_ARexxMark     = 1L << 16,
-  FLG_FirstInit     = 1L << 17,
-  FLG_AutoClip      = 1L << 18,
-  FLG_Activated     = 1L << 19, // the gadget was activated by MUIM_GoActive()
-  FLG_ActiveOnClick = 1L << 20, // should the gadget activated on click
+  FLG_HScroll        = 1L << 0,
+  FLG_NumLock        = 1L << 1,
+  FLG_ReadOnly       = 1L << 2,
+  FLG_FastCursor     = 1L << 3,
+  FLG_CheckWords     = 1L << 4,
+  FLG_InsertMode     = 1L << 5,
+  FLG_Quiet          = 1L << 6,
+  FLG_PopWindow      = 1L << 7,
+  FLG_UndoLost       = 1L << 8,
+  FLG_Draw           = 1L << 9,
+  FLG_InVGrp         = 1L << 10,
+  FLG_Ghosted        = 1L << 11,
+  FLG_OwnBackground  = 1L << 12,
+  FLG_FreezeCrsr     = 1L << 13,
+  FLG_Active         = 1L << 14,
+  FLG_OwnFrame       = 1L << 15,
+  FLG_ARexxMark      = 1L << 16,
+  FLG_FirstInit      = 1L << 17,
+  FLG_AutoClip       = 1L << 18,
+  FLG_Activated      = 1L << 19, // the gadget was activated by MUIM_GoActive()
+  FLG_ActiveOnClick  = 1L << 20, // should the gadget activated on click
 
   FLG_NumberOf
 };

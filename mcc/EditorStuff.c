@@ -305,7 +305,7 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
                 importedLine->line.Contents = contents;
                 importedLine->line.Length = length;
                 importedLine->visual = VisualHeight(line, data);
-                importedLine->line.Color = line->line.Color;
+                importedLine->line.Highlight = line->line.Highlight;
                 importedLine->line.Flow = line->line.Flow;
                 importedLine->line.Separator = line->line.Separator;
                 importedLine->line.Styles = styles;
@@ -403,7 +403,7 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
         updatefrom = 0;
       DumpText(data->visual_y+updatefrom, updatefrom, data->maxlines, TRUE, data);
 
-      if(data->update)
+      if(data->update == TRUE)
         res = TRUE;
       else
         data->update = TRUE;
@@ -463,7 +463,7 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
   char *newbuffer;
   LONG visual, oldvisual, line_nr;
   BOOL emptyline = FALSE;
-  LONG color = line->line.Color;
+  BOOL highlight = line->line.Highlight;
   UWORD flow = line->line.Flow;
   UWORD separator = line->line.Separator;
 
@@ -476,7 +476,7 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
   if(line->line.Length == 1)
   {
     emptyline = TRUE;
-    color = line->next->line.Color;
+    highlight = line->next->line.Highlight;
     flow = line->next->line.Flow;
     separator = line->next->line.Separator;
   }
@@ -666,7 +666,7 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
       line->next->previous = line;
     oldvisual = line->visual;
     line->visual = VisualHeight(line, data);
-    line->line.Color = color;
+    line->line.Highlight = highlight;
     line->line.Flow = flow;
     line->line.Separator = separator;
 
@@ -686,7 +686,7 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
       {
         if(emptyline && line_nr > 0)
         {
-          if(data->fastbackground)
+          if(data->fastbackground == TRUE)
           {
             ScrollUp(line_nr - 1, 1, data);
             SetCursor(data->CPos_X, data->actualline, TRUE, data);
@@ -696,7 +696,7 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
         }
         else
         {
-          if(data->fastbackground)
+          if(data->fastbackground == TRUE)
             ScrollUp(line_nr + line->visual - 1, 1, data);
           else
             DumpText(data->visual_y+line_nr+line->visual-1, line_nr+line->visual-1, data->maxlines, TRUE, data);
@@ -717,10 +717,10 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
       ULONG c = 0;
 
       while((--t_oldvisual) && (t_line_nr++ <= data->maxlines))
-        c = c + LineCharsWidth(line->line.Contents+c, data);
+        c += LineCharsWidth(line->line.Contents+c, data);
 
       while((c < line->line.Length) && (t_line_nr <= data->maxlines))
-        c = c + PrintLine(c, line, t_line_nr++, TRUE, data);
+        c += PrintLine(c, line, t_line_nr++, TRUE, data);
     }
 
     if(line_nr + oldvisual == 1 && line->visual == visual-1)
@@ -728,7 +728,7 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
       data->visual_y--;
       data->totallines -= 1;
 
-      if(data->fastbackground)
+      if(data->fastbackground == TRUE)
         DumpText(data->visual_y, 0, visual-1, TRUE, data);
       else
         DumpText(data->visual_y, 0, data->maxlines, TRUE, data);
@@ -783,12 +783,12 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
 
     data->HasChanged = TRUE;
     Init_LineNode(newline, line, line->line.Contents+x, data);
-    newline->line.Color = line->line.Color;
+    newline->line.Highlight = line->line.Highlight;
     newline->line.Flow = line->line.Flow;
     newline->line.Separator = line->line.Separator;
     if(buffer != NULL)
     {
-      newline->line.Color = buffer->del.style;
+      newline->line.Highlight = buffer->del.highlight;
       newline->line.Flow = buffer->del.flow;
       newline->line.Separator = buffer->del.separator;
     }
@@ -1002,7 +1002,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
 
     if(x == 0)
     {
-      line->line.Color = 0;
+      line->line.Highlight = FALSE;
       line->line.Separator = 0;
       if(!(line->previous && line->previous->line.Flow == line->line.Flow))
       {
@@ -1011,7 +1011,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
       if(line_nr != data->maxlines)
       {
         data->totallines += 1;
-        if(data->fastbackground)
+        if(data->fastbackground == TRUE)
         {
           if(line_nr)
           {
@@ -1041,7 +1041,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
           InstallLayerHook(data->rport->Layer, oldhook);
 
           PrintLine(0, line, data->maxlines-1, FALSE, data);
-          if(!data->fastbackground)
+          if(data->fastbackground == FALSE)
           {
             DumpText(data->visual_y+data->maxlines-1, data->maxlines-1, data->maxlines, TRUE, data);
           }
@@ -1062,13 +1062,13 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
       data->totallines += 1;
       if(buffer == NULL)
       {
-        line->next->line.Color = 0;
+        line->next->line.Highlight = FALSE;
         line->next->line.Separator = 0;
       }
       SetCursor(crsr_x, crsr_l, FALSE, data);
       if(line_nr < data->maxlines)
       {
-        if(data->fastbackground)
+        if(data->fastbackground == TRUE)
         {
           ScrollDown(line_nr, 1, data);
           if(line_nr+1 <= data->maxlines)
@@ -1175,7 +1175,7 @@ void OptimizedPrint(LONG x, struct line_node *line, LONG line_nr, LONG width, st
     if(twidth != width && x+twidth < (LONG)line->line.Length && line_nr <= data->maxlines)
     {
       x += twidth;
-      width = LineCharsWidth(line->line.Contents+x+width, data) + width - twidth;
+      width += LineCharsWidth(line->line.Contents+x+width, data) - twidth;
     }
     else
       break;
@@ -1233,6 +1233,7 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
       AddStyleToLine(x, line, 1, isFlagSet(style, UNDERLINE) ? UNDERLINE : ~UNDERLINE, data);
       line->line.Flow = buffer->del.flow;
       line->line.Separator = buffer->del.separator;
+      #warning is buffer->del.highlight missing here?
     }
   }
   else
@@ -1457,4 +1458,3 @@ BOOL RemoveChars(LONG x, struct line_node *line, LONG length, struct InstData *d
 }
 
 ///
-

@@ -93,7 +93,7 @@ static ULONG CallFunction(UWORD function, IPTR *args, const char *txtargs, struc
 
   SHOWVALUE(DBF_REXX, function);
 
-  if(data->flags & FLG_ReadOnly)
+  if(isFlagSet(data->flags, FLG_ReadOnly))
   {
     switch(function)
     {
@@ -127,7 +127,7 @@ static ULONG CallFunction(UWORD function, IPTR *args, const char *txtargs, struc
   else
   {
     if(function > GOTOBOOKMARK || function < GOTOLINE)
-      data->flags &= ~FLG_ARexxMark;
+      clearFlag(data->flags, FLG_ARexxMark);
 
     switch(function)
     {
@@ -335,7 +335,7 @@ static ULONG CallFunction(UWORD function, IPTR *args, const char *txtargs, struc
         }
         else
         {
-          data->flags |= FLG_ARexxMark;
+          setFlag(data->flags, FLG_ARexxMark);
         }
         break;
 
@@ -386,10 +386,10 @@ static ULONG CallFunction(UWORD function, IPTR *args, const char *txtargs, struc
 
     if(data->CPos_X != oldCPos_X || oldactualline != data->actualline)
     {
-      if(data->flags & FLG_Active && function <= GOTOBOOKMARK && function >= GOTOLINE)
+      if(isFlagSet(data->flags, FLG_Active) && function <= GOTOBOOKMARK && function >= GOTOLINE)
         SetCursor(oldCPos_X, oldactualline, FALSE, data);
 
-      if(data->flags & FLG_ARexxMark)
+      if(isFlagSet(data->flags, FLG_ARexxMark))
       {
         data->blockinfo.stopline = data->actualline;
         data->blockinfo.stopx = data->CPos_X;
@@ -412,7 +412,7 @@ static ULONG CallFunction(UWORD function, IPTR *args, const char *txtargs, struc
 
       ScrollIntoDisplay(data);
 
-      if(data->flags & FLG_Active && function <= GOTOBOOKMARK && function >= GOTOLINE)
+      if(isFlagSet(data->flags, FLG_Active) && function <= GOTOBOOKMARK && function >= GOTOLINE)
         SetCursor(data->CPos_X, data->actualline, TRUE, data);
 
       // make sure to notify others that the cursor has changed and so on.
@@ -440,7 +440,7 @@ ULONG HandleARexx(struct InstData *data, STRPTR command)
 
   ENTER();
 
-  if(data->shown && command && command[0] != '\0')
+  if(data->shown == TRUE && command != NULL && command[0] != '\0')
   {
     const char *txtargs = "";
     const char *cmd;
@@ -585,7 +585,7 @@ VOID Navigate (STRPTR command, struct InstData *data, LONG *match)
 
   if((*match) && (data->CPos_X != oldCPos_X || oldactualline != data->actualline))
   {
-    if(data->flags & FLG_Active)
+    if(isFlagSet(data->flags, FLG_Active))
       SetCursor(oldCPos_X, oldactualline, FALSE, data);
 
     ScrollIntoDisplay(data);
@@ -604,7 +604,7 @@ ULONG HandleARexx (struct InstData *data, STRPTR command)
   if(StringCompare(command, "COPY", &match))
     Key_Copy(data);
 
-  if(!(data->flags & FLG_ReadOnly))
+  if(isFlagClear(data->flags, FLG_ReadOnly))
   {
       UBYTE buffer[6];
 
@@ -647,7 +647,7 @@ ULONG HandleARexx (struct InstData *data, STRPTR command)
     if(!match)
       Navigate(command, data, &match);
 
-    if(match && (data->flags & FLG_Active))
+    if(match && isFlagSet(data->flags, FLG_Active))
     {
       SetCursor(data->CPos_X, data->actualline, FALSE, data);
     }

@@ -472,7 +472,7 @@ void SuggestWord (struct InstData *data)
 ///CheckWord()
 void CheckWord(struct InstData *data)
 {
-  if(data->TypeAndSpell && data->CPos_X && IsAlpha(data->mylocale, *(data->actualline->line.Contents+data->CPos_X-1)))
+  if(data->TypeAndSpell == TRUE && data->CPos_X != 0 && IsAlpha(data->mylocale, *(data->actualline->line.Contents+data->CPos_X-1)))
   {
     LONG  start, end = data->CPos_X;
     struct line_node *line = data->actualline;

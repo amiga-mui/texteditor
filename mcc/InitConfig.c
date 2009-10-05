@@ -141,7 +141,7 @@ void InitConfig(Object *obj, struct InstData *data)
   SetCol(data, obj, MUICFG_TextEditor_SeparatorShadow, &data->separatorshadow, 6);
   SetCol(data, obj, MUICFG_TextEditor_InactiveColor, &data->inactivecolor, 7);
 
-  if(!(data->flags & FLG_OwnBkgn))
+  if(isFlagClear(data->flags, FLG_OwnBackground))
   {
     LONG background = MUII_BACKGROUND;
 
@@ -193,7 +193,7 @@ void InitConfig(Object *obj, struct InstData *data)
 
   data->normalfont  = GetFont(data, obj, MUICFG_TextEditor_NormalFont);
   data->fixedfont   = GetFont(data, obj, MUICFG_TextEditor_FixedFont);
-  data->font = data->use_fixedfont ? data->fixedfont : data->normalfont;
+  data->font = (data->use_fixedfont == TRUE) ? data->fixedfont : data->normalfont;
 
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_BlockQual, &setting))
   {
@@ -228,7 +228,7 @@ void InitConfig(Object *obj, struct InstData *data)
     }
   }
 
-  if(!(data->flags & FLG_OwnFrame))
+  if(isFlagClear(data->flags, FLG_OwnFrame))
   {
   #ifndef __AROS__
     if(MUIMasterBase->lib_Version >= 20)
@@ -243,28 +243,25 @@ void InitConfig(Object *obj, struct InstData *data)
   data->TypeAndSpell = FALSE;
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_TypeNSpell, &setting))
   {
-    data->TypeAndSpell = *(long *)setting;
+    if(*(long *)setting)
+      data->TypeAndSpell = TRUE;
     set(obj, MUIA_TextEditor_TypeAndSpell, data->TypeAndSpell);
   }
 
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_CheckWord, &setting))
   {
     if(*(long *)setting)
-    {
-      data->flags |= FLG_CheckWords;
-    }
+      setFlag(data->flags, FLG_CheckWords);
     else
-    {
-      data->flags &= ~FLG_CheckWords;
-    }
+      clearFlag(data->flags, FLG_CheckWords);
   }
 
   data->Flow = data->actualline->line.Flow;
   data->Pen = GetColor(data->CPos_X, data->actualline);
 
-  if(~data->flags & FLG_FirstInit)
+  if(isFlagClear(data->flags, FLG_FirstInit))
   {
-    data->flags |= FLG_FirstInit;
+    setFlag(data->flags, FLG_FirstInit);
     data->NoNotify = TRUE;
     SetAttrs(obj,
             MUIA_FillArea,              FALSE,
@@ -286,25 +283,25 @@ void InitConfig(Object *obj, struct InstData *data)
 
     setting = (long)&lort;
     DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_Smooth, &setting);
-    if(data->slider)
+    if(data->slider != NULL)
     {
       set(data->slider, MUIA_Prop_DoSmooth, *(long *)setting);
     }
   }
 
+  data->selectPointer = TRUE;
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_SelectPointer, &setting))
   {
-    data->selectPointer = *(long *)setting;
+    if(*(long *)setting == 0)
+      data->selectPointer = FALSE;
   }
-  else
-    data->selectPointer = TRUE;
 
+  data->inactiveCursor = TRUE;
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_InactiveCursor, &setting))
   {
-    data->inactiveCursor = *(long *)setting;
+    if(*(long *)setting == 0)
+      data->inactiveCursor = FALSE;
   }
-  else
-    data->inactiveCursor = TRUE;
 
   {
     ULONG undolevel;
@@ -395,7 +392,7 @@ void InitConfig(Object *obj, struct InstData *data)
       {
         struct te_key *curKey = &mykeys[i];
 
-        D(DBF_STARTUP, "checking curKey[%d]: %08lx", i, curKey);
+        //D(DBF_STARTUP, "checking curKey[%d]: %08lx", i, curKey);
 
         if(curKey->code >= 500)
         {
@@ -407,7 +404,7 @@ void InitConfig(Object *obj, struct InstData *data)
           curKey->code = RAW[0];
           curKey->qual |= RAW[1];
 
-          if(RAW[0] == 67 && !(curKey->qual & IEQUALIFIER_NUMERICPAD))
+          if(RAW[0] == 67 && isFlagClear(curKey->qual, IEQUALIFIER_NUMERICPAD))
           {
             curKey->code = 68;
           }

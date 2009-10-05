@@ -57,13 +57,11 @@ void ResetDisplay(struct InstData *data)
   data->actualline = line;
 
   data->cursor_shown = 0;
-  if(data->shown)
+  if(data->shown == TRUE)
   {
-//        ULONG tst;
-
-    while(line)
+    while(line != NULL)
     {
-        LONG c;
+      LONG c;
 
       c = VisualHeight(line, data);
       lines += c;
@@ -102,11 +100,11 @@ void ResetDisplay(struct InstData *data)
 
 ///
 /// RequestInput()
-void  RequestInput(struct InstData *data)
+void RequestInput(struct InstData *data)
 {
   ENTER();
 
-  if(!(data->scrollaction || (data->mousemove)))
+  if(data->scrollaction == FALSE && data->mousemove == FALSE)
     DoMethod(_app(data->object), MUIM_Application_AddInputHandler, &data->ihnode);
 
   LEAVE();
@@ -114,11 +112,11 @@ void  RequestInput(struct InstData *data)
 
 ///
 /// RejectInput()
-void  RejectInput(struct InstData *data)
+void RejectInput(struct InstData *data)
 {
   ENTER();
 
-  if(!(data->scrollaction || (data->mousemove)))
+  if(data->scrollaction == FALSE && data->mousemove == FALSE)
     DoMethod(_app(data->object), MUIM_Application_RemInputHandler, &data->ihnode);
 
   LEAVE();
@@ -130,7 +128,7 @@ IPTR New(struct IClass *cl, Object *obj, struct opSet *msg)
 {
   ENTER();
 
-  if((obj = (Object *)DoSuperMethodA(cl, obj, (Msg)msg)))
+  if((obj = (Object *)DoSuperMethodA(cl, obj, (Msg)msg)) != NULL)
   {
     struct InstData *data = INST_DATA(cl, obj);
     data->object = obj;
@@ -160,13 +158,13 @@ IPTR New(struct IClass *cl, Object *obj, struct opSet *msg)
             data->WrapMode = MUIV_TextEditor_WrapMode_HardWrap;
 
             data->ExportHook = &ExportHookPlain;
-            data->flags |= FLG_AutoClip;
-            data->flags |= FLG_ActiveOnClick;
+            setFlag(data->flags, FLG_AutoClip);
+            setFlag(data->flags, FLG_ActiveOnClick);
 
             if(FindTagItem(MUIA_Background, msg->ops_AttrList))
-              data->flags |= FLG_OwnBkgn;
+              setFlag(data->flags, FLG_OwnBackground);
             if(FindTagItem(MUIA_Frame, msg->ops_AttrList))
-              data->flags |= FLG_OwnFrame;
+              setFlag(data->flags, FLG_OwnFrame);
 
             // initialize our temporary rastport
             InitRastPort(&data->tmprp);
@@ -236,7 +234,7 @@ IPTR Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
   {
     // disable that the object will automatically get a border when
     // the ActiveObjectOnClick option is active
-    if((data->flags & FLG_ActiveOnClick) != 0)
+    if(isFlagSet(data->flags, FLG_ActiveOnClick))
       _flags(obj) |= (1<<7);
 
     // now we check whether we have a valid font or not
@@ -269,7 +267,7 @@ IPTR Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
       // setup the selection pointer
       if(data->selectPointer == TRUE)
       {
-        data->ehnode.ehn_Events  |= IDCMP_MOUSEMOVE;
+        setFlag(data->ehnode.ehn_Events, IDCMP_MOUSEMOVE);
         SetupSelectPointer(data);
       }
 
@@ -281,7 +279,7 @@ IPTR Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
       DoMethod(_win(obj), MUIM_Window_AddEventHandler, &data->ehnode);
 
       data->smooth_wait = 0;
-      data->scrollaction      = FALSE;
+      data->scrollaction = FALSE;
 
       RETURN(TRUE);
       return(TRUE);
@@ -311,10 +309,10 @@ IPTR Cleanup(struct IClass *cl, Object *obj, Msg msg)
 
   // enable that the object will automatically get a border when
   // the ActiveObjectOnClick option is active
-  if((data->flags & FLG_ActiveOnClick) != 0)
+  if(isFlagSet(data->flags, FLG_ActiveOnClick))
     _flags(obj) &= ~(1<<7);
 
-  if(data->mousemove)
+  if(data->mousemove == TRUE)
   {
     data->mousemove = FALSE;
     RejectInput(data);
@@ -410,9 +408,9 @@ IPTR Show(struct IClass *cl, Object *obj, Msg msg)
   data->realypos    = data->ypos;
 
   line = data->firstline;
-  while(line)
+  while(line != NULL)
   {
-      LONG c;
+    LONG c;
 
     c = VisualHeight(line, data);
     lines += c;
@@ -421,11 +419,11 @@ IPTR Show(struct IClass *cl, Object *obj, Msg msg)
   }
   data->totallines = lines;
 
-  data->shown   = TRUE;
-  data->update  = FALSE;
+  data->shown = TRUE;
+  data->update = FALSE;
   ScrollIntoDisplay(data);
-  data->update  = TRUE;
-  data->shown   = FALSE;
+  data->update = TRUE;
+  data->shown = FALSE;
 
   SetAttrs(obj, MUIA_TextEditor_Prop_DeltaFactor, data->height,
             MUIA_TextEditor_Prop_Entries,
@@ -453,7 +451,7 @@ IPTR Show(struct IClass *cl, Object *obj, Msg msg)
   InitRastPort(&data->tmprp);
   SetFont(&data->tmprp, data->font);
 
-  set(data->SuggestWindow, MUIA_Window_Open, (data->flags & FLG_PopWindow ? TRUE : FALSE));
+  set(data->SuggestWindow, MUIA_Window_Open, isFlagSet(data->flags, FLG_PopWindow));
 
   data->shown = TRUE;
 
@@ -494,14 +492,14 @@ IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 
   DoSuperMethodA(cl, obj, (Msg)msg);
 
-  if(msg->flags & MADF_DRAWUPDATE && data->UpdateInfo)
+  if(isFlagSet(msg->flags, MADF_DRAWUPDATE) && data->UpdateInfo != NULL)
   {
-    data->flags |= FLG_Draw;
+    setFlag(data->flags, FLG_Draw);
     data->UpdateInfo = (APTR)_Dispatcher(cl, obj, (Msg)data->UpdateInfo);
-    data->flags &= ~FLG_Draw;
+    clearFlag(data->flags, FLG_Draw);
   }
 
-  if(msg->flags & MADF_DRAWOBJECT)
+  if(isFlagSet(msg->flags, MADF_DRAWOBJECT))
   {
     struct MUI_AreaData *ad = muiAreaData(obj);
 
@@ -524,7 +522,7 @@ IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 
     // make sure we ghost out the whole area in case
     // the gadget was flagged as being ghosted.
-    if(data->flags & FLG_Ghosted)
+    if(isFlagSet(data->flags, FLG_Ghosted))
     {
       UWORD *oldPattern = (UWORD *)data->rport->AreaPtrn;
       UBYTE oldSize = data->rport->AreaPtSz;
@@ -593,7 +591,7 @@ DISPATCHER(_Dispatcher)
 
 //  D(DBF_STARTUP, "cont...");
 
-  if(data->shown && !(data->flags & FLG_Draw))
+  if(data->shown == TRUE && isFlagClear(data->flags, FLG_Draw))
   {
     switch(msg->MethodID)
     {
@@ -666,18 +664,19 @@ DISPATCHER(_Dispatcher)
 
       // set the gadgets flags to active and also "activated" so that
       // other functions know that the gadget was activated recently.
-      data->flags |= (FLG_Active | FLG_Activated);
+      setFlag(data->flags, FLG_Active);
+      setFlag(data->flags, FLG_Activated);
 
-      if(data->shown)
+      if(data->shown == TRUE)
       {
         SetCursor(data->CPos_X, data->actualline, TRUE, data);
 
         // in case we ought to show a selected area in a different
         // color than in inactive state we call MarkText()
-        if((data->flags & FLG_ActiveOnClick) && Enabled(data))
+        if(isFlagSet(data->flags, FLG_ActiveOnClick) && Enabled(data))
           MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
 
-        if((data->flags & FLG_ReadOnly) == 0)
+        if(isFlagClear(data->flags, FLG_ReadOnly))
           set(_win(obj), MUIA_Window_DisableKeys, MUIKEYF_GADGET_NEXT);
       }
 
@@ -701,19 +700,19 @@ DISPATCHER(_Dispatcher)
       D(DBF_STARTUP, "MUIM_GoInActive");
 
       // clear the active and activated flag so that others know about it
-      data->flags &= ~FLG_Active;
-      data->flags &= ~FLG_Activated;
+      clearFlag(data->flags, FLG_Active);
+      clearFlag(data->flags, FLG_Activated);
 
-      if(data->shown)
+      if(data->shown == TRUE)
         set(_win(obj), MUIA_Window_DisableKeys, 0L);
 
-      if(data->mousemove)
+      if(data->mousemove == TRUE)
       {
         data->mousemove = FALSE;
         RejectInput(data);
       }
 
-      if(data->scrollaction)
+      if(data->scrollaction == TRUE)
         data->smooth_wait = 1;
 
       if(data->BlinkSpeed == 2)
@@ -726,7 +725,7 @@ DISPATCHER(_Dispatcher)
 
       // in case we ought to show a selected area in a different
       // color than in inactive state we call MarkText()
-      if((data->flags & FLG_ActiveOnClick) && Enabled(data))
+      if(isFlagSet(data->flags, FLG_ActiveOnClick) && Enabled(data))
         MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
 
       result = DoSuperMethodA(cl, obj, msg);
@@ -890,4 +889,3 @@ DISPATCHER(_Dispatcher)
 }
 
 ///
-

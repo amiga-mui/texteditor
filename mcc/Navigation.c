@@ -198,7 +198,7 @@ void  GoPreviousPage (struct InstData *data)
 {
   ENTER();
 
-  if(data->shown)
+  if(data->shown == TRUE)
   {
     OffsetToLines(data->CPos_X, data->actualline, &pos, data);
     if(!data->pixel_x)
@@ -252,7 +252,7 @@ void  GoUp  (struct InstData *data)
 {
   ENTER();
 
-  if(data->shown)
+  if(data->shown == TRUE)
   {
     OffsetToLines(data->CPos_X, data->actualline, &pos, data);
     if(!data->pixel_x)
@@ -323,7 +323,7 @@ void  GoNextPage  (struct InstData *data)
 {
   ENTER();
 
-  if(data->shown)
+  if(data->shown == TRUE)
   {
     OffsetToLines(data->CPos_X, data->actualline, &pos, data);
     if(!data->pixel_x)
@@ -368,7 +368,7 @@ void  GoDown   (struct InstData *data)
 {
   ENTER();
 
-  if(data->shown)
+  if(data->shown == TRUE)
   {
     OffsetToLines(data->CPos_X, data->actualline, &pos, data);
     if(!data->pixel_x)
@@ -407,7 +407,7 @@ void  GoEndOfLine (struct InstData *data)
 {
   ENTER();
 
-  if(data->shown)
+  if(data->shown == TRUE)
   {
     LONG c;
     OffsetToLines(data->CPos_X, data->actualline, &pos, data);
@@ -498,7 +498,7 @@ void  GoStartOfLine  (struct InstData *data)
 {
   ENTER();
 
-  if(data->shown)
+  if(data->shown == TRUE)
   {
     OffsetToLines  (data->CPos_X, data->actualline, &pos, data);
     data->CPos_X = pos.bytes;
