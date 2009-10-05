@@ -7,6 +7,9 @@ $URL$
 
 2009-10-05 Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcp/CreatePrefsGroup.c: removed the "+-5" part from the undo level slider,
+    because the new Undo/Redo management doesn't need these additional steps
+    anymore.
   * mcc/UndoFunctions.c: reimplemented the complete Undo/Redo handling from
     scratch. Before lots of temporary pointers were used and had to be kept in
     sync, which most probably did not always happen. It is really amazing how
