@@ -192,7 +192,7 @@ ULONG ToggleCursor (struct InstData *data)
 {
   ENTER();
 
-  if(data->flags & FLG_Active)
+  if(isFlagSet(data->flags, FLG_Active))
   {
     if(data->cursor_shown)
     {
@@ -218,15 +218,16 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
 
   ENTER();
 
-  if(data->smooth_wait == 1 && data->scrollaction)
+  if(data->smooth_wait == 1 && data->scrollaction == TRUE)
   {
     if(data->ypos != data->realypos)
     {
         LONG  move;
 
       if(data->scr_direction)
-          move = data->height-(data->realypos-data->ypos);
-      else  move = -(data->realypos-data->ypos);
+        move = data->height-(data->realypos-data->ypos);
+      else
+        move = -(data->realypos-data->ypos);
 
       if(move != 1 && move != -1)
         move  = (move*2)/3;
@@ -238,14 +239,14 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
       data->scrollaction = FALSE;
       RejectInput(data);
 
-      if(data->flags & FLG_Active)
+      if(isFlagSet(data->flags, FLG_Active))
       {
         SetCursor(data->CPos_X, data->actualline, TRUE, data);
       }
     }
   }
 
-  if(data->mousemove)
+  if(data->mousemove == TRUE)
   {
     LONG MouseX = muiRenderInfo(data->object)->mri_Window->MouseX;
     LONG MouseY = muiRenderInfo(data->object)->mri_Window->MouseY;
@@ -482,7 +483,7 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL movecursor)
     if(tvisual_y < 0)
       tvisual_y = 0;
 
-    if(!(data->flags & FLG_Quiet))
+    if(isFlagClear(data->flags, FLG_Active))
     {
       SetCursor(data->CPos_X, line, FALSE, data);
       if(data->blockinfo.enabled)

@@ -84,11 +84,11 @@ IPTR Get(struct IClass *cl, Object *obj, struct opGet *msg)
     break;
 
     case MUIA_TextEditor_ActiveObjectOnClick:
-      ti_Data = ((data->flags & FLG_ActiveOnClick) ? TRUE : FALSE);
+      ti_Data = isFlagSet(data->flags, FLG_ActiveOnClick);
     break;
 
     case MUIA_TextEditor_AutoClip:
-      ti_Data = ((data->flags & FLG_AutoClip) ? TRUE : FALSE);
+      ti_Data = isFlagSet(data->flags, FLG_AutoClip);
     break;
 
     case MUIA_TextEditor_KeyUpFocus:
@@ -135,7 +135,7 @@ IPTR Get(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = data->HasChanged;
       break;
     case MUIA_TextEditor_HorizontalScroll:
-      ti_Data = ((data->flags & FLG_HScroll) ? TRUE : FALSE);
+      ti_Data = isFlagSet(data->flags, FLG_HScroll);
       break;
     case MUIA_TextEditor_ImportWrap:
       ti_Data = data->ImportWrap;
@@ -157,10 +157,10 @@ IPTR Get(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = (data->visual_y-1)*data->height;
       break;
     case MUIA_TextEditor_ReadOnly:
-      ti_Data = ((data->flags & FLG_ReadOnly) ? TRUE : FALSE);
+      ti_Data = isFlagSet(data->flags, FLG_ReadOnly);
       break;
     case MUIA_TextEditor_Quiet:
-      ti_Data = ((data->flags & FLG_Quiet) ? TRUE : FALSE);
+      ti_Data = isFlagSet(data->flags, FLG_Quiet);
       break;
     case MUIA_TextEditor_StyleBold:
       ti_Data = ((GetStyle(data->CPos_X, data->actualline) & BOLD) ? TRUE : FALSE);
@@ -213,13 +213,14 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
 
   ENTER();
 
-  if(data->shown && !(data->flags & FLG_Draw))
+  if(data->shown == TRUE && isFlagClear(data->flags, FLG_Draw))
   {
-    if((tag = FindTagItem(MUIA_Disabled, msg->ops_AttrList)))
+    if((tag = FindTagItem(MUIA_Disabled, msg->ops_AttrList)) != NULL)
     {
       if(tag->ti_Data)
-          data->flags |= FLG_Ghosted;
-      else  data->flags &= ~FLG_Ghosted;
+        setFlag(data->flags, FLG_Ghosted);
+      else
+        clearFlag(data->flags, FLG_Ghosted);
     }
     data->UpdateInfo = msg;
     MUI_Redraw(obj, MADF_DRAWUPDATE);
@@ -241,12 +242,12 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_Disabled:
         if(ti_Data)
-          data->flags |= FLG_Ghosted;
+          setFlag(data->flags, FLG_Ghosted);
         else
-          data->flags &= ~FLG_Ghosted;
+          clearFlag(data->flags, FLG_Ghosted);
 
         // make sure an eventually existing slider is disabled as well
-        if(data->slider)
+        if(data->slider != NULL)
           set(data->slider, MUIA_Disabled, ti_Data);
 
         MUI_Redraw(obj, MADF_DRAWOBJECT);
@@ -262,9 +263,9 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_TextEditor_AutoClip:
         if(ti_Data)
-          data->flags |= FLG_AutoClip;
+          setFlag(data->flags, FLG_AutoClip);
         else
-          data->flags &= ~FLG_AutoClip;
+          setFlag(data->flags, FLG_AutoClip);
       break;
 
       case MUIA_TextEditor_ColorMap:
@@ -272,18 +273,18 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
         break;
       case MUIA_TextEditor_InVirtualGroup:
         if(ti_Data)
-          data->flags |= FLG_InVGrp;
+          setFlag(data->flags, FLG_InVGrp);
         else
-          data->flags &= ~FLG_InVGrp;
+          clearFlag(data->flags, FLG_InVGrp);
         break;
 
       case MUIA_TextEditor_CursorX:
-        if(!data->NoNotify)
+        if(data->NoNotify == FALSE)
           crsr_x = ti_Data;
         break;
 
       case MUIA_TextEditor_CursorY:
-        if(!data->NoNotify)
+        if(data->NoNotify == FALSE)
           crsr_y = ti_Data;
         break;
 
@@ -293,7 +294,7 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_TextEditor_Prop_First:
       {
-        if(((data->visual_y-1)*data->height+(data->realypos - data->ypos) != (LONG)ti_Data) && (data->shown))
+        if(((data->visual_y-1)*data->height+(data->realypos - data->ypos) != (LONG)ti_Data) && data->shown == TRUE)
         {
           LONG     diff, smooth;
           LONG     lastpixel = ((data->visual_y-1)*data->height) + (data->realypos - data->ypos);
@@ -373,7 +374,7 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
           MUI_RemoveClipping(muiRenderInfo(data->object), cliphandle);
           InstallLayerHook(data->rport->Layer, oldhook);
 
-          if(!data->scrollaction)
+          if(data->scrollaction == FALSE)
           {
             RequestInput(data);
             data->smooth_wait = 1;
@@ -396,11 +397,11 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
         if(ti_Data)
         {
           SetCursor(data->CPos_X, data->actualline, FALSE, data);
-          data->flags |= FLG_ReadOnly;
+          setFlag(data->flags, FLG_ReadOnly);
 
           // force the activeOnClick to be turned off
           // in case the user explicitly sets the readonly object
-          data->flags &= ~FLG_ActiveOnClick;
+          clearFlag(data->flags, FLG_ActiveOnClick);
 
           // enable that the object will automatically get a border when
           // the ActiveObjectOnClick option is active
@@ -408,16 +409,16 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
         }
         else
         {
-          data->flags &= ~FLG_ReadOnly;
-          if(data->shown)
+          clearFlag(data->flags, FLG_ReadOnly);
+          if(data->shown == TRUE)
           {
-            if(data->flags & FLG_Active)
+            if(isFlagSet(data->flags, FLG_Active))
               SetCursor(data->CPos_X, data->actualline, TRUE, data);
           }
 
           // disable that the object will automatically get a border when
           // the ActiveObjectOnClick option is active
-          if((data->flags & FLG_ActiveOnClick) != 0)
+          if(isFlagSet(data->flags, FLG_ActiveOnClick))
             _flags(obj) |= (1<<7);
         }
       }
@@ -427,7 +428,7 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
       {
         if(ti_Data)
         {
-          data->flags |=  FLG_ActiveOnClick;
+          setFlag(data->flags, FLG_ActiveOnClick);
 
           // disable that the object will automatically get a border when
           // the ActiveObjectOnClick option is active
@@ -435,7 +436,7 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
         }
         else
         {
-          data->flags &= ~FLG_ActiveOnClick;
+          clearFlag(data->flags, FLG_ActiveOnClick);
 
           // enable that the object will automatically get a border when
           // the ActiveObjectOnClick option is active
@@ -447,20 +448,20 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
       case MUIA_TextEditor_PopWindow_Open:
       {
         if(ti_Data)
-          data->flags |=  FLG_PopWindow;
+          setFlag(data->flags, FLG_PopWindow);
         else
-          data->flags &= ~FLG_PopWindow;
+          clearFlag(data->flags, FLG_PopWindow);
       }
       break;
 
       case MUIA_TextEditor_Quiet:
         if(ti_Data)
         {
-          data->flags |= FLG_Quiet;
+          setFlag(data->flags, FLG_Quiet);
         }
         else
         {
-          data->flags &= ~FLG_Quiet;
+          clearFlag(data->flags, FLG_Quiet);
           MUI_Redraw(obj, MADF_DRAWOBJECT);
           if(data->maxlines > data->totallines)
             set(data->object, MUIA_TextEditor_Prop_Entries, data->maxlines*data->height);
@@ -483,7 +484,7 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
         break;
 
       case MUIA_TextEditor_Pen:
-        if(!data->NoNotify)
+        if(data->NoNotify == FALSE)
         {
           data->Pen = ti_Data;
           AddColor(&data->blockinfo, (UWORD)ti_Data, data);
@@ -497,13 +498,13 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_TextEditor_Slider:
       {
-        if(!data->shown)
+        if(data->shown == FALSE)
         {
           data->slider = (void *)ti_Data;
 
           // disable the slider right away if the texteditor
           // gadget is disabled as well.
-          if(data->flags & FLG_Ghosted)
+          if(isFlagSet(data->flags, FLG_Ghosted))
             set(data->slider, MUIA_Disabled, TRUE);
 
           DoMethod(data->slider, MUIM_Notify,
@@ -530,7 +531,7 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_TextEditor_FixedFont:
         {
-          if(!data->shown)
+          if(data->shown == FALSE)
           {
             if(ti_Data)
             {
@@ -556,15 +557,15 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_TextEditor_HasChanged:
         data->HasChanged = ti_Data;
-        if(!ti_Data)
-          data->flags &= ~FLG_UndoLost;
+        if(ti_Data == FALSE)
+          clearFlag(data->flags, FLG_UndoLost);
         break;
 
       case MUIA_TextEditor_HorizontalScroll:
         if(ti_Data)
-          data->flags |=  FLG_HScroll;
+          setFlag(data->flags, FLG_HScroll);
         else
-          data->flags &= ~FLG_HScroll;
+          clearFlag(data->flags, FLG_HScroll);
         break;
 
       case MUIA_TextEditor_Contents:
@@ -622,7 +623,7 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
         break;
 
       case MUIA_TextEditor_Flow:
-        if(!data->NoNotify)
+        if(data->NoNotify == FALSE)
         {
           LONG    start, lines = 0;
 

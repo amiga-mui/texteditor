@@ -171,12 +171,14 @@ void ServerWriteInfo(IPTR session, struct line_node *line)
     SHOWVALUE(DBF_CLIPBOARD, error);
   }
 
-  if(line->line.Color)
+  if(line->line.Highlight == TRUE)
   {
+    UWORD uwordBool = TRUE;
+
     D(DBF_CLIPBOARD, "writing HIGH");
     error = PushChunk(iff, 0, ID_HIGH, IFFSIZE_UNKNOWN);
     SHOWVALUE(DBF_CLIPBOARD, error);
-    error = WriteChunkBytes(iff, &line->line.Color, 2);
+    error = WriteChunkBytes(iff, &uwordBool, sizeof(uwordBool));
     SHOWVALUE(DBF_CLIPBOARD, error);
     error = PopChunk(iff);
     SHOWVALUE(DBF_CLIPBOARD, error);
@@ -401,7 +403,7 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
   STRPTR textline;
   LONG codeset = 0;
   UWORD flow = MUIV_TextEditor_Flow_Left;
-  UWORD color = FALSE;
+  BOOL highlight = FALSE;
   UWORD separator = 0;
   LONG error;
   BOOL lineFinished = FALSE;
@@ -428,7 +430,7 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
         {
           D(DBF_CLIPBOARD, "reading CSET");
           SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
-          if(cn->cn_Size >= 4)
+          if(cn->cn_Size >= (LONG)sizeof(codeset))
           {
             /* Only the first four bytes are interesting */
             if(ReadChunkBytes(iff, &codeset, 4) != 4)
@@ -444,9 +446,9 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
         {
           D(DBF_CLIPBOARD, "reading FLOW");
           SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
-          if(cn->cn_Size == 2)
+          if(cn->cn_Size >= (LONG)sizeof(flow))
           {
-            if(ReadChunkBytes(iff, &flow, 2) == 2)
+            if(ReadChunkBytes(iff, &flow, sizeof(flow)) == 2)
               if(flow > MUIV_TextEditor_Flow_Right)
                 flow = MUIV_TextEditor_Flow_Left;
             SHOWVALUE(DBF_CLIPBOARD, flow);
@@ -456,12 +458,15 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
 
         case ID_HIGH:
         {
+          UWORD uwordBool;
+
           D(DBF_CLIPBOARD, "reading HIGH");
           SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
-          if (cn->cn_Size == 2)
+          if(cn->cn_Size >= (LONG)sizeof(uwordBool))
           {
-            error = ReadChunkBytes(iff, &color, 2);
-            SHOWVALUE(DBF_CLIPBOARD, color);
+            error = ReadChunkBytes(iff, &uwordBool, 2);
+            highlight = (uwordBool != 0) ? TRUE : FALSE;
+            SHOWVALUE(DBF_CLIPBOARD, highlight);
             SHOWVALUE(DBF_CLIPBOARD, error);
           }
         }
@@ -471,7 +476,7 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
         {
           D(DBF_CLIPBOARD, "reading SBAR");
           SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
-          if (cn->cn_Size == 2)
+          if (cn->cn_Size >= (LONG)sizeof(separator))
           {
             error = ReadChunkBytes(iff, &separator, 2);
             SHOWVALUE(DBF_CLIPBOARD, separator);
@@ -551,7 +556,7 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
               line->previous = NULL;
               line->line.Contents = textline;
               line->line.Length = length;
-              line->line.Color = color;
+              line->line.Highlight = highlight;
               line->line.Flow = flow;
               line->line.Separator = separator;
               line->line.Styles = styles;
@@ -574,12 +579,12 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
                 MyFree(colors);
             }
 
-            styles    = NULL;
+            styles = NULL;
             allocatedStyles = 0;
-            colors    = NULL;
+            colors = NULL;
             allocatedColors = 0;
-            flow      = MUIV_TextEditor_Flow_Left;
-            color     = FALSE;
+            flow = MUIV_TextEditor_Flow_Left;
+            highlight = FALSE;
             separator = 0;
           }
         }

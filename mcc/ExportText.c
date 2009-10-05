@@ -49,7 +49,7 @@ void *ExportText(UNUSED struct MUIP_TextEditor_ExportText *msg, struct InstData 
     emsg.Length = node->line.Length;
     emsg.Styles = node->line.Styles;
     emsg.Colors = node->line.Colors;
-    emsg.Highlight = node->line.Color;
+    emsg.Highlight = node->line.Highlight;
     emsg.Flow = node->line.Flow;
     emsg.Separator = node->line.Separator;
     emsg.ExportWrap = wraplen;
@@ -72,4 +72,3 @@ void *ExportText(UNUSED struct MUIP_TextEditor_ExportText *msg, struct InstData 
 }
 
 ///
-

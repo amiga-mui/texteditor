@@ -28,25 +28,50 @@
 #include "private.h"
 
 /// convert()
-ULONG convert(ULONG style)
+ULONG convert(UWORD style)
 {
-    unsigned long result = FS_NORMAL;
+  ULONG result = FS_NORMAL;
 
-  if(style & BOLD)
-    result |= FSF_BOLD;
-  if(style & ITALIC)
-    result |= FSF_ITALIC;
-  if(style & UNDERLINE)
-    result |= FSF_UNDERLINED;
+  ENTER();
 
+  if(isFlagSet(style, BOLD))
+    setFlag(result, FSF_BOLD);
+  if(isFlagSet(style, ITALIC))
+    setFlag(result, FSF_ITALIC);
+  if(isFlagSet(style, UNDERLINE))
+    setFlag(result, FSF_UNDERLINED);
+
+  RETURN(result);
   return(result);
 }
 
 ///
 /// ConvertPen()
-ULONG ConvertPen (UWORD color, BOOL highlight, struct InstData *data)
+ULONG ConvertPen(UWORD color, BOOL highlight, struct InstData *data)
 {
-  return(color ? (ULONG)(data->colormap ? (ULONG)data->colormap[color-1] : (ULONG)((color <= 8) ? _pens(data->object)[color-1] : color-9)) : (ULONG)(highlight ? (ULONG)data->highlightcolor : (ULONG)data->textcolor));
+  ULONG pen;
+
+  ENTER();
+
+  if(color != 0)
+  {
+    if(data->colormap != NULL)
+      pen = data->colormap[color-1];
+    else if(color <= 8)
+      pen = _pens(data->object)[color-1];
+    else
+      pen = color-9;
+  }
+  else
+  {
+    if(highlight == TRUE)
+      pen = data->highlightcolor;
+    else
+      pen = data->textcolor;
+  }
+
+  RETURN(pen);
+  return pen;
 }
 
 ///
@@ -79,12 +104,12 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
 
   ENTER();
 
-  length  = LineCharsWidth(text+x, data);
+  length = LineCharsWidth(text+x, data);
 
   if(doublebuffer == FALSE)
     rp = &data->copyrp;
 
-  if((line_nr > 0) && (data->update) && !(data->flags & FLG_Quiet) && data->rport != NULL && data->shown == TRUE)
+  if(line_nr > 0 && data->update == TRUE && isFlagClear(data->flags, FLG_Quiet) && data->rport != NULL && data->shown == TRUE)
   {
     LONG c_length = length;
     LONG startx = 0, stopx = 0;
@@ -95,8 +120,8 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
     struct marking block;
     BOOL cursor = FALSE;
 
-    if(line->line.Color && x == 0 && line->line.Length == 1)
-      line->line.Color = FALSE;
+    if(line->line.Highlight == TRUE && x == 0 && line->line.Length == 1)
+      line->line.Highlight = FALSE;
 
     if(doublebuffer == FALSE)
     {
@@ -165,10 +190,13 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
 
         blockwidth = ((stopx >= c_length+x) ? data->innerwidth-(blockstart+flow) : TextLength(&data->tmprp, text+startx, stopx-startx));
       }
-      else if(!(data->flags & (FLG_ReadOnly | FLG_Ghosted)) &&
-              line == data->actualline && data->CPos_X >= x &&
-              data->CPos_X < x+c_length && !Enabled(data) &&
-              (data->flags & FLG_Active || data->inactiveCursor == TRUE))
+      else if(isFlagClear(data->flags, FLG_ReadOnly) &&
+              isFlagClear(data->flags, FLG_Ghosted) &&
+              line == data->actualline &&
+              data->CPos_X >= x &&
+              data->CPos_X < x+c_length &&
+              !Enabled(data) &&
+              (isFlagSet(data->flags, FLG_Active) || data->inactiveCursor == TRUE))
       {
         cursor = TRUE;
         blockstart = TextLength(&data->tmprp, text+x, data->CPos_X-x);
@@ -187,8 +215,8 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       // clear the background first
       DoMethod(data->object, MUIM_DrawBackground, xoffset, starty,
                                                   flow+blockstart, data->height,
-                                                  (data->flags & FLG_InVGrp) ? 0 : data->xpos,
-                                                  (data->flags & FLG_InVGrp) ? data->height*(data->visual_y+line_nr-2) : data->realypos+data->height * (data->visual_y+line_nr-2),
+                                                  isFlagSet(data->flags, FLG_InVGrp) ? 0 : data->xpos,
+                                                  isFlagSet(data->flags, FLG_InVGrp) ? data->height*(data->visual_y+line_nr-2) : data->realypos+data->height * (data->visual_y+line_nr-2),
                                                   0);
 
       if(blockwidth)
@@ -197,8 +225,9 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
 
         // in case the gadget is in inactive state we use a different background
         // color for our selected area
-        if((data->flags & FLG_Active) == 0 && (data->flags & FLG_Activated) == 0 &&
-           (data->flags & FLG_ActiveOnClick) != 0)
+        if(isFlagClear(data->flags, FLG_Active) &&
+           isFlagClear(data->flags, FLG_Activated) &&
+           isFlagSet(data->flags, FLG_ActiveOnClick))
         {
           color = data->inactivecolor;
         }
@@ -226,12 +255,13 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
 
           // if the gadget is in inactive state we just draw a skeleton cursor instead
           if(cursor == TRUE &&
-             (data->flags & FLG_Active) == 0 && (data->flags & FLG_Activated) == 0)
+             isFlagClear(data->flags, FLG_Active) &&
+             isFlagClear(data->flags, FLG_Activated))
           {
             DoMethod(data->object, MUIM_DrawBackground, xoffset+flow+blockstart+1, starty+1,
                                                         blockwidth-2, data->height-2,
-                                                        (data->flags & FLG_InVGrp) ? 0 : data->xpos,
-                                                        (data->flags & FLG_InVGrp) ? data->height*(data->visual_y+line_nr-2) : data->realypos+data->height * (data->visual_y+line_nr-2),
+                                                        isFlagSet(data->flags, FLG_InVGrp) ? 0 : data->xpos,
+                                                        isFlagSet(data->flags, FLG_InVGrp) ? data->height*(data->visual_y+line_nr-2) : data->realypos+data->height * (data->visual_y+line_nr-2),
                                                         0);
           }
         }
@@ -252,7 +282,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
           x_width -= flow;
           x_ptrn += flow;
         }
-        if(!(data->flags & FLG_InVGrp))
+        if(isFlagClear(data->flags, FLG_InVGrp))
         {
           x_ptrn += data->xpos;
           y_ptrn += data->realypos;
@@ -266,7 +296,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
     if(doublebuffer == FALSE)
       AddClipping(data);
 
-    SetAPen(rp, (line->line.Color ? data->highlightcolor : data->textcolor));
+    SetAPen(rp, (line->line.Highlight ? data->highlightcolor : data->textcolor));
 
     while(c_length)
     {
@@ -286,7 +316,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       {
         while(colors->column-1 <= x)
         {
-          SetAPen(rp, ConvertPen(colors->color, line->line.Color, data));
+          SetAPen(rp, ConvertPen(colors->color, line->line.Highlight, data));
           colors++;
         }
 
@@ -357,7 +387,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
     }
 
 
-    if(data->flags & FLG_Ghosted)
+    if(isFlagSet(data->flags, FLG_Ghosted))
     {
       UWORD *oldPattern = (UWORD *)rp->AreaPtrn;
       UBYTE oldSize = rp->AreaPtSz;
@@ -425,7 +455,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
     }
   }
 
-  if(data->flags & FLG_HScroll)
+  if(isFlagSet(data->flags, FLG_HScroll))
     length = line->line.Length;
 
   RETURN(length);
@@ -433,4 +463,3 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
 }
 
 ///
-

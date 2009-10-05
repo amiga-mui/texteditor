@@ -113,6 +113,7 @@ BOOL Undo(struct InstData *data)
         buffer->del.style = GetStyle(data->CPos_X, data->actualline);
         buffer->del.flow = data->actualline->line.Flow;
         buffer->del.separator = data->actualline->line.Separator;
+        #warning is buffer->del.highlight missing here?
         RemoveChars(data->CPos_X, data->actualline, 1, data);
       }
       break;
@@ -429,7 +430,7 @@ BOOL AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData 
       case ET_BACKSPACEMERGE:
       case ET_MERGELINES:
       {
-        buffer->del.style = data->actualline->next->line.Color;
+        buffer->del.highlight = data->actualline->next->line.Highlight;
         buffer->del.flow = data->actualline->next->line.Flow;
         buffer->del.separator = data->actualline->next->line.Separator;
       }
@@ -442,6 +443,7 @@ BOOL AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData 
         buffer->del.style = GetStyle(data->CPos_X, data->actualline);
         buffer->del.flow = data->actualline->line.Flow;
         buffer->del.separator = data->actualline->line.Separator;
+        #warning is buffer->del.highlight missing here?
       }
       break;
 

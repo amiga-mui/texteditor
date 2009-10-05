@@ -78,19 +78,23 @@ IPTR HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
   ENTER();
 
   // check if the gadget was activate recently (via TAB key?)
-  wasActivated = (data->flags & FLG_Activated) == FLG_Activated;
-  data->flags &= ~FLG_Activated; // clear the activated flag immediately
+  wasActivated = isFlagSet(data->flags, FLG_Activated);
+  // clear the activated flag immediately
+  clearFlag(data->flags, FLG_Activated);
 
-  if((msg->muikey == MUIKEY_UP) && data->KeyUpFocus && _win(obj) && (data->firstline == data->actualline))
+  if(msg->muikey == MUIKEY_UP && data->KeyUpFocus && _win(obj) && data->firstline == data->actualline)
   {
     set(_win(obj), MUIA_Window_ActiveObject, data->KeyUpFocus);
 
     RETURN(MUI_EventHandlerRC_Eat);
     return MUI_EventHandlerRC_Eat;
   }
-  else if(!(data->flags & FLG_Ghosted) && data->shown && msg->imsg &&
-          (msg->muikey != MUIKEY_GADGET_PREV) && (msg->muikey != MUIKEY_GADGET_NEXT) && // if the user moves to another obj with TAB
-          (msg->muikey != MUIKEY_GADGET_OFF)) // user deselected gadget with CTRL+TAB
+  else if(isFlagClear(data->flags, FLG_Ghosted) &&
+          data->shown == TRUE &&
+          msg->imsg != NULL &&
+          msg->muikey != MUIKEY_GADGET_PREV &&
+          msg->muikey != MUIKEY_GADGET_NEXT && // if the user moves to another obj with TAB
+          msg->muikey != MUIKEY_GADGET_OFF) // user deselected gadget with CTRL+TAB
   {
     Object *activeobj;
     Object *defaultobj;
@@ -147,18 +151,18 @@ IPTR HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
     }
     else
     #if defined(__amigaos4__)
-    if((imsg->Class == IDCMP_MOUSEBUTTONS) || (activeobj == obj) ||
-       (data->flags & FLG_ReadOnly && defaultobj == obj && !activeobj) ||
-       (imsg->Class == IDCMP_EXTENDEDMOUSE && imsg->Code & IMSGCODE_INTUIWHEELDATA))
+    if(imsg->Class == IDCMP_MOUSEBUTTONS ||
+       activeobj == obj ||
+       (isFlagSet(data->flags, FLG_ReadOnly) && defaultobj == obj && activeobj == NULL) ||
+       (imsg->Class == IDCMP_EXTENDEDMOUSE && isFlagSet(imsg->Code, IMSGCODE_INTUIWHEELDATA)))
     #else
-    if((imsg->Class == IDCMP_MOUSEBUTTONS) || (activeobj == obj) ||
-       (data->flags & FLG_ReadOnly && defaultobj == obj && !activeobj) ||
-       (imsg->Class == IDCMP_RAWKEY &&
-        (imsg->Code == NM_WHEEL_UP || imsg->Code == NM_WHEEL_DOWN ||
-         imsg->Code == NM_WHEEL_LEFT || imsg->Code == NM_WHEEL_RIGHT)))
+    if(imsg->Class == IDCMP_MOUSEBUTTONS ||
+       activeobj == obj ||
+       (isFlagSet(data->flags, FLG_ReadOnly) && defaultobj == obj && activeobj == NULL) ||
+       (imsg->Class == IDCMP_RAWKEY && (imsg->Code == NM_WHEEL_UP || imsg->Code == NM_WHEEL_DOWN || imsg->Code == NM_WHEEL_LEFT || imsg->Code == NM_WHEEL_RIGHT)))
     #endif
     {
-      if(!(data->flags & FLG_Draw))
+      if(isFlagClear(data->flags, FLG_Draw))
       {
         data->UpdateInfo = msg;
         MUI_Redraw(obj, MADF_DRAWUPDATE);
@@ -276,12 +280,12 @@ IPTR HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
             return(0);
           }
 
-          if((imsg->Code == (IECODE_LBUTTON | IECODE_UP_PREFIX)) && data->mousemove)
+          if(imsg->Code == (IECODE_LBUTTON | IECODE_UP_PREFIX) && data->mousemove == TRUE)
           {
             data->mousemove = FALSE;
             RejectInput(data);
 
-            if((data->flags & FLG_ReadOnly) && (data->flags & FLG_AutoClip) && Enabled(data))
+            if(isFlagSet(data->flags, FLG_ReadOnly) && isFlagSet(data->flags, FLG_AutoClip) && Enabled(data))
               Key_Copy(data);
           }
           else
@@ -291,13 +295,16 @@ IPTR HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
             {
               struct MUI_AreaData *ad = muiAreaData(obj);
 
-              if(((imsg->MouseX >= ad->mad_Box.Left) &&
-                 (imsg->MouseX <  ad->mad_Box.Left + ad->mad_Box.Width) &&
-                 (imsg->MouseY >= data->ypos) &&
-                 (imsg->MouseY <  data->ypos+(data->maxlines * data->height))))
+              if(imsg->MouseX >= ad->mad_Box.Left &&
+                 imsg->MouseX <  ad->mad_Box.Left + ad->mad_Box.Width &&
+                 imsg->MouseY >= data->ypos &&
+                 imsg->MouseY <  data->ypos+(data->maxlines * data->height))
               {
-                if((data->flags & FLG_Active) == 0 && (data->flags & FLG_Activated) == 0 &&
-                   (data->flags & FLG_ActiveOnClick) != 0 && Enabled(data) && (imsg->Qualifier & IEQUALIFIER_CONTROL))
+                if(isFlagClear(data->flags, FLG_Active) &&
+                   isFlagClear(data->flags, FLG_Activated) &&
+                   isFlagSet(data->flags, FLG_ActiveOnClick) &&
+                   Enabled(data) &&
+                   isFlagSet(imsg->Qualifier, IEQUALIFIER_CONTROL))
                 {
                   // in case the user hold the control key while pressing in an
                   // inactive object we go and just activate it and let the MUIM_GoActive
@@ -312,14 +319,14 @@ IPTR HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                   RequestInput(data);
                   data->mousemove = TRUE;
 
-                  data->flags |= FLG_Activated;
+                  setFlag(data->flags, FLG_Activated);
                   SetCursor(data->CPos_X, data->actualline, FALSE, data);
                   PosFromCursor(imsg->MouseX, imsg->MouseY, data);
 
-                  if(imsg->Qualifier & (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT))
-                    data->selectmode  = 0;
+                  if(isFlagSet(imsg->Qualifier, IEQUALIFIER_LSHIFT) || isFlagSet(imsg->Qualifier, IEQUALIFIER_RSHIFT))
+                    data->selectmode = 0;
 
-                  if(!(data->blockinfo.enabled && (imsg->Qualifier & (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT))))
+                  if(!(data->blockinfo.enabled && (isFlagSet(imsg->Qualifier, IEQUALIFIER_LSHIFT) || isFlagSet(imsg->Qualifier, IEQUALIFIER_RSHIFT))))
                   {
                     // if we already have an enabled block we have to disable it
                     // and clear the marking area with MarkText()
@@ -421,7 +428,7 @@ IPTR HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 
                   SetCursor(data->CPos_X, data->actualline, TRUE, data);
 
-                  if((data->flags & FLG_ActiveOnClick) != 0)
+                  if(isFlagSet(data->flags, FLG_ActiveOnClick))
                     set(_win(obj), MUIA_Window_ActiveObject, obj);
                 }
               }
@@ -521,14 +528,14 @@ void Key_DelSomething(ULONG what, struct InstData *data)
       GoStartOfLine(data);
       break;
     case Del_EOL:
-      data->flags |= FLG_FreezeCrsr;
+      setFlag(data->flags, FLG_FreezeCrsr);
       GoEndOfLine(data);
       break;
     case Del_BOW:
       GoPreviousWord(data);
       break;
     case Del_EOW:
-      data->flags |= FLG_FreezeCrsr;
+      setFlag(data->flags, FLG_FreezeCrsr);
       GoNextWord(data);
       break;
   }
@@ -536,9 +543,11 @@ void Key_DelSomething(ULONG what, struct InstData *data)
   data->blockinfo.stopline = data->actualline;
   data->blockinfo.enabled = TRUE;
   if(Enabled(data))
-      Key_Clear(data);
-  else  data->blockinfo.enabled = FALSE;
-  data->flags &= ~FLG_FreezeCrsr;
+    Key_Clear(data);
+  else
+    data->blockinfo.enabled = FALSE;
+
+  clearFlag(data->flags, FLG_FreezeCrsr);
 
   LEAVE();
 }
@@ -563,16 +572,18 @@ void Key_DelLine(struct InstData *data)
   data->blockinfo.startx = data->CPos_X;
   data->blockinfo.startline = data->actualline;
 
-//  data->flags |= FLG_FreezeCrsr;
+//  setFlag(data->flags, FLG_FreezeCrsr);
   GoEndOfLine(data);
   GoRight(data);
   data->blockinfo.stopx = data->CPos_X;
   data->blockinfo.stopline = data->actualline;
   data->blockinfo.enabled = TRUE;
   if(Enabled(data))
-      Key_Clear(data);
-  else  data->blockinfo.enabled = FALSE;
-//  data->flags &= ~FLG_FreezeCrsr;
+    Key_Clear(data);
+  else
+    data->blockinfo.enabled = FALSE;
+
+//  clearFlag(data->flags, FLG_FreezeCrsr);
 
   LEAVE();
 }
@@ -817,7 +828,7 @@ void Key_Normal(UBYTE key, struct InstData *data)
 
   // check if the user wants to do a direct spell checking while
   // writing some text.
-  if(data->TypeAndSpell && (!IsAlpha(data->mylocale, key)) && key != '-')
+  if(data->TypeAndSpell == TRUE && !IsAlpha(data->mylocale, key) && key != '-')
     CheckWord(data);
 
   // add the pastechar to the undobuffer and paste the current
@@ -994,7 +1005,7 @@ static LONG FindKey(UBYTE key, ULONG qualifier, struct InstData *data)
         return 5;
       }
 
-      if(data->flags & FLG_ReadOnly)
+      if(isFlagSet(data->flags, FLG_ReadOnly))
       {
         LONG new_y = data->visual_y-1;
 
@@ -1306,7 +1317,7 @@ static BOOL ReactOnRawKey(struct IntuiMessage *imsg, struct InstData *data)
     {
       SetCursor(oldCPos_X, oldactualline, FALSE, data);
 
-      if(!(data->flags & FLG_ReadOnly))
+      if(isFlagClear(data->flags, FLG_ReadOnly))
       {
         if(imsg->Qualifier & data->blockqual)
         {
@@ -1323,7 +1334,7 @@ static BOOL ReactOnRawKey(struct IntuiMessage *imsg, struct InstData *data)
         }
         else
         {
-          data->flags &= ~FLG_ARexxMark;
+          clearFlag(data->flags, FLG_ARexxMark);
           if(data->blockinfo.enabled)
           {
             data->blockinfo.enabled = FALSE;
@@ -1342,7 +1353,7 @@ static BOOL ReactOnRawKey(struct IntuiMessage *imsg, struct InstData *data)
   {
     // we execute the ConvertKey() action which in fact will
     // perform the actual key press reaction
-    if((data->flags & FLG_ReadOnly) == 0 && (imsg->Qualifier & IEQUALIFIER_RCOMMAND) == 0)
+    if(isFlagClear(data->flags, FLG_ReadOnly) && isFlagClear(imsg->Qualifier, IEQUALIFIER_RCOMMAND))
       ConvertKey(imsg, data);
     else
       result = FALSE;
@@ -1366,7 +1377,7 @@ void ScrollIntoDisplay(struct InstData *data)
 
   ENTER();
 
-  if(data->shown)
+  if(data->shown == TRUE)
   {
     OffsetToLines(data->CPos_X, data->actualline, &pos, data);
     diff = pos.lines + LineToVisual(data->actualline, data) - 1;

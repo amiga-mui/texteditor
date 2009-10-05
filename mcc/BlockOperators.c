@@ -143,7 +143,7 @@ char *GetBlock(struct marking *block, struct InstData *data)
       emsg.Length = startline->line.Length - startx;
       emsg.Flow = startline->line.Flow;
       emsg.Separator = startline->line.Separator;
-      emsg.Highlight = startline->line.Color;
+      emsg.Highlight = startline->line.Highlight;
       emsg.UserData = (APTR)CallHookA(&ExportHookPlain, NULL, &emsg);
       MyFreePooled(data->mypool, emsg.Contents);
     }
@@ -161,7 +161,7 @@ char *GetBlock(struct marking *block, struct InstData *data)
       emsg.Colors   = act->line.Colors;
       emsg.Flow   = act->line.Flow;
       emsg.Separator = act->line.Separator;
-      emsg.Highlight = act->line.Color;
+      emsg.Highlight = act->line.Highlight;
       emsg.UserData = (APTR)CallHookA(&ExportHookPlain, (APTR)NULL, &emsg);
       act = act->next;
     }
@@ -217,7 +217,7 @@ char *GetBlock(struct marking *block, struct InstData *data)
       emsg.Length = stopx;
       emsg.Flow = stopline->line.Flow;
       emsg.Separator = stopline->line.Separator;
-      emsg.Highlight = stopline->line.Color;
+      emsg.Highlight = stopline->line.Highlight;
       emsg.Last = TRUE;
       text = (STRPTR)CallHookA(&ExportHookPlain, NULL, &emsg);
       MyFreePooled(data->mypool, emsg.Contents);
@@ -302,7 +302,7 @@ char *GetBlock(struct marking *block, struct InstData *data)
       emsg.Length = stopx-startx;
       emsg.Flow = startline->line.Flow;
       emsg.Separator = startline->line.Separator;
-      emsg.Highlight = startline->line.Color;
+      emsg.Highlight = startline->line.Highlight;
       emsg.Last = TRUE;
       text = (STRPTR)CallHookA(&ExportHookPlain, NULL, &emsg);
       MyFreePooled(data->mypool, emsg.Contents);
