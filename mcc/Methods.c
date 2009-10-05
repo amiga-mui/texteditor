@@ -42,11 +42,12 @@ ULONG OM_BlockInfo(struct MUIP_TextEditor_BlockInfo *msg, struct InstData *data)
   if(Enabled(data))
   {
     struct marking newblock;
+
     NiceBlock(&data->blockinfo, &newblock);
-    *(msg->startx)    = newblock.startx;
-    *(msg->stopx)   = newblock.stopx;
-    *(msg->starty)    = LineNr(newblock.startline, data)-1;
-    *(msg->stopy)   = LineNr(newblock.stopline, data)-1;
+    *(msg->startx) = newblock.startx;
+    *(msg->stopx)  = newblock.stopx;
+    *(msg->starty) = LineNr(newblock.startline, data)-1;
+    *(msg->stopy)  = LineNr(newblock.stopline, data)-1;
 
     result = TRUE;
   }
@@ -90,7 +91,7 @@ ULONG OM_QueryKeyAction(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextE
 ///
 
 ///OM_MarkText()
-ULONG OM_MarkText (struct MUIP_TextEditor_MarkText *msg, struct InstData *data)
+ULONG OM_MarkText(struct MUIP_TextEditor_MarkText *msg, struct InstData *data)
 {
   ENTER();
 
@@ -145,17 +146,17 @@ ULONG OM_MarkText (struct MUIP_TextEditor_MarkText *msg, struct InstData *data)
 ///
 
 ///CleanText()
-ULONG ClearText (struct InstData *data)
+ULONG ClearText(struct InstData *data)
 {
   struct line_node *newcontents;
 
   ENTER();
 
-  if((newcontents = AllocLine(data)))
+  if((newcontents = AllocLine(data)) != NULL)
   {
     if(Init_LineNode(newcontents, NULL, "\n", data))
     {
-      if(data->undosize != 0)
+      if(data->maxUndoSteps != 0)
       {
         struct  marking newblock;
 
@@ -188,7 +189,7 @@ ULONG ClearText (struct InstData *data)
 ///
 
 ///ToggleCursor()
-ULONG ToggleCursor (struct InstData *data)
+ULONG ToggleCursor(struct InstData *data)
 {
   ENTER();
 
@@ -222,7 +223,7 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
   {
     if(data->ypos != data->realypos)
     {
-        LONG  move;
+      LONG  move;
 
       if(data->scr_direction)
         move = data->height-(data->realypos-data->ypos);
@@ -232,7 +233,7 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
       if(move != 1 && move != -1)
         move  = (move*2)/3;
 
-      SetAttrs(data->object, MUIA_TextEditor_Prop_First, (data->visual_y-1)*data->height+(data->realypos-data->ypos)+move, TAG_DONE);
+      set(data->object, MUIA_TextEditor_Prop_First, (data->visual_y-1)*data->height+(data->realypos-data->ypos)+move);
     }
     else
     {
@@ -421,7 +422,7 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL movecursor)
 
   ENTER();
 
-  if((line = ImportText(text, data, data->ImportHook, data->ImportWrap)))
+  if((line = ImportText(text, data, data->ImportHook, data->ImportWrap)) != NULL)
   {
     BOOL oneline = FALSE;
     BOOL newline = FALSE;
@@ -430,7 +431,7 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL movecursor)
     line->visual = VisualHeight(line, data);
     data->totallines += line->visual;
 
-    while(line->next)
+    while(line->next != NULL)
     {
       line = line->next;
       line->visual = VisualHeight(line, data);
@@ -452,17 +453,17 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL movecursor)
       data->CPos_X += actline->line.Length-1;
       oneline = TRUE;
     }
-    if(!newline)
+    if(newline == FALSE)
       MergeLines(line, data);
     MergeLines(actline, data);
-    if(oneline)
+    if(oneline == TRUE)
       line = actline;
-    if(newline)
+    if(newline == TRUE)
     {
       line = line->next;
       data->CPos_X = 0;
     }
-    if(movecursor)
+    if(movecursor == TRUE)
     {
       data->actualline = line;
     }
@@ -498,7 +499,7 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL movecursor)
       data->blockinfo.enabled = FALSE;
     }
 
-    if(!movecursor)
+    if(movecursor == FALSE)
     {
       data->CPos_X = realx;
       data->actualline = line;

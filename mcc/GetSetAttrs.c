@@ -76,11 +76,11 @@ IPTR Get(struct IClass *cl, Object *obj, struct opGet *msg)
     break;
 
     case MUIA_TextEditor_UndoAvailable:
-      ti_Data = data->undolevel > 0 && data->undocur > 0;
+      ti_Data = (data->nextUndoStep > 0) ? TRUE : FALSE;
     break;
 
     case MUIA_TextEditor_RedoAvailable:
-      ti_Data = data->undolevel > 0 && data->undofill > data->undocur;
+      ti_Data = (data->nextUndoStep < data->usedUndoSteps) ? TRUE : FALSE;
     break;
 
     case MUIA_TextEditor_ActiveObjectOnClick:
@@ -188,7 +188,7 @@ IPTR Get(struct IClass *cl, Object *obj, struct opGet *msg)
       break;
 
     case MUIA_TextEditor_UndoLevels:
-      ti_Data = data->undolevel;
+      ti_Data = data->maxUndoSteps;
       break;
 
     default:
@@ -685,8 +685,8 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
         break;
 
       case MUIA_TextEditor_UndoLevels:
+        data->userUndoBufferSize = TRUE;
         ResizeUndoBuffer(data, ti_Data);
-        data->userUndoSize = TRUE;
         break;
     }
   }

@@ -373,13 +373,11 @@ struct InstData
   UWORD           TabSize;
   ULONG           WrapBorder;
   ULONG           WrapMode;
-  APTR            undobuffer;     // pointer to memory for the undo buffer
-  APTR            undopointer;    // pointer into undobuffer for current entry
-  ULONG           undosize;       // the size (in bytes) of the undobuffer
-  ULONG           undolevel;      // the maximum undo levels
-  ULONG           undofill;       // the filled up undo levels
-  ULONG           undocur;        // the current position in the undo buffer
-  BOOL            userUndoSize;
+  struct UserAction *undoSteps;   // pointer to memory for the undo actions
+  ULONG           maxUndoSteps;   // how many steps can be put into the undoBuffer
+  ULONG           usedUndoSteps;  // how many steps in the undoBuffer have been used so far
+  ULONG           nextUndoStep;   // index of the next undo/redo step
+  BOOL            userUndoBufferSize;
   BOOL            TypeAndSpell;
   BOOL            inactiveCursor;
   BOOL            selectPointer;
