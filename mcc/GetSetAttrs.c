@@ -472,15 +472,15 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
         break;
 
       case MUIA_TextEditor_StyleBold:
-        AddStyle(&data->blockinfo, BOLD, ti_Data, data);
+        AddStyle(&data->blockinfo, BOLD, ti_Data != 0, data);
         break;
 
       case MUIA_TextEditor_StyleItalic:
-        AddStyle(&data->blockinfo, ITALIC, ti_Data, data);
+        AddStyle(&data->blockinfo, ITALIC, ti_Data != 0, data);
         break;
 
       case MUIA_TextEditor_StyleUnderline:
-        AddStyle(&data->blockinfo, UNDERLINE, ti_Data, data);
+        AddStyle(&data->blockinfo, UNDERLINE, ti_Data != 0, data);
         break;
 
       case MUIA_TextEditor_Pen:

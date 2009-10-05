@@ -7,6 +7,8 @@ $URL$
 
 2009-10-05 Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/StyleOperators.c: added a missing notification when the style changed
+    from bold to non-bold.
   * mcp/CreatePrefsGroup.c: removed the "+-5" part from the undo level slider,
     because the new Undo/Redo management doesn't need these additional steps
     anymore.
