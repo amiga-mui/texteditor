@@ -27,9 +27,9 @@
 #include "Debug.h"
 
 #if defined(__amigaos4__)
-#define SHARED_MEMFLAG			MEMF_SHARED
+#define SHARED_MEMFLAG          MEMF_SHARED
 #else
-#define SHARED_MEMFLAG			MEMF_ANY
+#define SHARED_MEMFLAG          MEMF_ANY
 #endif
 
 /// MyAllocPooled()
