@@ -414,7 +414,7 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
 ///
 
 ///InsertText()
-ULONG InsertText(struct InstData *data, STRPTR text, BOOL movecursor)
+ULONG InsertText(struct InstData *data, STRPTR text, BOOL moveCursor)
 {
   struct line_node *line, *actline = data->actualline;
   UWORD x = data->CPos_X;
@@ -463,7 +463,7 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL movecursor)
       line = line->next;
       data->CPos_X = 0;
     }
-    if(movecursor == TRUE)
+    if(moveCursor == TRUE)
     {
       data->actualline = line;
     }
@@ -484,7 +484,7 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL movecursor)
     if(tvisual_y < 0)
       tvisual_y = 0;
 
-    if(isFlagClear(data->flags, FLG_Active))
+    if(isFlagClear(data->flags, FLG_Quiet))
     {
       SetCursor(data->CPos_X, line, FALSE, data);
       if(data->blockinfo.enabled)
@@ -499,7 +499,7 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL movecursor)
       data->blockinfo.enabled = FALSE;
     }
 
-    if(movecursor == FALSE)
+    if(moveCursor == FALSE)
     {
       data->CPos_X = realx;
       data->actualline = line;
