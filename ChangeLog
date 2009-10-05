@@ -7,6 +7,9 @@ $URL$
 
 2009-10-05 Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/UndoFunctions.c, mcc/Methods.c: fixed a double FreeMem() call and a
+    copy'n'paste bug which prevented a proper redraw after undoing the deletion
+    of a text block.
   * mcc/StyleOperators.c: added a missing notification when the style changed
     from bold to non-bold.
   * mcp/CreatePrefsGroup.c: removed the "+-5" part from the undo level slider,

@@ -36,7 +36,7 @@
 #include "TextEditor_mcp.h"
 #include "private.h"
 
-///GetFont()
+/// GetFont()
 struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
 {
   char *setting;
@@ -91,10 +91,10 @@ struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
   RETURN(f);
   return f;
 }
-///
 
-///SetCol()
-void SetCol (struct InstData *data, void *obj, long item, ULONG *storage, long bit)
+///
+/// SetCol()
+void SetCol(struct InstData *data, void *obj, long item, ULONG *storage, long bit)
 {
   struct MUI_PenSpec *spec;
 
@@ -110,9 +110,9 @@ void SetCol (struct InstData *data, void *obj, long item, ULONG *storage, long b
 
   LEAVE();
 }
-///
 
-///InitConfig()
+///
+/// InitConfig()
 void InitConfig(Object *obj, struct InstData *data)
 {
   ULONG setting = 0;
@@ -366,7 +366,7 @@ void InitConfig(Object *obj, struct InstData *data)
     ULONG size;
 
     setting = 0;
-    if(loadDefaultKeys || !DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_Keybindings, &setting) || setting == 0)
+    if(loadDefaultKeys == TRUE || !DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_Keybindings, &setting) || setting == 0)
       userkeys = (struct te_key *)default_keybindings;
     else
       userkeys = (struct te_key *)setting;
@@ -377,7 +377,7 @@ void InitConfig(Object *obj, struct InstData *data)
     // now we calculate the memory size
     size = (count+1)*sizeof(struct te_key);
 
-    if((data->RawkeyBindings = MyAllocPooled(data->mypool, size)))
+    if((data->RawkeyBindings = MyAllocPooled(data->mypool, size)) != NULL)
     {
       ULONG i;
       struct te_key *mykeys = data->RawkeyBindings;
@@ -411,14 +411,14 @@ void InitConfig(Object *obj, struct InstData *data)
 
   LEAVE();
 }
-///
 
-///FreeConfig()
-void  FreeConfig  (struct InstData *data, struct MUI_RenderInfo *mri)
+///
+/// FreeConfig()
+void  FreeConfig(struct InstData *data, struct MUI_RenderInfo *mri)
 {
   ENTER();
 
-  if(data->RawkeyBindings)
+  if(data->RawkeyBindings != NULL)
     MyFreePooled(data->mypool, data->RawkeyBindings);
 
   if(data->allocatedpens & 1)
@@ -440,9 +440,9 @@ void  FreeConfig  (struct InstData *data, struct MUI_RenderInfo *mri)
   if(data->allocatedpens & 256)
     MUI_ReleasePen(mri, data->inactivecolor);
 
-  if(data->normalfont)
+  if(data->normalfont != NULL)
     CloseFont(data->normalfont);
-  if(data->fixedfont)
+  if(data->fixedfont != NULL)
     CloseFont(data->fixedfont);
 
   if(data->BlinkSpeed == 2)
@@ -453,5 +453,5 @@ void  FreeConfig  (struct InstData *data, struct MUI_RenderInfo *mri)
 
   LEAVE();
 }
-///
 
+///

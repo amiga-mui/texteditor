@@ -37,7 +37,8 @@ static void FreeUndoStep(struct InstData *data, struct UserAction *step)
 
   if(step->type == ET_DELETEBLOCK || step->type == ET_PASTEBLOCK)
   {
-    MyFreePooled(data->mypool, step->clip);
+    if(step->clip != NULL)
+      MyFreePooled(data->mypool, step->clip);
   }
 
   LEAVE();
@@ -161,14 +162,16 @@ BOOL Undo(struct InstData *data)
 
       case ET_DELETEBLOCK:
       {
-        struct Hook *oldhook = data->ImportHook;
-        char *clip = (char *)action->clip;
+        struct Hook *oldhook;
 
         D(DBF_UNDO, "undo DELETEBLOCK");
+        oldhook = data->ImportHook;
         data->ImportHook = &ImPlainHook;
-        InsertText(data, clip, moveCursor);
+        InsertText(data, action->clip, moveCursor);
         data->ImportHook = oldhook;
-        MyFreePooled(data->mypool, clip);
+        MyFreePooled(data->mypool, action->clip);
+        // clear the pointer
+        action->clip = NULL;
 
         action->blk.x = data->CPos_X;
         action->blk.y = LineNr(data->actualline, data);
