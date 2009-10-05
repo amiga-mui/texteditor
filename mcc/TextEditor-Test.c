@@ -368,7 +368,7 @@ int main(void)
                                     "\n"
                                     "\33hThis gadget is not \33ifreeware\33n. You may not use it in your own programs without a licence. A licence can be obtained thru the author.\n"
                                     "\nColor test: \33b\33p[1]SHINE, \33p[2]HALFSHINE, \33p[3]BACKGROUND, \33p[4]HALFSHADOW, \33p[5]SHADOW, \33p[6]TEXT, \33p[7]FILL, \33p[8]MARK\33n\n"
-                                    "\nStyle test: \33bBOLD\33n, \33iITALIC\33n, \33uUNDERLINE\33n\n"
+                                    "\nStyle test: \33bBOLD\33n, \33iITALIC\33n, \33uUNDERLINE\33n, \33b\33iBOLD & ITALIC\33n, \33b\33uBOLD & UNDERLINE\33n, \33i\33uITALIC & UNDERLINE\33n, \33b\33i\33uBOLD & ITALIC & UNDERLINE\33n\n"
                                     "\n"
                                     "\33[s:2]\33c\33u\33b Usage: \33n\n"
                                     "\33l\n"

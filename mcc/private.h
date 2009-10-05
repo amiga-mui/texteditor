@@ -478,7 +478,7 @@ LONG  CutBlock        (struct InstData *, BOOL, BOOL, BOOL);
 
 void  UpdateStyles      (struct InstData *);
 UWORD GetStyle        (LONG, struct line_node *);
-void  AddStyle        (struct marking *, unsigned short, long, struct InstData *);
+void  AddStyle        (struct marking *, UWORD, BOOL, struct InstData *);
 void  AddStyleToLine      (LONG, struct line_node *, LONG, UWORD, struct InstData *);
 
 APTR MyAllocPooled(APTR pool, ULONG length);

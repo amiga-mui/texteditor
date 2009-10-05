@@ -27,7 +27,7 @@
 /// UpdateStyles()
 void UpdateStyles(struct InstData *data)
 {
-  UWORD style;
+  UWORD newStyle;
 
   ENTER();
 
@@ -36,49 +36,36 @@ void UpdateStyles(struct InstData *data)
     struct marking newblock;
 
     NiceBlock(&data->blockinfo, &newblock);
-    style = GetStyle(data->blockinfo.stopx - ((newblock.startx == data->blockinfo.startx && newblock.startline == data->blockinfo.startline) ? 1 : 0), data->blockinfo.stopline);
+    if(newblock.startx == data->blockinfo.startx && newblock.startline == data->blockinfo.startline)
+      newStyle = GetStyle(data->blockinfo.stopx-1, data->blockinfo.stopline);
+    else
+      newStyle = GetStyle(data->blockinfo.stopx, data->blockinfo.stopline);
   }
   else
   {
-    style = GetStyle(data->CPos_X, data->actualline);
+    newStyle = GetStyle(data->CPos_X, data->actualline);
   }
 
-  if(style != data->style)
+  if(newStyle != data->style)
   {
-    UWORD oldstyle = data->style;
+    UWORD oldStyle = data->style;
 
-    data->style = style;
+    data->style = newStyle;
 
-    if(isFlagSet(style, BOLD))
-    {
-      if(isFlagClear(oldstyle, BOLD))
-        set(data->object, MUIA_TextEditor_StyleBold, TRUE);
-    }
-    else
-    {
-      if(isFlagClear(oldstyle, BOLD))
-        set(data->object, MUIA_TextEditor_StyleBold, FALSE);
-    }
-    if(isFlagSet(style, ITALIC))
-    {
-      if(isFlagClear(oldstyle, ITALIC))
-        set(data->object, MUIA_TextEditor_StyleItalic, TRUE);
-    }
-    else
-    {
-      if(isFlagClear(oldstyle, ITALIC))
-        set(data->object, MUIA_TextEditor_StyleItalic, FALSE);
-    }
-    if(isFlagSet(style, UNDERLINE))
-    {
-      if(isFlagClear(oldstyle, UNDERLINE))
-        set(data->object, MUIA_TextEditor_StyleUnderline, TRUE);
-    }
-    else
-    {
-      if(isFlagClear(oldstyle, UNDERLINE))
-        set(data->object, MUIA_TextEditor_StyleUnderline, FALSE);
-    }
+    if(isFlagSet(newStyle, BOLD) && isFlagClear(oldStyle, BOLD))
+      set(data->object, MUIA_TextEditor_StyleBold, TRUE);
+    else if(isFlagClear(newStyle, BOLD) && isFlagSet(oldStyle, BOLD))
+      set(data->object, MUIA_TextEditor_StyleBold, FALSE);
+
+    if(isFlagSet(newStyle, ITALIC) && isFlagClear(oldStyle, ITALIC))
+      set(data->object, MUIA_TextEditor_StyleItalic, TRUE);
+    else if(isFlagClear(newStyle, ITALIC) && isFlagSet(oldStyle, ITALIC))
+      set(data->object, MUIA_TextEditor_StyleItalic, FALSE);
+
+    if(isFlagSet(newStyle, UNDERLINE) && isFlagClear(oldStyle, UNDERLINE))
+      set(data->object, MUIA_TextEditor_StyleUnderline, TRUE);
+    else if(isFlagClear(newStyle, UNDERLINE) && isFlagSet(oldStyle, UNDERLINE))
+      set(data->object, MUIA_TextEditor_StyleUnderline, FALSE);
   }
 
   LEAVE();
@@ -117,7 +104,7 @@ void AddStyleToLine(LONG x, struct line_node *line, LONG length, UWORD style, st
 {
   ULONG numStyles;
   struct LineStyle *styles = line->line.Styles;
-  struct LineStyle *oldstyles = styles;
+  struct LineStyle *oldStyles = styles;
   struct LineStyle *newstyles;
   UWORD cur_style = 0;
   UWORD end_style = GetStyle(x+length, line);
@@ -219,9 +206,9 @@ void AddStyleToLine(LONG x, struct line_node *line, LONG length, UWORD style, st
       DumpLine(line);
     }
 
-    if(oldstyles != NULL)
+    if(oldStyles != NULL)
     {
-      MyFreePooled(data->mypool, oldstyles);
+      MyFreePooled(data->mypool, oldStyles);
     }
   }
 
@@ -230,17 +217,17 @@ void AddStyleToLine(LONG x, struct line_node *line, LONG length, UWORD style, st
 
 ///
 /// AddStyle()
-void AddStyle(struct marking *realblock, UWORD style, long Set, struct InstData *data)
+void AddStyle(struct marking *realblock, UWORD style, BOOL set, struct InstData *data)
 {
-  struct  marking newblock;
-  LONG  startx, stopx;
-  struct  line_node *startline, *stopline;
+  struct marking newblock;
+  LONG startx, stopx;
+  struct line_node *startline, *stopline;
 
   ENTER();
 
-  if(!Set)
+  if(set == FALSE)
   {
-    if(!(data->style & style))
+    if((data->style & style) == 0)
     {
       LEAVE();
       return;
@@ -250,7 +237,7 @@ void AddStyle(struct marking *realblock, UWORD style, long Set, struct InstData 
   }
   else
   {
-    if(data->style & style)
+    if((data->style & style) != 0)
     {
       LEAVE();
       return;

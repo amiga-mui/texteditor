@@ -136,9 +136,9 @@ void AddColorToLine(UWORD x, struct line_node *line, UWORD length, UWORD color, 
 /// AddColor()
 VOID AddColor(struct marking *realblock, UWORD color, struct InstData *data)
 {
-  struct marking    newblock;
-  struct line_node  *startline, *stopline;
-  UWORD         startx, stopx;
+  struct marking newblock;
+  struct line_node *startline, *stopline;
+  UWORD startx, stopx;
 
   ENTER();
 
@@ -165,7 +165,7 @@ VOID AddColor(struct marking *realblock, UWORD color, struct InstData *data)
   }
   else
   {
-    struct  line_node *line = startline->next;
+    struct line_node *line = startline->next;
 
     AddColorToLine(startx, startline, startline->line.Length-startx-1, color, data);
     while(line != stopline)

@@ -29,7 +29,7 @@
 ULONG OM_SetBlock(struct MUIP_TextEditor_SetBlock *msg, struct InstData *data)
 {
   struct marking newblock;
- 
+
   ENTER();
 
   if(msg->starty <= (ULONG)data->totallines)
@@ -63,19 +63,19 @@ ULONG OM_SetBlock(struct MUIP_TextEditor_SetBlock *msg, struct InstData *data)
   if(isFlagSet(msg->operation, MUIF_TextEditor_SetBlock_StyleBold))
   {
 //D(DBF_STARTUP, "SetBlock: StyleBold %ld\n", msg->value);
-    AddStyle(&newblock, BOLD, msg->value, data);
+    AddStyle(&newblock, BOLD, msg->value != 0, data);
   }
 
   if(isFlagSet(msg->operation, MUIF_TextEditor_SetBlock_StyleItalic))
   {
 //D(DBF_STARTUP, "SetBlock: StyleItalic %ld\n", msg->value);
-    AddStyle(&newblock, ITALIC, msg->value, data);
+    AddStyle(&newblock, ITALIC, msg->value != 0, data);
   }
 
   if(isFlagSet(msg->operation, MUIF_TextEditor_SetBlock_StyleUnderline))
   {
 //D(DBF_STARTUP, "SetBlock: StyleUnderline %ld\n", msg->value);
-    AddStyle(&newblock, UNDERLINE, msg->value, data);
+    AddStyle(&newblock, UNDERLINE, msg->value != 0, data);
   }
 
   if(isFlagSet(msg->operation, MUIF_TextEditor_SetBlock_Flow))
@@ -100,10 +100,10 @@ ULONG OM_SetBlock(struct MUIP_TextEditor_SetBlock *msg, struct InstData *data)
 
     if(start < 1)
       start = 1;
-    
+
     if(start-1+lines > data->maxlines)
       lines = data->maxlines-(start-1);
-    
+
     DumpText(data->visual_y+start-1, start-1, start-1+lines, TRUE, data);
   }
 
