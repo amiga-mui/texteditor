@@ -249,7 +249,7 @@ IPTR Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
     // make sure we have a proper font setup here and
     // that our spellchecker suggest window object is also
     // correctly initialized.
-    if(data->font && SuggestWindow(data))
+    if(data->font != NULL && (data->SuggestWindow = SuggestWindow(data)) != NULL)
     {
       DoMethod(_app(obj), OM_ADDMEMBER, data->SuggestWindow);
 

@@ -524,7 +524,7 @@ void  ResetDisplay  (struct InstData *);
 
 void CheckWord    (struct InstData *);
 void SuggestWord    (struct InstData *);
-void *SuggestWindow (struct InstData *);
+Object *SuggestWindow (struct InstData *);
 
 void AddClipping    (struct InstData *);
 void RemoveClipping (struct InstData *);

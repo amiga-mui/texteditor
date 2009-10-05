@@ -40,6 +40,7 @@
 #include <proto/wb.h>
 
 #include "private.h"
+#include "Debug.h"
 
 #if !defined(__amigaos4__) || (INCLUDE_VERSION < 50)
 struct PathNode
@@ -49,7 +50,7 @@ struct PathNode
 };
 #endif
 
-///SelectCode()
+/// SelectCode()
 HOOKPROTONH(SelectCode, void, void *lvobj, long **parms)
 {
   struct InstData *data = (struct InstData *)*parms;
@@ -84,9 +85,9 @@ HOOKPROTONH(SelectCode, void, void *lvobj, long **parms)
   LEAVE();
 }
 MakeStaticHook(SelectHook, SelectCode);
-///
 
-///SendRexx()
+///
+/// SendRexx()
 static BOOL SendRexx(char *word, const char *command, UNUSED struct InstData *data)
 {
   struct MsgPort *rexxport;
@@ -139,23 +140,31 @@ static BOOL SendRexx(char *word, const char *command, UNUSED struct InstData *da
   RETURN(result);
   return result;
 }
+
 ///
 
 #if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
 #undef WorkbenchControl
-///WorkbenchControl()
+/// WorkbenchControl()
 BOOL WorkbenchControl(STRPTR name, ...)
-{ BOOL ret;
+{
+  BOOL ret;
   va_list args;
+
+  ENTER();
+
   va_start(args, name);
   ret=WorkbenchControlA(name, (struct TagItem *)args);
   va_end(args);
+
+  RETURN(ret);
   return ret;
 }
+
 ///
 #endif
 
-///CloneSearchPath()
+/// CloneSearchPath()
 /***********************************************************************
  This returns a duplicated search path (preferable the workbench
  searchpath) usable for NP_Path of SystemTagList().
@@ -172,20 +181,20 @@ static BPTR CloneSearchPath(void)
   // We don't like this evil code in OS4 compile, as we should have
   // a recent enough workbench available
   #ifndef __amigaos4__
-  if(!path)
+  if(path == 0)
   {
     struct Process *pr = (struct Process*)FindTask(NULL);
 
-    if (pr->pr_Task.tc_Node.ln_Type == NT_PROCESS)
+    if(pr->pr_Task.tc_Node.ln_Type == NT_PROCESS)
     {
       struct CommandLineInterface *cli = BADDR(pr->pr_CLI);
 
-      if (cli)
+      if(cli != 0)
       {
         BPTR *p = &path;
         BPTR dir = cli->cli_CommandDir;
 
-        while (dir)
+        while(dir != 0)
         {
           BPTR dir2;
           struct FileLock *lock = BADDR(dir);
@@ -193,12 +202,12 @@ static BPTR CloneSearchPath(void)
 
           dir = lock->fl_Link;
           dir2 = DupLock((BPTR)lock->fl_Key);
-          if (!dir2) break;
+          if(dir2 == 0)
+            break;
 
           /* Use AllocVec(), because this memory is freed by FreeVec()
            * by the system later */
-          node = AllocVec(sizeof(struct PathNode), MEMF_ANY);
-          if (!node)
+          if((node = AllocVec(sizeof(struct PathNode), MEMF_ANY)) == NULL)
           {
             UnLock(dir2);
             break;
@@ -224,28 +233,34 @@ static BPTR CloneSearchPath(void)
 ************************************************************************/
 static VOID FreeSearchPath(BPTR path)
 {
-  if (path == 0)
-    return;
+  ENTER();
 
-#ifndef __MORPHOS__
-  if (WorkbenchBase)
+  if(path != 0)
   {
-    WorkbenchControl(NULL, WBCTRLA_FreeSearchPath, path, TAG_DONE);
-  } else
-#endif
-  {
-#ifndef __amigaos4__
-     /* This is compatible with WorkbenchControl(NULL, WBCTRLA_FreeSearchPath, ...)
-      * in Ambient */
-     while (path)
-     {
+    #ifndef __MORPHOS__
+    if(WorkbenchBase != NULL)
+    {
+      WorkbenchControl(NULL, WBCTRLA_FreeSearchPath, path, TAG_DONE);
+    }
+    else
+    #endif
+    {
+      #ifndef __amigaos4__
+      /* This is compatible with WorkbenchControl(NULL, WBCTRLA_FreeSearchPath, ...)
+       * in Ambient */
+      while(path != 0)
+      {
         struct PathNode *node = BADDR(path);
+
         path = node->pn_Next;
         UnLock(node->pn_Lock);
         FreeVec(node);
-     }
-#endif
+      }
+      #endif
+    }
   }
+
+  LEAVE();
 }
 ///
 
@@ -255,6 +270,8 @@ static BOOL SendCLI(char *word, const char *command, UNUSED struct InstData *dat
   char buffer[512];
   BOOL result;
   BPTR path;
+
+  ENTER();
 
   snprintf(buffer, sizeof(buffer), command, word);
 
@@ -271,16 +288,18 @@ static BOOL SendCLI(char *word, const char *command, UNUSED struct InstData *dat
     result = TRUE;
   }
 
+  RETURN(result);
   return result;
 }
+
 ///
-
-///SuggestWindow()
-void *SuggestWindow (struct InstData *data)
+/// SuggestWindow()
+Object *SuggestWindow(struct InstData *data)
 {
-    void *lvobj;
+  Object *window;
+  Object *lvobj;
 
-  data->SuggestWindow = WindowObject,
+  window = WindowObject,
         MUIA_Window_Borderless,     TRUE,
         MUIA_Window_CloseGadget,    FALSE,
         MUIA_Window_DepthGadget,    FALSE,
@@ -315,23 +334,27 @@ void *SuggestWindow (struct InstData *data)
   DoMethod(lvobj, MUIM_Notify, MUIA_Listview_DoubleClick, TRUE,
       MUIV_Notify_Self, 3, MUIM_CallHook, &SelectHook, data);
 
-  DoMethod(data->SuggestWindow, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
+  DoMethod(window, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
       MUIV_Notify_Self, 3, MUIM_Set, MUIA_Window_Open, FALSE);
 
-  DoMethod(data->SuggestWindow, MUIM_Notify, MUIA_Window_Open, MUIV_EveryTime,
+  DoMethod(window, MUIM_Notify, MUIA_Window_Open, MUIV_EveryTime,
       data->object, 3, MUIM_Set, MUIA_TextEditor_PopWindow_Open, MUIV_TriggerValue);
 
   data->SuggestListview = lvobj;
-  return(data->SuggestWindow);
-}
-///
 
-///LookupWord()
+  RETURN(window);
+  return window;
+}
+
+///
+/// LookupWord()
 static BOOL LookupWord(STRPTR word, struct InstData *data)
 {
   BOOL res;
 
-  if(data->LookupSpawn)
+  ENTER();
+
+  if(data->LookupSpawn != 0)
     res = SendRexx(word, data->LookupCmd, data);
   else
     res = SendCLI(word, data->LookupCmd, data);
@@ -346,17 +369,20 @@ static BOOL LookupWord(STRPTR word, struct InstData *data)
       res = FALSE;
   }
 
+  RETURN(res);
   return res;
 }
-///
 
-///SuggestWord()
-void SuggestWord (struct InstData *data)
+///
+/// SuggestWord()
+void SuggestWord(struct InstData *data)
 {
-    ULONG   top, left;
-    LONG    line_nr;
-    struct  pos_info pos;
-    struct  line_node *line = data->actualline;
+  ULONG top, left;
+  LONG line_nr;
+  struct pos_info pos;
+  struct line_node *line = data->actualline;
+
+  ENTER();
 
   if(IsAlpha(data->mylocale, *(line->line.Contents+data->CPos_X)))
   {
@@ -425,24 +451,24 @@ void SuggestWord (struct InstData *data)
       }
       else
       {
-        LONG res;
+        BOOL res;
 
         if(data->SuggestSpawn)
           res = SendRexx(word, data->SuggestCmd, data);
         else
           res = SendCLI(word, data->SuggestCmd, data);
 
-        if(res)
+        if(res == TRUE)
         {
-            BPTR  fh;
+          BPTR fh;
 
-          if((fh = Open("T:Matches", MODE_OLDFILE)))
+          if((fh = Open("T:Matches", MODE_OLDFILE)) != 0)
           {
-              char    entry[128];
-              Object  *group;
+            char entry[128];
+            Object *group;
 
             DoMethod(data->SuggestListview, MUIM_List_Clear);
-            while(FGets(fh, entry, 128))
+            while(FGets(fh, entry, 128) != NULL)
             {
               entry[strlen(entry)-1] = '\0';
               DoMethod(data->SuggestListview, MUIM_List_InsertSingle, entry, MUIV_List_Insert_Sorted);
@@ -466,15 +492,20 @@ void SuggestWord (struct InstData *data)
   {
     DisplayBeep(NULL);
   }
-}
-///
 
-///CheckWord()
+  LEAVE();
+}
+
+///
+/// CheckWord()
 void CheckWord(struct InstData *data)
 {
+  ENTER();
+
   if(data->TypeAndSpell == TRUE && data->CPos_X != 0 && IsAlpha(data->mylocale, *(data->actualline->line.Contents+data->CPos_X-1)))
   {
-    LONG  start, end = data->CPos_X;
+    LONG start;
+    LONG end = data->CPos_X;
     struct line_node *line = data->actualline;
 
     do
@@ -501,5 +532,7 @@ void CheckWord(struct InstData *data)
       data->actualline = line;
     }
   }
+
+  LEAVE();
 }
 ///

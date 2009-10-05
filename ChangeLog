@@ -7,6 +7,7 @@ $URL$
 
 2009-10-05 Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/SpellChecker.c: added the usual ENTER()/LEAVE() macro calls.
   * mcc/UndoFunctions.c, mcc/Methods.c: fixed a double FreeMem() call and a
     copy'n'paste bug which prevented a proper redraw after undoing the deletion
     of a text block.
