@@ -104,6 +104,7 @@ void SetupDebug(void)
       { "undo",      DBF_UNDO      },
       { "dump",      DBF_DUMP      },
       { "style",     DBF_STYLE     },
+      { "spell",     DBF_SPELL     },
       { "all",       DBF_ALL       },
       { NULL,        0             }
     };

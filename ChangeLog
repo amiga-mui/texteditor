@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-10-06 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Debug.c, mcc/SpellChecker.c: added the SPELL debug flag to get some
+    debug output from the spell checking process.
+
 2009-10-05 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/SpellChecker.c: added the usual ENTER()/LEAVE() macro calls.
