@@ -171,7 +171,7 @@ ULONG ClearText(struct InstData *data)
 
         data->CPos_X = 0;
         data->actualline = data->firstline;
-        AddToUndoBuffer(ET_DELETEBLOCK, (char *)&newblock, data);
+        AddToUndoBuffer(data, ET_DELETEBLOCK, &newblock);
       }
       FreeTextMem(data->firstline, data);
       data->firstline = newcontents;

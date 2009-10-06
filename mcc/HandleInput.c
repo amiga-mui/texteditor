@@ -621,7 +621,6 @@ void Key_Copy(struct InstData *data)
 ///Key_Paste()
 void Key_Paste(struct InstData *data)
 {
-  BOOL update;
   struct marking block;
 
   ENTER();
@@ -635,12 +634,11 @@ void Key_Paste(struct InstData *data)
   block.startx = data->CPos_X;
 //  SetCursor(data->CPos_X, data->actualline, FALSE, data);
   data->update = FALSE;
-  update = PasteClip(data->CPos_X, data->actualline, data);
-  if(update)
+  if(PasteClip(data->CPos_X, data->actualline, data) == TRUE)
   {
     block.stopline = data->actualline;
     block.stopx = data->CPos_X;
-    AddToUndoBuffer(ET_PASTEBLOCK, (char *)&block, data);
+    AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
     data->pixel_x = 0;
   }
 
@@ -669,7 +667,7 @@ void Key_Tab(struct InstData *data)
     };
 
     CheckWord(data);
-    AddToUndoBuffer(ET_PASTEBLOCK, (char *)&block, data);
+    AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
     data->CPos_X += data->TabSize;
     PasteChars(data->CPos_X-data->TabSize, data->actualline, data->TabSize, "            ", NULL, data);
   }
@@ -689,7 +687,7 @@ void Key_Return(struct InstData *data)
     ScrollIntoDisplay(data);
 
   CheckWord(data);
-  AddToUndoBuffer(ET_SPLITLINE, NULL, data);
+  AddToUndoBuffer(data, ET_SPLITLINE, NULL);
   SplitLine(data->CPos_X, data->actualline, TRUE, NULL, data);
 
   // make sure the cursor is visible
@@ -711,7 +709,7 @@ void Key_Backspace(struct InstData *data)
     if(data->CPos_X > 0)
     {
       data->CPos_X--;
-      AddToUndoBuffer(ET_BACKSPACECHAR, data->actualline->line.Contents+data->CPos_X, data);
+      AddToUndoBuffer(data, ET_BACKSPACECHAR, &data->actualline->line.Contents[data->CPos_X]);
       RemoveChars(data->CPos_X, data->actualline, 1, data);
     }
     else
@@ -720,7 +718,7 @@ void Key_Backspace(struct InstData *data)
       {
         data->actualline = data->actualline->previous;
         data->CPos_X = data->actualline->line.Length-1;
-        AddToUndoBuffer(ET_BACKSPACEMERGE, NULL, data);
+        AddToUndoBuffer(data, ET_BACKSPACEMERGE, NULL);
         ScrollIntoDisplay(data);
         MergeLines(data->actualline, data);
       }
@@ -746,14 +744,14 @@ void Key_Delete(struct InstData *data)
 
     if(data->actualline->line.Length > (ULONG)(data->CPos_X+1))
     {
-      AddToUndoBuffer(ET_DELETECHAR, data->actualline->line.Contents+data->CPos_X, data);
+      AddToUndoBuffer(data, ET_DELETECHAR, &data->actualline->line.Contents[data->CPos_X]);
       RemoveChars(data->CPos_X, data->actualline, 1, data);
     }
     else
     {
-      if(data->actualline->next)
+      if(data->actualline->next != NULL)
       {
-        AddToUndoBuffer(ET_MERGELINES, NULL, data);
+        AddToUndoBuffer(data, ET_MERGELINES, NULL);
         MergeLines(data->actualline, data);
       }
     }
@@ -792,7 +790,7 @@ void cutcopypasteerase (UBYTE key, ULONG qualifier, struct InstData *data)
       {
         block.stopline = data->actualline;
         block.stopx = data->CPos_X;
-        AddToUndoBuffer(ET_PASTEBLOCK, (char *)&block, data);
+        AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
         if(t_updatefrom < updatefrom)
           updatefrom = t_updatefrom;
       }
@@ -833,7 +831,7 @@ void Key_Normal(UBYTE key, struct InstData *data)
 
   // add the pastechar to the undobuffer and paste the current
   // key immediately.
-  AddToUndoBuffer(ET_PASTECHAR, NULL, data);
+  AddToUndoBuffer(data, ET_PASTECHAR, NULL);
   PasteChars(data->CPos_X++, data->actualline, 1, (char *)&key, NULL, data);
 
   // check if the user selected the texteditor to do an automatic hard word
@@ -866,9 +864,9 @@ void Key_Normal(UBYTE key, struct InstData *data)
       ULONG length = data->CPos_X-xpos;
 
       data->CPos_X = xpos;
-      AddToUndoBuffer(ET_SPLITLINE, NULL, data);
+      AddToUndoBuffer(data, ET_SPLITLINE, NULL);
       SplitLine(data->CPos_X, data->actualline, TRUE, NULL, data);
-      AddToUndoBuffer(ET_DELETECHAR, data->actualline->line.Contents+data->CPos_X, data);
+      AddToUndoBuffer(data, ET_DELETECHAR, &data->actualline->line.Contents[data->CPos_X]);
       data->CPos_X = length-1;
       RemoveChars(0, data->actualline, 1, data);
     }

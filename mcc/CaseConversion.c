@@ -55,8 +55,8 @@ VOID MangleCharacters(UBYTE (*change)(UBYTE c), struct InstData *data)
     newblock.stopx     = stopx;
   }
 
-  AddToUndoBuffer(ET_DELETEBLOCK, (char *)&newblock, data);
-  AddToUndoBuffer(ET_PASTEBLOCK, (char *)&newblock, data);
+  AddToUndoBuffer(data, ET_DELETEBLOCK, &newblock);
+  AddToUndoBuffer(data, ET_PASTEBLOCK, &newblock);
 
   _startx = startx;
   _startline = startline;
