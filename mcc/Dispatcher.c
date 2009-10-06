@@ -767,7 +767,7 @@ DISPATCHER(_Dispatcher)
       result = InsertText(data, ins_msg->text, TRUE);
       block.stopx = data->CPos_X;
       block.stopline = data->actualline;
-      AddToUndoBuffer(ET_PASTEBLOCK, (char *)&block, data);
+      AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
     }
     break;
 

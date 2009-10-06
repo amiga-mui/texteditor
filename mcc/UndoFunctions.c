@@ -349,7 +349,7 @@ BOOL Redo(struct InstData *data)
 
 ///
 /// AddToUndoBuffer()
-BOOL AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData *data)
+BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *eventData)
 {
   ENTER();
 
@@ -414,8 +414,10 @@ BOOL AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData 
       case ET_DELETECHAR:
       case ET_BACKSPACECHAR:
       {
+        STRPTR str = (STRPTR)eventData;
+
         D(DBF_UNDO, "add undo DELETECHAR/BACKSPACECHAR");
-        action->del.character = *eventdata;
+        action->del.character = str[0];
         action->del.style = GetStyle(data->CPos_X, data->actualline);
         action->del.flow = data->actualline->line.Flow;
         action->del.separator = data->actualline->line.Separator;
@@ -425,7 +427,7 @@ BOOL AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData 
 
       case ET_PASTEBLOCK:
       {
-        struct marking *block = (struct marking *)eventdata;
+        struct marking *block = (struct marking *)eventData;
 
         D(DBF_UNDO, "add undo PASTEBLOCK");
         action->x = block->startx;
@@ -438,10 +440,10 @@ BOOL AddToUndoBuffer(enum EventType eventtype, char *eventdata, struct InstData 
       case ET_DELETEBLOCK:
       {
         char *text;
-        struct marking *block = (struct marking *)eventdata;
+        struct marking *block = (struct marking *)eventData;
 
         D(DBF_UNDO, "add undo DELETEBLOCK");
-        if((text = GetBlock((struct marking *)eventdata, data)) != NULL)
+        if((text = GetBlock(block, data)) != NULL)
         {
           action->x = block->startx;
           action->y = LineNr(block->startline, data);

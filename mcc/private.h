@@ -509,7 +509,7 @@ void EndClipSession(struct InstData *data);
 LONG CutBlock2 (struct InstData *, BOOL, BOOL, struct marking *, BOOL);
 char *GetBlock (struct marking *, struct InstData *);
 
-BOOL AddToUndoBuffer(enum EventType, char *, struct InstData *);
+BOOL AddToUndoBuffer(struct InstData *, enum EventType, void *);
 void ResetUndoBuffer(struct InstData *);
 void ResizeUndoBuffer(struct InstData *, ULONG);
 BOOL Undo(struct InstData *);

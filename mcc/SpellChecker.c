@@ -61,10 +61,10 @@ HOOKPROTONH(SelectCode, void, void *lvobj, long **parms)
 
   DoMethod(lvobj, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &entry);
 
-  if(entry)
+  if(entry != NULL)
   {
-      int length = strlen(entry);
-      UWORD oldpos;
+    int length = strlen(entry);
+    UWORD oldpos;
 
     if(Enabled(data))
       Key_Clear(data);
@@ -73,7 +73,7 @@ HOOKPROTONH(SelectCode, void, void *lvobj, long **parms)
     block.startx    = data->CPos_X;
     block.stopline    = data->actualline;
     block.stopx     = data->CPos_X+length;
-    AddToUndoBuffer(ET_PASTEBLOCK, (char *)&block, data);
+    AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
     oldpos = data->CPos_X;
     data->CPos_X += length;
     PasteChars(oldpos, data->actualline, length, entry, NULL, data);
