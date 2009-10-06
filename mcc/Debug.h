@@ -62,6 +62,7 @@
 #define DBF_UNDO      (1<<5)     // UndoFunctions.c
 #define DBF_DUMP      (1<<6)
 #define DBF_STYLE     (1<<7)     // styles and colors
+#define DBF_SPELL     (1<<8)     // SpellChecker.c
 #define DBF_ALL       0xffffffff
 
 void SetupDebug(void);
