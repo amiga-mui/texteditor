@@ -522,10 +522,7 @@ void SuggestWord(struct InstData *data)
     }
   }
   else
-  {
-    D(DBF_ALWAYS, "DisplayBeep");
     DisplayBeep(NULL);
-  }
 
   LEAVE();
 }
@@ -558,10 +555,7 @@ void CheckWord(struct InstData *data)
       strlcpy(word, data->actualline->line.Contents+start, end-start+1);
 
       if(LookupWord(word, data) == FALSE)
-      {
-        D(DBF_ALWAYS, "DisplayBeep");
         DisplayBeep(NULL);
-      }
     }
     else
     {
