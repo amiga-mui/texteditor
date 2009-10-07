@@ -133,7 +133,7 @@
 #define _isinwholeobject(o,x,y)   (_between(_left(o),(x),_right (o)) && _between(_top(o) ,(y),_bottom(o)))
 
 // own common macros
-#define Enabled(data)   ((data)->blockinfo.enabled && \
+#define Enabled(data)   ((data)->blockinfo.enabled == TRUE && \
                          ((data)->blockinfo.startx != (data)->blockinfo.stopx || \
                           (data)->blockinfo.startline != (data)->blockinfo.stopline || \
                           (data)->selectmode == 3))
@@ -248,18 +248,18 @@ struct UserAction
 
   struct
   {
-    UBYTE   character;     // deletechar
+    UBYTE   character; // deletechar
     UBYTE   style;
     UBYTE   flow;
     UBYTE   separator;
     UBYTE   highlight;
   } del;
 
-  UBYTE   *clip;       // deleteblock
+  STRPTR clip;         // deleteblock
 
   struct
   {
-    UWORD x, y;       // pasteblock
+    UWORD x, y;        // pasteblock
   } blk;
 
   UWORD x, y;
@@ -410,159 +410,29 @@ struct InstData
   enum CursorState currentCursorState;
 };
 
+// AllocBitMap.c
 struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG), REG(d1, LONG), REG(d2, LONG), REG(d3, LONG flags), REG(a0, struct BitMap *));
-VOID SAVEDS ASM MUIG_FreeBitMap(REG(a0, struct BitMap *));
+void SAVEDS ASM MUIG_FreeBitMap(REG(a0, struct BitMap *));
 
-void  RequestInput  (struct InstData *);
-void  RejectInput   (struct InstData *);
-
-void  ScrollIntoDisplay (struct InstData *);
-long  CheckSep    (unsigned char, struct InstData *);
-long  CheckSent   (unsigned char, struct InstData *);
-void  NextLine    (struct InstData *);
-
-ULONG convert(UWORD style);
-LONG PrintLine(LONG, struct line_node *, LONG, BOOL, struct InstData *);
-ULONG ConvertPen(UWORD, BOOL, struct InstData *);
-
-void  ClearLine   (char *, LONG, LONG, struct InstData *);
-void  ScrollUp    (LONG, LONG, struct InstData *);
-void  ScrollDown    (LONG, LONG, struct InstData *);
-void  SetCursor   (LONG, struct line_node *, BOOL, struct InstData *);
-LONG  LineCharsWidth (char *, struct InstData *);
-ULONG FlowSpace   (UWORD, STRPTR, struct InstData *);
-BOOL ExpandLine(struct line_node *, LONG, struct InstData *);
-BOOL CompressLine(struct line_node *, struct InstData *);
-void  OffsetToLines (LONG, struct line_node *, struct pos_info *, struct InstData *);
-void  DumpText    (LONG, LONG, LONG, BOOL, struct InstData *);
-BOOL Init_LineNode(struct line_node *, struct line_node *, const char *, struct InstData *);
-ULONG VisualHeight  (struct line_node *, struct InstData *);
-void  GetLine     (LONG, struct pos_info *, struct InstData *);
-LONG  LineToVisual  (struct line_node *, struct InstData *);
-
-BOOL PasteClip(LONG x, struct line_node *line, struct InstData *);
-BOOL SplitLine(LONG x, struct line_node *, BOOL, struct UserAction *, struct InstData *);
-BOOL MergeLines(struct line_node *, struct InstData *);
-BOOL RemoveChars(LONG, struct line_node *, LONG, struct InstData *);
-BOOL PasteChars(LONG, struct line_node *, LONG, const char *, struct UserAction *, struct InstData *);
-
-void  SetBookmark       (UWORD, struct InstData *);
-void  GotoBookmark      (UWORD, struct InstData *);
-
-void  GoTop           (struct InstData *);
-void  GoPreviousPage    (struct InstData *);
-void  GoPreviousLine    (struct InstData *);
-void  GoUp            (struct InstData *);
-
-void  GoBottom        (struct InstData *);
-void  GoNextPage        (struct InstData *);
-void  GoNextLine        (struct InstData *);
-void  GoDown          (struct InstData *);
-
-void  GoNextWord        (struct InstData *);
-void  GoEndOfLine       (struct InstData *);
-void  GoNextSentence    (struct InstData *);
-void  GoRight         (struct InstData *);
-
-void  GoPreviousWord    (struct InstData *);
-void  GoStartOfLine     (struct InstData *);
-void  GoPreviousSentence  (struct InstData *);
-void  GoLeft          (struct InstData *);
-
-void  PosFromCursor     (short, short, struct InstData *);
-void  MarkText        (LONG, struct line_node *, LONG, struct line_node *, struct InstData *);
-
-VOID  RedrawArea        (UWORD, struct line_node *, UWORD, struct line_node *, struct InstData *);
-void  NiceBlock       (struct marking *, struct marking *);
-LONG  CutBlock        (struct InstData *, BOOL, BOOL, BOOL);
-
-void  UpdateStyles      (struct InstData *);
-UWORD GetStyle        (LONG, struct line_node *);
-void  AddStyle        (struct marking *, UWORD, BOOL, struct InstData *);
-void  AddStyleToLine      (LONG, struct line_node *, LONG, UWORD, struct InstData *);
-
+// AllocFunctions.c
+struct line_node  *AllocLine(struct InstData *data);
+void FreeLine(struct InstData *data, struct line_node *line);
 APTR MyAllocPooled(APTR pool, ULONG length);
 void MyFreePooled(APTR, APTR);
 APTR MyAlloc(ULONG length);
 void MyFree(APTR);
 ULONG GetAllocSize(APTR);
 
-struct line_node  *AllocLine(struct InstData *data);
-void FreeLine(struct line_node *line, struct InstData *data);
+// BlockOperators.c
+STRPTR GetBlock(struct InstData *, struct marking *);
+void RedrawArea(struct InstData *, UWORD, struct line_node *, UWORD, struct line_node *);
+void NiceBlock(struct marking *, struct marking *);
+LONG CutBlock(struct InstData *, BOOL, BOOL, BOOL);
+LONG CutBlock2(struct InstData *, BOOL, BOOL, BOOL, struct marking *);
 
-/* ------------ */
-
-void  InitConfig(Object *, struct InstData *);
-void  FreeConfig(struct InstData *, struct MUI_RenderInfo *);
-
-ULONG HandleARexx(struct InstData *, STRPTR command);
-
-struct line_node *ImportText(char *, struct InstData *, struct Hook *, LONG);
-void *ExportText(struct MUIP_TextEditor_ExportText *msg, struct InstData *data);
-void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data);
-
-struct  line_node *loadtext (void);
-unsigned short  *CheckStyles(char *);
-
-BOOL StartClipSession(struct InstData *data, ULONG flags);
-void EndClipSession(struct InstData *data);
-LONG CutBlock2 (struct InstData *, BOOL, BOOL, struct marking *, BOOL);
-char *GetBlock (struct marking *, struct InstData *);
-
-BOOL AddToUndoBuffer(struct InstData *, enum EventType, void *);
-void ResetUndoBuffer(struct InstData *);
-void ResizeUndoBuffer(struct InstData *, ULONG);
-BOOL Undo(struct InstData *);
-BOOL Redo(struct InstData *);
-
-ULONG ClearText   (struct InstData *);
-ULONG ToggleCursor  (struct InstData *);
-ULONG InputTrigger  (struct IClass *, Object *);
-ULONG InsertText    (struct InstData *, STRPTR, BOOL);
-void  FreeTextMem   (struct line_node *, struct InstData *);
-void  ResetDisplay  (struct InstData *);
-
-void CheckWord    (struct InstData *);
-void SuggestWord    (struct InstData *);
-Object *SuggestWindow (struct InstData *);
-
-void AddClipping    (struct InstData *);
-void RemoveClipping (struct InstData *);
-
-IPTR Get(struct IClass *, Object *, struct opGet *);
-IPTR Set(struct IClass *, Object *, struct opSet *);
-IPTR HandleInput(struct IClass *, Object *, struct MUIP_HandleEvent *);
-
-void Key_Backspace  (struct InstData *);
-void Key_Delete   (struct InstData *);
-void Key_Return   (struct InstData *);
-void Key_Tab      (struct InstData *);
-void Key_Clear      (struct InstData *);
-void Key_Cut      (struct InstData *);
-void Key_Copy     (struct InstData *);
-void Key_Paste      (struct InstData *);
-void Key_DelLine    (struct InstData *);
-void Key_ToUpper    (struct InstData *);
-void Key_ToLower    (struct InstData *);
-
-unsigned short LineNr (struct line_node *, struct InstData *);
-struct line_node *LineNode (unsigned short, struct InstData *);
-
-UWORD GetColor      (UWORD, struct line_node *);
-VOID  AddColor      (struct marking *, UWORD, struct InstData *);
-
-ULONG OM_MarkText   (struct MUIP_TextEditor_MarkText *, struct InstData *);
-ULONG OM_BlockInfo  (struct MUIP_TextEditor_BlockInfo *, struct InstData *);
-ULONG OM_Search   (struct MUIP_TextEditor_Search *, struct InstData *);
-ULONG OM_Replace    (Object *obj, struct MUIP_TextEditor_Replace *msg, struct InstData *data);
-ULONG OM_QueryKeyAction(struct IClass *cl, Object *obj, struct MUIP_TextEditor_QueryKeyAction *msg);
-ULONG OM_SetBlock(struct MUIP_TextEditor_SetBlock *msg, struct InstData *data);
-
-// Pointer.c
-void SetupSelectPointer(struct InstData *data);
-void CleanupSelectPointer(struct InstData *data);
-void ShowSelectPointer(Object *obj, struct InstData *data);
-void HideSelectPointer(Object *obj, struct InstData *data);
+// CaseConversion.c
+void Key_ToUpper(struct InstData *);
+void Key_ToLower(struct InstData *);
 
 // ClipboardServer.c
 BOOL StartClipboardServer(void);
@@ -572,6 +442,146 @@ void ClientEndSession(IPTR session);
 void ClientWriteChars(IPTR session, struct line_node *line, LONG start, LONG length);
 void ClientWriteLine(IPTR session, struct line_node *line);
 LONG ClientReadLine(IPTR session, struct line_node **line, ULONG *cset);
+
+// ColorOperators.c
+UWORD GetColor(UWORD, struct line_node *);
+void AddColor(struct InstData *, struct marking *, UWORD);
+
+// Dispatcher.c
+void ResetDisplay(struct InstData *);
+void RequestInput(struct InstData *);
+void RejectInput(struct InstData *);
+
+// EditorStuff.c
+BOOL PasteClip(struct InstData *, LONG x, struct line_node *line);
+BOOL SplitLine(struct InstData *, LONG x, struct line_node *, BOOL, struct UserAction *);
+BOOL MergeLines(struct InstData *, struct line_node *);
+BOOL RemoveChars(struct InstData *, LONG, struct line_node *, LONG);
+BOOL PasteChars(struct InstData *, LONG, struct line_node *, LONG, const char *, struct UserAction *);
+
+// ExportBlock.c
+void *ExportBlock(struct InstData *data, struct MUIP_TextEditor_ExportBlock *msg);
+
+// ExportText.c
+void *ExportText(struct InstData *data, struct MUIP_TextEditor_ExportText *msg);
+
+// GetSetAttrs.c
+IPTR Get(struct IClass *, Object *, struct opGet *);
+IPTR Set(struct IClass *, Object *, struct opSet *);
+
+// HandleARexx.c
+ULONG HandleARexx(struct InstData *, STRPTR command);
+
+// HandleInput.c
+IPTR HandleInput(struct IClass *, Object *, struct MUIP_HandleEvent *);
+void Key_Backspace(struct InstData *);
+void Key_Delete(struct InstData *);
+void Key_Return(struct InstData *);
+void Key_Tab(struct InstData *);
+void Key_Clear(struct InstData *);
+void Key_Cut(struct InstData *);
+void Key_Copy(struct InstData *);
+void Key_Paste(struct InstData *);
+void Key_DelLine(struct InstData *);
+void ScrollIntoDisplay(struct InstData *);
+void MarkText(struct InstData *, LONG, struct line_node *, LONG, struct line_node *);
+
+// ImportText.c
+struct line_node *ImportText(struct InstData *, char *, struct Hook *, LONG);
+
+// InitConfig.c
+void InitConfig(struct InstData *, Object *);
+void FreeConfig(struct InstData *, struct MUI_RenderInfo *);
+
+// Methods.c
+ULONG OM_MarkText(struct InstData *, struct MUIP_TextEditor_MarkText *);
+ULONG OM_BlockInfo(struct InstData *, struct MUIP_TextEditor_BlockInfo *);
+ULONG OM_QueryKeyAction(struct IClass *cl, Object *obj, struct MUIP_TextEditor_QueryKeyAction *msg);
+ULONG ClearText(struct InstData *);
+ULONG ToggleCursor(struct InstData *);
+ULONG InputTrigger(struct IClass *, Object *);
+ULONG InsertText(struct InstData *, STRPTR, BOOL);
+
+// MixedFunctions.c
+void AddClipping(struct InstData *);
+void RemoveClipping(struct InstData *);
+void FreeTextMem(struct InstData *, struct line_node *);
+BOOL Init_LineNode(struct InstData *, struct line_node *, struct line_node *, CONST_STRPTR);
+BOOL ExpandLine(struct InstData *, struct line_node *, LONG);
+BOOL CompressLine(struct InstData *, struct line_node *);
+LONG LineCharsWidth(struct InstData *, CONST_STRPTR);
+ULONG VisualHeight(struct InstData *, struct line_node *);
+void OffsetToLines(struct InstData *, LONG, struct line_node *, struct pos_info *);
+LONG LineNr(struct InstData *, struct line_node *);
+struct line_node *LineNode(struct InstData *, LONG);
+void ScrollUp(struct InstData *, LONG, LONG);
+void ScrollDown(struct InstData *, LONG, LONG);
+void SetCursor(struct InstData *, LONG, struct line_node *, BOOL);
+void DumpText(struct InstData *, LONG, LONG, LONG, BOOL);
+void GetLine(struct InstData *, LONG, struct pos_info *);
+LONG LineToVisual(struct InstData *, struct line_node *);
+
+// Navigation.c
+void SetBookmark(struct InstData *, UWORD);
+void GotoBookmark(struct InstData *, UWORD);
+void GoTop(struct InstData *);
+void GoPreviousPage (struct InstData *);
+void GoPreviousLine(struct InstData *);
+void GoUp(struct InstData *);
+void GoBottom(struct InstData *);
+void GoNextPage(struct InstData *);
+void GoNextLine(struct InstData *);
+void GoDown(struct InstData *);
+void GoNextWord(struct InstData *);
+void GoEndOfLine(struct InstData *);
+void GoNextSentence(struct InstData *);
+void GoRight(struct InstData *);
+void GoPreviousWord(struct InstData *);
+void GoStartOfLine(struct InstData *);
+void GoPreviousSentence(struct InstData *);
+void GoLeft(struct InstData *);
+BOOL CheckSep(struct InstData *, char);
+BOOL CheckSent(struct InstData *, char);
+void NextLine(struct InstData *);
+ULONG FlowSpace(struct InstData *, UWORD, STRPTR);
+void PosFromCursor(struct InstData *, WORD, WORD);
+
+// Pointer.c
+void SetupSelectPointer(struct InstData *data);
+void CleanupSelectPointer(struct InstData *data);
+void ShowSelectPointer(struct InstData *data, Object *obj);
+void HideSelectPointer(struct InstData *data, Object *obj);
+
+// PrintLineWithStyles.c
+ULONG convert(UWORD);
+LONG PrintLine(struct InstData *, LONG, struct line_node *, LONG, BOOL);
+ULONG ConvertPen(struct InstData *, UWORD, BOOL);
+void DrawSeparator(struct InstData *, struct RastPort *, WORD, WORD, WORD, WORD);
+
+// Search.c
+ULONG OM_Search(struct IClass *, Object *, struct MUIP_TextEditor_Search *);
+ULONG OM_Replace(struct IClass *, Object *, struct MUIP_TextEditor_Replace *);
+
+// SetBlock.c
+ULONG OM_SetBlock(struct InstData *, struct MUIP_TextEditor_SetBlock *msg);
+
+// SpellChecker.c
+void CheckWord(struct InstData *);
+void SuggestWord(struct InstData *);
+Object *SuggestWindow(struct InstData *);
+
+// StyleOperators.c
+void UpdateStyles(struct InstData *);
+UWORD GetStyle(LONG, struct line_node *);
+void AddStyle(struct InstData *, struct marking *, UWORD, BOOL);
+void AddStyleToLine(struct InstData *, LONG, struct line_node *, LONG, UWORD);
+
+// UndoFunctions.c
+BOOL AddToUndoBuffer(struct InstData *, enum EventType, void *);
+void ResetUndoBuffer(struct InstData *);
+void ResizeUndoBuffer(struct InstData *, ULONG);
+BOOL Undo(struct InstData *);
+BOOL Redo(struct InstData *);
 
 #if defined(DEBUG)
 void DumpLine(struct line_node *line);

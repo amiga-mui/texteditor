@@ -51,10 +51,10 @@ IPTR Get(struct IClass *cl, Object *obj, struct opGet *msg)
       UWORD xplace, yplace, cursor_width;
       UWORD x = data->CPos_X;
       struct line_node *line = data->actualline;
-      LONG line_nr = LineToVisual(line, data) - 1;
+      LONG line_nr = LineToVisual(data, line) - 1;
       struct pos_info pos;
 
-      OffsetToLines(x, line, &pos, data);
+      OffsetToLines(data, x, line, &pos);
 
       // calculate the cursor width
       // if it is set to 6 then we should find out how the width of the current char is
@@ -64,7 +64,7 @@ IPTR Get(struct IClass *cl, Object *obj, struct opGet *msg)
         cursor_width = data->CursorWidth;
 
       xplace  = data->xpos + TextLength(&data->tmprp, &line->line.Contents[x-pos.x], pos.x);
-      xplace += FlowSpace(line->line.Flow, line->line.Contents+pos.bytes, data);
+      xplace += FlowSpace(data, line->line.Flow, line->line.Contents+pos.bytes);
       yplace  = data->ypos + (data->height * (line_nr + pos.lines - 1));
 
       data->CursorPosition.MinX = xplace;
@@ -114,7 +114,7 @@ IPTR Get(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = data->CPos_X;
       break;
     case MUIA_TextEditor_CursorY:
-      ti_Data = LineNr(data->actualline, data)-1;
+      ti_Data = LineNr(data, data->actualline)-1;
       break;
     case MUIA_TextEditor_ExportWrap:
       ti_Data = data->ExportWrap;
@@ -338,7 +338,7 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
               }
             }
 
-            DumpText(data->visual_y+line_nr, line_nr, data->maxlines+1, FALSE, data);
+            DumpText(data, data->visual_y+line_nr, line_nr, data->maxlines+1, FALSE);
           }
           else
           {
@@ -363,12 +363,12 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
                   }
               }
 
-              DumpText(data->visual_y, 0, lines, FALSE, data);
+              DumpText(data, data->visual_y, 0, lines, FALSE);
             }
             else
             {
-              if(smooth)
-                DumpText(data->visual_y, 0, data->maxlines+1, FALSE, data);
+              if(smooth != 0)
+                DumpText(data, data->visual_y, 0, data->maxlines+1, FALSE);
             }
           }
           MUI_RemoveClipping(muiRenderInfo(data->object), cliphandle);
@@ -396,7 +396,7 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
       {
         if(ti_Data)
         {
-          SetCursor(data->CPos_X, data->actualline, FALSE, data);
+          SetCursor(data, data->CPos_X, data->actualline, FALSE);
           setFlag(data->flags, FLG_ReadOnly);
 
           // force the activeOnClick to be turned off
@@ -413,7 +413,7 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
           if(data->shown == TRUE)
           {
             if(isFlagSet(data->flags, FLG_Active))
-              SetCursor(data->CPos_X, data->actualline, TRUE, data);
+              SetCursor(data, data->CPos_X, data->actualline, TRUE);
           }
 
           // disable that the object will automatically get a border when
@@ -472,22 +472,22 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
         break;
 
       case MUIA_TextEditor_StyleBold:
-        AddStyle(&data->blockinfo, BOLD, ti_Data != 0, data);
+        AddStyle(data, &data->blockinfo, BOLD, ti_Data != 0);
         break;
 
       case MUIA_TextEditor_StyleItalic:
-        AddStyle(&data->blockinfo, ITALIC, ti_Data != 0, data);
+        AddStyle(data, &data->blockinfo, ITALIC, ti_Data != 0);
         break;
 
       case MUIA_TextEditor_StyleUnderline:
-        AddStyle(&data->blockinfo, UNDERLINE, ti_Data != 0, data);
+        AddStyle(data, &data->blockinfo, UNDERLINE, ti_Data != 0);
         break;
 
       case MUIA_TextEditor_Pen:
         if(data->NoNotify == FALSE)
         {
           data->Pen = ti_Data;
-          AddColor(&data->blockinfo, (UWORD)ti_Data, data);
+          AddColor(data, &data->blockinfo, (UWORD)ti_Data);
           data->HasChanged = TRUE;
         }
         break;
@@ -635,7 +635,7 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
 
             NiceBlock(&data->blockinfo, &newblock);
             startline = newblock.startline;
-            start = LineToVisual(startline, data);
+            start = LineToVisual(data, startline);
 
             do {
               lines += startline->visual;
@@ -646,7 +646,7 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
           }
           else
           {
-            start = LineToVisual(data->actualline, data);
+            start = LineToVisual(data, data->actualline);
             lines = data->actualline->visual;
             data->actualline->line.Flow = ti_Data;
             data->pixel_x = 0;
@@ -655,7 +655,7 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
             start = 1;
           if(start-1+lines > data->maxlines)
             lines = data->maxlines-(start-1);
-          DumpText(data->visual_y+start-1, start-1, start-1+lines, TRUE, data);
+          DumpText(data, data->visual_y+start-1, start-1, start-1+lines, TRUE);
           data->HasChanged = TRUE;
         }
         break;
@@ -691,13 +691,13 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
     }
   }
 
-  if(contents)
+  if(contents != NULL)
   {
     struct line_node *newcontents;
 
-    if((newcontents = ImportText(contents, data, data->ImportHook, data->ImportWrap)))
+    if((newcontents = ImportText(data, contents, data->ImportHook, data->ImportWrap)) != NULL)
     {
-      FreeTextMem(data->firstline, data);
+      FreeTextMem(data, data->firstline);
       data->firstline = newcontents;
       ResetDisplay(data);
       ResetUndoBuffer(data);
@@ -707,11 +707,11 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
 
   if(crsr_x != 0xffff || crsr_y != 0xffff)
   {
-    SetCursor(data->CPos_X, data->actualline, FALSE, data);
+    SetCursor(data, data->CPos_X, data->actualline, FALSE);
 
     if(crsr_y != 0xffff)
     {
-      data->actualline = LineNode(crsr_y+1, data);
+      data->actualline = LineNode(data, crsr_y+1);
       if(data->actualline->line.Length < data->CPos_X)
         data->CPos_X = data->actualline->line.Length-1;
     }
@@ -721,7 +721,7 @@ IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
     }
 
     ScrollIntoDisplay(data);
-    SetCursor(data->CPos_X, data->actualline, TRUE, data);
+    SetCursor(data, data->CPos_X, data->actualline, TRUE);
 
     data->pixel_x = 0;
     result = TRUE;

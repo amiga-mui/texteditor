@@ -38,7 +38,7 @@ APTR NewObject( struct IClass *classPtr, CONST_STRPTR classID, Tag tag1, ... )
 { return NewObjectA(classPtr, classID, (struct TagItem *)&tag1); }
 ULONG SetAttrs( APTR object, ULONG tag1, ... )
 { return SetAttrsA(object, (struct TagItem *)&tag1); }
-VOID SetWindowPointer( struct Window *win, Tag tag1, ... )
+void SetWindowPointer( struct Window *win, Tag tag1, ... )
 { SetWindowPointerA(win, (struct TagItem *)&tag1); }
 
 #include <proto/dos.h>

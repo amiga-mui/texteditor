@@ -76,7 +76,7 @@ HOOKPROTONH(SelectCode, void, void *lvobj, long **parms)
     AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
     oldpos = data->CPos_X;
     data->CPos_X += length;
-    PasteChars(oldpos, data->actualline, length, entry, NULL, data);
+    PasteChars(data, oldpos, data->actualline, length, entry, NULL);
   }
   set(data->SuggestWindow, MUIA_Window_Open, FALSE);
   DoMethod(lvobj, MUIM_List_Clear);
@@ -116,7 +116,7 @@ static BOOL SafePutMsg(CONST_STRPTR portName, struct Message *msg)
 
 ///
 /// SendRexx()
-static BOOL SendRexx(STRPTR word, CONST_STRPTR command, UNUSED struct InstData *data)
+static BOOL SendRexx(CONST_STRPTR word, CONST_STRPTR command)
 {
   struct MsgPort *clipport;
   struct RexxMsg *rxmsg;
@@ -254,7 +254,7 @@ static BPTR CloneSearchPath(void)
 /***********************************************************************
  Free the memory returned by CloneSearchPath
 ************************************************************************/
-static VOID FreeSearchPath(BPTR path)
+static void FreeSearchPath(BPTR path)
 {
   ENTER();
 
@@ -288,7 +288,7 @@ static VOID FreeSearchPath(BPTR path)
 ///
 
 /// SendCLI()
-static BOOL SendCLI(STRPTR word, CONST_STRPTR command, UNUSED struct InstData *data)
+static BOOL SendCLI(CONST_STRPTR word, CONST_STRPTR command)
 {
   char buffer[512];
   BOOL result;
@@ -356,7 +356,7 @@ Object *SuggestWindow(struct InstData *data)
         End;
 
   DoMethod(lvobj, MUIM_Notify, MUIA_Listview_DoubleClick, TRUE,
-      MUIV_Notify_Self, 3, MUIM_CallHook, &SelectHook, data);
+      MUIV_Notify_Self, 3, MUIM_CallHook, &SelectHook);
 
   DoMethod(window, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
       MUIV_Notify_Self, 3, MUIM_Set, MUIA_Window_Open, FALSE);
@@ -372,16 +372,16 @@ Object *SuggestWindow(struct InstData *data)
 
 ///
 /// LookupWord()
-static BOOL LookupWord(STRPTR word, struct InstData *data)
+static BOOL LookupWord(struct InstData *data, CONST_STRPTR word)
 {
   BOOL res;
 
   ENTER();
 
   if(data->LookupSpawn != 0)
-    res = SendRexx(word, data->LookupCmd, data);
+    res = SendRexx(word, data->LookupCmd);
   else
-    res = SendCLI(word, data->LookupCmd, data);
+    res = SendCLI(word, data->LookupCmd);
 
   if(res == TRUE)
   {
@@ -424,11 +424,11 @@ void SuggestWord(struct InstData *data)
     if(Enabled(data))
     {
       data->blockinfo.enabled = FALSE;
-      MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+      MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
     }
 /*    else
     {
-      SetCursor(data->CPos_X, line, FALSE, data);
+      SetCursor(data, data->CPos_X, line, FALSE);
     }
 */
 
@@ -441,11 +441,11 @@ void SuggestWord(struct InstData *data)
     data->blockinfo.startx = data->CPos_X;
     data->blockinfo.startline = line;
 
-    line_nr = LineToVisual(line, data) - 1;
-    OffsetToLines(data->CPos_X, line, &pos, data);
+    line_nr = LineToVisual(data, line) - 1;
+    OffsetToLines(data, data->CPos_X, line, &pos);
     left = xget(_win(data->object), MUIA_Window_LeftEdge);
     top = xget(_win(data->object), MUIA_Window_TopEdge);
-    left  += data->xpos + FlowSpace(line->line.Flow, line->line.Contents+(data->CPos_X-pos.x), data) + TextLength(&data->tmprp, line->line.Contents+(data->CPos_X-pos.x), pos.x);
+    left  += data->xpos + FlowSpace(data, line->line.Flow, line->line.Contents+(data->CPos_X-pos.x)) + TextLength(&data->tmprp, line->line.Contents+(data->CPos_X-pos.x), pos.x);
     top += data->ypos + (data->height * (line_nr + pos.lines));
 
     while(data->CPos_X < line->line.Length && (IsAlpha(data->mylocale, line->line.Contents[data->CPos_X]) || line->line.Contents[data->CPos_X] == '-' || line->line.Contents[data->CPos_X] == '\''))
@@ -456,13 +456,12 @@ void SuggestWord(struct InstData *data)
     data->blockinfo.stopline = line;
 
     data->blockinfo.enabled = TRUE;
-    MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+    MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
 
-    SetAttrs(data->SuggestWindow,
-                MUIA_Window_Open,     FALSE,
-                MUIA_Window_LeftEdge, left,
-                MUIA_Window_TopEdge,    top,
-                TAG_DONE);
+    SetAttrs(data->SuggestWindow, MUIA_Window_Open,     FALSE,
+                                  MUIA_Window_LeftEdge, left,
+                                  MUIA_Window_TopEdge,  top,
+                                  TAG_DONE);
 
     if(data->blockinfo.stopx-data->blockinfo.startx < 256)
     {
@@ -472,7 +471,7 @@ void SuggestWord(struct InstData *data)
 
       set(_win(data->object), MUIA_Window_Sleep, TRUE);
 
-      if(isFlagSet(data->flags, FLG_CheckWords) && LookupWord(word, data) == TRUE)
+      if(isFlagSet(data->flags, FLG_CheckWords) && LookupWord(data, word) == TRUE)
       {
         Object *group = (Object *)xget(data->SuggestWindow, MUIA_Window_RootObject);
 
@@ -488,9 +487,9 @@ void SuggestWord(struct InstData *data)
         BOOL res;
 
         if(data->SuggestSpawn != 0)
-          res = SendRexx(word, data->SuggestCmd, data);
+          res = SendRexx(word, data->SuggestCmd);
         else
-          res = SendCLI(word, data->SuggestCmd, data);
+          res = SendCLI(word, data->SuggestCmd);
 
         if(res == TRUE)
         {
@@ -554,7 +553,7 @@ void CheckWord(struct InstData *data)
 
       strlcpy(word, data->actualline->line.Contents+start, end-start+1);
 
-      if(LookupWord(word, data) == FALSE)
+      if(LookupWord(data, word) == FALSE)
         DisplayBeep(NULL);
     }
     else

@@ -29,11 +29,8 @@
 
 #include "TextEditor_mcp.h"
 
-
-ULONG FlowSpace(UWORD, STRPTR, struct InstData *);
-
-///OM_BlockInfo()
-ULONG OM_BlockInfo(struct MUIP_TextEditor_BlockInfo *msg, struct InstData *data)
+/// OM_BlockInfo()
+ULONG OM_BlockInfo(struct InstData *data, struct MUIP_TextEditor_BlockInfo *msg)
 {
   ULONG result = FALSE;
 
@@ -46,8 +43,8 @@ ULONG OM_BlockInfo(struct MUIP_TextEditor_BlockInfo *msg, struct InstData *data)
     NiceBlock(&data->blockinfo, &newblock);
     *(msg->startx) = newblock.startx;
     *(msg->stopx)  = newblock.stopx;
-    *(msg->starty) = LineNr(newblock.startline, data)-1;
-    *(msg->stopy)  = LineNr(newblock.stopline, data)-1;
+    *(msg->starty) = LineNr(data, newblock.startline)-1;
+    *(msg->stopy)  = LineNr(data, newblock.stopline)-1;
 
     result = TRUE;
   }
@@ -55,9 +52,9 @@ ULONG OM_BlockInfo(struct MUIP_TextEditor_BlockInfo *msg, struct InstData *data)
   RETURN(result);
   return(result);
 }
-///
 
-///OM_QueryKeyAction()
+///
+/// OM_QueryKeyAction()
 ULONG OM_QueryKeyAction(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_QueryKeyAction *msg)
 {
   struct te_key *userkeys;
@@ -88,21 +85,21 @@ ULONG OM_QueryKeyAction(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextE
   RETURN((ULONG)foundKey);
   return (ULONG)foundKey;
 }
-///
 
-///OM_MarkText()
-ULONG OM_MarkText(struct MUIP_TextEditor_MarkText *msg, struct InstData *data)
+///
+/// OM_MarkText()
+ULONG OM_MarkText(struct InstData *data, struct MUIP_TextEditor_MarkText *msg)
 {
   ENTER();
 
   if(Enabled(data))
   {
     data->blockinfo.enabled = FALSE;
-    MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+    MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
   }
   else
   {
-    SetCursor(data->CPos_X, data->actualline, FALSE, data);
+    SetCursor(data, data->CPos_X, data->actualline, FALSE);
   }
 
   // check if anything at all should be marked or not
@@ -111,9 +108,9 @@ ULONG OM_MarkText(struct MUIP_TextEditor_MarkText *msg, struct InstData *data)
     // check if only the specified area should be marked/selected
     if((LONG)msg->stop_crsr_y != MUIV_TextEditor_MarkText_All)
     {
-      data->blockinfo.startline = LineNode(msg->start_crsr_y+1, data);
+      data->blockinfo.startline = LineNode(data, msg->start_crsr_y+1);
       data->blockinfo.startx = (data->blockinfo.startline->line.Length > msg->start_crsr_x) ? msg->start_crsr_x : data->blockinfo.startline->line.Length-1;
-      data->blockinfo.stopline = LineNode(msg->stop_crsr_y+1, data);
+      data->blockinfo.stopline = LineNode(data, msg->stop_crsr_y+1);
       data->blockinfo.stopx = (data->blockinfo.stopline->line.Length > msg->stop_crsr_x) ? msg->stop_crsr_x : data->blockinfo.stopline->line.Length-1;
       data->blockinfo.enabled = TRUE;
 
@@ -137,15 +134,15 @@ ULONG OM_MarkText(struct MUIP_TextEditor_MarkText *msg, struct InstData *data)
       data->blockinfo.enabled = TRUE;
     }
 
-    MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+    MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
   }
 
   RETURN(TRUE);
   return(TRUE);
 }
-///
 
-///CleanText()
+///
+/// CleanText()
 ULONG ClearText(struct InstData *data)
 {
   struct line_node *newcontents;
@@ -154,7 +151,7 @@ ULONG ClearText(struct InstData *data)
 
   if((newcontents = AllocLine(data)) != NULL)
   {
-    if(Init_LineNode(newcontents, NULL, "\n", data))
+    if(Init_LineNode(data, newcontents, NULL, "\n") == TRUE)
     {
       if(data->maxUndoSteps != 0)
       {
@@ -173,22 +170,22 @@ ULONG ClearText(struct InstData *data)
         data->actualline = data->firstline;
         AddToUndoBuffer(data, ET_DELETEBLOCK, &newblock);
       }
-      FreeTextMem(data->firstline, data);
+      FreeTextMem(data, data->firstline);
       data->firstline = newcontents;
       ResetDisplay(data);
     }
     else
     {
-      FreeLine(newcontents, data);
+      FreeLine(data, newcontents);
     }
   }
 
   RETURN(TRUE);
   return(TRUE);
 }
-///
 
-///ToggleCursor()
+///
+/// ToggleCursor()
 ULONG ToggleCursor(struct InstData *data)
 {
   ENTER();
@@ -197,12 +194,12 @@ ULONG ToggleCursor(struct InstData *data)
   {
     if(data->cursor_shown)
     {
-      SetCursor(data->CPos_X, data->actualline, FALSE, data);
+      SetCursor(data, data->CPos_X, data->actualline, FALSE);
       data->cursor_shown = FALSE;
     }
     else
     {
-      SetCursor(data->CPos_X, data->actualline, TRUE, data);
+      SetCursor(data, data->CPos_X, data->actualline, TRUE);
       data->cursor_shown = TRUE;
     }
   }
@@ -210,9 +207,9 @@ ULONG ToggleCursor(struct InstData *data)
   RETURN(TRUE);
   return(TRUE);
 }
-///
 
-///InputTrigger()
+///
+/// InputTrigger()
 ULONG InputTrigger(struct IClass *cl, Object *obj)
 {
   struct InstData *data = INST_DATA(cl, obj);
@@ -242,7 +239,7 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
 
       if(isFlagSet(data->flags, FLG_Active))
       {
-        SetCursor(data->CPos_X, data->actualline, TRUE, data);
+        SetCursor(data, data->CPos_X, data->actualline, TRUE);
       }
     }
   }
@@ -253,7 +250,7 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
     LONG MouseY = muiRenderInfo(data->object)->mri_Window->MouseY;
     LONG oldCPos_X = data->CPos_X;
     struct line_node *oldactualline = data->actualline;
-    BOOL Scroll = TRUE;
+    BOOL scroll = TRUE;
 
     if(xget(_win(data->object), MUIA_Window_Activate) == FALSE)
     {
@@ -301,14 +298,14 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
       }
       else
       {
-        PosFromCursor(MouseX, MouseY, data);
-        Scroll = FALSE;
+        PosFromCursor(data, MouseX, MouseY);
+        scroll = FALSE;
       }
     }
 
-    if(data->blockinfo.enabled && Scroll && data->blockinfo.stopline == data->actualline && data->blockinfo.stopx == data->CPos_X)
+    if(data->blockinfo.enabled == TRUE && scroll == TRUE && data->blockinfo.stopline == data->actualline && data->blockinfo.stopx == data->CPos_X)
     {
-      PosFromCursor(MouseX, MouseY, data);
+      PosFromCursor(data, MouseX, MouseY);
     }
 
     if(data->selectmode != 0)
@@ -322,7 +319,7 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
         {
           if(data->selectmode == 1)
           {
-            while((data->CPos_X < data->actualline->line.Length-1) && !CheckSep(*(data->actualline->line.Contents+data->CPos_X), data))
+            while(data->CPos_X < data->actualline->line.Length-1 && CheckSep(data, data->actualline->line.Contents[data->CPos_X]) == FALSE)
 //            while((data->CPos_X < data->actualline->line.Length-1) && (*(data->actualline->line.Contents+data->CPos_X) != ' '))
               data->CPos_X++;
           }
@@ -337,14 +334,14 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
         struct pos_info pos;
         ULONG flow;
 
-        OffsetToLines(data->CPos_X, data->actualline, &pos, data);
-        flow = FlowSpace(data->actualline->line.Flow, data->actualline->line.Contents+pos.bytes, data);
+        OffsetToLines(data, data->CPos_X, data->actualline, &pos);
+        flow = FlowSpace(data, data->actualline->line.Flow, data->actualline->line.Contents+pos.bytes);
 
         if(MouseX <= (LONG)(data->xpos+flow+TextLength(&data->tmprp, data->actualline->line.Contents+pos.bytes, pos.extra-pos.bytes-1)))
         {
           if(data->selectmode == 1)
           {
-            while(data->CPos_X > 0 && !CheckSep(*(data->actualline->line.Contents+data->CPos_X-1), data))
+            while(data->CPos_X > 0 && CheckSep(data, data->actualline->line.Contents[data->CPos_X-1]) == FALSE)
 //            while(data->CPos_X > 0 && *(data->actualline->line.Contents+data->CPos_X-1) != ' ')
               data->CPos_X--;
           }
@@ -356,7 +353,7 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
       }
     }
 
-    if(data->blockinfo.enabled || data->selectmode == 0)
+    if(data->blockinfo.enabled == TRUE || data->selectmode == 0)
     {
       // if selectmode == 2, then the user has trippleclicked at the line
       // and wants to get the whole line marked
@@ -368,17 +365,17 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
         if(data->actualline->line.Contents[data->CPos_X] > ' ')
         {
           data->CPos_X++;
-          MarkText(data->blockinfo.stopx, data->blockinfo.stopline, data->CPos_X, data->actualline, data);
+          MarkText(data, data->blockinfo.stopx, data->blockinfo.stopline, data->CPos_X, data->actualline);
         }
         else
-          MarkText(data->blockinfo.stopx, data->blockinfo.stopline, data->CPos_X+1, data->actualline, data);
+          MarkText(data, data->blockinfo.stopx, data->blockinfo.stopline, data->CPos_X+1, data->actualline);
 
         data->selectmode = 3;
       }
       else if(data->blockinfo.stopline != data->actualline || data->blockinfo.stopx != data->CPos_X)
       {
         data->blockinfo.enabled = TRUE;
-        MarkText(data->blockinfo.stopx, data->blockinfo.stopline, data->CPos_X, data->actualline, data);
+        MarkText(data, data->blockinfo.stopx, data->blockinfo.stopline, data->CPos_X, data->actualline);
       }
 
       data->blockinfo.stopline = data->actualline;
@@ -390,10 +387,10 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
       RejectInput(data);
     }
 
-    if((oldCPos_X != data->CPos_X) || (oldactualline != data->actualline))
+    if(oldCPos_X != data->CPos_X || oldactualline != data->actualline)
     {
       ScrollIntoDisplay(data);
-      PosFromCursor(MouseX, MouseY, data);
+      PosFromCursor(data, MouseX, MouseY);
 
       // make sure to notify others that the cursor has changed and so on.
       data->NoNotify = TRUE;
@@ -402,7 +399,7 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
         set(obj, MUIA_TextEditor_CursorX, data->CPos_X);
 
       if(data->actualline != oldactualline)
-        set(obj, MUIA_TextEditor_CursorY, LineNr(data->actualline, data)-1);
+        set(obj, MUIA_TextEditor_CursorY, LineNr(data, data->actualline)-1);
 
       data->NoNotify = FALSE;
     }
@@ -411,9 +408,9 @@ ULONG InputTrigger(struct IClass *cl, Object *obj)
   RETURN(TRUE);
   return(TRUE);
 }
-///
 
-///InsertText()
+///
+/// InsertText()
 ULONG InsertText(struct InstData *data, STRPTR text, BOOL moveCursor)
 {
   struct line_node *line, *actline = data->actualline;
@@ -422,19 +419,19 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL moveCursor)
 
   ENTER();
 
-  if((line = ImportText(text, data, data->ImportHook, data->ImportWrap)) != NULL)
+  if((line = ImportText(data, text, data->ImportHook, data->ImportWrap)) != NULL)
   {
     BOOL oneline = FALSE;
     BOOL newline = FALSE;
     struct line_node *startline = line;
 
-    line->visual = VisualHeight(line, data);
+    line->visual = VisualHeight(data, line);
     data->totallines += line->visual;
 
     while(line->next != NULL)
     {
       line = line->next;
-      line->visual = VisualHeight(line, data);
+      line->visual = VisualHeight(data, line);
       data->totallines += line->visual;
     }
 
@@ -442,7 +439,7 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL moveCursor)
       newline = TRUE;
 
     data->update = FALSE;
-    SplitLine(x, actline, FALSE, NULL, data);
+    SplitLine(data, x, actline, FALSE, NULL);
     line->next = actline->next;
     actline->next->previous = line;
     actline->next = startline;
@@ -454,8 +451,8 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL moveCursor)
       oneline = TRUE;
     }
     if(newline == FALSE)
-      MergeLines(line, data);
-    MergeLines(actline, data);
+      MergeLines(data, line);
+    MergeLines(data, actline);
     if(oneline == TRUE)
       line = actline;
     if(newline == TRUE)
@@ -480,19 +477,19 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL moveCursor)
 
     ScrollIntoDisplay(data);
 
-    tvisual_y = LineToVisual(actline, data)-1;
+    tvisual_y = LineToVisual(data, actline)-1;
     if(tvisual_y < 0)
       tvisual_y = 0;
 
     if(isFlagClear(data->flags, FLG_Quiet))
     {
-      SetCursor(data->CPos_X, line, FALSE, data);
-      if(data->blockinfo.enabled)
+      SetCursor(data, data->CPos_X, line, FALSE);
+      if(data->blockinfo.enabled == TRUE)
       {
         data->blockinfo.enabled = FALSE;
-        MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+        MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
       }
-      DumpText(data->visual_y+tvisual_y, tvisual_y, data->maxlines, TRUE, data);
+      DumpText(data, data->visual_y+tvisual_y, tvisual_y, data->maxlines, TRUE);
     }
     else
     {
@@ -509,4 +506,5 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL moveCursor)
   RETURN(TRUE);
   return(TRUE);
 }
+
 ///

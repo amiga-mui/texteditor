@@ -47,7 +47,7 @@ ULONG convert(UWORD style)
 
 ///
 /// ConvertPen()
-ULONG ConvertPen(UWORD color, BOOL highlight, struct InstData *data)
+ULONG ConvertPen(struct InstData *data, UWORD color, BOOL highlight)
 {
   ULONG pen;
 
@@ -76,7 +76,7 @@ ULONG ConvertPen(UWORD color, BOOL highlight, struct InstData *data)
 
 ///
 /// DrawSeparator()
-VOID DrawSeparator (struct RastPort *rp, WORD X, WORD Y, WORD Width, WORD Height, struct InstData *data)
+void DrawSeparator(struct InstData *data, struct RastPort *rp, WORD X, WORD Y, WORD Width, WORD Height)
 {
   ENTER();
 
@@ -96,7 +96,7 @@ VOID DrawSeparator (struct RastPort *rp, WORD X, WORD Y, WORD Width, WORD Height
 
 ///
 /// PrintLine()
-LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, struct InstData *data)
+LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer)
 {
   STRPTR text = line->line.Contents;
   LONG length;
@@ -104,7 +104,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
 
   ENTER();
 
-  length = LineCharsWidth(text+x, data);
+  length = LineCharsWidth(data, text+x);
 
   if(doublebuffer == FALSE)
     rp = &data->copyrp;
@@ -129,7 +129,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       xoffset = data->xpos;
     }
 
-    flow = FlowSpace(line->line.Flow, text+x, data);
+    flow = FlowSpace(data, line->line.Flow, text+x);
     Move(rp, xoffset+flow, starty+rp->TxBaseline);
 
     if(Enabled(data))
@@ -316,7 +316,7 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       {
         while(colors->column-1 <= x)
         {
-          SetAPen(rp, ConvertPen(colors->color, line->line.Highlight, data));
+          SetAPen(rp, ConvertPen(data, colors->color, line->line.Highlight));
           colors++;
         }
 
@@ -381,9 +381,9 @@ LONG PrintLine(LONG x, struct line_node *line, LONG line_nr, BOOL doublebuffer, 
       }
       else
       {
-        DrawSeparator(rp, RightX, Y, RightWidth, Height, data);
+        DrawSeparator(data, rp, RightX, Y, RightWidth, Height);
       }
-      DrawSeparator(rp, LeftX, Y, LeftWidth, Height, data);
+      DrawSeparator(data, rp, LeftX, Y, LeftWidth, Height);
     }
 
 

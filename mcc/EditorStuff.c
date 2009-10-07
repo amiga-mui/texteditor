@@ -173,7 +173,7 @@ void DumpLine(struct line_node *line)
 /*----------------------*
  * Paste from Clipboard *
  *----------------------*/
-BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
+BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
 {
   BOOL res = FALSE;
   IPTR clipSession;
@@ -260,7 +260,7 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
 
             SHOWSTRING(DBF_CLIPBOARD, contents);
 
-            if((importedLine = ImportText(contents, data, &ImPlainHook, data->ImportWrap)) != NULL)
+            if((importedLine = ImportText(data, contents, &ImPlainHook, data->ImportWrap)) != NULL)
             {
               DumpLine(importedLine);
 
@@ -270,11 +270,11 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
                 previous->next = importedLine;
 
               importedLine->previous = previous;
-              importedLine->visual = VisualHeight(importedLine, data);
+              importedLine->visual = VisualHeight(data, importedLine);
               while(importedLine->next != NULL)
               {
                 importedLine = importedLine->next;
-                importedLine->visual = VisualHeight(importedLine, data);
+                importedLine->visual = VisualHeight(data, importedLine);
                 DumpLine(importedLine);
               }
 
@@ -304,7 +304,7 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
                 importedLine->previous = previous;
                 importedLine->line.Contents = contents;
                 importedLine->line.Length = length;
-                importedLine->visual = VisualHeight(line, data);
+                importedLine->visual = VisualHeight(data, line);
                 importedLine->line.Highlight = line->line.Highlight;
                 importedLine->line.Flow = line->line.Flow;
                 importedLine->line.Separator = line->line.Separator;
@@ -326,7 +326,7 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
               }
               else
               {
-                FreeLine(importedLine, data);
+                FreeLine(data, importedLine);
                 importedLine = NULL;
               }
             }
@@ -367,7 +367,7 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
         line = line->next;
       }
 
-      SplitLine(x, actline, FALSE, NULL, data);
+      SplitLine(data, x, actline, FALSE, NULL);
       importedLine->next = actline->next;
       actline->next->previous = importedLine;
       actline->next = importedLines;
@@ -381,10 +381,10 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
       if(newline == FALSE)
       {
         D(DBF_CLIPBOARD, "merging line");
-        MergeLines(importedLine, data);
+        MergeLines(data, importedLine);
       }
       D(DBF_CLIPBOARD, "merging actline");
-      MergeLines(actline, data);
+      MergeLines(data, actline);
 
       if(oneline == TRUE)
         importedLine = actline;
@@ -398,10 +398,10 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
       data->update = TRUE;
 
       ScrollIntoDisplay(data);
-      updatefrom = LineToVisual(actline, data)-1;
+      updatefrom = LineToVisual(data, actline)-1;
       if(updatefrom < 0)
         updatefrom = 0;
-      DumpText(data->visual_y+updatefrom, updatefrom, data->maxlines, TRUE, data);
+      DumpText(data, data->visual_y+updatefrom, updatefrom, data->maxlines, TRUE);
 
       if(data->update == TRUE)
         res = TRUE;
@@ -427,7 +427,7 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
         if(line->line.Contents != NULL)
           MyFreePooled(data->mypool, line->line.Contents);
         D(DBF_CLIPBOARD, "freeing line");
-        FreeLine(line, data);
+        FreeLine(data, line);
         line = next;
       }
 
@@ -457,7 +457,7 @@ BOOL PasteClip(LONG x, struct line_node *actline, struct InstData *data)
 /*--------------------------*
  * Merge two lines into one *
  *--------------------------*/
-BOOL MergeLines(struct line_node *line, struct InstData *data)
+BOOL MergeLines(struct InstData *data, struct line_node *line)
 {
   struct line_node *next;
   char *newbuffer;
@@ -665,7 +665,7 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
     if(line->next != NULL)
       line->next->previous = line;
     oldvisual = line->visual;
-    line->visual = VisualHeight(line, data);
+    line->visual = VisualHeight(data, line);
     line->line.Highlight = highlight;
     line->line.Flow = flow;
     line->line.Separator = separator;
@@ -673,9 +673,9 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
     D(DBF_DUMP, "after merge");
     DumpLine(line);
 
-    FreeLine(next, data);
+    FreeLine(data, next);
 
-    line_nr = LineToVisual(line, data);
+    line_nr = LineToVisual(data, line);
 
     // handle that we have to scroll up/down due to word wrapping
     // that occurrs when merging lines
@@ -688,18 +688,18 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
         {
           if(data->fastbackground == TRUE)
           {
-            ScrollUp(line_nr - 1, 1, data);
-            SetCursor(data->CPos_X, data->actualline, TRUE, data);
+            ScrollUp(data, line_nr - 1, 1);
+            SetCursor(data, data->CPos_X, data->actualline, TRUE);
           }
           else
-            DumpText(data->visual_y+line_nr-1, line_nr-1, data->maxlines, TRUE, data);
+            DumpText(data, data->visual_y+line_nr-1, line_nr-1, data->maxlines, TRUE);
         }
         else
         {
           if(data->fastbackground == TRUE)
-            ScrollUp(line_nr + line->visual - 1, 1, data);
+            ScrollUp(data, line_nr + line->visual - 1, 1);
           else
-            DumpText(data->visual_y+line_nr+line->visual-1, line_nr+line->visual-1, data->maxlines, TRUE, data);
+            DumpText(data, data->visual_y+line_nr+line->visual-1, line_nr+line->visual-1, data->maxlines, TRUE);
         }
       }
     }
@@ -707,7 +707,7 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
     {
       data->totallines += 1;
       if(line_nr+line->visual-1 < data->maxlines)
-        ScrollDown(line_nr + line->visual - 2, 1, data);
+        ScrollDown(data, line_nr + line->visual - 2, 1);
     }
 
     if(!(emptyline && (line_nr + line->visual - 1 < data->maxlines)))
@@ -717,10 +717,10 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
       ULONG c = 0;
 
       while((--t_oldvisual) && (t_line_nr++ <= data->maxlines))
-        c += LineCharsWidth(line->line.Contents+c, data);
+        c += LineCharsWidth(data, line->line.Contents+c);
 
       while((c < line->line.Length) && (t_line_nr <= data->maxlines))
-        c += PrintLine(c, line, t_line_nr++, TRUE, data);
+        c += PrintLine(data, c, line, t_line_nr++, TRUE);
     }
 
     if(line_nr + oldvisual == 1 && line->visual == visual-1)
@@ -729,9 +729,9 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
       data->totallines -= 1;
 
       if(data->fastbackground == TRUE)
-        DumpText(data->visual_y, 0, visual-1, TRUE, data);
+        DumpText(data, data->visual_y, 0, visual-1, TRUE);
       else
-        DumpText(data->visual_y, 0, data->maxlines, TRUE, data);
+        DumpText(data, data->visual_y, 0, data->maxlines, TRUE);
     }
 
     RETURN(TRUE);
@@ -749,7 +749,7 @@ BOOL MergeLines(struct line_node *line, struct InstData *data)
 /*---------------------*
  * Split line into two *
  *---------------------*/
-BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction *buffer, struct InstData *data)
+BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_crsr, struct UserAction *buffer)
 {
   struct line_node *newline;
   struct line_node *next;
@@ -764,7 +764,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
   D(DBF_DUMP, "before split, x=%ld",x);
   DumpLine(line);
 
-  OffsetToLines(x, line, &pos, data);
+  OffsetToLines(data, x, line, &pos);
   lines = pos.lines;
 
   next = line->next;
@@ -782,7 +782,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
     ULONG usedNewColors = 0;
 
     data->HasChanged = TRUE;
-    Init_LineNode(newline, line, line->line.Contents+x, data);
+    Init_LineNode(data, newline, line, line->line.Contents+x);
     newline->line.Highlight = line->line.Highlight;
     newline->line.Flow = line->line.Flow;
     newline->line.Separator = line->line.Separator;
@@ -987,10 +987,10 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
 
 /*------------------*/
     c = line->visual;
-    line->visual = VisualHeight(line, data);
-    CompressLine(line, data);
+    line->visual = VisualHeight(data, line);
+    CompressLine(data, line);
 
-    line_nr = LineToVisual(line, data) + line->visual - 1;
+    line_nr = LineToVisual(data, line) + line->visual - 1;
     if(line_nr < 0)
       line_nr = 0;
 
@@ -1015,16 +1015,16 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
         {
           if(line_nr)
           {
-            ScrollDown(line_nr-1, 1, data);
-            PrintLine(0, line, line_nr, FALSE, data);
+            ScrollDown(data, line_nr-1, 1);
+            PrintLine(data, 0, line, line_nr, FALSE);
           }
           else
           {
-            ScrollDown(line_nr, 1, data);
+            ScrollDown(data, line_nr, 1);
           }
         }
         else
-          DumpText(data->visual_y+line_nr-1, line_nr-1, data->maxlines, TRUE, data);
+          DumpText(data, data->visual_y+line_nr-1, line_nr-1, data->maxlines, TRUE);
       }
       else
       {
@@ -1040,10 +1040,10 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
                     data->xpos + data->innerwidth - 1, (data->ypos + ((data->maxlines-1) * data->height)) - 1);
           InstallLayerHook(data->rport->Layer, oldhook);
 
-          PrintLine(0, line, data->maxlines-1, FALSE, data);
+          PrintLine(data, 0, line, data->maxlines-1, FALSE);
           if(data->fastbackground == FALSE)
           {
-            DumpText(data->visual_y+data->maxlines-1, data->maxlines-1, data->maxlines, TRUE, data);
+            DumpText(data, data->visual_y+data->maxlines-1, data->maxlines-1, data->maxlines, TRUE);
           }
         }
       }
@@ -1065,17 +1065,17 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
         line->next->line.Highlight = FALSE;
         line->next->line.Separator = 0;
       }
-      SetCursor(crsr_x, crsr_l, FALSE, data);
+      SetCursor(data, crsr_x, crsr_l, FALSE);
       if(line_nr < data->maxlines)
       {
         if(data->fastbackground == TRUE)
         {
-          ScrollDown(line_nr, 1, data);
+          ScrollDown(data, line_nr, 1);
           if(line_nr+1 <= data->maxlines)
-            PrintLine(0, line->next, line_nr+1, FALSE, data);
+            PrintLine(data, 0, line->next, line_nr+1, FALSE);
         }
         else
-          DumpText(data->visual_y+line_nr, line_nr, data->maxlines, TRUE, data);
+          DumpText(data, data->visual_y+line_nr, line_nr, data->maxlines, TRUE);
       }
 
       D(DBF_DUMP, "after split, old line");
@@ -1088,27 +1088,27 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
     }
     x = line->line.Length;
 
-    OffsetToLines(x-1, line, &pos, data);
+    OffsetToLines(data, x-1, line, &pos);
     if(((ULONG)(line->visual + line->next->visual) >= c) && (line->visual == lines))
     {
       if((ULONG)(line->visual + line->next->visual) > c)
         data->totallines += 1;
 
-      PrintLine(pos.bytes, line, line_nr, TRUE, data);
+      PrintLine(data, pos.bytes, line, line_nr, TRUE);
 
       if((line_nr+line->next->visual-1 < data->maxlines) && ((ULONG)(line->visual + line->next->visual) > c))
       {
-        ScrollDown(line_nr+line->next->visual-1, 1, data);
+        ScrollDown(data, line_nr+line->next->visual-1, 1);
       }
     }
     else
     {
-      PrintLine((x-1)-pos.x, line, line_nr, TRUE, data);
+      PrintLine(data, (x-1)-pos.x, line, line_nr, TRUE);
 
       if((line_nr < data->maxlines) && ((ULONG)(line->visual + line->next->visual) < c))
       {
         data->totallines -= 1;
-        ScrollUp(line_nr, 1, data);
+        ScrollUp(data, line_nr, 1);
       }
     }
 /*------------------*/
@@ -1116,7 +1116,7 @@ BOOL SplitLine(LONG x, struct line_node *line, BOOL move_crsr, struct UserAction
     line_nr++;
     c = 0;
     while((c < line->line.Length) && (line_nr <= data->maxlines))
-      c = c + PrintLine(c, line, line_nr++, TRUE, data);
+      c = c + PrintLine(data, c, line, line_nr++, TRUE);
   /* Her printes !HELE! den nye linie, burde optimeres! */
 
     D(DBF_DUMP, "after split, old line");
@@ -1161,7 +1161,7 @@ static void strcpyback(char *dest, char *src)
 /* ------------------------------------ *
  *  Functions which updates the display *
  * ------------------------------------ */
-void OptimizedPrint(LONG x, struct line_node *line, LONG line_nr, LONG width, struct InstData *data)
+static void OptimizedPrint(struct InstData *data, LONG x, struct line_node *line, LONG line_nr, LONG width)
 {
   ENTER();
 
@@ -1169,13 +1169,13 @@ void OptimizedPrint(LONG x, struct line_node *line, LONG line_nr, LONG width, st
   {
     LONG twidth;
 
-    twidth = PrintLine(x, line, line_nr, TRUE, data);
+    twidth = PrintLine(data, x, line, line_nr, TRUE);
     line_nr++;
 
     if(twidth != width && x+twidth < (LONG)line->line.Length && line_nr <= data->maxlines)
     {
       x += twidth;
-      width += LineCharsWidth(line->line.Contents+x+width, data) - twidth;
+      width += LineCharsWidth(data, line->line.Contents+x+width) - twidth;
     }
     else
       break;
@@ -1187,7 +1187,7 @@ void OptimizedPrint(LONG x, struct line_node *line, LONG line_nr, LONG width, st
 
 ///
 /// UpdateChange()
-static void UpdateChange(LONG x, struct line_node *line, LONG length, const char *characters, struct UserAction *buffer, struct InstData *data)
+static void UpdateChange(struct InstData *data, LONG x, struct line_node *line, LONG length, const char *characters, struct UserAction *buffer)
 {
   LONG diff;
   LONG skip=0;
@@ -1198,12 +1198,12 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
 
   ENTER();
 
-  line_nr = LineToVisual(line, data);
+  line_nr = LineToVisual(data, line);
   orgline_nr = line_nr;
 
   do
   {
-    width = LineCharsWidth(line->line.Contents + skip, data);
+    width = LineCharsWidth(data, line->line.Contents + skip);
 
     // don't exceed the line length!
     if(skip > (LONG)line->line.Length)
@@ -1228,9 +1228,9 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
     {
       UWORD style = buffer->del.style;
 
-      AddStyleToLine(x, line, 1, isFlagSet(style, BOLD) ? BOLD : ~BOLD, data);
-      AddStyleToLine(x, line, 1, isFlagSet(style, ITALIC) ? ITALIC : ~ITALIC, data);
-      AddStyleToLine(x, line, 1, isFlagSet(style, UNDERLINE) ? UNDERLINE : ~UNDERLINE, data);
+      AddStyleToLine(data, x, line, 1, isFlagSet(style, BOLD) ? BOLD : ~BOLD);
+      AddStyleToLine(data, x, line, 1, isFlagSet(style, ITALIC) ? ITALIC : ~ITALIC);
+      AddStyleToLine(data, x, line, 1, isFlagSet(style, UNDERLINE) ? UNDERLINE : ~UNDERLINE);
       line->line.Flow = buffer->del.flow;
       line->line.Separator = buffer->del.separator;
       #warning is buffer->del.highlight missing here?
@@ -1243,7 +1243,7 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
     line->line.Length -= length;
   }
 
-  diff = VisualHeight(line, data) - line->visual;
+  diff = VisualHeight(data, line) - line->visual;
   if(diff != 0)
   {
     LONG movement;
@@ -1256,23 +1256,23 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
     if(diff > 0)
     {
       if(movement < data->maxlines)
-        ScrollDown(movement, diff, data);
+        ScrollDown(data, movement, diff);
     }
     else
     {
       movement = orgline_nr + line->visual - 1;
       if(movement <= data->maxlines)
-        ScrollUp(movement, -diff, data);
+        ScrollUp(data, movement, -diff);
     }
   }
 
   if(orgline_nr != line_nr)
   {
-    if(lineabove_width != LineCharsWidth(line->line.Contents+skip-lineabove_width, data))
+    if(lineabove_width != LineCharsWidth(data, line->line.Contents+skip-lineabove_width))
     {
       LONG newwidth;
 
-      newwidth = PrintLine(skip-lineabove_width, line, line_nr-1, TRUE, data) - lineabove_width;
+      newwidth = PrintLine(data, skip-lineabove_width, line, line_nr-1, TRUE) - lineabove_width;
       skip  += newwidth;
       width -= newwidth;
       if(skip >= (LONG)line->line.Length)
@@ -1283,7 +1283,7 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
     }
   }
 
-  OptimizedPrint(skip, line, line_nr, width, data);
+  OptimizedPrint(data, skip, line, line_nr, width);
   ScrollIntoDisplay(data);
   data->HasChanged = TRUE;
 
@@ -1295,7 +1295,7 @@ static void UpdateChange(LONG x, struct line_node *line, LONG length, const char
 /*------------------------------*
  * Paste n characters to a line *
  *------------------------------*/
-BOOL PasteChars(LONG x, struct line_node *line, LONG length, const char *characters, struct UserAction *buffer, struct InstData *data)
+BOOL PasteChars(struct InstData *data, LONG x, struct line_node *line, LONG length, const char *characters, struct UserAction *buffer)
 {
   ENTER();
 
@@ -1333,14 +1333,14 @@ BOOL PasteChars(LONG x, struct line_node *line, LONG length, const char *charact
 
   if(GetAllocSize(line->line.Contents) < line->line.Length + length + 1)
   {
-    if(ExpandLine(line, length, data) == FALSE)
+    if(ExpandLine(data, line, length) == FALSE)
     {
       RETURN(FALSE);
       return(FALSE);
     }
   }
 
-  UpdateChange(x, line, length, characters, buffer, data);
+  UpdateChange(data, x, line, length, characters, buffer);
 
   RETURN(TRUE);
   return(TRUE);
@@ -1351,7 +1351,7 @@ BOOL PasteChars(LONG x, struct line_node *line, LONG length, const char *charact
 /*----------------------------*
  * Remove n chars from a line *
  *----------------------------*/
-BOOL RemoveChars(LONG x, struct line_node *line, LONG length, struct InstData *data)
+BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG length)
 {
   ENTER();
 
@@ -1451,7 +1451,7 @@ BOOL RemoveChars(LONG x, struct line_node *line, LONG length, struct InstData *d
     line->line.Colors[store].column = EOC;
   }
 
-  UpdateChange(x, line, length, NULL, NULL, data);
+  UpdateChange(data, x, line, length, NULL, NULL);
 
   RETURN(TRUE);
   return(TRUE);

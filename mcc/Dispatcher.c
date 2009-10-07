@@ -63,7 +63,7 @@ void ResetDisplay(struct InstData *data)
     {
       LONG c;
 
-      c = VisualHeight(line, data);
+      c = VisualHeight(data, line);
       lines += c;
       line->visual = c;
       line = line->next;
@@ -87,13 +87,8 @@ void ResetDisplay(struct InstData *data)
 
     UpdateStyles(data);
 
-    DumpText(data->visual_y, 0, data->maxlines, FALSE, data);
-/*    get(_win(data->object), MUIA_Window_ActiveObject, &tst);
-    if(tst == (ULONG)data->object)
-    {
-      SetCursor(data->CPos_X, data->actualline, TRUE, data);
-    }
-*/  }
+    DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
+  }
 
   LEAVE();
 }
@@ -124,7 +119,7 @@ void RejectInput(struct InstData *data)
 
 ///
 /// OM_NEW()
-IPTR New(struct IClass *cl, Object *obj, struct opSet *msg)
+static IPTR New(struct IClass *cl, Object *obj, struct opSet *msg)
 {
   ENTER();
 
@@ -148,7 +143,7 @@ IPTR New(struct IClass *cl, Object *obj, struct opSet *msg)
       {
         if((data->firstline = AllocLine(data)) != NULL)
         {
-          if(Init_LineNode(data->firstline, NULL, "\n", data))
+          if(Init_LineNode(data, data->firstline, NULL, "\n") == TRUE)
           {
             data->actualline = data->firstline;
             data->update = TRUE;
@@ -192,7 +187,7 @@ IPTR New(struct IClass *cl, Object *obj, struct opSet *msg)
 
 ///
 /// OM_DISPOSE()
-IPTR Dispose(struct IClass *cl, Object *obj, Msg msg)
+static IPTR Dispose(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
 
@@ -220,7 +215,7 @@ IPTR Dispose(struct IClass *cl, Object *obj, Msg msg)
 
 ///
 /// MUIM_Setup()
-IPTR Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
+static IPTR Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
 {
   struct InstData *data = INST_DATA(cl, obj);
 
@@ -228,7 +223,7 @@ IPTR Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
 
   // initialize the configuration of our TextEditor
   // object from the configuration set by the user
-  InitConfig(obj, data);
+  InitConfig(data, obj);
 
   if(DoSuperMethodA(cl, obj, (Msg)rinfo))
   {
@@ -292,7 +287,7 @@ IPTR Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
 
 ///
 /// MUIM_Cleanup
-IPTR Cleanup(struct IClass *cl, Object *obj, Msg msg)
+static IPTR Cleanup(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
   IPTR result = 0;
@@ -332,7 +327,7 @@ IPTR Cleanup(struct IClass *cl, Object *obj, Msg msg)
 
 ///
 /// MUIM_AskMinMax()
-IPTR AskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
+static IPTR AskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
   struct MUI_MinMax *mi;
@@ -383,7 +378,7 @@ IPTR AskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
 
 ///
 /// MUIM_Show()
-IPTR Show(struct IClass *cl, Object *obj, Msg msg)
+static IPTR Show(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
   struct line_node  *line;
@@ -412,7 +407,7 @@ IPTR Show(struct IClass *cl, Object *obj, Msg msg)
   {
     LONG c;
 
-    c = VisualHeight(line, data);
+    c = VisualHeight(data, line);
     lines += c;
     line->visual = c;
     line = line->next;
@@ -461,14 +456,14 @@ IPTR Show(struct IClass *cl, Object *obj, Msg msg)
 
 ///
 /// MUIM_Hide()
-IPTR Hide(struct IClass *cl, Object *obj, Msg msg)
+static IPTR Hide(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
 
   ENTER();
 
   data->shown = FALSE;
-  HideSelectPointer(obj, data);
+  HideSelectPointer(data, obj);
   nnset(data->SuggestWindow, MUIA_Window_Open, FALSE);
   set(_win(obj), MUIA_Window_DisableKeys, 0L);
   MUIG_FreeBitMap(data->doublebuffer);
@@ -484,7 +479,7 @@ IPTR Hide(struct IClass *cl, Object *obj, Msg msg)
 
 ///
 /// MUIM_Draw()
-IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
+static IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
 
@@ -538,7 +533,7 @@ IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
     }
 
     // dump all text now
-    DumpText(data->visual_y, 0, data->maxlines, FALSE, data);
+    DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
   }
 
   RETURN(0);
@@ -560,7 +555,7 @@ DISPATCHER(_Dispatcher)
   ENTER();
 
   //kprintf("Method: 0x%lx\n", msg->MethodID);
-//  D(DBF_STARTUP, "Stack usage: %ld %lx", (ULONG)FindTask(NULL)->tc_SPUpper - (ULONG)FindTask(NULL)->tc_SPReg, data);
+//  D(DBF_STARTUP, "Stack usage: %ld %lx", (ULONG)FindTask(NULL)->tc_SPUpper - (ULONG)FindTask(NULL)->tc_SPReg);
 
   // this one must be catched before we try to obtain the instance data, because nobody
   // will guarantee that the pointer returned by INST_DATA() is valid if no object has
@@ -642,7 +637,7 @@ DISPATCHER(_Dispatcher)
         set(obj, MUIA_TextEditor_CursorX, data->CPos_X);
 
       if(data->actualline != oldy)
-        set(obj, MUIA_TextEditor_CursorY, LineNr(data->actualline, data)-1);
+        set(obj, MUIA_TextEditor_CursorY, LineNr(data, data->actualline)-1);
 
       data->NoNotify = FALSE;
 
@@ -669,12 +664,12 @@ DISPATCHER(_Dispatcher)
 
       if(data->shown == TRUE)
       {
-        SetCursor(data->CPos_X, data->actualline, TRUE, data);
+        SetCursor(data, data->CPos_X, data->actualline, TRUE);
 
         // in case we ought to show a selected area in a different
         // color than in inactive state we call MarkText()
         if(isFlagSet(data->flags, FLG_ActiveOnClick) && Enabled(data))
-          MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+          MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
 
         if(isFlagClear(data->flags, FLG_ReadOnly))
           set(_win(obj), MUIA_Window_DisableKeys, MUIKEYF_GADGET_NEXT);
@@ -721,12 +716,12 @@ DISPATCHER(_Dispatcher)
         data->BlinkSpeed = 1;
       }
 
-      SetCursor(data->CPos_X, data->actualline, FALSE, data);
+      SetCursor(data, data->CPos_X, data->actualline, FALSE);
 
       // in case we ought to show a selected area in a different
       // color than in inactive state we call MarkText()
       if(isFlagSet(data->flags, FLG_ActiveOnClick) && Enabled(data))
-        MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+        MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
 
       result = DoSuperMethodA(cl, obj, msg);
 
@@ -771,15 +766,15 @@ DISPATCHER(_Dispatcher)
     }
     break;
 
-    case MUIM_TextEditor_ExportBlock:      result = (ULONG)ExportBlock((struct MUIP_TextEditor_ExportBlock *)msg, data); RETURN(result); return(result); break;
-    case MUIM_TextEditor_ExportText:  result = (ULONG)ExportText((struct MUIP_TextEditor_ExportText *)msg, data); RETURN(result); return(result); break;
+    case MUIM_TextEditor_ExportBlock:      result = (ULONG)ExportBlock(data, (struct MUIP_TextEditor_ExportBlock *)msg); RETURN(result); return(result); break;
+    case MUIM_TextEditor_ExportText:  result = (ULONG)ExportText(data, (struct MUIP_TextEditor_ExportText *)msg); RETURN(result); return(result); break;
     case MUIM_TextEditor_ARexxCmd:    result = HandleARexx(data, ((struct MUIP_TextEditor_ARexxCmd *)msg)->command); break;
-    case MUIM_TextEditor_MarkText:    result = OM_MarkText((struct MUIP_TextEditor_MarkText *)msg, data); break;
-    case MUIM_TextEditor_BlockInfo:   result = OM_BlockInfo((struct MUIP_TextEditor_BlockInfo *)msg, data); break;
-    case MUIM_TextEditor_Search:      result = OM_Search((struct MUIP_TextEditor_Search *)msg, data); break;
-    case MUIM_TextEditor_Replace:     result = OM_Replace(obj, (struct MUIP_TextEditor_Replace *)msg, data); break;
+    case MUIM_TextEditor_MarkText:    result = OM_MarkText(data, (struct MUIP_TextEditor_MarkText *)msg); break;
+    case MUIM_TextEditor_BlockInfo:   result = OM_BlockInfo(data, (struct MUIP_TextEditor_BlockInfo *)msg); break;
+    case MUIM_TextEditor_Search:      result = OM_Search(cl, obj, (struct MUIP_TextEditor_Search *)msg); break;
+    case MUIM_TextEditor_Replace:     result = OM_Replace(cl, obj, (struct MUIP_TextEditor_Replace *)msg); break;
     case MUIM_TextEditor_QueryKeyAction: result = OM_QueryKeyAction(cl, obj, (struct MUIP_TextEditor_QueryKeyAction *)msg); break;
-    case MUIM_TextEditor_SetBlock:      result = OM_SetBlock((struct MUIP_TextEditor_SetBlock *)msg, data); RETURN(result); return(result); break;
+    case MUIM_TextEditor_SetBlock:      result = OM_SetBlock(data, (struct MUIP_TextEditor_SetBlock *)msg); RETURN(result); return(result); break;
 
     case MUIM_Export:
     {

@@ -37,7 +37,7 @@
 #include "private.h"
 
 /// GetFont()
-struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
+static struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
 {
   char *setting;
   char *fontname;
@@ -94,7 +94,7 @@ struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
 
 ///
 /// SetCol()
-void SetCol(struct InstData *data, void *obj, long item, ULONG *storage, long bit)
+static void SetCol(struct InstData *data, void *obj, long item, ULONG *storage, long bit)
 {
   struct MUI_PenSpec *spec;
 
@@ -113,7 +113,7 @@ void SetCol(struct InstData *data, void *obj, long item, ULONG *storage, long bi
 
 ///
 /// InitConfig()
-void InitConfig(Object *obj, struct InstData *data)
+void InitConfig(struct InstData *data, Object *obj)
 {
   ULONG setting = 0;
   UWORD *muipens = _pens(obj);
@@ -414,7 +414,7 @@ void InitConfig(Object *obj, struct InstData *data)
 
 ///
 /// FreeConfig()
-void  FreeConfig(struct InstData *data, struct MUI_RenderInfo *mri)
+void FreeConfig(struct InstData *data, struct MUI_RenderInfo *mri)
 {
   ENTER();
 

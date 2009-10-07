@@ -26,19 +26,19 @@
 
 #include "private.h"
 
-///SimpleMarkText()
-VOID SimpleMarkText (UWORD startx, struct line_node *startline, UWORD stopx, struct line_node *stopline, struct InstData *data)
+/// SimpleMarkText()
+static void SimpleMarkText(struct InstData *data, UWORD startx, struct line_node *startline, UWORD stopx, struct line_node *stopline)
 {
   ENTER();
 
   if(Enabled(data))
   {
     data->blockinfo.enabled = FALSE;
-    MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+    MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
   }
 //  else
   {
-    SetCursor(data->CPos_X, data->actualline, FALSE, data);
+    SetCursor(data, data->CPos_X, data->actualline, FALSE);
   }
 
   data->blockinfo.startline = startline;
@@ -48,18 +48,20 @@ VOID SimpleMarkText (UWORD startx, struct line_node *startline, UWORD stopx, str
   data->blockinfo.enabled = TRUE;
 
   ScrollIntoDisplay(data);
-  MarkText(startx, startline, stopx, stopline, data);
+  MarkText(data, startx, startline, stopx, stopline);
 
   LEAVE();
 }
+
 ///
 
 static LONG Native_strncmp (STRPTR str1, STRPTR str2, LONG len) { return strncmp(str1, str2, len); }
 static LONG Utility_strnicmp (STRPTR str1, STRPTR str2, LONG len) { return Strnicmp(str1, str2, len); }
 
-///OM_Search()
-ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
+/// OM_Search()
+ULONG OM_Search(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Search *msg)
 {
+  struct InstData *data = INST_DATA(cl, obj);
   STRPTR str = msg->SearchString;
   LONG len = strlen(str), step = 0;
 
@@ -125,8 +127,8 @@ ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
             UWORD startx = contents - line->line.Contents;
 
 //D(DBF_STARTUP, "MUIF_TextEditor_Search_Backwards found\n");
-              
-            SimpleMarkText(startx, line, startx+len, line, data);
+
+            SimpleMarkText(data, startx, line, startx+len, line);
 
             RETURN(TRUE);
             return TRUE;
@@ -160,7 +162,7 @@ ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
             {
               UWORD startx = contents - line->line.Contents;
 
-              SimpleMarkText(startx, line, startx+len, line, data);
+              SimpleMarkText(data, startx, line, startx+len, line);
 
               RETURN(TRUE);
               return TRUE;
@@ -180,11 +182,12 @@ ULONG OM_Search (struct MUIP_TextEditor_Search *msg, struct InstData *data)
   RETURN(FALSE);
   return FALSE;
 }
-///
 
-///OM_Replace()
-ULONG OM_Replace (Object *obj, struct MUIP_TextEditor_Replace *msg, struct InstData *data)
+///
+/// OM_Replace()
+ULONG OM_Replace(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Replace *msg)
 {
+  struct InstData *data = INST_DATA(cl, obj);
   ULONG res = FALSE;
 
   ENTER();
@@ -199,4 +202,5 @@ ULONG OM_Replace (Object *obj, struct MUIP_TextEditor_Replace *msg, struct InstD
   RETURN(res);
   return res;
 }
+
 ///
