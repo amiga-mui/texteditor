@@ -178,7 +178,7 @@ static struct BitMap selectPointerBitmap =
 #endif
 #endif
 
-///IdentifyPointerColors()
+/// IdentifyPointerColors()
 static void IdentifyPointerColors(Object *obj)
 {
   int i;
@@ -291,9 +291,9 @@ static void IdentifyPointerColors(Object *obj)
 
   LEAVE();
 }
-///
 
-///SetupSelectPointer()
+///
+/// SetupSelectPointer()
 void SetupSelectPointer(struct InstData *data)
 {
   ENTER();
@@ -341,9 +341,9 @@ void SetupSelectPointer(struct InstData *data)
 
   LEAVE();
 }
-///
 
-///CleanupSelectPointer()
+///
+/// CleanupSelectPointer()
 void CleanupSelectPointer(struct InstData *data)
 {
   ENTER();
@@ -380,10 +380,10 @@ void CleanupSelectPointer(struct InstData *data)
 
   LEAVE();
 }
-///
 
-///ShowSelectPointer()
-void ShowSelectPointer(Object *obj, struct InstData *data)
+///
+/// ShowSelectPointer()
+void ShowSelectPointer(struct InstData *data, Object *obj)
 {
   ENTER();
 
@@ -425,10 +425,10 @@ void ShowSelectPointer(Object *obj, struct InstData *data)
 
   LEAVE();
 }
-///
 
-///HideSelectPointer()
-void HideSelectPointer(Object *obj, struct InstData *data)
+///
+/// HideSelectPointer()
+void HideSelectPointer(struct InstData *data, Object *obj)
 {
   ENTER();
 
@@ -449,4 +449,5 @@ void HideSelectPointer(Object *obj, struct InstData *data)
 
   LEAVE();
 }
+
 ///

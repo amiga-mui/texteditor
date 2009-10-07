@@ -100,7 +100,7 @@ UWORD GetStyle(LONG x, struct line_node *line)
 
 ///
 /// AddStyleToLine()
-void AddStyleToLine(LONG x, struct line_node *line, LONG length, UWORD style, struct InstData *data)
+void AddStyleToLine(struct InstData *data, LONG x, struct line_node *line, LONG length, UWORD style)
 {
   ULONG numStyles;
   struct LineStyle *styles = line->line.Styles;
@@ -217,7 +217,7 @@ void AddStyleToLine(LONG x, struct line_node *line, LONG length, UWORD style, st
 
 ///
 /// AddStyle()
-void AddStyle(struct marking *realblock, UWORD style, BOOL set, struct InstData *data)
+void AddStyle(struct InstData *data, struct marking *realblock, UWORD style, BOOL set)
 {
   struct marking newblock;
   LONG startx, stopx;
@@ -245,7 +245,7 @@ void AddStyle(struct marking *realblock, UWORD style, BOOL set, struct InstData 
   }
   data->HasChanged = TRUE;
 
-  if(realblock->enabled && (realblock->startx != realblock->stopx || realblock->startline != realblock->stopline))
+  if(realblock->enabled == TRUE && (realblock->startx != realblock->stopx || realblock->startline != realblock->stopline))
   {
     NiceBlock(realblock, &newblock);
     startx    = newblock.startx;
@@ -263,21 +263,21 @@ void AddStyle(struct marking *realblock, UWORD style, BOOL set, struct InstData 
 
   if(startline == stopline)
   {
-    AddStyleToLine(startx, startline, stopx-startx, style, data);
+    AddStyleToLine(data, startx, startline, stopx-startx, style);
   }
   else
   {
     struct line_node *line = startline->next;
 
-    AddStyleToLine(startx, startline, startline->line.Length-startx-1, style, data);
+    AddStyleToLine(data, startx, startline, startline->line.Length-startx-1, style);
     while(line != stopline)
     {
-      AddStyleToLine(0, line, line->line.Length-1, style, data);
+      AddStyleToLine(data, 0, line, line->line.Length-1, style);
       line = line->next;
     }
-    AddStyleToLine(0, line, stopx, style, data);
+    AddStyleToLine(data, 0, line, stopx, style);
   }
-  RedrawArea(startx, startline, stopx, stopline, data);
+  RedrawArea(data, startx, startline, stopx, stopline);
 
   if(style > 0xff)
     data->style &= style;

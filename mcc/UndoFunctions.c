@@ -63,7 +63,7 @@ BOOL Undo(struct InstData *data)
     if(Enabled(data))
     {
       data->blockinfo.enabled = FALSE;
-      MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+      MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
     }
 
     // as the redo operation automatically
@@ -77,11 +77,11 @@ BOOL Undo(struct InstData *data)
     data->nextUndoStep--;
     action = &data->undoSteps[data->nextUndoStep];
 
-//    if(data->actualline != LineNode(buffer->y, data) || data->CPos_X != buffer->x)
-    SetCursor(data->CPos_X, data->actualline, FALSE, data);
+//    if(data->actualline != LineNode(data, buffer->y) || data->CPos_X != buffer->x)
+    SetCursor(data, data->CPos_X, data->actualline, FALSE);
 
     data->CPos_X = action->x;
-    data->actualline = LineNode(action->y, data);
+    data->actualline = LineNode(data, action->y);
     ScrollIntoDisplay(data);
 
     // perform the saved undo action
@@ -95,14 +95,14 @@ BOOL Undo(struct InstData *data)
         action->del.flow = data->actualline->line.Flow;
         action->del.separator = data->actualline->line.Separator;
         #warning is buffer->del.highlight missing here?
-        RemoveChars(data->CPos_X, data->actualline, 1, data);
+        RemoveChars(data, data->CPos_X, data->actualline, 1);
       }
       break;
 
       case ET_BACKSPACECHAR:
       {
         D(DBF_UNDO, "undo BACKSPACECHAR");
-        PasteChars(data->CPos_X, data->actualline, 1, (char *)&action->del.character, action, data);
+        PasteChars(data, data->CPos_X, data->actualline, 1, (char *)&action->del.character, action);
         data->CPos_X++;
       }
       break;
@@ -110,28 +110,28 @@ BOOL Undo(struct InstData *data)
       case ET_DELETECHAR:
       {
         D(DBF_UNDO, "undo DELETECHAR");
-        PasteChars(data->CPos_X, data->actualline, 1, (char *)&action->del.character, action, data);
+        PasteChars(data, data->CPos_X, data->actualline, 1, (char *)&action->del.character, action);
       }
       break;
 
       case ET_SPLITLINE:
       {
         D(DBF_UNDO, "undo SPLITLINE");
-        MergeLines(data->actualline, data);
+        MergeLines(data, data->actualline);
       }
       break;
 
       case ET_MERGELINES:
       {
         D(DBF_UNDO, "undo MERGELINES");
-        SplitLine(data->CPos_X, data->actualline, FALSE, action, data);
+        SplitLine(data, data->CPos_X, data->actualline, FALSE, action);
       }
       break;
 
       case ET_BACKSPACEMERGE:
       {
         D(DBF_UNDO, "undo BACKSPACEMARGE");
-        SplitLine(data->CPos_X, data->actualline, TRUE, action, data);
+        SplitLine(data, data->CPos_X, data->actualline, TRUE, action);
       }
       break;
 
@@ -140,16 +140,16 @@ BOOL Undo(struct InstData *data)
         struct marking block =
         {
           TRUE,
-          LineNode(action->y, data),
+          LineNode(data, action->y),
           action->x,
-          LineNode(action->blk.y, data),
+          LineNode(data, action->blk.y),
           action->blk.x
         };
-        char *clip = GetBlock(&block, data);
+        STRPTR clip = GetBlock(data, &block);
 
         D(DBF_UNDO, "undo PASTEBLOCK");
-        CutBlock2(data, FALSE, FALSE, &block, TRUE);
-        action->clip = (unsigned char *)clip;
+        CutBlock2(data, FALSE, FALSE, TRUE, &block);
+        action->clip = clip;
       }
       break;
 
@@ -174,12 +174,12 @@ BOOL Undo(struct InstData *data)
         action->clip = NULL;
 
         action->blk.x = data->CPos_X;
-        action->blk.y = LineNr(data->actualline, data);
+        action->blk.y = LineNr(data, data->actualline);
 
         if(moveCursor == FALSE)
         {
           data->CPos_X = action->x;
-          data->actualline = LineNode(action->y, data);
+          data->actualline = LineNode(data, action->y);
         }
       }
       break;
@@ -192,7 +192,7 @@ BOOL Undo(struct InstData *data)
     ScrollIntoDisplay(data);
 
     if(isFlagSet(data->flags, FLG_Active))
-      SetCursor(data->CPos_X, data->actualline, TRUE, data);
+      SetCursor(data, data->CPos_X, data->actualline, TRUE);
 
     // if there are no further undo levels we
     // have to set UndoAvailable to FALSE
@@ -234,7 +234,7 @@ BOOL Redo(struct InstData *data)
     if(Enabled(data))
     {
       data->blockinfo.enabled = FALSE;
-      MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+      MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
     }
 
     // in case nextUndoStep is equal zero then we have to
@@ -246,10 +246,10 @@ BOOL Redo(struct InstData *data)
     action = &data->undoSteps[data->nextUndoStep];
     data->nextUndoStep++;
 
-//    if(data->actualline != LineNode(buffer->y, data) || data->CPos_X != buffer->x)
-    SetCursor(data->CPos_X, data->actualline, FALSE, data);
+//    if(data->actualline != LineNode(data, buffer->y) || data->CPos_X != buffer->x)
+    SetCursor(data, data->CPos_X, data->actualline, FALSE);
     data->CPos_X = action->x;
-    data->actualline = LineNode(action->y, data);
+    data->actualline = LineNode(data, action->y);
     ScrollIntoDisplay(data);
 
     switch(action->type)
@@ -257,7 +257,7 @@ BOOL Redo(struct InstData *data)
       case ET_PASTECHAR:
       {
         D(DBF_UNDO, "redo PASTECHAR");
-        PasteChars(data->CPos_X, data->actualline, 1, (char *)&action->del.character, action, data);
+        PasteChars(data, data->CPos_X, data->actualline, 1, (char *)&action->del.character, action);
         data->CPos_X++;
       }
       break;
@@ -266,14 +266,14 @@ BOOL Redo(struct InstData *data)
       case ET_DELETECHAR:
       {
         D(DBF_UNDO, "redo BACKSPACECHAR/DELETECHAR");
-        RemoveChars(data->CPos_X, data->actualline, 1, data);
+        RemoveChars(data, data->CPos_X, data->actualline, 1);
       }
       break;
 
       case ET_SPLITLINE:
       {
         D(DBF_UNDO, "redo SPLITLINE");
-        SplitLine(data->CPos_X, data->actualline, TRUE, NULL, data);
+        SplitLine(data, data->CPos_X, data->actualline, TRUE, NULL);
       }
       break;
 
@@ -281,7 +281,7 @@ BOOL Redo(struct InstData *data)
       case ET_BACKSPACEMERGE:
       {
         D(DBF_UNDO, "redo MERGELINES/BACKSPACEMERGE");
-        MergeLines(data->actualline, data);
+        MergeLines(data, data->actualline);
       }
       break;
 
@@ -291,12 +291,12 @@ BOOL Redo(struct InstData *data)
 
         D(DBF_UNDO, "redo PASTEBLOCK");
         data->ImportHook = &ImPlainHook;
-        InsertText(data, (char *)action->clip, TRUE);
+        InsertText(data, action->clip, TRUE);
         data->ImportHook = oldhook;
         MyFreePooled(data->mypool, action->clip);
 
         action->blk.x = data->CPos_X;
-        action->blk.y = LineNr(data->actualline, data);
+        action->blk.y = LineNr(data, data->actualline);
       }
       break;
 
@@ -306,16 +306,16 @@ BOOL Redo(struct InstData *data)
         struct marking block =
         {
           TRUE,
-          LineNode(action->y, data),
+          LineNode(data, action->y),
           action->x,
-          LineNode(action->blk.y, data),
+          LineNode(data, action->blk.y),
           action->blk.x
         };
-        char *clip = GetBlock(&block, data);
+        STRPTR clip = GetBlock(data, &block);
 
         D(DBF_UNDO, "redo DELETEBLOCK/DELETEBLOCK_NOMOVE");
-        CutBlock2(data, FALSE, FALSE, &block, TRUE);
-        action->clip = (unsigned char *)clip;
+        CutBlock2(data, FALSE, FALSE, TRUE, &block);
+        action->clip = clip;
       }
       break;
 
@@ -327,7 +327,7 @@ BOOL Redo(struct InstData *data)
     ScrollIntoDisplay(data);
 
     if(isFlagSet(data->flags, FLG_Active))
-      SetCursor(data->CPos_X, data->actualline, TRUE, data);
+      SetCursor(data, data->CPos_X, data->actualline, TRUE);
 
     // if nextUndoStep == usedUndoSteps this signals that we
     // don't have any things to redo anymore.
@@ -396,7 +396,7 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
     set(data->object, MUIA_TextEditor_UndoAvailable, TRUE);
 
     action->x = data->CPos_X;
-    action->y = LineNr(data->actualline, data);
+    action->y = LineNr(data, data->actualline);
     action->type = eventtype;
 
     switch(eventtype)
@@ -431,23 +431,23 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
 
         D(DBF_UNDO, "add undo PASTEBLOCK");
         action->x = block->startx;
-        action->y = LineNr(block->startline, data);
+        action->y = LineNr(data, block->startline);
         action->blk.x = block->stopx;
-        action->blk.y = LineNr(block->stopline, data);
+        action->blk.y = LineNr(data, block->stopline);
       }
       break;
 
       case ET_DELETEBLOCK:
       {
-        char *text;
+        STRPTR text;
         struct marking *block = (struct marking *)eventData;
 
         D(DBF_UNDO, "add undo DELETEBLOCK");
-        if((text = GetBlock(block, data)) != NULL)
+        if((text = GetBlock(data, block)) != NULL)
         {
           action->x = block->startx;
-          action->y = LineNr(block->startline, data);
-          action->clip = (unsigned char *)text;
+          action->y = LineNr(data, block->startline);
+          action->clip = text;
 
           if(isFlagSet(data->flags, FLG_FreezeCrsr))
             action->type = ET_DELETEBLOCK_NOMOVE;

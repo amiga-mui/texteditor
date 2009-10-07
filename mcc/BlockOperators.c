@@ -32,28 +32,34 @@
 #include "private.h"
 
 /// RedrawArea()
-VOID RedrawArea(UWORD startx, struct line_node *startline, UWORD stopx, struct line_node *stopline, struct InstData *data)
+void RedrawArea(struct InstData *data, UWORD startx, struct line_node *startline, UWORD stopx, struct line_node *stopline)
 {
   struct pos_info pos1, pos2;
-  LONG line_nr1 = LineToVisual(startline, data) - 1;
-  LONG line_nr2 = LineToVisual(stopline, data) - 1;
+  LONG line_nr1;
+  LONG line_nr2;
 
   ENTER();
 
-  OffsetToLines(startx, startline, &pos1, data);
+  line_nr1 = LineToVisual(data, startline) - 1;
+  line_nr2 = LineToVisual(data, stopline) - 1;
+
+  OffsetToLines(data, startx, startline, &pos1);
 
   if(stopx >= stopline->line.Length)
     stopx = stopline->line.Length-1;
 
-  OffsetToLines(stopx, stopline, &pos2, data);
+  OffsetToLines(data, stopx, stopline, &pos2);
 
-  if((line_nr1 += pos1.lines-1) < 0)
+  line_nr1 += pos1.lines-1;
+  if(line_nr1 < 0)
     line_nr1 = 0;
-  if((line_nr2 += pos2.lines-1) >= data->maxlines)
+
+  line_nr2 += pos2.lines-1;
+  if(line_nr2 >= data->maxlines)
     line_nr2 = data->maxlines-1;
   if(line_nr1 <= line_nr2)
   {
-    DumpText(data->visual_y+line_nr1, line_nr1, line_nr2+1, TRUE, data);
+    DumpText(data, data->visual_y+line_nr1, line_nr1, line_nr2+1, TRUE);
   }
 
   LEAVE();
@@ -61,12 +67,12 @@ VOID RedrawArea(UWORD startx, struct line_node *startline, UWORD stopx, struct l
 
 ///
 /// GetBlock()
-char *GetBlock(struct marking *block, struct InstData *data)
+STRPTR GetBlock(struct InstData *data, struct marking *block)
 {
-  LONG    startx, stopx;
-  struct  line_node *startline, *stopline, *act;
-  char    *text = NULL;
-  struct  ExportMessage emsg;
+  LONG startx, stopx;
+  struct line_node *startline, *stopline, *act;
+  STRPTR text = NULL;
+  struct ExportMessage emsg;
 
   ENTER();
 
@@ -384,7 +390,7 @@ LONG CutBlock(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update)
   if(NoCut == FALSE)
     AddToUndoBuffer(data, ET_DELETEBLOCK, &newblock);
 
-  result = CutBlock2(data, Clipboard, NoCut, &newblock, update);
+  result = CutBlock2(data, Clipboard, NoCut, update, &newblock);
 
   RETURN(result);
   return(result);
@@ -392,7 +398,7 @@ LONG CutBlock(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update)
 
 ///
 /// CutBlock2()
-LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, struct marking *newblock, BOOL update)
+LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, struct marking *newblock)
 {
   LONG  tvisual_y;
   LONG  startx, stopx;
@@ -446,7 +452,7 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, struct marking
 
         //D(DBF_STARTUP, "FreeLine %08lx", cc_startline);
 
-        FreeLine(cc_startline, data);
+        FreeLine(data, cc_startline);
       }
       else
         c_startline = c_startline->next;
@@ -468,14 +474,14 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, struct marking
       //D(DBF_STARTUP, "RemoveChars: %ld %ld %08lx %ld", startx, stopx, startline, startline->line.Length);
 
       if(startline->line.Length-startx-1 > 0)
-        RemoveChars(startx, startline, startline->line.Length-startx-1, data);
+        RemoveChars(data, startx, startline, startline->line.Length-startx-1);
 
       if(stopx != 0)
-        RemoveChars(0, stopline, stopx, data);
+        RemoveChars(data, 0, stopline, stopx);
 
       data->CPos_X = startx;
       data->actualline = startline;
-      MergeLines(startline, data);
+      MergeLines(data, startline);
     }
   }
   else
@@ -490,7 +496,7 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, struct marking
 
       if(update == TRUE && NoCut == TRUE)
       {
-        MarkText(data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline, data);
+        MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
           goto end;
       }
     }
@@ -498,13 +504,13 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, struct marking
     if(NoCut == FALSE)
     {
       data->CPos_X = startx;
-      RemoveChars(startx, startline, stopx-startx, data);
+      RemoveChars(data, startx, startline, stopx-startx);
       if(update == TRUE)
         goto end;
     }
   }
 
-  tvisual_y = LineToVisual(startline, data)-1;
+  tvisual_y = LineToVisual(data, startline)-1;
   if(tvisual_y < 0 || tvisual_y > data->maxlines)
   {
     //D(DBF_STARTUP, "ScrollIntoDisplay");
@@ -516,7 +522,7 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, struct marking
   {
     //D(DBF_STARTUP, "DumpText! %ld %ld %ld", data->visual_y, tvisual_y, data->maxlines);
     data->update = TRUE;
-    DumpText(data->visual_y+tvisual_y, tvisual_y, data->maxlines, TRUE, data);
+    DumpText(data, data->visual_y+tvisual_y, tvisual_y, data->maxlines, TRUE);
   }
   res = tvisual_y;
 
@@ -527,4 +533,3 @@ end:
 }
 
 ///
-

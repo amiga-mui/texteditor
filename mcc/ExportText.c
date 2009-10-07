@@ -27,7 +27,7 @@
 #include "private.h"
 
 /// ExportText()
-void *ExportText(UNUSED struct MUIP_TextEditor_ExportText *msg, struct InstData *data)
+void *ExportText(struct InstData *data, UNUSED struct MUIP_TextEditor_ExportText *msg)
 {
   struct line_node *node = data->firstline;
   struct Hook *exportHook = data->ExportHook;

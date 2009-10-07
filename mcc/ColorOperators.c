@@ -45,7 +45,7 @@ UWORD GetColor(UWORD x, struct line_node *line)
 
 ///
 /// AddColorToLine()
-void AddColorToLine(UWORD x, struct line_node *line, UWORD length, UWORD color, struct InstData *data)
+static void AddColorToLine(struct InstData *data, UWORD x, struct line_node *line, UWORD length, UWORD color)
 {
   ULONG numColors;
   struct LineColor *colors = line->line.Colors;
@@ -134,7 +134,7 @@ void AddColorToLine(UWORD x, struct line_node *line, UWORD length, UWORD color, 
 }
 ///
 /// AddColor()
-VOID AddColor(struct marking *realblock, UWORD color, struct InstData *data)
+void AddColor(struct InstData *data, struct marking *realblock, UWORD color)
 {
   struct marking newblock;
   struct line_node *startline, *stopline;
@@ -143,7 +143,7 @@ VOID AddColor(struct marking *realblock, UWORD color, struct InstData *data)
   ENTER();
 
   data->HasChanged = TRUE;
-  if(realblock->enabled && (realblock->startx != realblock->stopx || realblock->startline != realblock->stopline))
+  if(realblock->enabled == TRUE && (realblock->startx != realblock->stopx || realblock->startline != realblock->stopline))
   {
     NiceBlock(realblock, &newblock);
     startx    = newblock.startx;
@@ -161,21 +161,21 @@ VOID AddColor(struct marking *realblock, UWORD color, struct InstData *data)
 
   if(startline == stopline)
   {
-    AddColorToLine(startx, startline, stopx-startx, color, data);
+    AddColorToLine(data, startx, startline, stopx-startx, color);
   }
   else
   {
     struct line_node *line = startline->next;
 
-    AddColorToLine(startx, startline, startline->line.Length-startx-1, color, data);
+    AddColorToLine(data, startx, startline, startline->line.Length-startx-1, color);
     while(line != stopline)
     {
-      AddColorToLine(0, line, line->line.Length-1, color, data);
+      AddColorToLine(data, 0, line, line->line.Length-1, color);
       line = line->next;
     }
-    AddColorToLine(0, line, stopx, color, data);
+    AddColorToLine(data, 0, line, stopx, color);
   }
-  RedrawArea(startx, startline, stopx, stopline, data);
+  RedrawArea(data, startx, startline, stopx, stopline);
 
   LEAVE();
 }

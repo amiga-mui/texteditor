@@ -49,7 +49,7 @@ APTR MyAllocPooled(APTR pool, ULONG length)
 
 ///
 /// MyFreePooled()
-VOID MyFreePooled(APTR pool, APTR mem)
+void MyFreePooled(APTR pool, APTR mem)
 {
   ULONG *memptr, length;
 
@@ -81,7 +81,7 @@ APTR MyAlloc(ULONG length)
 
 ///
 /// MyFree()
-VOID MyFree(APTR mem)
+void MyFree(APTR mem)
 {
   ULONG *memptr, length;
 
@@ -111,7 +111,7 @@ struct line_node *AllocLine(struct InstData *data)
 
 ///
 /// FreeLine()
-void FreeLine(struct line_node* line, struct InstData *data)
+void FreeLine(struct InstData *data, struct line_node* line)
 {
   ENTER();
 

@@ -47,11 +47,10 @@
 /*************************************************************************/
 
 #include "private.h"
-
-VOID DrawSeparator (struct RastPort *rp, WORD X, WORD Y, WORD Width, WORD Height, struct InstData *data);
+#include "Debug.h"
 
 /// AddClipping()
-void AddClipping (struct InstData *data)
+void AddClipping(struct InstData *data)
 {
   ENTER();
 
@@ -65,7 +64,7 @@ void AddClipping (struct InstData *data)
 
 ///
 /// RemoveClipping()
-void RemoveClipping (struct InstData *data)
+void RemoveClipping(struct InstData *data)
 {
   ENTER();
 
@@ -75,7 +74,9 @@ void RemoveClipping (struct InstData *data)
   LEAVE();
 }
 
-void FreeTextMem(struct line_node *line, struct InstData *data)
+///
+/// FreeTextMem
+void FreeTextMem(struct InstData *data, struct line_node *line)
 {
   ENTER();
 
@@ -89,7 +90,7 @@ void FreeTextMem(struct line_node *line, struct InstData *data)
 
     line = line->next;
 
-    FreeLine(tline, data);
+    FreeLine(data, tline);
   }
 
   LEAVE();
@@ -100,7 +101,7 @@ void FreeTextMem(struct line_node *line, struct InstData *data)
 /*-----------------------------------*
  * Initializes a line_node structure *
  *-----------------------------------*/
-BOOL Init_LineNode(struct line_node *line, struct line_node *previous, const char *text, struct InstData *data)
+BOOL Init_LineNode(struct InstData *data, struct line_node *line, struct line_node *previous, CONST_STRPTR text)
 {
   BOOL success = FALSE;
   LONG textlength = 0;
@@ -108,10 +109,10 @@ BOOL Init_LineNode(struct line_node *line, struct line_node *previous, const cha
 
   ENTER();
 
-  while((text[textlength] != '\n') && (text[textlength] != 0))
+  while(text[textlength] != '\n' && text[textlength] != '\0')
     textlength++;
 
-  if((ctext = MyAllocPooled(data->mypool, textlength+2)))
+  if((ctext = MyAllocPooled(data->mypool, textlength+2)) != NULL)
   {
     memcpy(ctext, text, textlength+1);
     ctext[textlength+1] = 0;
@@ -121,7 +122,7 @@ BOOL Init_LineNode(struct line_node *line, struct line_node *previous, const cha
     line->line.Contents = ctext;
     line->line.Length = textlength+1;
     if(data->rport != NULL)
-      line->visual = VisualHeight(line, data);
+      line->visual = VisualHeight(data, line);
     line->line.Highlight = FALSE;
     line->line.Styles = NULL;
     line->line.Colors = NULL;
@@ -140,7 +141,7 @@ BOOL Init_LineNode(struct line_node *line, struct line_node *previous, const cha
 
 ///
 /// ExpandLine()
-BOOL ExpandLine(struct line_node *line, LONG length, struct InstData *data)
+BOOL ExpandLine(struct InstData *data, struct line_node *line, LONG length)
 {
   BOOL result = FALSE;
   char *newbuffer;
@@ -161,7 +162,7 @@ BOOL ExpandLine(struct line_node *line, LONG length, struct InstData *data)
 
 ///
 /// CompressLine()
-BOOL CompressLine(struct line_node *line, struct InstData *data)
+BOOL CompressLine(struct InstData *data, struct line_node *line)
 {
   BOOL result = FALSE;
   char *newbuffer;
@@ -180,12 +181,13 @@ BOOL CompressLine(struct line_node *line, struct InstData *data)
   RETURN(result);
   return result;
 }
+
 ///
 /// LineCharsWidth()
 /*-----------------------------------------------------*
  * Returns the number of chars that will fit on a line *
  *-----------------------------------------------------*/
-LONG LineCharsWidth(char *text, struct InstData *data)
+LONG LineCharsWidth(struct InstData *data, CONST_STRPTR text)
 {
   LONG c;
   LONG w = data->innerwidth;
@@ -251,7 +253,7 @@ LONG LineCharsWidth(char *text, struct InstData *data)
 /*-------------------------------------------------------*
  * Return the number of visual lines that the line fills *
  *-------------------------------------------------------*/
-ULONG VisualHeight(struct line_node *line, struct InstData *data)
+ULONG VisualHeight(struct InstData *data, struct line_node *line)
 {
   ULONG lines = 0;
 
@@ -266,7 +268,7 @@ ULONG VisualHeight(struct line_node *line, struct InstData *data)
 
     while(c < length)
     {
-      LONG d = LineCharsWidth(line->line.Contents+c, data);
+      LONG d = LineCharsWidth(data, line->line.Contents+c);
 
       if(d > 0)
         c += d;
@@ -282,49 +284,11 @@ ULONG VisualHeight(struct line_node *line, struct InstData *data)
 }
 
 ///
-
-/*
-/// ClearLine()
-//Clear from EOL to end of window
-void ClearLine(char *text, int printed, int line_nr, struct InstData *data)
-{
-      int textlength;
-
-  if(data->update == FALSE)
-    return;
-
-  textlength = TextLength(data->tmprp, text, printed);
-
-  if(data->fastbackground == TRUE)
-  {
-    SetDrMd(data->rport, JAM2);
-    SetAPen(data->rport, data->backgroundcolor);
-    RectFill(data->rport,
-          data->xpos + textlength,
-          data->ypos + (data->height * (line_nr - 1)),
-          data->xpos + data->innerwidth - 1,
-          data->ypos + (data->height * line_nr) - 1
-          );
-  }
-  else
-  {
-    DoMethod(data->object, MUIM_DrawBackground,
-              data->xpos + textlength,
-              data->ypos + (data->height * (line_nr - 1)),
-              data->innerwidth - textlength,
-              data->height,
-              data->xpos+textlength, data->realypos+data->height * (data->visual_y+line_nr-2));
-  }
-}
-
-///
-*/
-
 /// OffsetToLines()
 /*-----------------------------------------*
  * Convert an xoffset to a number of lines *
  *-----------------------------------------*/
-void OffsetToLines(LONG x, struct line_node *line, struct pos_info *pos, struct InstData *data)
+void OffsetToLines(struct InstData *data, LONG x, struct line_node *line, struct pos_info *pos)
 {
   ENTER();
 
@@ -336,7 +300,7 @@ void OffsetToLines(LONG x, struct line_node *line, struct pos_info *pos, struct 
 
     while(c <= (ULONG)x)
     {
-      LONG e = LineCharsWidth(line->line.Contents+c, data);
+      LONG e = LineCharsWidth(data, line->line.Contents+c);
 
       d = c;
 
@@ -367,9 +331,9 @@ void OffsetToLines(LONG x, struct line_node *line, struct pos_info *pos, struct 
 
 ///
 /// LineNr()
-unsigned short LineNr(struct line_node *line, struct InstData *data)
+LONG LineNr(struct InstData *data, struct line_node *line)
 {
-  unsigned short result = 1;
+  LONG result = 1;
   struct line_node *actual = data->firstline;
 
   ENTER();
@@ -386,7 +350,7 @@ unsigned short LineNr(struct line_node *line, struct InstData *data)
 
 ///
 /// LineNode()
-struct line_node *LineNode(unsigned short linenr, struct InstData *data)
+struct line_node *LineNode(struct InstData *data, LONG linenr)
 {
   struct line_node *actual = data->firstline;
 
@@ -406,7 +370,7 @@ struct line_node *LineNode(unsigned short linenr, struct InstData *data)
 /*------------------*
  * Place the cursor *
  *------------------*/
-void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
+void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
 {
   unsigned char chars[4] = "   \0";
   LONG   line_nr;
@@ -438,8 +402,8 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
     return;
   }
 
-  line_nr = LineToVisual(line, data) - 1;
-  OffsetToLines(x, line, &pos, data);
+  line_nr = LineToVisual(data, line) - 1;
+  OffsetToLines(data, x, line, &pos);
 
   if(line_nr + pos.lines <= data->maxlines && line_nr + pos.lines > 0)
   {
@@ -466,7 +430,7 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
       cursor_width = data->CursorWidth;
 
     xplace  = data->xpos + TextLength(&data->tmprp, line->line.Contents+(x-pos.x), pos.x+start);
-    xplace += FlowSpace(line->line.Flow, line->line.Contents+pos.bytes, data);
+    xplace += FlowSpace(data, line->line.Flow, line->line.Contents+pos.bytes);
     yplace  = data->ypos + (data->height * (line_nr + pos.lines - 1));
     cursorxplace = xplace + TextLength(&data->tmprp, line->line.Contents+(x+start), 0-start);
 
@@ -566,7 +530,7 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
 
       for(c = start; c <= stop; c++)
       {
-        SetAPen(rp, ConvertPen(colors[1+c], line->line.Highlight, data));
+        SetAPen(rp, ConvertPen(data, colors[1+c], line->line.Highlight));
         SetSoftStyle(rp, styles[1+c], AskSoftStyle(rp));
         Text(rp, (STRPTR)&chars[1+c], 1);
       }
@@ -578,7 +542,7 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
         WORD LeftX, LeftWidth;
         WORD RightX, RightWidth;
         WORD Y, Height;
-        UWORD flow = FlowSpace(line->line.Flow, line->line.Contents+pos.bytes, data);
+        UWORD flow = FlowSpace(data, line->line.Flow, line->line.Contents+pos.bytes);
 
         LeftX = data->xpos;
         LeftWidth = flow-3;
@@ -601,9 +565,9 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
         }
         else
         {
-          DrawSeparator(rp, RightX, Y, RightWidth, Height, data);
+          DrawSeparator(data, rp, RightX, Y, RightWidth, Height);
         }
-        DrawSeparator(rp, LeftX, Y, LeftWidth, Height, data);
+        DrawSeparator(data, rp, LeftX, Y, LeftWidth, Height);
       }
 
       if(clipping)
@@ -619,7 +583,7 @@ void SetCursor(LONG x, struct line_node *line, BOOL Set, struct InstData *data)
 /*-----------------------------------------*
  * Dump text from buffer and out to screen *
  *-----------------------------------------*/
-void DumpText(LONG visual_y, LONG line_nr, LONG lines, BOOL doublebuffer, struct InstData *data)
+void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BOOL doublebuffer)
 {
   struct pos_info pos;
   struct line_node *line;
@@ -630,7 +594,7 @@ void DumpText(LONG visual_y, LONG line_nr, LONG lines, BOOL doublebuffer, struct
 
   if(data->update == TRUE && data->shown == TRUE && isFlagClear(data->flags, FLG_Quiet))
   {
-    GetLine(visual_y, &pos, data);
+    GetLine(data, visual_y, &pos);
     line = pos.line;
     x = pos.x;
 
@@ -647,7 +611,7 @@ void DumpText(LONG visual_y, LONG line_nr, LONG lines, BOOL doublebuffer, struct
     while((line != NULL) && (line_nr != lines))
     {
       while((x < line->line.Length) && (line_nr != lines))
-        x = x + PrintLine(x, line, ++line_nr, doublebuffer, data);
+        x = x + PrintLine(data, x, line, ++line_nr, doublebuffer);
 
       line = line->next;
       x = 0;
@@ -703,7 +667,7 @@ void DumpText(LONG visual_y, LONG line_nr, LONG lines, BOOL doublebuffer, struct
 /*-----------------------*
  * Scroll up the display *
  *-----------------------*/
-void ScrollUp(LONG line_nr, LONG lines, struct InstData *data)
+void ScrollUp(struct InstData *data, LONG line_nr, LONG lines)
 {
   struct pos_info pos;
 
@@ -717,7 +681,7 @@ void ScrollUp(LONG line_nr, LONG lines, struct InstData *data)
 
   if(data->fastbackground == FALSE && line_nr > 0)
   {
-    DumpText(data->visual_y+line_nr, line_nr, data->maxlines, FALSE, data);
+    DumpText(data, data->visual_y+line_nr, line_nr, data->maxlines, FALSE);
   }
   else
   {
@@ -748,8 +712,8 @@ void ScrollUp(LONG line_nr, LONG lines, struct InstData *data)
       {
         if(data->visual_y+data->maxlines-1 <= data->totallines)
         {
-          GetLine(data->visual_y + data->maxlines - 1, &pos, data);
-          PrintLine(pos.x, pos.line, data->maxlines, TRUE, data);
+          GetLine(data, data->visual_y + data->maxlines - 1, &pos);
+          PrintLine(data, pos.x, pos.line, data->maxlines, TRUE);
         }
         else
         {
@@ -764,12 +728,12 @@ void ScrollUp(LONG line_nr, LONG lines, struct InstData *data)
       }
       else
       {
-        DumpText(data->visual_y+data->maxlines-lines, data->maxlines-lines, data->maxlines, FALSE, data);
+        DumpText(data, data->visual_y+data->maxlines-lines, data->maxlines-lines, data->maxlines, FALSE);
       }
     }
     else
     {
-      DumpText(data->visual_y, 0, data->maxlines, FALSE, data);
+      DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
     }
   }
 
@@ -781,7 +745,7 @@ void ScrollUp(LONG line_nr, LONG lines, struct InstData *data)
 /*-------------------------*
  * Scroll down the display *
  *-------------------------*/
-void ScrollDown(LONG line_nr, LONG lines, struct InstData *data)
+void ScrollDown(struct InstData *data, LONG line_nr, LONG lines)
 {
   ENTER();
 
@@ -793,7 +757,7 @@ void ScrollDown(LONG line_nr, LONG lines, struct InstData *data)
 
   if(data->fastbackground == FALSE && line_nr > 0)
   {
-    DumpText(data->visual_y+line_nr, line_nr, data->maxlines, FALSE, data);
+    DumpText(data, data->visual_y+line_nr, line_nr, data->maxlines, FALSE);
   }
   else
   {
@@ -822,12 +786,12 @@ void ScrollDown(LONG line_nr, LONG lines, struct InstData *data)
 
       if(line_nr == 0)
       {
-        DumpText(data->visual_y, 0, lines, FALSE, data);
+        DumpText(data, data->visual_y, 0, lines, FALSE);
       }
     }
     else
     {
-      DumpText(data->visual_y, 0, data->maxlines, FALSE, data);
+      DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
     }
   }
 
@@ -839,7 +803,7 @@ void ScrollDown(LONG line_nr, LONG lines, struct InstData *data)
 /*----------------------------------------------*
  * Find a line and fillout a pos_info structure *
  *----------------------------------------------*/
-void GetLine(LONG realline, struct pos_info *pos, struct InstData *data)
+void GetLine(struct InstData *data, LONG realline, struct pos_info *pos)
 {
   struct line_node *line = data->firstline;
   LONG x = 0;
@@ -863,7 +827,7 @@ void GetLine(LONG realline, struct pos_info *pos, struct InstData *data)
   {
     while(--realline)
     {
-      x += LineCharsWidth(line->line.Contents+x, data);
+      x += LineCharsWidth(data, line->line.Contents+x);
     }
   }
 
@@ -877,7 +841,7 @@ void GetLine(LONG realline, struct pos_info *pos, struct InstData *data)
 /*----------------------------*
  * Find visual line on screen *
  *----------------------------*/
-LONG LineToVisual(struct line_node *line, struct InstData *data)
+LONG LineToVisual(struct InstData *data, struct line_node *line)
 {
   LONG  line_nr = 2 - data->visual_y;   // Top line!
   struct line_node *tline = data->firstline;

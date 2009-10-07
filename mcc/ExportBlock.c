@@ -27,7 +27,7 @@
 #include "private.h"
 
 /// ExportBlock()
-void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data)
+void *ExportBlock(struct InstData *data, struct MUIP_TextEditor_ExportBlock *msg)
 {
   struct line_node *node;
   struct Hook *exportHook = data->ExportHook;
@@ -40,7 +40,7 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
   ENTER();
 
   // get information about marked text
-  if(data->blockinfo.enabled)
+  if(data->blockinfo.enabled == TRUE)
     NiceBlock(&data->blockinfo, &newblock);
   else
   {
@@ -54,7 +54,7 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
   {
 
     if(msg->starty <= (ULONG)data->totallines)
-      newblock.startline = LineNode(msg->starty+1, data);
+      newblock.startline = LineNode(data, msg->starty+1);
 
     if(msg->startx <= (newblock.startline)->line.Length)
       newblock.startx = msg->startx;
@@ -63,7 +63,7 @@ void *ExportBlock(struct MUIP_TextEditor_ExportBlock *msg, struct InstData *data
       newblock.stopx = msg->stopx;
 
     if(msg->starty <= (ULONG)data->totallines)
-      newblock.stopline = LineNode(msg->stopy+1, data);
+      newblock.stopline = LineNode(data, msg->stopy+1);
   }
 
   node = newblock.startline;
