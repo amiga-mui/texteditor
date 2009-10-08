@@ -21,6 +21,7 @@
 ***************************************************************************/
 
 #include "private.h"
+#include "Debug.h"
 
 /// GetColor()
 UWORD GetColor(UWORD x, struct line_node *line)

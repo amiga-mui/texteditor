@@ -23,6 +23,7 @@
 #include <proto/intuition.h>
 
 #include "private.h"
+#include "Debug.h"
 
 /// UpdateStyles()
 void UpdateStyles(struct InstData *data)

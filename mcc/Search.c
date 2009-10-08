@@ -25,6 +25,7 @@
 #include <proto/utility.h>
 
 #include "private.h"
+#include "Debug.h"
 
 /// SimpleMarkText()
 static void SimpleMarkText(struct InstData *data, UWORD startx, struct line_node *startline, UWORD stopx, struct line_node *stopline)

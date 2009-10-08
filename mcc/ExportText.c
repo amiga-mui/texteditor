@@ -25,6 +25,7 @@
 #include <proto/utility.h>
 
 #include "private.h"
+#include "Debug.h"
 
 /// ExportText()
 void *ExportText(struct InstData *data, UNUSED struct MUIP_TextEditor_ExportText *msg)

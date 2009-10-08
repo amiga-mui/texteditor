@@ -32,6 +32,7 @@
 #include <proto/dos.h>
 
 #include "private.h"
+#include "Debug.h"
 
 struct RexxCommand
 {

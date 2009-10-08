@@ -25,6 +25,7 @@
 #include <proto/utility.h>
 
 #include "private.h"
+#include "Debug.h"
 
 /// ExportBlock()
 void *ExportBlock(struct InstData *data, struct MUIP_TextEditor_ExportBlock *msg)

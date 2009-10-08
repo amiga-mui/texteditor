@@ -39,6 +39,7 @@
 #include <libraries/mui.h>
 
 #include "private.h"
+#include "Debug.h"
 
 DISPATCHERPROTO(_Dispatcher);
 

@@ -30,6 +30,7 @@
 #include <proto/iffparse.h>
 
 #include "private.h"
+#include "Debug.h"
 
 /// RedrawArea()
 void RedrawArea(struct InstData *data, UWORD startx, struct line_node *startline, UWORD stopx, struct line_node *stopline)

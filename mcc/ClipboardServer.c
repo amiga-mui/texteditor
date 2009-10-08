@@ -35,7 +35,6 @@
 #include <proto/iffparse.h>
 
 #include "private.h"
-
 #include "Debug.h"
 
 static struct Library *IFFParseBase = NULL;
