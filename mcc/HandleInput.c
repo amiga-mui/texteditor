@@ -38,6 +38,7 @@
 #include <stdlib.h>
 
 #include "private.h"
+#include "Debug.h"
 
 #if !defined(__amigaos4__)
 #include "newmouse.h"

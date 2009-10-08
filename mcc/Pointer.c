@@ -32,6 +32,7 @@
 #include <proto/graphics.h>
 
 #include "private.h"
+#include "Debug.h"
 
 // the meta data of the pointer image/data
 #define selectPointerWidth   7

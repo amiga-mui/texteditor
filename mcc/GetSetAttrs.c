@@ -33,6 +33,7 @@
 #include <proto/muimaster.h>
 
 #include "private.h"
+#include "Debug.h"
 
 #include "version.h"
 

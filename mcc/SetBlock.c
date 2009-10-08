@@ -25,6 +25,7 @@
 #include <proto/utility.h>
 
 #include "private.h"
+#include "Debug.h"
 
 /// OM_SetBlock()
 ULONG OM_SetBlock(struct InstData *data, struct MUIP_TextEditor_SetBlock *msg)

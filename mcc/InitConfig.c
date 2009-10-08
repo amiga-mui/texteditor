@@ -35,61 +35,50 @@
 
 #include "TextEditor_mcp.h"
 #include "private.h"
+#include "Debug.h"
 
 /// GetFont()
 static struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long attr)
 {
+  struct TextFont *font = NULL;
   char *setting;
-  char *fontname;
-  char *size_ptr;
-  struct TextFont *f;
-  struct TextAttr myfont;
-  int fontname_len;
 
   ENTER();
 
-  if(!DoMethod(obj, MUIM_GetConfigItem, attr, &setting))
+  if(DoMethod(obj, MUIM_GetConfigItem, attr, &setting) && setting != NULL)
   {
-    RETURN(NULL);
-    return NULL;
+    char *fontname;
+    int fontnameLen;
+
+    fontnameLen = strlen(setting)+6;
+    if((fontname = AllocVec(fontnameLen, MEMF_SHARED|MEMF_CLEAR)) != NULL)
+    {
+      char *sizePtr;
+      struct TextAttr textAttr;
+
+      textAttr.ta_Name = fontname;
+      textAttr.ta_YSize = 8;
+      textAttr.ta_Style = FS_NORMAL;
+      textAttr.ta_Flags = 0;
+
+      strlcpy(fontname, setting, fontnameLen);
+      if((sizePtr = strchr(fontname, '/')) != NULL)
+      {
+        LONG size;
+
+        StrToLong(sizePtr + 1, &size);
+        strlcpy(sizePtr, ".font", fontnameLen-(sizePtr-fontname));
+        textAttr.ta_YSize = size;
+      }
+
+      font = OpenDiskFont(&textAttr);
+    }
+
+    FreeVec(fontname);
   }
 
-  if(!setting)
-  {
-    RETURN(NULL);
-    return NULL;
-  }
-
-  fontname_len = strlen(setting)+6;
-  if(!(fontname = AllocVec(fontname_len, MEMF_SHARED|MEMF_CLEAR)))
-  {
-    RETURN(NULL);
-    return NULL;
-  }
-
-  f = NULL;
-
-  myfont.ta_Name = fontname;
-  myfont.ta_YSize = 8;
-  myfont.ta_Style = FS_NORMAL;
-  myfont.ta_Flags = 0;
-
-  strlcpy(fontname, setting, fontname_len);
-  size_ptr = strchr(fontname,'/');
-  if (size_ptr)
-  {
-    LONG size;
-
-    StrToLong(size_ptr + 1, &size);
-    strlcpy(size_ptr, ".font", fontname_len-(size_ptr-fontname));
-    myfont.ta_YSize = size;
-  }
-
-  f = OpenDiskFont(&myfont);
-  FreeVec(fontname);
-
-  RETURN(f);
-  return f;
+  RETURN(font);
+  return font;
 }
 
 ///

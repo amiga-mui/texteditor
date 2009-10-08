@@ -28,6 +28,7 @@
 #include <proto/intuition.h>
 
 #include "private.h"
+#include "Debug.h"
 
 /// FreeUndoStep()
 // free the memory occupated an undo step

@@ -26,6 +26,7 @@
 #include <proto/intuition.h>
 
 #include "private.h"
+#include "Debug.h"
 
 #include "TextEditor_mcp.h"
 

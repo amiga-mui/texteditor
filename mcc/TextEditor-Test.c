@@ -35,6 +35,7 @@
 #include <proto/utility.h>
 
 #include "private.h"
+#include "Debug.h"
 #include "version.h"
 
 #include "SDI_hook.h"

@@ -26,6 +26,7 @@
 #include <proto/intuition.h>
 
 #include "private.h"
+#include "Debug.h"
 
 /// convert()
 ULONG convert(UWORD style)
