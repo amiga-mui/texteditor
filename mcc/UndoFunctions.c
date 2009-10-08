@@ -381,6 +381,9 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
 
     action = &data->undoSteps[data->nextUndoStep];
 
+    // clear any previous data
+    memset(action, 0, sizeof(*action));
+
     // advance the index for the next undo step
     data->nextUndoStep++;
     // and count this new step
