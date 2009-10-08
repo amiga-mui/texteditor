@@ -38,7 +38,10 @@ static void FreeUndoStep(struct InstData *data, struct UserAction *step)
   if(step->type == ET_DELETEBLOCK || step->type == ET_PASTEBLOCK)
   {
     if(step->clip != NULL)
+    {
       MyFreePooled(data->mypool, step->clip);
+      step->clip = NULL;
+    }
   }
 
   LEAVE();
