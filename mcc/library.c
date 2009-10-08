@@ -32,6 +32,7 @@
 /******************************************************************************/
 
 #include "private.h"
+#include "Debug.h"
 #include "version.h"
 
 #define VERSION       LIB_VERSION
