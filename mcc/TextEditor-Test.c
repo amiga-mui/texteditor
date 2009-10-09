@@ -127,7 +127,7 @@ struct Library *UtilityBase = NULL;
 struct Library *WorkbenchBase = NULL;
 #elif defined(__MORPHOS__)
 struct Library *DiskfontBase = NULL;
-struct Library *GfxBase = NULL;
+struct GfxBase *GfxBase = NULL;
 struct IntuitionBase *IntuitionBase = NULL;
 struct Library *KeymapBase = NULL;
 struct Library *LayersBase = NULL;
