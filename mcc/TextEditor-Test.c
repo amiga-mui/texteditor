@@ -138,7 +138,7 @@ struct Library *UtilityBase = NULL;
 struct Library *WorkbenchBase = NULL;
 #else
 struct Library *DiskfontBase = NULL;
-struct Library *GfxBase = NULL;
+struct GfxBase *GfxBase = NULL;
 struct IntuitionBase *IntuitionBase = NULL;
 struct Library *KeymapBase = NULL;
 struct Library *LayersBase = NULL;
@@ -179,7 +179,7 @@ int main(void)
 
   if((DiskfontBase = OpenLibrary("diskfont.library", 38)) &&
     GETINTERFACE(IDiskfont, DiskfontBase))
-  if((GfxBase = OpenLibrary("graphics.library", 38)) &&
+  if((GfxBase = (APTR)OpenLibrary("graphics.library", 38)) &&
     GETINTERFACE(IGraphics, GfxBase))
   if((IntuitionBase = (APTR)OpenLibrary("intuition.library", 38)) &&
     GETINTERFACE(IIntuition, IntuitionBase))
@@ -605,6 +605,10 @@ int main(void)
       GetProgramName(prgname, 32);
       PrintFault(error, prgname);
     }
+
+    #if defined(DEBUG)
+    CleanupDebug();
+    #endif
   }
 
   ShutdownClipboardServer();
@@ -654,7 +658,7 @@ int main(void)
   if(GfxBase)
   {
     DROPINTERFACE(IGraphics);
-    CloseLibrary(GfxBase);
+    CloseLibrary((struct Library *)GfxBase);
   }
 
   if(DiskfontBase)
