@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-10-09 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Debug.c: implemented the memory tracking for the debug build as known
+    from YAM to catch possible memory leaks.
+
 2009-10-08 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/UndoFunctions.c: when reusing an undo entry the former contents were not
