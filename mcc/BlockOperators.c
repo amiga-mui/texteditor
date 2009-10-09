@@ -448,6 +448,8 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, s
         MyFreePooled(data->mypool, c_startline->line.Contents);
         if(c_startline->line.Styles != NULL)
           MyFreePooled(data->mypool, c_startline->line.Styles);
+        if(c_startline->line.Colors != NULL)
+          MyFreePooled(data->mypool, c_startline->line.Colors);
         data->totallines -= c_startline->visual;
         c_startline = c_startline->next;
 
