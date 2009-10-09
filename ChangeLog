@@ -7,6 +7,9 @@ $URL$
 
 2009-10-09 Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/BlockOperators.c: cutting a line to the clipboard and deleting complete
+    lines will now free the attached color informations as well. Before only the
+    text and the styles were freed which means this was a potential memory leak.
   * mcc/Dispatcher.c: the OM_DISPOSE method will now free all lines together
     with their contents, styles and colors. Although we are using a per-instance
     memory pool this is not absolutely necessary to avoid memory leaks, but it
