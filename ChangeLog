@@ -7,6 +7,10 @@ $URL$
 
 2009-10-09 Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/Dispatcher.c: the OM_DISPOSE method will now free all lines together
+    with their contents, styles and colors. Although we are using a per-instance
+    memory pool this is not absolutely necessary to avoid memory leaks, but it
+    is bad style to rely on such features.
   * mcc/Debug.c: implemented the memory tracking for the debug build as known
     from YAM to catch possible memory leaks.
 

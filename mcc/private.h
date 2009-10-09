@@ -464,8 +464,8 @@ void *ExportBlock(struct InstData *data, struct MUIP_TextEditor_ExportBlock *msg
 void *ExportText(struct InstData *data, struct MUIP_TextEditor_ExportText *msg);
 
 // GetSetAttrs.c
-IPTR Get(struct IClass *, Object *, struct opGet *);
-IPTR Set(struct IClass *, Object *, struct opSet *);
+IPTR mGet(struct IClass *, Object *, struct opGet *);
+IPTR mSet(struct IClass *, Object *, struct opSet *);
 
 // HandleARexx.c
 ULONG HandleARexx(struct InstData *, STRPTR command);

@@ -118,7 +118,7 @@ void FreeLine(struct InstData *data, struct line_node* line)
   // structures as well such as the global blockinfo structure.
   if(data->blockinfo.startline == line)
   {
-    if(line->next)
+    if(line->next != NULL)
       data->blockinfo.startline = line->next;
     else
     {
@@ -129,7 +129,7 @@ void FreeLine(struct InstData *data, struct line_node* line)
 
   if(data->blockinfo.stopline == line)
   {
-    if(line->previous)
+    if(line->previous != NULL)
       data->blockinfo.stopline = line->previous;
     else
     {
