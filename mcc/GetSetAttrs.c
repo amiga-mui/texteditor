@@ -37,8 +37,8 @@
 
 #include "version.h"
 
-/// OM_GET()
-IPTR Get(struct IClass *cl, Object *obj, struct opGet *msg)
+/// mGet()
+IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
   IPTR ti_Data;
@@ -203,8 +203,8 @@ IPTR Get(struct IClass *cl, Object *obj, struct opGet *msg)
 }
 
 ///
-/// OM_SET()
-IPTR Set(struct IClass *cl, Object *obj, struct opSet *msg)
+/// mSet()
+IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
   struct TagItem *tags, *tag;

@@ -119,8 +119,8 @@ void RejectInput(struct InstData *data)
 }
 
 ///
-/// OM_NEW()
-static IPTR New(struct IClass *cl, Object *obj, struct opSet *msg)
+/// mNew()
+static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
 {
   ENTER();
 
@@ -167,7 +167,7 @@ static IPTR New(struct IClass *cl, Object *obj, struct opSet *msg)
 
             // walk through all attributes and check if
             // they were set during OM_NEW
-            Set(cl, obj, (struct opSet *)msg);
+            mSet(cl, obj, (struct opSet *)msg);
             data->visual_y = 1;
 
             // start with an inactive cursor
@@ -187,19 +187,43 @@ static IPTR New(struct IClass *cl, Object *obj, struct opSet *msg)
 }
 
 ///
-/// OM_DISPOSE()
-static IPTR Dispose(struct IClass *cl, Object *obj, Msg msg)
+/// mDispose()
+static IPTR mDispose(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
+  struct line_node *line;
 
   ENTER();
 
   ResizeUndoBuffer(data, 0);
+
+  data->blockinfo.startline = NULL;
+  data->blockinfo.stopline = NULL;
+
+  // free all lines with their contents
+  line = data->firstline;
+  while(line != NULL)
+  {
+    struct line_node *next = line->next;
+
+    if(line->line.Styles != NULL)
+      MyFreePooled(data->mypool, line->line.Styles);
+    if(line->line.Colors != NULL)
+      MyFreePooled(data->mypool, line->line.Colors);
+    if(line->line.Contents != NULL)
+      MyFreePooled(data->mypool, line->line.Contents);
+    FreeLine(data, line);
+
+    line = next;
+  }
+  data->firstline = NULL;
+
   if(data->mylocale != NULL)
   {
     CloseLocale(data->mylocale);
     data->mylocale = NULL;
   }
+
   if(data->mypool != NULL)
   {
     #if defined(__amigaos4__)
@@ -215,8 +239,8 @@ static IPTR Dispose(struct IClass *cl, Object *obj, Msg msg)
 }
 
 ///
-/// MUIM_Setup()
-static IPTR Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
+/// mSetup()
+static IPTR mSetup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
 {
   struct InstData *data = INST_DATA(cl, obj);
 
@@ -287,8 +311,8 @@ static IPTR Setup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
 }
 
 ///
-/// MUIM_Cleanup
-static IPTR Cleanup(struct IClass *cl, Object *obj, Msg msg)
+/// mCleanup
+static IPTR mCleanup(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
   IPTR result = 0;
@@ -327,8 +351,8 @@ static IPTR Cleanup(struct IClass *cl, Object *obj, Msg msg)
 }
 
 ///
-/// MUIM_AskMinMax()
-static IPTR AskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
+/// mAskMinMax()
+static IPTR mAskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
   struct MUI_MinMax *mi;
@@ -378,8 +402,8 @@ static IPTR AskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg
 }
 
 ///
-/// MUIM_Show()
-static IPTR Show(struct IClass *cl, Object *obj, Msg msg)
+/// mShow()
+static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
   struct line_node  *line;
@@ -456,8 +480,8 @@ static IPTR Show(struct IClass *cl, Object *obj, Msg msg)
 }
 
 ///
-/// MUIM_Hide()
-static IPTR Hide(struct IClass *cl, Object *obj, Msg msg)
+/// mHide()
+static IPTR mHide(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
 
@@ -479,7 +503,7 @@ static IPTR Hide(struct IClass *cl, Object *obj, Msg msg)
 }
 
 ///
-/// MUIM_Draw()
+/// mDraw()
 static IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
@@ -542,6 +566,89 @@ static IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 }
 
 ///
+/// mGoActive
+IPTR mGoActive(struct IClass *cl, Object *obj, Msg msg)
+{
+  struct InstData *data = INST_DATA(cl, obj);
+  IPTR result;
+
+  ENTER();
+
+  // set the gadgets flags to active and also "activated" so that
+  // other functions know that the gadget was activated recently.
+  setFlag(data->flags, FLG_Active);
+  setFlag(data->flags, FLG_Activated);
+
+  if(data->shown == TRUE)
+  {
+    SetCursor(data, data->CPos_X, data->actualline, TRUE);
+
+    // in case we ought to show a selected area in a different
+    // color than in inactive state we call MarkText()
+    if(isFlagSet(data->flags, FLG_ActiveOnClick) && Enabled(data))
+      MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
+
+    if(isFlagClear(data->flags, FLG_ReadOnly))
+      set(_win(obj), MUIA_Window_DisableKeys, MUIKEYF_GADGET_NEXT);
+  }
+
+  if(data->BlinkSpeed == 1)
+  {
+    DoMethod(_app(obj), MUIM_Application_AddInputHandler, &data->blinkhandler);
+    data->BlinkSpeed = 2;
+  }
+
+  result = DoSuperMethodA(cl, obj, msg);
+
+  RETURN(result);
+  return(result);
+}
+
+///
+/// mGoInactive
+IPTR mGoInactive(struct IClass *cl, Object *obj, Msg msg)
+{
+  struct InstData *data = INST_DATA(cl, obj);
+  IPTR result;
+
+  ENTER();
+
+  // clear the active and activated flag so that others know about it
+  clearFlag(data->flags, FLG_Active);
+  clearFlag(data->flags, FLG_Activated);
+
+  if(data->shown == TRUE)
+    set(_win(obj), MUIA_Window_DisableKeys, 0L);
+
+  if(data->mousemove == TRUE)
+  {
+    data->mousemove = FALSE;
+    RejectInput(data);
+  }
+
+  if(data->scrollaction == TRUE)
+    data->smooth_wait = 1;
+
+  if(data->BlinkSpeed == 2)
+  {
+    DoMethod(_app(obj), MUIM_Application_RemInputHandler, &data->blinkhandler);
+    data->BlinkSpeed = 1;
+  }
+
+  SetCursor(data, data->CPos_X, data->actualline, FALSE);
+
+  // in case we ought to show a selected area in a different
+  // color than in inactive state we call MarkText()
+  if(isFlagSet(data->flags, FLG_ActiveOnClick) && Enabled(data))
+    MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
+
+  result = DoSuperMethodA(cl, obj, msg);
+
+  RETURN(result);
+  return(result);
+}
+
+///
 /// _Dispatcher()
 DISPATCHER(_Dispatcher)
 {
@@ -563,7 +670,7 @@ DISPATCHER(_Dispatcher)
   // been created yet!!
   if(msg->MethodID == OM_NEW)
   {
-    result = New(cl, obj, (struct opSet *)msg);
+    result = mNew(cl, obj, (struct opSet *)msg);
 
     RETURN(result);
     return(result);
@@ -615,12 +722,12 @@ DISPATCHER(_Dispatcher)
 
   switch(msg->MethodID)
   {
-    case MUIM_Setup:      result = Setup(cl, obj, (struct MUI_RenderInfo *)msg);      RETURN(result); return(result); break;
-    case MUIM_Show:       result = Show(cl, obj, msg);                                RETURN(result); return(result); break;
-    case MUIM_AskMinMax:  result = AskMinMax(cl, obj, (struct MUIP_AskMinMax *)msg);  RETURN(result); return(result); break;
-    case MUIM_Draw:       result = mDraw(cl, obj, (struct MUIP_Draw *)msg);           RETURN(result); return(result); break;
-    case OM_GET:          result = Get(cl, obj, (struct opGet *)msg);                 RETURN(result); return(result); break;
-    case OM_SET:          result = Set(cl, obj, (struct opSet *)msg); break;
+    case MUIM_Setup:       result = mSetup(cl, obj, (struct MUI_RenderInfo *)msg);      RETURN(result); return(result); break;
+    case MUIM_Show:        result = mShow(cl, obj, msg);                                RETURN(result); return(result); break;
+    case MUIM_AskMinMax:   result = mAskMinMax(cl, obj, (struct MUIP_AskMinMax *)msg);  RETURN(result); return(result); break;
+    case MUIM_Draw:        result = mDraw(cl, obj, (struct MUIP_Draw *)msg);            RETURN(result); return(result); break;
+    case OM_GET:           result = mGet(cl, obj, (struct opGet *)msg);                 RETURN(result); return(result); break;
+    case OM_SET:           result = mSet(cl, obj, (struct opSet *)msg); break;
 
     case MUIM_HandleEvent:
     {
@@ -652,92 +759,14 @@ DISPATCHER(_Dispatcher)
     }
     break;
 
-    case MUIM_GoActive:
-    {
-      IPTR result;
-
-      D(DBF_STARTUP, "MUIM_GoActive");
-
-      // set the gadgets flags to active and also "activated" so that
-      // other functions know that the gadget was activated recently.
-      setFlag(data->flags, FLG_Active);
-      setFlag(data->flags, FLG_Activated);
-
-      if(data->shown == TRUE)
-      {
-        SetCursor(data, data->CPos_X, data->actualline, TRUE);
-
-        // in case we ought to show a selected area in a different
-        // color than in inactive state we call MarkText()
-        if(isFlagSet(data->flags, FLG_ActiveOnClick) && Enabled(data))
-          MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
-
-        if(isFlagClear(data->flags, FLG_ReadOnly))
-          set(_win(obj), MUIA_Window_DisableKeys, MUIKEYF_GADGET_NEXT);
-      }
-
-      if(data->BlinkSpeed == 1)
-      {
-        DoMethod(_app(obj), MUIM_Application_AddInputHandler, &data->blinkhandler);
-        data->BlinkSpeed = 2;
-      }
-
-      result = DoSuperMethodA(cl, obj, msg);
-
-      RETURN(result);
-      return(result);
-    }
-    break;
-
-    case MUIM_GoInactive:
-    {
-      IPTR result;
-
-      D(DBF_STARTUP, "MUIM_GoInActive");
-
-      // clear the active and activated flag so that others know about it
-      clearFlag(data->flags, FLG_Active);
-      clearFlag(data->flags, FLG_Activated);
-
-      if(data->shown == TRUE)
-        set(_win(obj), MUIA_Window_DisableKeys, 0L);
-
-      if(data->mousemove == TRUE)
-      {
-        data->mousemove = FALSE;
-        RejectInput(data);
-      }
-
-      if(data->scrollaction == TRUE)
-        data->smooth_wait = 1;
-
-      if(data->BlinkSpeed == 2)
-      {
-        DoMethod(_app(obj), MUIM_Application_RemInputHandler, &data->blinkhandler);
-        data->BlinkSpeed = 1;
-      }
-
-      SetCursor(data, data->CPos_X, data->actualline, FALSE);
-
-      // in case we ought to show a selected area in a different
-      // color than in inactive state we call MarkText()
-      if(isFlagSet(data->flags, FLG_ActiveOnClick) && Enabled(data))
-        MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
-
-      result = DoSuperMethodA(cl, obj, msg);
-
-      RETURN(result);
-      return(result);
-    }
-    break;
-
-    case MUIM_Hide:                     result = Hide(cl, obj, msg);    RETURN(result); return(result); break;
-    case MUIM_Cleanup:                  result = Cleanup(cl, obj, msg); RETURN(result); return(result); break;
-    case OM_DISPOSE:                    result = Dispose(cl, obj, msg); RETURN(result); return(result); break;
-    case MUIM_TextEditor_ClearText:     result = ClearText(data);       break;
-    case MUIM_TextEditor_ToggleCursor:  result = ToggleCursor(data);    RETURN(result); return(result); break;
-    case MUIM_TextEditor_InputTrigger:  result = InputTrigger(cl, obj); break;
-
+    case MUIM_GoActive:                 result = mGoActive(cl, obj, msg);   RETURN(result); return(result); break;
+    case MUIM_GoInactive:               result = mGoInactive(cl, obj, msg); RETURN(result); return(result); break;
+    case MUIM_Hide:                     result = mHide(cl, obj, msg);       RETURN(result); return(result); break;
+    case MUIM_Cleanup:                  result = mCleanup(cl, obj, msg);    RETURN(result); return(result); break;
+    case OM_DISPOSE:                    result = mDispose(cl, obj, msg);    RETURN(result); return(result); break;
+    case MUIM_TextEditor_ClearText:     result = ClearText(data);           break;
+    case MUIM_TextEditor_ToggleCursor:  result = ToggleCursor(data);        RETURN(result); return(result); break;
+    case MUIM_TextEditor_InputTrigger:  result = InputTrigger(cl, obj);     break;
     case MUIM_TextEditor_InsertText:
     {
       struct MUIP_TextEditor_InsertText *ins_msg = (struct MUIP_TextEditor_InsertText *)msg;
