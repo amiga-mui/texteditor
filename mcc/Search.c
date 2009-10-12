@@ -59,8 +59,8 @@ static void SimpleMarkText(struct InstData *data, UWORD startx, struct line_node
 static LONG Native_strncmp (STRPTR str1, STRPTR str2, LONG len) { return strncmp(str1, str2, len); }
 static LONG Utility_strnicmp (STRPTR str1, STRPTR str2, LONG len) { return Strnicmp(str1, str2, len); }
 
-/// OM_Search()
-ULONG OM_Search(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Search *msg)
+/// mSearch()
+IPTR mSearch(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Search *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
   STRPTR str = msg->SearchString;
@@ -68,7 +68,7 @@ ULONG OM_Search(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Se
 
   ENTER();
 
-  if(len && len <= 120)
+  if(len > 0 && len <= 120)
   {
     BYTE map[256];
     LONG (*StrCmp)(STRPTR, STRPTR, LONG);
@@ -76,7 +76,7 @@ ULONG OM_Search(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Se
     struct line_node *line;
 
     // if the FromTop flag is set we start the search right from the top
-    if(msg->Flags & MUIF_TextEditor_Search_FromTop)
+    if(isFlagSet(msg->Flags, MUIF_TextEditor_Search_FromTop))
     {
       cursor = 0;
       line = data->firstline;
@@ -91,7 +91,7 @@ ULONG OM_Search(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Se
 
     // if a casesensitive search is requested we use a different
     // compare function.
-    if(msg->Flags & MUIF_TextEditor_Search_CaseSensitive)
+    if(isFlagSet(msg->Flags, MUIF_TextEditor_Search_CaseSensitive))
     {
       StrCmp = Native_strncmp;
 
@@ -108,13 +108,13 @@ ULONG OM_Search(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Se
       }
     }
 
-    if(msg->Flags & MUIF_TextEditor_Search_Backwards)
+    if(isFlagSet(msg->Flags, MUIF_TextEditor_Search_Backwards))
     {
 //D(DBF_STARTUP, "MUIF_TextEditor_Search_Backwards  search=%s\n", msg->SearchString);
       if(Enabled(data))
         cursor -= len;
 
-      while(line)
+      while(line != NULL)
       {
         LONG lenTmp  = len;
         STRPTR contents = line->line.Contents + cursor - lenTmp+1;
@@ -140,7 +140,7 @@ ULONG OM_Search(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Se
 
         line = line->previous;
 
-        if (line)
+        if(line != NULL)
           cursor = line->line.Length;
       }
     }
@@ -185,11 +185,11 @@ ULONG OM_Search(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Se
 }
 
 ///
-/// OM_Replace()
-ULONG OM_Replace(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Replace *msg)
+/// mReplace()
+IPTR mReplace(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Replace *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
-  ULONG res = FALSE;
+  IPTR res = FALSE;
 
   ENTER();
 

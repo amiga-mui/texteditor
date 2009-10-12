@@ -434,10 +434,12 @@ static ULONG CallFunction(struct InstData *data, UWORD function, IPTR *args, con
 }
 
 ///
-/// HandleARexx()
-ULONG HandleARexx(struct InstData *data, STRPTR command)
+/// mHandleARexx()
+IPTR mHandleARexx(struct IClass *cl, Object *obj, struct MUIP_TextEditor_ARexxCmd *msg)
 {
-  ULONG result = 0;
+  struct InstData *data = INST_DATA(cl, obj);
+  IPTR result = 0;
+  STRPTR command = msg->command;
 
   ENTER();
 

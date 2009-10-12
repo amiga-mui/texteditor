@@ -27,8 +27,8 @@
 #include "private.h"
 #include "Debug.h"
 
-/// OM_SetBlock()
-ULONG OM_SetBlock(struct InstData *data, struct MUIP_TextEditor_SetBlock *msg)
+/// mSetBlock()
+IPTR mSetBlock(struct InstData *data, struct MUIP_TextEditor_SetBlock *msg)
 {
   struct marking newblock;
 

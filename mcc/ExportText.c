@@ -27,9 +27,10 @@
 #include "private.h"
 #include "Debug.h"
 
-/// ExportText()
-void *ExportText(struct InstData *data, UNUSED struct MUIP_TextEditor_ExportText *msg)
+/// mExportText()
+IPTR mExportText(struct IClass *cl, Object *obj, UNUSED struct MUIP_TextEditor_ExportText *msg)
 {
+  struct InstData *data = INST_DATA(cl, obj);
   struct line_node *node = data->firstline;
   struct Hook *exportHook = data->ExportHook;
   ULONG wraplen = data->ExportWrap;
@@ -68,8 +69,8 @@ void *ExportText(struct InstData *data, UNUSED struct MUIP_TextEditor_ExportText
     node = next_node;
   }
 
-  RETURN(user_data);
-  return user_data;
+  RETURN((IPTR)user_data);
+  return (IPTR)user_data;
 }
 
 ///

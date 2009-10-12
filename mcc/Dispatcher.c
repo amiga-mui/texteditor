@@ -346,7 +346,7 @@ static IPTR mCleanup(struct IClass *cl, Object *obj, Msg msg)
   DeinitRastPort(&data->tmprp);
 #endif
 
-  RETURN(result);
+  return result;
   return result;
 }
 
@@ -600,8 +600,8 @@ IPTR mGoActive(struct IClass *cl, Object *obj, Msg msg)
 
   result = DoSuperMethodA(cl, obj, msg);
 
-  RETURN(result);
-  return(result);
+  return result;
+  return result;
 }
 
 ///
@@ -644,8 +644,86 @@ IPTR mGoInactive(struct IClass *cl, Object *obj, Msg msg)
 
   result = DoSuperMethodA(cl, obj, msg);
 
+  return result;
+  return result;
+}
+
+///
+/// mInsertText
+IPTR mInsertText(struct IClass *cl, Object *obj, struct MUIP_TextEditor_InsertText *msg)
+{
+  struct InstData *data = INST_DATA(cl, obj);
+  struct marking block;
+  IPTR result;
+
+  ENTER();
+
+  switch(msg->pos)
+  {
+    case MUIV_TextEditor_InsertText_Top:
+    {
+      GoTop(data);
+    }
+    break;
+
+    case MUIV_TextEditor_InsertText_Bottom:
+    {
+      GoBottom(data);
+    }
+    break;
+  }
+
+  block.startx = data->CPos_X;
+  block.startline = data->actualline;
+  result = InsertText(data, msg->text, TRUE);
+  block.stopx = data->CPos_X;
+  block.stopline = data->actualline;
+  AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
+
   RETURN(result);
-  return(result);
+  return result;
+}
+
+///
+/// mExport
+IPTR mExport(UNUSED struct IClass *cl, Object *obj, struct MUIP_Export *msg)
+{
+  ULONG id;
+
+  ENTER();
+
+  if((id = (muiNotifyData(obj)->mnd_ObjectID)) != 0)
+  {
+    STRPTR contents;
+
+    if((contents = (STRPTR)DoMethod(obj, MUIM_TextEditor_ExportText)) != NULL)
+    {
+      DoMethod(msg->dataspace, MUIM_Dataspace_Add, contents, strlen(contents)+1, id);
+      FreeVec(contents);
+    }
+  }
+
+  RETURN(0);
+  return 0;
+}
+
+///
+/// mImport
+IPTR mImport(UNUSED struct IClass *cl, Object *obj, struct MUIP_Import *msg)
+{
+  ULONG id;
+
+  ENTER();
+
+  if((id = (muiNotifyData(obj)->mnd_ObjectID)) != 0)
+  {
+    STRPTR contents = (STRPTR)DoMethod(msg->dataspace, MUIM_Dataspace_Find, id);
+
+    set(obj, MUIA_TextEditor_Contents, contents != NULL ? (ULONG)contents : (ULONG)"");
+  }
+
+  RETURN(0);
+  return 0;
 }
 
 ///
@@ -672,8 +750,8 @@ DISPATCHER(_Dispatcher)
   {
     result = mNew(cl, obj, (struct opSet *)msg);
 
-    RETURN(result);
-    return(result);
+    return result;
+    return result;
   }
 
   // now get the instance data
@@ -714,28 +792,34 @@ DISPATCHER(_Dispatcher)
         result = (ULONG)data->UpdateInfo;
         data->UpdateInfo = NULL;
 
-        RETURN(result);
-        return(result);
+        return result;
+        return result;
       }
     }
   }
 
   switch(msg->MethodID)
   {
-    case MUIM_Setup:       result = mSetup(cl, obj, (struct MUI_RenderInfo *)msg);      RETURN(result); return(result); break;
-    case MUIM_Show:        result = mShow(cl, obj, msg);                                RETURN(result); return(result); break;
-    case MUIM_AskMinMax:   result = mAskMinMax(cl, obj, (struct MUIP_AskMinMax *)msg);  RETURN(result); return(result); break;
-    case MUIM_Draw:        result = mDraw(cl, obj, (struct MUIP_Draw *)msg);            RETURN(result); return(result); break;
-    case OM_GET:           result = mGet(cl, obj, (struct opGet *)msg);                 RETURN(result); return(result); break;
-    case OM_SET:           result = mSet(cl, obj, (struct opSet *)msg); break;
-
+    case OM_DISPOSE:                     result = mDispose(cl, obj, msg);                  RETURN(result); return result; break;
+    case OM_GET:                         result = mGet(cl, obj, (APTR)msg);                RETURN(result); return result; break;
+    case OM_SET:                         result = mSet(cl, obj, (APTR)msg);                                               break;
+    case MUIM_Setup:                     result = mSetup(cl, obj, (APTR)msg);              RETURN(result); return result; break;
+    case MUIM_Show:                      result = mShow(cl, obj, msg);                     RETURN(result); return result; break;
+    case MUIM_AskMinMax:                 result = mAskMinMax(cl, obj, (APTR)msg);          RETURN(result); return result; break;
+    case MUIM_Draw:                      result = mDraw(cl, obj, (APTR)msg);               RETURN(result); return result; break;
+    case MUIM_Hide:                      result = mHide(cl, obj, msg);                     RETURN(result); return result; break;
+    case MUIM_Cleanup:                   result = mCleanup(cl, obj, msg);                  RETURN(result); return result; break;
+    case MUIM_Export:                    result = mExport(cl, obj, (APTR)msg);                                            break;
+    case MUIM_Import:                    result = mImport(cl, obj, (APTR)msg);                                            break;
+    case MUIM_GoActive:                  result = mGoActive(cl, obj, msg);                 RETURN(result); return result; break;
+    case MUIM_GoInactive:                result = mGoInactive(cl, obj, msg);               RETURN(result); return result; break;
     case MUIM_HandleEvent:
     {
       ULONG oldx = data->CPos_X;
       struct line_node *oldy = data->actualline;
 
       // process all input events
-      result = HandleInput(cl, obj, (struct MUIP_HandleEvent *)msg);
+      result = mHandleInput(cl, obj, (struct MUIP_HandleEvent *)msg);
 
       // see if the cursor was moved and if so we go and notify
       // others
@@ -759,93 +843,20 @@ DISPATCHER(_Dispatcher)
     }
     break;
 
-    case MUIM_GoActive:                 result = mGoActive(cl, obj, msg);   RETURN(result); return(result); break;
-    case MUIM_GoInactive:               result = mGoInactive(cl, obj, msg); RETURN(result); return(result); break;
-    case MUIM_Hide:                     result = mHide(cl, obj, msg);       RETURN(result); return(result); break;
-    case MUIM_Cleanup:                  result = mCleanup(cl, obj, msg);    RETURN(result); return(result); break;
-    case OM_DISPOSE:                    result = mDispose(cl, obj, msg);    RETURN(result); return(result); break;
-    case MUIM_TextEditor_ClearText:     result = ClearText(data);           break;
-    case MUIM_TextEditor_ToggleCursor:  result = ToggleCursor(data);        RETURN(result); return(result); break;
-    case MUIM_TextEditor_InputTrigger:  result = InputTrigger(cl, obj);     break;
-    case MUIM_TextEditor_InsertText:
-    {
-      struct MUIP_TextEditor_InsertText *ins_msg = (struct MUIP_TextEditor_InsertText *)msg;
-      struct marking block;
-
-      switch(ins_msg->pos)
-      {
-        case MUIV_TextEditor_InsertText_Top:
-        {
-          GoTop(data);
-        }
-        break;
-
-        case MUIV_TextEditor_InsertText_Bottom:
-        {
-          GoBottom(data);
-        }
-        break;
-      }
-
-      block.startx = data->CPos_X;
-      block.startline = data->actualline;
-      result = InsertText(data, ins_msg->text, TRUE);
-      block.stopx = data->CPos_X;
-      block.stopline = data->actualline;
-      AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
-    }
-    break;
-
-    case MUIM_TextEditor_ExportBlock:      result = (ULONG)ExportBlock(data, (struct MUIP_TextEditor_ExportBlock *)msg); RETURN(result); return(result); break;
-    case MUIM_TextEditor_ExportText:  result = (ULONG)ExportText(data, (struct MUIP_TextEditor_ExportText *)msg); RETURN(result); return(result); break;
-    case MUIM_TextEditor_ARexxCmd:    result = HandleARexx(data, ((struct MUIP_TextEditor_ARexxCmd *)msg)->command); break;
-    case MUIM_TextEditor_MarkText:    result = OM_MarkText(data, (struct MUIP_TextEditor_MarkText *)msg); break;
-    case MUIM_TextEditor_BlockInfo:   result = OM_BlockInfo(data, (struct MUIP_TextEditor_BlockInfo *)msg); break;
-    case MUIM_TextEditor_Search:      result = OM_Search(cl, obj, (struct MUIP_TextEditor_Search *)msg); break;
-    case MUIM_TextEditor_Replace:     result = OM_Replace(cl, obj, (struct MUIP_TextEditor_Replace *)msg); break;
-    case MUIM_TextEditor_QueryKeyAction: result = OM_QueryKeyAction(cl, obj, (struct MUIP_TextEditor_QueryKeyAction *)msg); break;
-    case MUIM_TextEditor_SetBlock:      result = OM_SetBlock(data, (struct MUIP_TextEditor_SetBlock *)msg); RETURN(result); return(result); break;
-
-    case MUIM_Export:
-    {
-      ULONG id;
-      struct MUIP_Export *exp_msg = (struct MUIP_Export *)msg;
-
-      if((id = (muiNotifyData(obj)->mnd_ObjectID)))
-      {
-        STRPTR contents;
-        if((contents = (STRPTR)DoMethod(obj, MUIM_TextEditor_ExportText)))
-        {
-          DoMethod(exp_msg->dataspace, MUIM_Dataspace_Add, contents, strlen(contents)+1, id);
-          FreeVec(contents);
-        }
-      }
-      result = 0;
-    }
-    break;
-
-    case MUIM_Import:
-    {
-      ULONG id;
-      struct MUIP_Import *imp_msg = (struct MUIP_Import *)msg;
-
-      if((id = (muiNotifyData(obj)->mnd_ObjectID)))
-      {
-        STRPTR contents = (STRPTR)DoMethod(imp_msg->dataspace, MUIM_Dataspace_Find, id);
-
-        set(obj, MUIA_TextEditor_Contents, contents != NULL ? (ULONG)contents : (ULONG)"");
-      }
-      result = 0;
-    }
-    break;
-
-    default:
-    {
-      result = DoSuperMethodA(cl, obj, msg);
-
-      RETURN(result);
-      return(result);
-    }
+    case MUIM_TextEditor_ClearText:      result = mClearText(cl, obj, msg);                                               break;
+    case MUIM_TextEditor_ToggleCursor:   result = mToggleCursor(cl, obj, msg);             RETURN(result); return result; break;
+    case MUIM_TextEditor_InputTrigger:   result = mInputTrigger(cl, obj, msg);                                            break;
+    case MUIM_TextEditor_InsertText:     result = mInsertText(cl, obj, (APTR)msg);                                        break;
+    case MUIM_TextEditor_ExportBlock:    result = mExportBlock(cl, obj, (APTR)msg);        RETURN(result); return result; break;
+    case MUIM_TextEditor_ExportText:     result = mExportText(cl, obj, (APTR)msg);         RETURN(result); return result; break;
+    case MUIM_TextEditor_ARexxCmd:       result = mHandleARexx(cl, obj, (APTR)msg);                                       break;
+    case MUIM_TextEditor_MarkText:       result = mMarkText(data, (APTR)msg);                                             break;
+    case MUIM_TextEditor_BlockInfo:      result = mBlockInfo(data, (APTR)msg);                                            break;
+    case MUIM_TextEditor_Search:         result = mSearch(cl, obj, (APTR)msg);                                            break;
+    case MUIM_TextEditor_Replace:        result = mReplace(cl, obj, (APTR)msg);                                           break;
+    case MUIM_TextEditor_QueryKeyAction: result = mQueryKeyAction(cl, obj, (APTR)msg);                                    break;
+    case MUIM_TextEditor_SetBlock:       result = mSetBlock(data, (APTR)msg);              RETURN(result); return result; break;
+    default:                             result = DoSuperMethodA(cl, obj, msg);            RETURN(result); return result; break;
   }
 
   if(t_haschanged != data->HasChanged)
@@ -864,7 +875,7 @@ DISPATCHER(_Dispatcher)
     }
   }
 
-  if((data->visual_y != t_visual_y) || (data->totallines != t_totallines))
+  if(data->visual_y != t_visual_y || data->totallines != t_totallines)
   {
     SetAttrs(obj, MUIA_TextEditor_Prop_Entries,
               ((data->totallines-(data->visual_y-1) < data->maxlines) ?
@@ -909,8 +920,8 @@ DISPATCHER(_Dispatcher)
   data->NoNotify = FALSE;
   UpdateStyles(data);
 
-  RETURN(result);
-  return(result);
+  return result;
+  return result;
 }
 
 ///
