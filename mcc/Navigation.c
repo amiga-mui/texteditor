@@ -56,7 +56,7 @@ ULONG FlowSpace(struct InstData *data, UWORD flow, STRPTR text)
 static ULONG CursorOffset(struct InstData *data)
 {
   struct line_node *line = data->actualline;
-  STRPTR text = line->line.Contents+data->CPos_X;
+  STRPTR text = &line->line.Contents[data->CPos_X];
   ULONG res=0;
   ULONG lineCharsWidth;
 
@@ -98,14 +98,14 @@ static LONG GetPosInPixels(struct InstData *data, LONG bytes, LONG x)
 
   ENTER();
 
-  pos = TextLength(&data->tmprp, data->actualline->line.Contents+bytes, x);
+  pos = TextLength(&data->tmprp, &data->actualline->line.Contents[bytes], x);
 
   if(data->actualline->line.Contents[data->CPos_X] == '\n')
     pos += TextLength(&data->tmprp, " ", 1)/2;
   else
-    pos += TextLength(&data->tmprp, data->actualline->line.Contents+data->CPos_X, 1)/2;
+    pos += TextLength(&data->tmprp, &data->actualline->line.Contents[data->CPos_X], 1)/2;
 
-  pos += FlowSpace(data, data->actualline->line.Flow, data->actualline->line.Contents+bytes);
+  pos += FlowSpace(data, data->actualline->line.Flow, &data->actualline->line.Contents[bytes]);
 
   RETURN(pos);
   return(pos);
@@ -230,7 +230,7 @@ void GoPreviousPage(struct InstData *data)
         }
         while(linemove--)
         {
-          data->CPos_X += LineCharsWidth(data, data->actualline->line.Contents+data->CPos_X);
+          data->CPos_X += LineCharsWidth(data, &data->actualline->line.Contents[data->CPos_X]);
         }
       }
       data->CPos_X += CursorOffset(data);
@@ -276,7 +276,7 @@ void GoUp(struct InstData *data)
     {
       while(--pos.lines)
       {
-        data->CPos_X += LineCharsWidth(data, data->actualline->line.Contents+data->CPos_X);
+        data->CPos_X += LineCharsWidth(data, &data->actualline->line.Contents[data->CPos_X]);
       }
       data->CPos_X += CursorOffset(data);
     }
@@ -412,7 +412,7 @@ void GoEndOfLine(struct InstData *data)
 
     OffsetToLines(data, data->CPos_X, data->actualline, &pos);
 
-    if((c = LineCharsWidth(data, data->actualline->line.Contents+pos.bytes)) > 0)
+    if((c = LineCharsWidth(data, &data->actualline->line.Contents[pos.bytes])) > 0)
       data->CPos_X = pos.bytes + c - 1;
     else
       data->CPos_X = pos.bytes;

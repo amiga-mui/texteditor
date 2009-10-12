@@ -549,7 +549,7 @@ static IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
       UWORD newPattern[] = {0x1111, 0x4444};
 
       SetDrMd(data->rport, JAM1);
-      SetAPen(data->rport, *(_pens(obj)+MPEN_SHADOW));
+      SetAPen(data->rport, _pens(obj)[MPEN_SHADOW]);
       data->rport->AreaPtrn = newPattern;
       data->rport->AreaPtSz = 1;
       RectFill(data->rport, ad->mad_Box.Left, ad->mad_Box.Top, ad->mad_Box.Left + ad->mad_Box.Width  - 1, ad->mad_Box.Top  + ad->mad_Box.Height - 1);

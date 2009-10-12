@@ -551,7 +551,7 @@ void CheckWord(struct InstData *data)
     {
       char word[256];
 
-      strlcpy(word, data->actualline->line.Contents+start, end-start+1);
+      strlcpy(word, &data->actualline->line.Contents[start], end-start+1);
 
       if(LookupWord(data, word) == FALSE)
         DisplayBeep(NULL);

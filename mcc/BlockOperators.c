@@ -305,7 +305,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
     emsg.Colors = NULL;
     if(emsg.Contents != NULL)
     {
-      memcpy(emsg.Contents, startline->line.Contents+startx, stopx-startx);
+      memcpy(emsg.Contents, &startline->line.Contents[startx], stopx-startx);
       emsg.Length = stopx-startx;
       emsg.Flow = startline->line.Flow;
       emsg.Separator = startline->line.Separator;
