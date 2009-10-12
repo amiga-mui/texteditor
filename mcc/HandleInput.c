@@ -526,7 +526,7 @@ void Key_Normal(struct InstData *data, char key)
 
     // now we make sure to wrap *exactly* at the WrapBorder the user
     // specified instead of wrapping right where we are.
-    while(xpos > 0 && *(data->actualline->line.Contents+xpos) != ' ')
+    while(xpos > 0 && data->actualline->line.Contents[xpos] != ' ')
       xpos--;
 
     // if we reached the end we go and find a wrap position after
@@ -534,7 +534,7 @@ void Key_Normal(struct InstData *data, char key)
     if(xpos == 0)
     {
       xpos = data->WrapBorder;
-      while(xpos < data->CPos_X && *(data->actualline->line.Contents+xpos) != ' ')
+      while(xpos < data->CPos_X && data->actualline->line.Contents[xpos] != ' ')
         xpos++;
     }
 

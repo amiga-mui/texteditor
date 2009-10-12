@@ -105,21 +105,20 @@ static void SetCol(struct InstData *data, void *obj, long item, ULONG *storage, 
 void InitConfig(struct InstData *data, Object *obj)
 {
   ULONG setting = 0;
-  UWORD *muipens = _pens(obj);
   BOOL loadDefaultKeys = FALSE;
 
   ENTER();
 
   data->allocatedpens = 0;
-  data->textcolor         = *(muipens+MPEN_TEXT);
-  data->backgroundcolor   = *(muipens+MPEN_BACKGROUND);
-  data->highlightcolor    = *(muipens+MPEN_SHINE);
-  data->cursorcolor       = *(muipens+MPEN_SHINE);
-  data->cursortextcolor   = *(muipens+MPEN_TEXT);
-  data->markedcolor       = *(muipens+MPEN_FILL);
-  data->separatorshine    = *(muipens+MPEN_HALFSHINE);
-  data->separatorshadow   = *(muipens+MPEN_HALFSHADOW);
-  data->inactivecolor     = *(muipens+MPEN_HALFSHADOW);
+  data->textcolor         = _pens(obj)[MPEN_TEXT];
+  data->backgroundcolor   = _pens(obj)[MPEN_BACKGROUND];
+  data->highlightcolor    = _pens(obj)[MPEN_SHINE];
+  data->cursorcolor       = _pens(obj)[MPEN_SHINE];
+  data->cursortextcolor   = _pens(obj)[MPEN_TEXT];
+  data->markedcolor       = _pens(obj)[MPEN_FILL];
+  data->separatorshine    = _pens(obj)[MPEN_HALFSHINE];
+  data->separatorshadow   = _pens(obj)[MPEN_HALFSHADOW];
+  data->inactivecolor     = _pens(obj)[MPEN_HALFSHADOW];
 
   SetCol(data, obj, MUICFG_TextEditor_TextColor, &data->textcolor, 0);
   SetCol(data, obj, MUICFG_TextEditor_CursorColor, &data->cursorcolor, 1);

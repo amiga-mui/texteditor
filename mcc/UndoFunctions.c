@@ -94,7 +94,7 @@ BOOL Undo(struct InstData *data)
       case ET_PASTECHAR:
       {
         D(DBF_UNDO, "undo PASTECHAR");
-        action->del.character = *(data->actualline->line.Contents+data->CPos_X);
+        action->del.character = data->actualline->line.Contents[data->CPos_X];
         action->del.style = GetStyle(data->CPos_X, data->actualline);
         action->del.flow = data->actualline->line.Flow;
         action->del.separator = data->actualline->line.Separator;

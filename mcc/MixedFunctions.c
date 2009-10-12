@@ -268,7 +268,7 @@ ULONG VisualHeight(struct InstData *data, struct line_node *line)
 
     while(c < length)
     {
-      LONG d = LineCharsWidth(data, line->line.Contents+c);
+      LONG d = LineCharsWidth(data, &line->line.Contents[c]);
 
       if(d > 0)
         c += d;
@@ -300,7 +300,7 @@ void OffsetToLines(struct InstData *data, LONG x, struct line_node *line, struct
 
     while(c <= (ULONG)x)
     {
-      LONG e = LineCharsWidth(data, line->line.Contents+c);
+      LONG e = LineCharsWidth(data, &line->line.Contents[c]);
 
       d = c;
 
@@ -429,10 +429,10 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
     else
       cursor_width = data->CursorWidth;
 
-    xplace  = data->xpos + TextLength(&data->tmprp, line->line.Contents+(x-pos.x), pos.x+start);
-    xplace += FlowSpace(data, line->line.Flow, line->line.Contents+pos.bytes);
+    xplace  = data->xpos + TextLength(&data->tmprp, &line->line.Contents[x-pos.x], pos.x+start);
+    xplace += FlowSpace(data, line->line.Flow, &line->line.Contents[pos.bytes]);
     yplace  = data->ypos + (data->height * (line_nr + pos.lines - 1));
-    cursorxplace = xplace + TextLength(&data->tmprp, line->line.Contents+(x+start), 0-start);
+    cursorxplace = xplace + TextLength(&data->tmprp, &line->line.Contents[x+start], 0-start);
 
     //D(DBF_STARTUP, "xplace: %ld, yplace: %ld cplace: %ld, innerwidth: %ld width: %ld %ld", xplace, yplace, cursorxplace, data->innerwidth, _width(data->object), data->xpos);
 
@@ -542,11 +542,11 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
         WORD LeftX, LeftWidth;
         WORD RightX, RightWidth;
         WORD Y, Height;
-        UWORD flow = FlowSpace(data, line->line.Flow, line->line.Contents+pos.bytes);
+        UWORD flow = FlowSpace(data, line->line.Flow, &line->line.Contents[pos.bytes]);
 
         LeftX = data->xpos;
         LeftWidth = flow-3;
-        RightX = data->xpos + flow + TextLength(&data->tmprp, line->line.Contents+pos.bytes, pos.extra-pos.bytes-1) + 3;
+        RightX = data->xpos + flow + TextLength(&data->tmprp, &line->line.Contents[pos.bytes], pos.extra-pos.bytes-1) + 3;
         RightWidth = data->xpos+data->innerwidth - RightX;
         Y = yplace;
         Height = (line->line.Separator & LNSF_Thick) ? 2 : 1;
@@ -639,7 +639,7 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
             newPattern[1] = 0x1111;
         }
         SetDrMd(data->rport, JAM1);
-        SetAPen(data->rport, *(_pens(data->object)+MPEN_SHADOW));
+        SetAPen(data->rport, _pens(data->object)[MPEN_SHADOW]);
         data->rport->AreaPtrn = newPattern;
         data->rport->AreaPtSz = 1;
         RectFill(data->rport,
@@ -827,7 +827,7 @@ void GetLine(struct InstData *data, LONG realline, struct pos_info *pos)
   {
     while(--realline)
     {
-      x += LineCharsWidth(data, line->line.Contents+x);
+      x += LineCharsWidth(data, &line->line.Contents[x]);
     }
   }
 

@@ -324,7 +324,7 @@ ULONG mInputTrigger(struct IClass *cl, Object *obj, UNUSED Msg msg)
           if(data->selectmode == 1)
           {
             while(data->CPos_X < data->actualline->line.Length-1 && CheckSep(data, data->actualline->line.Contents[data->CPos_X]) == FALSE)
-//            while((data->CPos_X < data->actualline->line.Length-1) && (*(data->actualline->line.Contents+data->CPos_X) != ' '))
+//            while((data->CPos_X < data->actualline->line.Length-1) && (data->actualline->line.Contents[data->CPos_X] != ' '))
               data->CPos_X++;
           }
           else
@@ -339,14 +339,14 @@ ULONG mInputTrigger(struct IClass *cl, Object *obj, UNUSED Msg msg)
         ULONG flow;
 
         OffsetToLines(data, data->CPos_X, data->actualline, &pos);
-        flow = FlowSpace(data, data->actualline->line.Flow, data->actualline->line.Contents+pos.bytes);
+        flow = FlowSpace(data, data->actualline->line.Flow, &data->actualline->line.Contents[pos.bytes]);
 
-        if(MouseX <= (LONG)(data->xpos+flow+TextLength(&data->tmprp, data->actualline->line.Contents+pos.bytes, pos.extra-pos.bytes-1)))
+        if(MouseX <= (LONG)(data->xpos+flow+TextLength(&data->tmprp, &data->actualline->line.Contents[pos.bytes], pos.extra-pos.bytes-1)))
         {
           if(data->selectmode == 1)
           {
             while(data->CPos_X > 0 && CheckSep(data, data->actualline->line.Contents[data->CPos_X-1]) == FALSE)
-//            while(data->CPos_X > 0 && *(data->actualline->line.Contents+data->CPos_X-1) != ' ')
+//            while(data->CPos_X > 0 && data->actualline->line.Contents[data->CPos_X-1] != ' ')
               data->CPos_X--;
           }
           else
@@ -439,7 +439,7 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL moveCursor)
       data->totallines += line->visual;
     }
 
-    if(*(line->line.Contents+line->line.Length) == '\n')
+    if(line->line.Contents[line->line.Length] == '\n')
       newline = TRUE;
 
     data->update = FALSE;

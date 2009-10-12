@@ -65,7 +65,7 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
         cursor_width = data->CursorWidth;
 
       xplace  = data->xpos + TextLength(&data->tmprp, &line->line.Contents[x-pos.x], pos.x);
-      xplace += FlowSpace(data, line->line.Flow, line->line.Contents+pos.bytes);
+      xplace += FlowSpace(data, line->line.Flow, &line->line.Contents[pos.bytes]);
       yplace  = data->ypos + (data->height * (line_nr + pos.lines - 1));
 
       data->CursorPosition.MinX = xplace;
