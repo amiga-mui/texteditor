@@ -141,12 +141,12 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
       buf->flow = emsg->Flow;
     }
 
-    if(emsg->Separator)
+    if(emsg->Separator != LNSF_None)
     {
       if(hookType == MUIV_TextEditor_ExportHook_Plain)
         snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033[s:%d]", emsg->Separator);
       else
-        strlcpy(buf->pointer, ((emsg->Separator & LNSF_Thick) ? "<tsb>" : "<sb>"), buf->size-(buf->pointer-buf->buffer));
+        strlcpy(buf->pointer, isFlagSet(emsg->Separator, LNSF_Thick) ? "<tsb>" : "<sb>", buf->size-(buf->pointer-buf->buffer));
 
       buf->pointer += strlen(buf->pointer);
     }

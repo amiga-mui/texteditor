@@ -7,6 +7,8 @@ $URL$
 
 2009-10-12 Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/misc: added a proper definition for "no separator" and use it all over
+    the place.
   * mcc/misc: cleaned up the dispatcher a bit. Now all method functions have the
     usual class/object/message parameters.
 

@@ -127,7 +127,7 @@ BOOL Init_LineNode(struct InstData *data, struct line_node *line, struct line_no
     line->line.Styles = NULL;
     line->line.Colors = NULL;
     line->line.Flow = MUIV_TextEditor_Flow_Left;
-    line->line.Separator = 0;
+    line->line.Separator = LNSF_None;
 
     if(previous != NULL)
       previous->next = line;
@@ -537,7 +537,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
       SetSoftStyle(rp, FS_NORMAL, AskSoftStyle(rp));
 
       /* This is really bad code!!! */
-      if(line->line.Separator)
+      if(line->line.Separator != LNSF_None)
       {
         WORD LeftX, LeftWidth;
         WORD RightX, RightWidth;
@@ -549,17 +549,14 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
         RightX = data->xpos + flow + TextLength(&data->tmprp, &line->line.Contents[pos.bytes], pos.extra-pos.bytes-1) + 3;
         RightWidth = data->xpos+data->innerwidth - RightX;
         Y = yplace;
-        Height = (line->line.Separator & LNSF_Thick) ? 2 : 1;
+        Height = isFlagSet(line->line.Separator, LNSF_Thick) ? 2 : 1;
 
-        if(line->line.Separator & LNSF_Middle)
+        if(isFlagSet(line->line.Separator, LNSF_Middle))
           Y += (data->height/2)-Height;
-        else
-        {
-          if(line->line.Separator & LNSF_Bottom)
-            Y += data->height-(2*Height);
-        }
+        else if(isFlagSet(line->line.Separator, LNSF_Bottom))
+          Y += data->height-(2*Height);
 
-        if(line->line.Separator & LNSF_StrikeThru || line->line.Length == 1)
+        if(isFlagSet(line->line.Separator, LNSF_StrikeThru) || line->line.Length == 1)
         {
           LeftWidth = data->innerwidth;
         }
