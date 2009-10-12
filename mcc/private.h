@@ -413,7 +413,7 @@ struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG), REG(d1, LONG), REG(d2
 void SAVEDS ASM MUIG_FreeBitMap(REG(a0, struct BitMap *));
 
 // AllocFunctions.c
-struct line_node  *AllocLine(struct InstData *data);
+struct line_node *AllocLine(struct InstData *data);
 void FreeLine(struct InstData *data, struct line_node *line);
 APTR MyAllocPooled(APTR pool, ULONG length);
 void MyFreePooled(APTR, APTR);
@@ -458,20 +458,20 @@ BOOL RemoveChars(struct InstData *, LONG, struct line_node *, LONG);
 BOOL PasteChars(struct InstData *, LONG, struct line_node *, LONG, const char *, struct UserAction *);
 
 // ExportBlock.c
-void *ExportBlock(struct InstData *data, struct MUIP_TextEditor_ExportBlock *msg);
+IPTR mExportBlock(struct IClass *, Object *, struct MUIP_TextEditor_ExportBlock *);
 
 // ExportText.c
-void *ExportText(struct InstData *data, struct MUIP_TextEditor_ExportText *msg);
+IPTR mExportText(struct IClass *, Object *, struct MUIP_TextEditor_ExportText *);
 
 // GetSetAttrs.c
 IPTR mGet(struct IClass *, Object *, struct opGet *);
 IPTR mSet(struct IClass *, Object *, struct opSet *);
 
 // HandleARexx.c
-ULONG HandleARexx(struct InstData *, STRPTR command);
+IPTR mHandleARexx(struct IClass *, Object *, struct MUIP_TextEditor_ARexxCmd *);
 
 // HandleInput.c
-IPTR HandleInput(struct IClass *, Object *, struct MUIP_HandleEvent *);
+IPTR mHandleInput(struct IClass *, Object *, struct MUIP_HandleEvent *);
 void Key_Backspace(struct InstData *);
 void Key_Delete(struct InstData *);
 void Key_Return(struct InstData *);
@@ -492,12 +492,12 @@ void InitConfig(struct InstData *, Object *);
 void FreeConfig(struct InstData *, struct MUI_RenderInfo *);
 
 // Methods.c
-ULONG OM_MarkText(struct InstData *, struct MUIP_TextEditor_MarkText *);
-ULONG OM_BlockInfo(struct InstData *, struct MUIP_TextEditor_BlockInfo *);
-ULONG OM_QueryKeyAction(struct IClass *cl, Object *obj, struct MUIP_TextEditor_QueryKeyAction *msg);
-ULONG ClearText(struct InstData *);
-ULONG ToggleCursor(struct InstData *);
-ULONG InputTrigger(struct IClass *, Object *);
+IPTR mMarkText(struct InstData *, struct MUIP_TextEditor_MarkText *);
+IPTR mBlockInfo(struct InstData *, struct MUIP_TextEditor_BlockInfo *);
+IPTR mQueryKeyAction(struct IClass *, Object *, struct MUIP_TextEditor_QueryKeyAction *);
+IPTR mClearText(struct IClass *, Object *, Msg);
+IPTR mToggleCursor(struct IClass *, Object *, Msg);
+IPTR mInputTrigger(struct IClass *, Object *, Msg);
 ULONG InsertText(struct InstData *, STRPTR, BOOL);
 
 // MixedFunctions.c
@@ -557,11 +557,11 @@ ULONG ConvertPen(struct InstData *, UWORD, BOOL);
 void DrawSeparator(struct InstData *, struct RastPort *, WORD, WORD, WORD, WORD);
 
 // Search.c
-ULONG OM_Search(struct IClass *, Object *, struct MUIP_TextEditor_Search *);
-ULONG OM_Replace(struct IClass *, Object *, struct MUIP_TextEditor_Replace *);
+IPTR mSearch(struct IClass *, Object *, struct MUIP_TextEditor_Search *);
+IPTR mReplace(struct IClass *, Object *, struct MUIP_TextEditor_Replace *);
 
 // SetBlock.c
-ULONG OM_SetBlock(struct InstData *, struct MUIP_TextEditor_SetBlock *msg);
+IPTR mSetBlock(struct InstData *, struct MUIP_TextEditor_SetBlock *msg);
 
 // SpellChecker.c
 void CheckWord(struct InstData *);

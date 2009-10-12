@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-10-12 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/misc: cleaned up the dispatcher a bit. Now all method functions have the
+    usual class/object/message parameters.
+
 2009-10-09 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/BlockOperators.c: cutting a line to the clipboard and deleting complete

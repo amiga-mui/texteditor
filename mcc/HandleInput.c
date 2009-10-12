@@ -671,8 +671,8 @@ static BOOL ReactOnRawKey(struct InstData *data, struct IntuiMessage *imsg)
 }
 
 ///
-/// MUIM_HandleInput()
-IPTR HandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
+/// mHandleInput()
+IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
   BOOL wasActivated;

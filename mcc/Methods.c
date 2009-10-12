@@ -30,10 +30,10 @@
 
 #include "TextEditor_mcp.h"
 
-/// OM_BlockInfo()
-ULONG OM_BlockInfo(struct InstData *data, struct MUIP_TextEditor_BlockInfo *msg)
+/// mBlockInfo()
+IPTR mBlockInfo(struct InstData *data, struct MUIP_TextEditor_BlockInfo *msg)
 {
-  ULONG result = FALSE;
+  IPTR result = FALSE;
 
   ENTER();
 
@@ -55,8 +55,8 @@ ULONG OM_BlockInfo(struct InstData *data, struct MUIP_TextEditor_BlockInfo *msg)
 }
 
 ///
-/// OM_QueryKeyAction()
-ULONG OM_QueryKeyAction(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_QueryKeyAction *msg)
+/// mQueryKeyAction()
+IPTR mQueryKeyAction(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_QueryKeyAction *msg)
 {
   struct te_key *userkeys;
   struct te_key *foundKey = NULL;
@@ -83,13 +83,13 @@ ULONG OM_QueryKeyAction(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextE
     }
   }
 
-  RETURN((ULONG)foundKey);
-  return (ULONG)foundKey;
+  RETURN((IPTR)foundKey);
+  return (IPTR)foundKey;
 }
 
 ///
-/// OM_MarkText()
-ULONG OM_MarkText(struct InstData *data, struct MUIP_TextEditor_MarkText *msg)
+/// mMarkText()
+IPTR mMarkText(struct InstData *data, struct MUIP_TextEditor_MarkText *msg)
 {
   ENTER();
 
@@ -143,9 +143,10 @@ ULONG OM_MarkText(struct InstData *data, struct MUIP_TextEditor_MarkText *msg)
 }
 
 ///
-/// CleanText()
-ULONG ClearText(struct InstData *data)
+/// mClearText()
+ULONG mClearText(struct IClass *cl, Object *obj, UNUSED Msg msg)
 {
+  struct InstData *data = INST_DATA(cl, obj);
   struct line_node *newcontents;
 
   ENTER();
@@ -186,9 +187,11 @@ ULONG ClearText(struct InstData *data)
 }
 
 ///
-/// ToggleCursor()
-ULONG ToggleCursor(struct InstData *data)
+/// mToggleCursor()
+ULONG mToggleCursor(struct IClass *cl, Object *obj, UNUSED Msg msg)
 {
+  struct InstData *data = INST_DATA(cl, obj);
+
   ENTER();
 
   if(isFlagSet(data->flags, FLG_Active))
@@ -210,8 +213,8 @@ ULONG ToggleCursor(struct InstData *data)
 }
 
 ///
-/// InputTrigger()
-ULONG InputTrigger(struct IClass *cl, Object *obj)
+/// mInputTrigger()
+ULONG mInputTrigger(struct IClass *cl, Object *obj, UNUSED Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
 
