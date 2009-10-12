@@ -159,7 +159,7 @@ void ServerWriteInfo(IPTR session, struct line_node *line)
     SHOWVALUE(DBF_CLIPBOARD, error);
   }
 
-  if(line->line.Separator)
+  if(line->line.Separator != LNSF_None)
   {
     D(DBF_CLIPBOARD, "writing SBAR");
     error = PushChunk(iff, 0, ID_SBAR, IFFSIZE_UNKNOWN);
@@ -403,7 +403,7 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
   LONG codeset = 0;
   UWORD flow = MUIV_TextEditor_Flow_Left;
   BOOL highlight = FALSE;
-  UWORD separator = 0;
+  UWORD separator = LNSF_None;
   LONG error;
   BOOL lineFinished = FALSE;
 
@@ -584,7 +584,7 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
             allocatedColors = 0;
             flow = MUIV_TextEditor_Flow_Left;
             highlight = FALSE;
-            separator = 0;
+            separator = LNSF_None;
           }
         }
         break;

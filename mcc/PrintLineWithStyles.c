@@ -355,28 +355,25 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     }
     SetSoftStyle(rp, FS_NORMAL, AskSoftStyle(rp));
 
-    if(line->line.Separator)
+    if(line->line.Separator != LNSF_None)
     {
-        WORD  LeftX, LeftWidth,
-            RightX, RightWidth,
-            Y, Height;
+      WORD LeftX, LeftWidth;
+      WORD RightX, RightWidth;
+      WORD Y, Height;
 
       LeftX = xoffset;
       LeftWidth = flow-3;
       RightX = rp->cp_x+3;
       RightWidth = xoffset+data->innerwidth - RightX;
       Y = starty;
-      Height = (line->line.Separator & LNSF_Thick) ? 2 : 1;
+      Height = isFlagSet(line->line.Separator, LNSF_Thick) ? 2 : 1;
 
-      if(line->line.Separator & LNSF_Middle)
+      if(isFlagSet(line->line.Separator, LNSF_Middle))
         Y += (data->height/2)-Height;
-      else
-      {
-        if(line->line.Separator & LNSF_Bottom)
-          Y += data->height-(2*Height);
-      }
+      else if(isFlagSet(line->line.Separator, LNSF_Bottom))
+        Y += data->height-(2*Height);
 
-      if(line->line.Separator & LNSF_StrikeThru || line->line.Length == 1)
+      if(isFlagSet(line->line.Separator, LNSF_StrikeThru) || line->line.Length == 1)
       {
         LeftWidth = data->innerwidth;
       }

@@ -1008,7 +1008,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
     {
       // split at the beginning of the line
       line->line.Highlight = FALSE;
-      line->line.Separator = 0;
+      line->line.Separator = LNSF_None;
       if(line->previous == NULL || line->previous->line.Flow != line->line.Flow)
       {
         line->line.Flow = MUIV_TextEditor_Flow_Left;
@@ -1068,7 +1068,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
       if(buffer == NULL)
       {
         line->next->line.Highlight = FALSE;
-        line->next->line.Separator = 0;
+        line->next->line.Separator = LNSF_None;
       }
       SetCursor(data, crsr_x, crsr_l, FALSE);
       if(line_nr < data->maxlines)
