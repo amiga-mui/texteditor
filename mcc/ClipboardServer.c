@@ -493,11 +493,11 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
           if(colors != NULL)
           {
             // forget any duplicate colors
-            MyFree(colors);
+            FreeVec(colors);
             colors = NULL;
           }
           // allocate one word more than the chunk tell us, because we terminate the array with EOC
-          if(numColors > 0 && (colors = MyAlloc((numColors+1) * sizeof(*colors))) != NULL)
+          if(numColors > 0 && (colors = AllocVec((numColors+1) * sizeof(*colors), SHARED_MEMFLAG)) != NULL)
           {
             error = ReadChunkBytes(iff, colors, numColors * sizeof(struct LineColor));
             SHOWVALUE(DBF_CLIPBOARD, error);
@@ -516,11 +516,11 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
           if(styles != NULL && styles != (APTR)-1)
           {
             // forget any duplicate styles
-            MyFree(styles);
+            FreeVec(styles);
             styles = NULL;
           }
           // allocate one word more than the chunk tell us, because we terminate the array with EOS
-          if(numStyles > 0 && (styles = MyAlloc((numStyles+1) * sizeof(struct LineStyle))) != NULL)
+          if(numStyles > 0 && (styles = AllocVec((numStyles+1) * sizeof(struct LineStyle), SHARED_MEMFLAG)) != NULL)
           {
             error = ReadChunkBytes(iff, styles, numStyles * sizeof(struct LineStyle));
             SHOWVALUE(DBF_CLIPBOARD, error);
@@ -542,19 +542,20 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
             // allocate 2 additional bytes:
             // - one for the trailing LF
             // - another one for the terminating NUL
-            if((textline = MyAlloc(length + 2)) != NULL)
+            if((textline = AllocVec(length + 2, SHARED_MEMFLAG)) != NULL)
             {
               error = ReadChunkBytes(iff, textline, length);
               SHOWVALUE(DBF_CLIPBOARD, error);
               textline[length] = '\0';
             }
 
-            if(textline != NULL && (line = MyAlloc(sizeof(*line))) != NULL)
+            if(textline != NULL && (line = AllocVec(sizeof(*line), SHARED_MEMFLAG)) != NULL)
             {
               line->next = NULL;
               line->previous = NULL;
               line->line.Contents = textline;
               line->line.Length = length;
+              line->line.allocatedContents = length+2;
               line->line.Highlight = highlight;
               line->line.Flow = flow;
               line->line.Separator = separator;
@@ -571,11 +572,11 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
             else
             {
               if(textline != NULL)
-                MyFree(textline);
+                FreeVec(textline);
               if(styles != NULL)
-                MyFree(styles);
+                FreeVec(styles);
               if(colors != NULL)
-                MyFree(colors);
+                FreeVec(colors);
             }
 
             styles = NULL;
@@ -598,9 +599,9 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
   if(line == NULL)
   {
     if(styles != NULL)
-      MyFree(styles);
+      FreeVec(styles);
     if(colors != NULL)
-      MyFree(colors);
+      FreeVec(colors);
   }
 
   *linePtr = line;

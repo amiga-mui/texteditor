@@ -78,12 +78,13 @@ struct line_node *ImportText(struct InstData *data, char *contents, struct Hook 
             // if the line has nor predecessor it was obviously the first line
             // so we prepare a "fake" line_node to let the textEditor clear our
             // text
-            if((ctext = MyAllocPooled(data->mypool, 2)) != NULL)
+            if((ctext = AllocVecPooled(data->mypool, 2)) != NULL)
             {
               ctext[0] = '\n';
               ctext[1] = '\0';
               line->line.Contents = ctext;
-              line->line.Length   = 1;
+              line->line.Length = 1;
+              line->line.allocatedContents = 2;
             }
             else
             {

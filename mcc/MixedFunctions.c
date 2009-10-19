@@ -84,9 +84,9 @@ void FreeTextMem(struct InstData *data, struct line_node *line)
   {
     struct  line_node *tline = line;
 
-    MyFreePooled(data->mypool, line->line.Contents);
+    FreeVecPooled(data->mypool, line->line.Contents);
     if(line->line.Styles != NULL)
-      MyFreePooled(data->mypool, line->line.Styles);
+      FreeVecPooled(data->mypool, line->line.Styles);
 
     line = line->next;
 
@@ -112,15 +112,20 @@ BOOL Init_LineNode(struct InstData *data, struct line_node *line, struct line_no
   while(text[textlength] != '\n' && text[textlength] != '\0')
     textlength++;
 
-  if((ctext = MyAllocPooled(data->mypool, textlength+2)) != NULL)
+  // count one byte more for the trailing LF byte
+  textlength++;
+
+  // and allocate yet another additional byte for the trailing NUL byte
+  if((ctext = AllocVecPooled(data->mypool, textlength+1)) != NULL)
   {
-    memcpy(ctext, text, textlength+1);
-    ctext[textlength+1] = 0;
+    memcpy(ctext, text, textlength);
+    ctext[textlength] = 0;
 
     line->next = NULL;
     line->previous = previous;
     line->line.Contents = ctext;
-    line->line.Length = textlength+1;
+    line->line.Length = textlength;
+    line->line.allocatedContents = textlength+1;
     if(data->rport != NULL)
       line->visual = VisualHeight(data, line);
     line->line.Highlight = FALSE;
@@ -145,14 +150,23 @@ BOOL ExpandLine(struct InstData *data, struct line_node *line, LONG length)
 {
   BOOL result = FALSE;
   char *newbuffer;
+  ULONG expandedSize;
 
   ENTER();
 
-  if((newbuffer = MyAllocPooled(data->mypool, line->line.Length+40+length)) != NULL)
+  if(line->line.allocatedContents >=2 && line->line.Length >= line->line.allocatedContents)
   {
-    memcpy(newbuffer, line->line.Contents, line->line.Length+1);
-    MyFreePooled(data->mypool, line->line.Contents);
+    E(DBF_STYLE, "line length (%ld) > allocated size (%ld)", line->line.Length, line->line.allocatedContents-1);
+  }
+
+  expandedSize = line->line.allocatedContents+40+length;
+
+  if((newbuffer = AllocVecPooled(data->mypool, expandedSize)) != NULL)
+  {
+    strlcpy(newbuffer, line->line.Contents, expandedSize);
+    FreeVecPooled(data->mypool, line->line.Contents);
     line->line.Contents = newbuffer;
+    line->line.allocatedContents = expandedSize;
     result = TRUE;
   }
 
@@ -166,15 +180,19 @@ BOOL CompressLine(struct InstData *data, struct line_node *line)
 {
   BOOL result = FALSE;
   char *newbuffer;
+  ULONG compressedSize;
 
   ENTER();
 
-  if((newbuffer = MyAllocPooled(data->mypool, strlen(line->line.Contents)+1)) != NULL)
+  compressedSize = strlen(line->line.Contents)+1;
+
+  if((newbuffer = AllocVecPooled(data->mypool, compressedSize)) != NULL)
   {
-    memcpy(newbuffer, line->line.Contents, line->line.Length+1);
-    MyFreePooled(data->mypool, line->line.Contents);
+    strlcpy(newbuffer, line->line.Contents, compressedSize);
+    FreeVecPooled(data->mypool, line->line.Contents);
     line->line.Contents = newbuffer;
-    line->line.Length  = strlen(newbuffer);
+    line->line.Length = strlen(newbuffer);
+    line->line.allocatedContents = compressedSize;
     result = TRUE;
   }
 

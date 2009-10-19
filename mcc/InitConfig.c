@@ -365,7 +365,7 @@ void InitConfig(struct InstData *data, Object *obj)
     // now we calculate the memory size
     size = (count+1)*sizeof(struct te_key);
 
-    if((data->RawkeyBindings = MyAllocPooled(data->mypool, size)) != NULL)
+    if((data->RawkeyBindings = AllocVecPooled(data->mypool, size)) != NULL)
     {
       ULONG i;
       struct te_key *mykeys = data->RawkeyBindings;
@@ -407,7 +407,7 @@ void FreeConfig(struct InstData *data, struct MUI_RenderInfo *mri)
   ENTER();
 
   if(data->RawkeyBindings != NULL)
-    MyFreePooled(data->mypool, data->RawkeyBindings);
+    FreeVecPooled(data->mypool, data->RawkeyBindings);
 
   if(data->allocatedpens & 1)
     MUI_ReleasePen(mri, data->textcolor);

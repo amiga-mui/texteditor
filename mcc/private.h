@@ -193,6 +193,7 @@ struct LineNode
 {
   STRPTR   Contents;      // Set this to the linecontents (allocated via the poolhandle)
   ULONG    Length;        // The length of the line (including the '\n')
+  ULONG allocatedContents;
   struct LineStyle *Styles; // Set this to the styles used for this line (allocated via the poolhandle). The array is terminated by an (EOS,0) marker
   ULONG allocatedStyles;
   ULONG usedStyles;
@@ -413,13 +414,18 @@ struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG), REG(d1, LONG), REG(d2
 void SAVEDS ASM MUIG_FreeBitMap(REG(a0, struct BitMap *));
 
 // AllocFunctions.c
-struct line_node *AllocLine(struct InstData *data);
-void FreeLine(struct InstData *data, struct line_node *line);
-APTR MyAllocPooled(APTR pool, ULONG length);
-void MyFreePooled(APTR, APTR);
-APTR MyAlloc(ULONG length);
-void MyFree(APTR);
-ULONG GetAllocSize(APTR);
+#if defined(__amigaos4__)
+#define SHARED_MEMFLAG          MEMF_SHARED
+#else
+#define SHARED_MEMFLAG          MEMF_ANY
+#endif
+
+struct line_node *AllocLine(struct InstData *);
+void FreeLine(struct InstData *, struct line_node *);
+#if !defined(__amigaos4__) && !defined(__MORPHOS__)
+APTR AllocVecPooled(APTR, ULONG);
+void FreeVecPooled(APTR, APTR);
+#endif
 
 // BlockOperators.c
 STRPTR GetBlock(struct InstData *, struct marking *);

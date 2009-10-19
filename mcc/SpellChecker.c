@@ -521,7 +521,10 @@ void SuggestWord(struct InstData *data)
     }
   }
   else
+  {
+    D(DBF_ALWAYS, "character '%lc' is non-alpha", line->line.Contents[data->CPos_X]);
     DisplayBeep(NULL);
+  }
 
   LEAVE();
 }

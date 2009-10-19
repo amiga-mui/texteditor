@@ -81,7 +81,7 @@ static char *utf8_to_ansi(struct InstData *data, STRPTR src)
    }
    while (octets > 0);
 
-   dst = MyAllocPooled(data->mypool, strlength);
+   dst = AllocVecPooled(data->mypool, strlength);
 
    if (dst)
    {
@@ -117,7 +117,7 @@ static char *utf8_to_ansi(struct InstData *data, STRPTR src)
       }
       while (octets > 0);
 
-      MyFreePooled(data->mypool, src);   // Free original buffer
+      FreeVecPooled(data->mypool, src);   // Free original buffer
    }
 
    if(dst == NULL)
@@ -211,10 +211,10 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
         {
           allocatedStyles = line->line.allocatedStyles;
 
-          if((styles = MyAllocPooled(data->mypool, allocatedStyles * sizeof(*styles))) != NULL)
+          if((styles = AllocVecPooled(data->mypool, allocatedStyles * sizeof(*styles))) != NULL)
             memcpy(styles, line->line.Styles, allocatedStyles * sizeof(*styles));
 
-          MyFree(line->line.Styles);
+          FreeVec(line->line.Styles);
           line->line.Styles = NULL;
 
           // we found styles, this mean the clip was created by ourselves
@@ -226,10 +226,10 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
         {
           allocatedColors = line->line.allocatedColors;
 
-          if((colors = MyAllocPooled(data->mypool, allocatedColors * sizeof(*colors))) != NULL)
+          if((colors = AllocVecPooled(data->mypool, allocatedColors * sizeof(*colors))) != NULL)
             memcpy(colors, line->line.Colors, allocatedColors * sizeof(*colors));
 
-          MyFree(line->line.Colors);
+          FreeVec(line->line.Colors);
           line->line.Colors = NULL;
 
           // we found colors, this mean the clip was created by ourselves
@@ -298,12 +298,13 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
 
             if((importedLine = AllocLine(data)) != NULL)
             {
-              if((contents = MyAllocPooled(data->mypool, length+1)) != NULL)
+              if((contents = AllocVecPooled(data->mypool, length+1)) != NULL)
               {
                 strcpy(contents, line->line.Contents);
                 importedLine->previous = previous;
                 importedLine->line.Contents = contents;
                 importedLine->line.Length = length;
+                importedLine->line.allocatedContents = length+1;
                 importedLine->visual = VisualHeight(data, line);
                 importedLine->line.Highlight = line->line.Highlight;
                 importedLine->line.Flow = line->line.Flow;
@@ -332,11 +333,11 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
             }
           }
 
-          MyFree(line->line.Contents);
+          FreeVec(line->line.Contents);
           line->line.Contents = NULL;
         }
 
-        MyFree(line);
+        FreeVec(line);
         line = NULL;
       }
       else
@@ -419,13 +420,13 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
 
         D(DBF_CLIPBOARD, "freeing %ld colors", line->line.allocatedColors);
         if(line->line.Colors != NULL)
-          MyFreePooled(data->mypool, line->line.Colors);
+          FreeVecPooled(data->mypool, line->line.Colors);
         D(DBF_CLIPBOARD, "freeing %ld styles", line->line.allocatedStyles);
         if(line->line.Styles != NULL)
-          MyFreePooled(data->mypool, line->line.Styles);
+          FreeVecPooled(data->mypool, line->line.Styles);
         D(DBF_CLIPBOARD, "freeing contents");
         if(line->line.Contents != NULL)
-          MyFreePooled(data->mypool, line->line.Contents);
+          FreeVecPooled(data->mypool, line->line.Contents);
         D(DBF_CLIPBOARD, "freeing line");
         FreeLine(data, line);
         line = next;
@@ -462,6 +463,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
   BOOL result = FALSE;
   struct line_node *next;
   char *newbuffer;
+  ULONG newbufferSize;
   LONG visual, oldvisual, line_nr;
   BOOL emptyline = FALSE;
   BOOL highlight = line->line.Highlight;
@@ -483,24 +485,25 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
   }
   visual = line->visual + line->next->visual;
 
-  if((newbuffer = MyAllocPooled(data->mypool, line->line.Length+line->next->line.Length+1)) != NULL)
+  newbufferSize = line->line.Length+line->next->line.Length+1;
+  if((newbuffer = AllocVecPooled(data->mypool, newbufferSize)) != NULL)
   {
     memcpy(newbuffer, line->line.Contents, line->line.Length-1);
     memcpy(newbuffer+line->line.Length-1, line->next->line.Contents, line->next->line.Length+1);
-    MyFreePooled(data->mypool, line->line.Contents);
-    MyFreePooled(data->mypool, line->next->line.Contents);
+    FreeVecPooled(data->mypool, line->line.Contents);
+    FreeVecPooled(data->mypool, line->next->line.Contents);
 
     if(emptyline == TRUE)
     {
       if(line->line.Styles != NULL)
-        MyFreePooled(data->mypool, line->line.Styles);
+        FreeVecPooled(data->mypool, line->line.Styles);
 
       line->line.Styles = line->next->line.Styles;
       line->line.allocatedStyles = line->next->line.allocatedStyles;
       line->line.usedStyles = line->next->line.usedStyles;
 
       if(line->line.Colors != NULL)
-        MyFreePooled(data->mypool, line->line.Colors);
+        FreeVecPooled(data->mypool, line->line.Colors);
 
       line->line.Colors = line->next->line.Colors;
       line->line.allocatedColors = line->next->line.allocatedColors;
@@ -519,7 +522,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
 
       allocStyles = 3 + line->line.usedStyles + line->next->line.usedStyles;
 
-      if((styles = MyAllocPooled(data->mypool, allocStyles * sizeof(*styles))) != NULL)
+      if((styles = AllocVecPooled(data->mypool, allocStyles * sizeof(*styles))) != NULL)
       {
         struct LineStyle *t_styles = styles;
         ULONG usedStyles = 0;
@@ -562,7 +565,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
               usedStyles++;
             }
           }
-          MyFreePooled(data->mypool, line->line.Styles);
+          FreeVecPooled(data->mypool, line->line.Styles);
         }
 
         if(styles2 != NULL)
@@ -584,7 +587,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
               usedStyles++;
             }
           }
-          MyFreePooled(data->mypool, line->next->line.Styles);
+          FreeVecPooled(data->mypool, line->next->line.Styles);
         }
         styles->column = EOS;
         usedStyles++;
@@ -601,7 +604,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
 
       allocColors = 3 + line->line.usedColors + line->next->line.usedColors;
 
-      if((colors = MyAllocPooled(data->mypool, allocColors * sizeof(*colors))) != NULL)
+      if((colors = AllocVecPooled(data->mypool, allocColors * sizeof(*colors))) != NULL)
       {
         struct LineColor *t_colors = colors;
         ULONG usedColors = 0;
@@ -618,7 +621,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
             colors++;
             usedColors++;
           }
-          MyFreePooled(data->mypool, line->line.Colors);
+          FreeVecPooled(data->mypool, line->line.Colors);
         }
 
         if(end_color != 0 && (colors2 == NULL || colors2->column != 1))
@@ -642,7 +645,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
             colors++;
             usedColors++;
           }
-          MyFreePooled(data->mypool, line->next->line.Colors);
+          FreeVecPooled(data->mypool, line->next->line.Colors);
         }
         colors->column = EOC;
         usedColors++;
@@ -660,6 +663,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
 
     line->line.Contents = newbuffer;
     line->line.Length  = strlen(newbuffer);
+    line->line.allocatedContents = newbufferSize;
 
     next = line->next;
     line->next = line->next->next;
@@ -825,7 +829,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
       numStyles += 4;
       D(DBF_STYLE, "allocating space for %ld styles", numStyles);
 
-      if((newstyles = MyAllocPooled(data->mypool, numStyles * sizeof(*newstyles))) != NULL)
+      if((newstyles = AllocVecPooled(data->mypool, numStyles * sizeof(*newstyles))) != NULL)
       {
         struct LineStyle *nstyles = newstyles;
 
@@ -936,7 +940,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
       numColors += 4;
       D(DBF_STYLE, "allocating space for %ld colors", numColors);
 
-      if((newcolors = MyAllocPooled(data->mypool, numColors * sizeof(*newcolors))) != NULL)
+      if((newcolors = AllocVecPooled(data->mypool, numColors * sizeof(*newcolors))) != NULL)
       {
         struct LineColor *ncolors = newcolors;
 
@@ -1317,7 +1321,7 @@ BOOL PasteChars(struct InstData *data, LONG x, struct line_node *line, LONG leng
     }
   }
 
-  if(GetAllocSize(line->line.Contents) < line->line.Length + length + 1)
+  if(line->line.allocatedContents < line->line.Length + length + 1)
   {
     if(ExpandLine(data, line, length) == FALSE)
     {
