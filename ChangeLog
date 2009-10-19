@@ -7,6 +7,8 @@ $URL$
 
 2009-10-19 Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/SpellChecker.c: the spell checker no longer treats a missing ENV:Found
+    variable as a failure and thus will no longer DisplayBeep() in this case.
   * mcc/misc: added an allocation size counter to each line to get rid of the
     necessity to peek around in memory to get an allocation's size.
 

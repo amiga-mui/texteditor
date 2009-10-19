@@ -396,7 +396,8 @@ static BOOL LookupWord(struct InstData *data, CONST_STRPTR word)
     else
     {
       D(DBF_SPELL, "cannot read ENV variable 'Found', error code %ld", IoErr());
-      res = FALSE;
+      // don't treat a missing "Found" variable as a failure, at least this
+      // is what previous releases did.
     }
   }
   else
