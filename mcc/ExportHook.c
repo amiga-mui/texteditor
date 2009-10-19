@@ -58,10 +58,10 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
   {
     if(data != NULL)
     {
-      buf = MyAllocPooled(data->mypool, sizeof(struct Buffer));
+      buf = AllocVecPooled(data->mypool, sizeof(struct Buffer));
       if(buf != NULL)
       {
-        buf->buffer = MyAllocPooled(data->mypool, 512);
+        buf->buffer = AllocVecPooled(data->mypool, 512);
         buf->size   = 512;
       }
     }
@@ -94,7 +94,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
 
       if(data)
       {
-        buf->buffer = MyAllocPooled(data->mypool, oldsize+expand+512);
+        buf->buffer = AllocVecPooled(data->mypool, oldsize+expand+512);
         buf->size = oldsize+expand+512;
       }
       else
@@ -107,7 +107,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
       memcpy(buf->buffer, oldbuf, offset);
 
       if(data)
-        MyFreePooled(data->mypool, oldbuf);
+        FreeVecPooled(data->mypool, oldbuf);
       else
         FreeVec(oldbuf);
     }
@@ -360,7 +360,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
 
       if(data)
       {
-        MyFreePooled(data->mypool, buf);
+        FreeVecPooled(data->mypool, buf);
       }
       else
       {

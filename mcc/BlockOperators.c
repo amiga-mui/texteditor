@@ -97,13 +97,13 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
   if(startline != stopline)
   {
     /* Create a firstline look-a-like */
-    emsg.Contents = (STRPTR)MyAllocPooled(data->mypool, startline->line.Length-startx);
+    emsg.Contents = (STRPTR)AllocVecPooled(data->mypool, startline->line.Length-startx);
     if(startline->line.Styles != NULL && startline->line.Styles[0].column != EOS)
     {
       UWORD startstyle = GetStyle(startx, startline);
 
       // allocate space for all old styles and up to 4 new styles
-      if((emsg.Styles = (struct LineStyle *)MyAllocPooled(data->mypool, (startline->line.usedStyles+4) * sizeof(struct LineStyle))) != NULL)
+      if((emsg.Styles = (struct LineStyle *)AllocVecPooled(data->mypool, (startline->line.usedStyles+4) * sizeof(struct LineStyle))) != NULL)
       {
         struct LineStyle *styles = emsg.Styles;
         struct LineStyle *oldstyles = startline->line.Styles;
@@ -152,11 +152,11 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
       emsg.Separator = startline->line.Separator;
       emsg.Highlight = startline->line.Highlight;
       emsg.UserData = (APTR)CallHookA(&ExportHookPlain, NULL, &emsg);
-      MyFreePooled(data->mypool, emsg.Contents);
+      FreeVecPooled(data->mypool, emsg.Contents);
     }
 
     if(emsg.Styles != NULL)
-      MyFreePooled(data->mypool, emsg.Styles);
+      FreeVecPooled(data->mypool, emsg.Styles);
 
     /* Start iterating... */
     act = startline->next;
@@ -174,13 +174,13 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
     }
 
     /* Create a Lastline look-a-like */
-    emsg.Contents = (STRPTR)MyAllocPooled(data->mypool, stopx);
+    emsg.Contents = AllocVecPooled(data->mypool, stopx);
     if(stopline->line.Styles != NULL && stopline->line.Styles->column != EOS)
     {
       UWORD stopstyle = GetStyle(stopx, stopline);
 
       // allocate space for all old styles and up to 4 new styles
-      if((emsg.Styles = (struct LineStyle *)MyAllocPooled(data->mypool, (stopline->line.usedStyles+4) * sizeof(struct LineStyle))) != NULL)
+      if((emsg.Styles = AllocVecPooled(data->mypool, (stopline->line.usedStyles+4) * sizeof(struct LineStyle))) != NULL)
       {
         struct LineStyle *styles = emsg.Styles;
         struct LineStyle *oldstyles = stopline->line.Styles;
@@ -227,23 +227,23 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
       emsg.Highlight = stopline->line.Highlight;
       emsg.Last = TRUE;
       text = (STRPTR)CallHookA(&ExportHookPlain, NULL, &emsg);
-      MyFreePooled(data->mypool, emsg.Contents);
+      FreeVecPooled(data->mypool, emsg.Contents);
     }
 
     if(emsg.Styles != NULL)
-      MyFreePooled(data->mypool, emsg.Styles);
+      FreeVecPooled(data->mypool, emsg.Styles);
   }
   else
   {
     /* Create a single line */
-    emsg.Contents = (STRPTR)MyAllocPooled(data->mypool, stopx-startx);
+    emsg.Contents = (STRPTR)AllocVecPooled(data->mypool, stopx-startx);
     if(startline->line.Styles != NULL && startline->line.Styles->column != EOS)
     {
       UWORD startstyle = GetStyle(startx, startline);
       UWORD stopstyle = GetStyle(stopx, stopline);
 
       // allocate space for all old styles and up to 4 new styles
-      if((emsg.Styles = (struct LineStyle *)MyAllocPooled(data->mypool, (startline->line.usedStyles+4) * sizeof(struct LineStyle))) != NULL)
+      if((emsg.Styles = (struct LineStyle *)AllocVecPooled(data->mypool, (startline->line.usedStyles+4) * sizeof(struct LineStyle))) != NULL)
       {
         struct LineStyle *styles = emsg.Styles;
         struct LineStyle *oldstyles = startline->line.Styles;
@@ -312,11 +312,11 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
       emsg.Highlight = startline->line.Highlight;
       emsg.Last = TRUE;
       text = (STRPTR)CallHookA(&ExportHookPlain, NULL, &emsg);
-      MyFreePooled(data->mypool, emsg.Contents);
+      FreeVecPooled(data->mypool, emsg.Contents);
     }
 
     if(emsg.Styles != NULL)
-      MyFreePooled(data->mypool, emsg.Styles);
+      FreeVecPooled(data->mypool, emsg.Styles);
   }
 
   RETURN(text);
@@ -445,11 +445,11 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, s
       {
         struct line_node *cc_startline = c_startline;
 
-        MyFreePooled(data->mypool, c_startline->line.Contents);
+        FreeVecPooled(data->mypool, c_startline->line.Contents);
         if(c_startline->line.Styles != NULL)
-          MyFreePooled(data->mypool, c_startline->line.Styles);
+          FreeVecPooled(data->mypool, c_startline->line.Styles);
         if(c_startline->line.Colors != NULL)
-          MyFreePooled(data->mypool, c_startline->line.Colors);
+          FreeVecPooled(data->mypool, c_startline->line.Colors);
         data->totallines -= c_startline->visual;
         c_startline = c_startline->next;
 

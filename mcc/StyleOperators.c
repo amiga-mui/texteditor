@@ -119,7 +119,7 @@ void AddStyleToLine(struct InstData *data, LONG x, struct line_node *line, LONG 
   else
     numStyles = 8;
 
-  if((newstyles = MyAllocPooled(data->mypool, numStyles * sizeof(struct LineStyle))) != NULL)
+  if((newstyles = AllocVecPooled(data->mypool, numStyles * sizeof(struct LineStyle))) != NULL)
   {
     ULONG usedStyles = 0;
 
@@ -209,7 +209,7 @@ void AddStyleToLine(struct InstData *data, LONG x, struct line_node *line, LONG 
 
     if(oldStyles != NULL)
     {
-      MyFreePooled(data->mypool, oldStyles);
+      FreeVecPooled(data->mypool, oldStyles);
     }
   }
 

@@ -485,7 +485,7 @@ IPTR mHandleARexx(struct IClass *cl, Object *obj, struct MUIP_TextEditor_ARexxCm
           ULONG length = strlen(txtargs);
           char *buffer;
 
-          if((buffer = MyAllocPooled(data->mypool, length+2)) != NULL)
+          if((buffer = AllocVecPooled(data->mypool, length+2)) != NULL)
           {
             struct RDArgs *ra_result = NULL;
 
@@ -504,7 +504,7 @@ IPTR mHandleARexx(struct IClass *cl, Object *obj, struct MUIP_TextEditor_ARexxCm
 
               FreeArgs(ra_result);
             }
-            MyFreePooled(data->mypool, buffer);
+            FreeVecPooled(data->mypool, buffer);
           }
           FreeDosObject(DOS_RDARGS, myrdargs);
         }

@@ -1119,7 +1119,7 @@ void Key_DelLine(struct InstData *data)
     MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
   }
 
-  if(data->actualline->next == NULL && *data->actualline->line.Contents == '\n')
+  if(data->actualline->next == NULL && data->actualline->line.Contents[0] == '\n')
     GoLeft(data);
 
   GoStartOfLine(data);

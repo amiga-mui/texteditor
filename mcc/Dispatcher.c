@@ -207,11 +207,11 @@ static IPTR mDispose(struct IClass *cl, Object *obj, Msg msg)
     struct line_node *next = line->next;
 
     if(line->line.Styles != NULL)
-      MyFreePooled(data->mypool, line->line.Styles);
+      FreeVecPooled(data->mypool, line->line.Styles);
     if(line->line.Colors != NULL)
-      MyFreePooled(data->mypool, line->line.Colors);
+      FreeVecPooled(data->mypool, line->line.Colors);
     if(line->line.Contents != NULL)
-      MyFreePooled(data->mypool, line->line.Contents);
+      FreeVecPooled(data->mypool, line->line.Contents);
     FreeLine(data, line);
 
     line = next;

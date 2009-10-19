@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-10-19 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/misc: added an allocation size counter to each line to get rid of the
+    necessity to peek around in memory to get an allocation's size.
+
 2009-10-12 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: added a proper definition for "no separator" and use it all over

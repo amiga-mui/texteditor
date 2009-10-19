@@ -40,7 +40,7 @@ static void FreeUndoStep(struct InstData *data, struct UserAction *step)
   {
     if(step->clip != NULL)
     {
-      MyFreePooled(data->mypool, step->clip);
+      FreeVecPooled(data->mypool, step->clip);
       step->clip = NULL;
     }
   }
@@ -173,7 +173,7 @@ BOOL Undo(struct InstData *data)
         data->ImportHook = &ImPlainHook;
         InsertText(data, action->clip, moveCursor);
         data->ImportHook = oldhook;
-        MyFreePooled(data->mypool, action->clip);
+        FreeVecPooled(data->mypool, action->clip);
         // clear the pointer
         action->clip = NULL;
 
@@ -297,7 +297,7 @@ BOOL Redo(struct InstData *data)
         data->ImportHook = &ImPlainHook;
         InsertText(data, action->clip, TRUE);
         data->ImportHook = oldhook;
-        MyFreePooled(data->mypool, action->clip);
+        FreeVecPooled(data->mypool, action->clip);
 
         action->blk.x = data->CPos_X;
         action->blk.y = LineNr(data, data->actualline);
@@ -515,7 +515,7 @@ void ResizeUndoBuffer(struct InstData *data, ULONG maxSteps)
     if(data->undoSteps != NULL)
     {
       ResetUndoBuffer(data);
-      MyFreePooled(data->mypool, data->undoSteps);
+      FreeVecPooled(data->mypool, data->undoSteps);
     }
 
     // reset everything to zero
@@ -532,7 +532,7 @@ void ResizeUndoBuffer(struct InstData *data, ULONG maxSteps)
       newSize = (maxSteps * sizeof(struct UserAction));
 
       // allocate a new undo buffer
-      if((data->undoSteps = MyAllocPooled(data->mypool, newSize)) != NULL)
+      if((data->undoSteps = AllocVecPooled(data->mypool, newSize)) != NULL)
         data->maxUndoSteps = maxSteps;
     }
   }

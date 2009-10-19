@@ -167,13 +167,13 @@ static void AddToGrow(struct grow *grow, void *newItem)
     char *new_array;
 
     // we reserve 8 new items
-    if((new_array = MyAllocPooled(grow->pool, (grow->maxItemCount+8) * grow->itemSize)) != NULL)
+    if((new_array = AllocVecPooled(grow->pool, (grow->maxItemCount+8) * grow->itemSize)) != NULL)
     {
       // Copy old contents into new array
       if(grow->array != NULL)
       {
         memcpy(new_array, grow->array, grow->itemCount * grow->itemSize);
-        MyFreePooled(grow->pool, grow->array);
+        FreeVecPooled(grow->pool, grow->array);
       }
 
       grow->array = new_array;
@@ -268,7 +268,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 
     // allocate some more memory for the possible quote mark '>', note that if
     // a '=' is detected at the end of a line this memory is not sufficient!
-    if((line->Contents = MyAllocPooled(msg->PoolHandle, len+4)) != NULL)
+    if((line->Contents = AllocVecPooled(msg->PoolHandle, len+4)) != NULL)
     {
       unsigned char *dest_start = (unsigned char *)line->Contents;
       unsigned char *dest = dest_start;
@@ -559,7 +559,7 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 
     // allocate some more memory for the possible quote mark '>', note that if
     // a '=' is detected at the end of a line this memory is not sufficient!
-    if((line->Contents = MyAllocPooled(msg->PoolHandle, len+4)) != NULL)
+    if((line->Contents = AllocVecPooled(msg->PoolHandle, len+4)) != NULL)
     {
       BOOL lastWasSeparator = TRUE;
       unsigned char *dest_start = (unsigned char *)line->Contents;
@@ -744,11 +744,11 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
               /* The size of the dest buffer has to be increased now */
               len += eol - src + 4 * tabs;
 
-              if((new_dest_start = (unsigned char*)MyAllocPooled(msg->PoolHandle, len + 4)) == NULL)
+              if((new_dest_start = (unsigned char*)AllocVecPooled(msg->PoolHandle, len + 4)) == NULL)
                 break;
 
               memcpy(new_dest_start, dest_start, dest - dest_start);
-              MyFreePooled(msg->PoolHandle,dest_start);
+              FreeVecPooled(msg->PoolHandle,dest_start);
 
               /* Update all dest variables */
               dest_word_start = new_dest_start + (dest_word_start - dest_start);

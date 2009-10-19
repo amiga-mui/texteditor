@@ -23,16 +23,13 @@
 #include <proto/exec.h>
 
 #include "private.h"
+
+#define DEBUG_USE_MALLOC_REDEFINE
 #include "Debug.h"
 
-#if defined(__amigaos4__)
-#define SHARED_MEMFLAG          MEMF_SHARED
-#else
-#define SHARED_MEMFLAG          MEMF_ANY
-#endif
-
-/// MyAllocPooled()
-APTR MyAllocPooled(APTR pool, ULONG length)
+/// AllocVecPooled()
+#if !defined(__amigaos4__) && !defined(__MORPHOS__)
+APTR AllocVecPooled(APTR pool, ULONG length)
 {
   ULONG *mem;
 
@@ -45,10 +42,12 @@ APTR MyAllocPooled(APTR pool, ULONG length)
   RETURN(mem);
   return(mem);
 }
+#endif // !__amigaos4__ && !__MORPHOS__
 
 ///
-/// MyFreePooled()
-void MyFreePooled(APTR pool, APTR mem)
+/// FreeVecPooled()
+#if !defined(__amigaos4__) && !defined(__MORPHOS__)
+void FreeVecPooled(APTR pool, APTR mem)
 {
   ULONG *memptr, length;
 
@@ -61,38 +60,7 @@ void MyFreePooled(APTR pool, APTR mem)
 
   LEAVE();
 }
-
-///
-/// MyAlloc()
-APTR MyAlloc(ULONG length)
-{
-  ULONG *mem;
-
-  ENTER();
-
-  length += sizeof(ULONG);
-  if((mem = AllocMem(length, SHARED_MEMFLAG)))
-    *mem++ = length;
-
-  RETURN(mem);
-  return(mem);
-}
-
-///
-/// MyFree()
-void MyFree(APTR mem)
-{
-  ULONG *memptr, length;
-
-  ENTER();
-
-  memptr = &((ULONG *)mem)[-1];
-  length = *memptr;
-
-  FreeMem(memptr, length);
-
-  LEAVE();
-}
+#endif // !__amigaos4__ && !__MORPHOS__
 
 ///
 /// AllocLine()
@@ -102,7 +70,7 @@ struct line_node *AllocLine(struct InstData *data)
 
   ENTER();
 
-  newline = AllocPooled(data->mypool, sizeof(struct line_node));
+  newline = AllocVecPooled(data->mypool, sizeof(struct line_node));
 
   RETURN(newline);
   return newline;
@@ -138,27 +106,10 @@ void FreeLine(struct InstData *data, struct line_node* line)
     }
   }
 
-  // lets use FreePooled to free the memory of the line
-  FreePooled(data->mypool, line, sizeof(struct line_node));
+  // finally free the line itself
+  FreeVecPooled(data->mypool, line);
 
   LEAVE();
 }
 
 ///
-/// GetAllocSize()
-ULONG GetAllocSize(void *ptr)
-{
-  ULONG *memptr;
-  ULONG size;
-
-  ENTER();
-
-  memptr = &((ULONG *)ptr)[-1];
-  size = *memptr - sizeof(ULONG);
-
-  RETURN(size);
-  return size;
-}
-
-///
-

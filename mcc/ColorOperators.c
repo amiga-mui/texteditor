@@ -62,7 +62,7 @@ static void AddColorToLine(struct InstData *data, UWORD x, struct line_node *lin
   else
     numColors = 8;
 
-  if((newcolors = MyAllocPooled(data->mypool, numColors * sizeof(struct LineColor))) != NULL)
+  if((newcolors = AllocVecPooled(data->mypool, numColors * sizeof(struct LineColor))) != NULL)
   {
     ULONG usedColors = 0;
     UWORD oldcol = 0;
@@ -127,7 +127,7 @@ static void AddColorToLine(struct InstData *data, UWORD x, struct line_node *lin
 
     if(oldcolors != NULL)
     {
-      MyFreePooled(data->mypool, oldcolors);
+      FreeVecPooled(data->mypool, oldcolors);
     }
   }
 
