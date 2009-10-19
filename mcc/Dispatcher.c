@@ -174,7 +174,7 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             data->currentCursorState = CS_INACTIVE;
 
             RETURN((IPTR)obj);
-            return((IPTR)obj);
+            return (IPTR)obj;
           }
         }
       }
@@ -183,7 +183,7 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
   }
 
   RETURN(FALSE);
-  return(FALSE);
+  return FALSE;
 }
 
 ///
@@ -235,13 +235,14 @@ static IPTR mDispose(struct IClass *cl, Object *obj, Msg msg)
   }
 
   LEAVE();
-  return(DoSuperMethodA(cl, obj, msg));
+  return DoSuperMethodA(cl, obj, msg);
 }
 
 ///
 /// mSetup()
 static IPTR mSetup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
 {
+  IPTR result = FALSE;
   struct InstData *data = INST_DATA(cl, obj);
 
   ENTER();
@@ -301,13 +302,12 @@ static IPTR mSetup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
       data->smooth_wait = 0;
       data->scrollaction = FALSE;
 
-      RETURN(TRUE);
-      return(TRUE);
+      result = TRUE;
     }
   }
 
-  RETURN(FALSE);
-  return(FALSE);
+  RETURN(result);
+  return result;
 }
 
 ///
@@ -346,7 +346,7 @@ static IPTR mCleanup(struct IClass *cl, Object *obj, Msg msg)
   DeinitRastPort(&data->tmprp);
 #endif
 
-  return result;
+  RETURN(result);
   return result;
 }
 
@@ -398,7 +398,7 @@ static IPTR mAskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *ms
   }
 
   RETURN(0);
-  return(0);
+  return 0;
 }
 
 ///
@@ -476,7 +476,7 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
   data->shown = TRUE;
 
   RETURN(TRUE);
-  return(TRUE);
+  return TRUE;
 }
 
 ///
@@ -499,7 +499,7 @@ static IPTR mHide(struct IClass *cl, Object *obj, Msg msg)
   data->rport = NULL;
 
   LEAVE();
-  return(DoSuperMethodA(cl, obj, msg));
+  return DoSuperMethodA(cl, obj, msg);
 }
 
 ///
@@ -562,7 +562,7 @@ static IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
   }
 
   RETURN(0);
-  return(0);
+  return 0;
 }
 
 ///
@@ -600,7 +600,7 @@ IPTR mGoActive(struct IClass *cl, Object *obj, Msg msg)
 
   result = DoSuperMethodA(cl, obj, msg);
 
-  return result;
+  RETURN(result);
   return result;
 }
 
@@ -644,7 +644,7 @@ IPTR mGoInactive(struct IClass *cl, Object *obj, Msg msg)
 
   result = DoSuperMethodA(cl, obj, msg);
 
-  return result;
+  RETURN(result);
   return result;
 }
 
@@ -750,7 +750,7 @@ DISPATCHER(_Dispatcher)
   {
     result = mNew(cl, obj, (struct opSet *)msg);
 
-    return result;
+    RETURN(result);
     return result;
   }
 
@@ -792,7 +792,7 @@ DISPATCHER(_Dispatcher)
         result = (ULONG)data->UpdateInfo;
         data->UpdateInfo = NULL;
 
-        return result;
+        RETURN(result);
         return result;
       }
     }
@@ -838,7 +838,7 @@ DISPATCHER(_Dispatcher)
       if(result == 0)
       {
         RETURN(0);
-        return(0);
+        return 0;
       }
     }
     break;
@@ -871,7 +871,7 @@ DISPATCHER(_Dispatcher)
     else
     {
       RETURN(newresult);
-      return(newresult);
+      return newresult;
     }
   }
 
@@ -920,7 +920,7 @@ DISPATCHER(_Dispatcher)
   data->NoNotify = FALSE;
   UpdateStyles(data);
 
-  return result;
+  RETURN(result);
   return result;
 }
 
