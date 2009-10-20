@@ -20,6 +20,7 @@
 
 ***************************************************************************/
 
+#include <proto/exec.h>
 #include <proto/intuition.h>
 
 #include "private.h"

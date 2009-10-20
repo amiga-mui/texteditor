@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-10-20 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/ColorOperators.c, mcc/StyleOperators.c, mcc/ImportHook.c: added a
+    missing #include.
+
 2009-10-19 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/SpellChecker.c: the spell checker no longer treats a missing ENV:Found
