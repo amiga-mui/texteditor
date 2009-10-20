@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include <proto/dos.h>
+#include <proto/exec.h>
 
 #include "private.h"
 #include "Debug.h"
