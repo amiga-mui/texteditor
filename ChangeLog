@@ -7,6 +7,10 @@ $URL$
 
 2009-10-21 Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/BlockOperators.c, mcc/ExportHook.c: avoid allocating zero sized buffers
+    and make sure not to produce memory leaks when getting a block's contents.
+    An empty last line caused leaks and false error messages about not enough
+    memory for the undo buffer. This was yet an other of Allan's ancient bugs...
   * mcc/Debug.c: added BLOCK debug class.
 
 2009-10-20 Thore Böckelmann <tboeckel@gmx.de>

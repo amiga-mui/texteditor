@@ -93,75 +93,79 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
   emsg.ExportWrap = 0;
   emsg.Last = FALSE;
   emsg.data = data;
+  emsg.failure = FALSE;
 
   if(startline != stopline)
   {
-    /* Create a firstline look-a-like */
-    emsg.Contents = (STRPTR)AllocVecPooled(data->mypool, startline->line.Length-startx);
-    if(startline->line.Styles != NULL && startline->line.Styles[0].column != EOS)
+    // Create a firstline look-a-like if it contains any text
+    D(DBF_BLOCK, "exporting first line with length %ld, starting at %ld", startline->line.Length-startx, startx);
+    if(emsg.failure == FALSE && startline->line.Length-startx > 0 && (emsg.Contents = AllocVecPooled(data->mypool, startline->line.Length-startx+1)) != NULL)
     {
-      UWORD startstyle = GetStyle(startx, startline);
-
-      // allocate space for all old styles and up to 4 new styles
-      if((emsg.Styles = (struct LineStyle *)AllocVecPooled(data->mypool, (startline->line.usedStyles+4) * sizeof(struct LineStyle))) != NULL)
+      if(startline->line.Styles != NULL && startline->line.Styles[0].column != EOS)
       {
-        struct LineStyle *styles = emsg.Styles;
-        struct LineStyle *oldstyles = startline->line.Styles;
+        UWORD startstyle = GetStyle(startx, startline);
 
-        if(isFlagSet(startstyle, BOLD))
+        // allocate space for all old styles and up to 4 new styles
+        if((emsg.Styles = (struct LineStyle *)AllocVecPooled(data->mypool, (startline->line.usedStyles+4) * sizeof(struct LineStyle))) != NULL)
         {
-          styles->column = 1;
-          styles->style = BOLD;
-          styles++;
-        }
-        if(isFlagSet(startstyle, ITALIC))
-        {
-          styles->column = 1;
-          styles->style = ITALIC;
-          styles++;
-        }
-        if(isFlagSet(startstyle, UNDERLINE))
-        {
-          styles->column = 1;
-          styles->style = UNDERLINE;
-          styles++;
-        }
+          struct LineStyle *styles = emsg.Styles;
+          struct LineStyle *oldstyles = startline->line.Styles;
 
-        while(oldstyles->column <= startx)
-          oldstyles++;
+          if(isFlagSet(startstyle, BOLD))
+          {
+            styles->column = 1;
+            styles->style = BOLD;
+            styles++;
+          }
+          if(isFlagSet(startstyle, ITALIC))
+          {
+            styles->column = 1;
+            styles->style = ITALIC;
+            styles++;
+          }
+          if(isFlagSet(startstyle, UNDERLINE))
+          {
+            styles->column = 1;
+            styles->style = UNDERLINE;
+            styles++;
+          }
 
-        while(oldstyles->column != EOS)
-        {
-          styles->column = oldstyles->column - startx;
-          styles->style = oldstyles->style;
-          styles++;
-          oldstyles++;
+          while(oldstyles->column <= startx)
+            oldstyles++;
+
+          while(oldstyles->column != EOS)
+          {
+            styles->column = oldstyles->column - startx;
+            styles->style = oldstyles->style;
+            styles++;
+            oldstyles++;
+          }
+          styles->column = EOS;
         }
-        styles->column = EOS;
       }
-    }
-    else
-      emsg.Styles = NULL;
+      else
+        emsg.Styles = NULL;
 
-    emsg.Colors = NULL;
-    if(emsg.Contents != NULL)
-    {
-      memcpy(emsg.Contents, startline->line.Contents + startx, startline->line.Length - startx);
+      emsg.Colors = NULL;
+
+      strlcpy(emsg.Contents, &startline->line.Contents[startx], startline->line.Length-startx+1);
       emsg.Length = startline->line.Length - startx;
       emsg.Flow = startline->line.Flow;
       emsg.Separator = startline->line.Separator;
       emsg.Highlight = startline->line.Highlight;
       emsg.UserData = (APTR)CallHookA(&ExportHookPlain, NULL, &emsg);
+
       FreeVecPooled(data->mypool, emsg.Contents);
+
+      if(emsg.Styles != NULL)
+        FreeVecPooled(data->mypool, emsg.Styles);
     }
 
-    if(emsg.Styles != NULL)
-      FreeVecPooled(data->mypool, emsg.Styles);
-
-    /* Start iterating... */
+    // Start iterating...
     act = startline->next;
-    while(act != stopline)
+    while(emsg.failure == FALSE && act != stopline)
     {
+      D(DBF_BLOCK, "exporting line with length %ld", act->line.Length);
       emsg.Contents = act->line.Contents;
       emsg.Length   = act->line.Length;
       emsg.Styles   = act->line.Styles;
@@ -169,158 +173,186 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
       emsg.Flow   = act->line.Flow;
       emsg.Separator = act->line.Separator;
       emsg.Highlight = act->line.Highlight;
-      emsg.UserData = (APTR)CallHookA(&ExportHookPlain, (APTR)NULL, &emsg);
+      emsg.UserData = (APTR)CallHookA(&ExportHookPlain, NULL, &emsg);
       act = act->next;
     }
 
-    /* Create a Lastline look-a-like */
-    emsg.Contents = AllocVecPooled(data->mypool, stopx);
-    if(stopline->line.Styles != NULL && stopline->line.Styles->column != EOS)
+    // Create a Lastline look-a-like if it contains any text
+    D(DBF_BLOCK, "exporting last line, stopping at %ld", stopx);
+    if(emsg.failure == FALSE && stopx > 0 && (emsg.Contents = AllocVecPooled(data->mypool, stopx+1)) != NULL)
     {
-      UWORD stopstyle = GetStyle(stopx, stopline);
-
-      // allocate space for all old styles and up to 4 new styles
-      if((emsg.Styles = AllocVecPooled(data->mypool, (stopline->line.usedStyles+4) * sizeof(struct LineStyle))) != NULL)
+      if(stopline->line.Styles != NULL && stopline->line.Styles->column != EOS)
       {
-        struct LineStyle *styles = emsg.Styles;
-        struct LineStyle *oldstyles = stopline->line.Styles;
+        UWORD stopstyle = GetStyle(stopx, stopline);
 
-        while(oldstyles->column <= stopx)
+        // allocate space for all old styles and up to 4 new styles
+        if((emsg.Styles = AllocVecPooled(data->mypool, (stopline->line.usedStyles+4) * sizeof(struct LineStyle))) != NULL)
         {
-          styles->column = oldstyles->column;
-          styles->style = oldstyles->style;
-          styles++;
-          oldstyles++;
-        }
+          struct LineStyle *styles = emsg.Styles;
+          struct LineStyle *oldstyles = stopline->line.Styles;
 
-        if(isFlagSet(stopstyle, BOLD))
-        {
-          styles->column = stopx+1;
-          styles->style = ~BOLD;
-          styles++;
+          while(oldstyles->column <= stopx)
+          {
+            styles->column = oldstyles->column;
+            styles->style = oldstyles->style;
+            styles++;
+            oldstyles++;
+          }
+
+          if(isFlagSet(stopstyle, BOLD))
+          {
+            styles->column = stopx+1;
+            styles->style = ~BOLD;
+            styles++;
+          }
+          if(isFlagSet(stopstyle, ITALIC))
+          {
+            styles->column = stopx+1;
+            styles->style = ~ITALIC;
+            styles++;
+          }
+          if(isFlagSet(stopstyle, UNDERLINE))
+          {
+            styles->column = stopx+1;
+            styles->style = ~UNDERLINE;
+            styles++;
+          }
+          styles->column = EOS;
         }
-        if(isFlagSet(stopstyle, ITALIC))
-        {
-          styles->column = stopx+1;
-          styles->style = ~ITALIC;
-          styles++;
-        }
-        if(isFlagSet(stopstyle, UNDERLINE))
-        {
-          styles->column = stopx+1;
-          styles->style = ~UNDERLINE;
-          styles++;
-        }
-        styles->column = EOS;
       }
-    }
-    else
-      emsg.Styles = NULL;
+      else
+        emsg.Styles = NULL;
 
-    emsg.Colors = NULL;
-    if(emsg.Contents != NULL)
-    {
-      memcpy(emsg.Contents, stopline->line.Contents, stopx);
+      emsg.Colors = NULL;
+
+      strlcpy(emsg.Contents, stopline->line.Contents, stopx+1);
       emsg.Length = stopx;
       emsg.Flow = stopline->line.Flow;
       emsg.Separator = stopline->line.Separator;
       emsg.Highlight = stopline->line.Highlight;
       emsg.Last = TRUE;
       text = (STRPTR)CallHookA(&ExportHookPlain, NULL, &emsg);
-      FreeVecPooled(data->mypool, emsg.Contents);
-    }
 
-    if(emsg.Styles != NULL)
-      FreeVecPooled(data->mypool, emsg.Styles);
+      FreeVecPooled(data->mypool, emsg.Contents);
+
+      if(emsg.Styles != NULL)
+        FreeVecPooled(data->mypool, emsg.Styles);
+
+      // clear the state pointer
+      emsg.UserData = NULL;
+    }
   }
   else
   {
-    /* Create a single line */
-    emsg.Contents = (STRPTR)AllocVecPooled(data->mypool, stopx-startx);
-    if(startline->line.Styles != NULL && startline->line.Styles->column != EOS)
+    // Create a single line
+    D(DBF_BLOCK, "exporting single line, starting at %ld, stopping at %ld", startx, stopx);
+    if(emsg.failure == FALSE && stopx-startx > 0 && (emsg.Contents = AllocVecPooled(data->mypool, stopx-startx+1)) != NULL)
     {
-      UWORD startstyle = GetStyle(startx, startline);
-      UWORD stopstyle = GetStyle(stopx, stopline);
-
-      // allocate space for all old styles and up to 4 new styles
-      if((emsg.Styles = (struct LineStyle *)AllocVecPooled(data->mypool, (startline->line.usedStyles+4) * sizeof(struct LineStyle))) != NULL)
+      if(startline->line.Styles != NULL && startline->line.Styles->column != EOS)
       {
-        struct LineStyle *styles = emsg.Styles;
-        struct LineStyle *oldstyles = startline->line.Styles;
+        UWORD startstyle = GetStyle(startx, startline);
+        UWORD stopstyle = GetStyle(stopx, stopline);
 
-        if(isFlagSet(startstyle, BOLD))
+        // allocate space for all old styles and up to 4 new styles
+        if((emsg.Styles = (struct LineStyle *)AllocVecPooled(data->mypool, (startline->line.usedStyles+4) * sizeof(struct LineStyle))) != NULL)
         {
-          styles->column = 1;
-          styles->style = BOLD;
-          styles++;
-        }
-        if(isFlagSet(startstyle, ITALIC))
-        {
-          styles->column = 1;
-          styles->style = ITALIC;
-          styles++;
-        }
-        if(isFlagSet(startstyle, UNDERLINE))
-        {
-          styles->column = 1;
-          styles->style = UNDERLINE;
-          styles++;
-        }
+          struct LineStyle *styles = emsg.Styles;
+          struct LineStyle *oldstyles = startline->line.Styles;
 
-        while(oldstyles->column <= startx)
-          oldstyles++;
+          if(isFlagSet(startstyle, BOLD))
+          {
+            styles->column = 1;
+            styles->style = BOLD;
+            styles++;
+          }
+          if(isFlagSet(startstyle, ITALIC))
+          {
+            styles->column = 1;
+            styles->style = ITALIC;
+            styles++;
+          }
+          if(isFlagSet(startstyle, UNDERLINE))
+          {
+            styles->column = 1;
+            styles->style = UNDERLINE;
+            styles++;
+          }
 
-        while(oldstyles->column <= stopx)
-        {
-          styles->column = oldstyles->column - startx;
-          styles->style = oldstyles->style;
-          styles++;
-          oldstyles++;
-        }
+          while(oldstyles->column <= startx)
+            oldstyles++;
 
-        if(isFlagSet(stopstyle, BOLD))
-        {
-          styles->column = stopx-startx+1;
-          styles->style = ~BOLD;
-          styles++;
+          while(oldstyles->column <= stopx)
+          {
+            styles->column = oldstyles->column - startx;
+            styles->style = oldstyles->style;
+            styles++;
+            oldstyles++;
+          }
+
+          if(isFlagSet(stopstyle, BOLD))
+          {
+            styles->column = stopx-startx+1;
+            styles->style = ~BOLD;
+            styles++;
+          }
+          if(isFlagSet(stopstyle, ITALIC))
+          {
+            styles->column = stopx-startx+1;
+            styles->style = ~ITALIC;
+            styles++;
+          }
+          if(isFlagSet(stopstyle, UNDERLINE))
+          {
+            styles->column = stopx-startx+1;
+            styles->style = ~UNDERLINE;
+            styles++;
+          }
+          styles->column = EOS;
         }
-        if(isFlagSet(stopstyle, ITALIC))
-        {
-          styles->column = stopx-startx+1;
-          styles->style = ~ITALIC;
-          styles++;
-        }
-        if(isFlagSet(stopstyle, UNDERLINE))
-        {
-          styles->column = stopx-startx+1;
-          styles->style = ~UNDERLINE;
-          styles++;
-        }
-        styles->column = EOS;
       }
-    }
-    else
-      emsg.Styles = NULL;
+      else
+        emsg.Styles = NULL;
 
-    emsg.Colors = NULL;
-    if(emsg.Contents != NULL)
-    {
-      memcpy(emsg.Contents, &startline->line.Contents[startx], stopx-startx);
+      emsg.Colors = NULL;
+
+      strlcpy(emsg.Contents, &startline->line.Contents[startx], stopx-startx+1);
       emsg.Length = stopx-startx;
       emsg.Flow = startline->line.Flow;
       emsg.Separator = startline->line.Separator;
       emsg.Highlight = startline->line.Highlight;
       emsg.Last = TRUE;
       text = (STRPTR)CallHookA(&ExportHookPlain, NULL, &emsg);
-      FreeVecPooled(data->mypool, emsg.Contents);
-    }
 
-    if(emsg.Styles != NULL)
-      FreeVecPooled(data->mypool, emsg.Styles);
+      FreeVecPooled(data->mypool, emsg.Contents);
+
+      if(emsg.Styles != NULL)
+        FreeVecPooled(data->mypool, emsg.Styles);
+
+      // clear the state pointer
+      emsg.UserData = NULL;
+    }
+  }
+
+  if(emsg.UserData != NULL)
+  {
+    SHOWVALUE(DBF_BLOCK, emsg.failure);
+    // clear the state pointer if that didn't happen before
+    // and get the final exported text
+    emsg.Contents = (STRPTR)"\n";
+    emsg.Styles = NULL;
+    emsg.Colors = NULL;
+    emsg.Length = 0;
+    emsg.Flow = MUIV_TextEditor_Flow_Left;
+    emsg.Separator = LNSF_None;
+    emsg.Highlight = FALSE;
+    emsg.Last = TRUE;
+    // clear the failure signal, otherwise the hook will do nothing
+    emsg.failure = FALSE;
+    text = (STRPTR)CallHookA(&ExportHookPlain, NULL, &emsg);
   }
 
   RETURN(text);
-  return(text);
+  return text;
 }
 
 ///
