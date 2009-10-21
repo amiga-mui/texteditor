@@ -264,12 +264,14 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
     int len;
     struct LineNode *line = msg->linenode;
     ULONG wrap = msg->ImportWrap;
+    ULONG allocatedContents;
 
     len = eol - src + 4 * tabs;
 
     // allocate some more memory for the possible quote mark '>', note that if
     // a '=' is detected at the end of a line this memory is not sufficient!
-    if((line->Contents = AllocVecPooled(msg->PoolHandle, len+4)) != NULL)
+    allocatedContents = len+4;
+    if((line->Contents = AllocVecPooled(msg->PoolHandle, allocatedContents)) != NULL)
     {
       unsigned char *dest_start = (unsigned char *)line->Contents;
       unsigned char *dest = dest_start;
@@ -293,6 +295,9 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 
       style_grow.pool = msg->PoolHandle;
       style_grow.itemSize = sizeof(newStyle);
+
+      // remember the allocation size
+      line->allocatedContents = allocatedContents;
 
       // Copy loop
       while(src < eol)
@@ -555,12 +560,14 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
     int len;
     struct LineNode *line = msg->linenode;
     ULONG wrap = msg->ImportWrap;
+    ULONG allocatedContents;
 
     len = eol - src + 4 * tabs;
 
     // allocate some more memory for the possible quote mark '>', note that if
     // a '=' is detected at the end of a line this memory is not sufficient!
-    if((line->Contents = AllocVecPooled(msg->PoolHandle, len+4)) != NULL)
+    allocatedContents = len+4;
+    if((line->Contents = AllocVecPooled(msg->PoolHandle, allocatedContents)) != NULL)
     {
       BOOL lastWasSeparator = TRUE;
       unsigned char *dest_start = (unsigned char *)line->Contents;
@@ -587,6 +594,9 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 
       style_grow.pool = msg->PoolHandle;
       style_grow.itemSize = sizeof(newStyle);
+
+      // remember the allocation size
+      line->allocatedContents = allocatedContents;
 
       if(src[0] == '>')
         line->Highlight = TRUE;

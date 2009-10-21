@@ -7,6 +7,9 @@ $URL$
 
 2009-10-21 Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/ImportHook.c: the import hooks didn't set the allocation size of the
+    contents in the line structure which caused bogus error messages in the
+    debug log and caused trashed memory when a line had to be expanded.
   * mcc/MixedFunctions.c: the recently changed ExpandLine() and CompressLine()
     functions used the wrong length. This could lead to visibly truncated lines.
   * mcc/BlockOperators.c, mcc/ExportHook.c: avoid allocating zero sized buffers
