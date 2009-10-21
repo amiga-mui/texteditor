@@ -126,6 +126,7 @@ void SetupDebug(void)
       { "dump",      DBF_DUMP      },
       { "style",     DBF_STYLE     },
       { "spell",     DBF_SPELL     },
+      { "block",     DBF_BLOCK     },
       { "all",       DBF_ALL       },
       { NULL,        0             }
     };
