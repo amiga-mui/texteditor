@@ -163,7 +163,7 @@ BOOL ExpandLine(struct InstData *data, struct line_node *line, LONG length)
 
   if((newbuffer = AllocVecPooled(data->mypool, expandedSize)) != NULL)
   {
-    strlcpy(newbuffer, line->line.Contents, expandedSize);
+    strlcpy(newbuffer, line->line.Contents, line->line.Length+1);
     FreeVecPooled(data->mypool, line->line.Contents);
     line->line.Contents = newbuffer;
     line->line.allocatedContents = expandedSize;
@@ -188,7 +188,7 @@ BOOL CompressLine(struct InstData *data, struct line_node *line)
 
   if((newbuffer = AllocVecPooled(data->mypool, compressedSize)) != NULL)
   {
-    strlcpy(newbuffer, line->line.Contents, compressedSize);
+    strlcpy(newbuffer, line->line.Contents, line->line.Length+1);
     FreeVecPooled(data->mypool, line->line.Contents);
     line->line.Contents = newbuffer;
     line->line.Length = strlen(newbuffer);

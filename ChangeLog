@@ -7,6 +7,8 @@ $URL$
 
 2009-10-21 Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/MixedFunctions.c: the recently changed ExpandLine() and CompressLine()
+    functions used the wrong length. This could lead to visibly truncated lines.
   * mcc/BlockOperators.c, mcc/ExportHook.c: avoid allocating zero sized buffers
     and make sure not to produce memory leaks when getting a block's contents.
     An empty last line caused leaks and false error messages about not enough
