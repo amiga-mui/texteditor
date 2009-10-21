@@ -279,6 +279,7 @@ struct ExportMessage
   ULONG  ExportWrap;   // For your use only (reflects MUIA_TextEditor_ExportWrap)
   BOOL   Last;         // Set to TRUE if this is the last line
   APTR   data;         // pointer to the instance data of TextEditor.mcc (PRIVATE)
+  BOOL   failure;      // something went wrong during the export
 };
 
 struct ImportMessage
