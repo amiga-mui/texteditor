@@ -605,7 +605,7 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
         if(src[1] == 's' && src[2] == 'b' && src[3] == '>')
         {
           line->Separator = LNSF_Middle;
-          src+= 4;
+          src += 4;
           line->Flow = MUIV_TextEditor_Flow_Center;
           line->clearFlow = TRUE;
         }
