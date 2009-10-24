@@ -423,7 +423,7 @@ void SAVEDS ASM MUIG_FreeBitMap(REG(a0, struct BitMap *));
 
 struct line_node *AllocLine(struct InstData *);
 void FreeLine(struct InstData *, struct line_node *);
-#if !defined(__amigaos4__) && !defined(__MORPHOS__)
+#if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
 APTR AllocVecPooled(APTR, ULONG);
 void FreeVecPooled(APTR, APTR);
 #endif

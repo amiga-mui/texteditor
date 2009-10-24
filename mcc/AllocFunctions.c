@@ -28,7 +28,7 @@
 #include "Debug.h"
 
 /// AllocVecPooled()
-#if !defined(__amigaos4__) && !defined(__MORPHOS__)
+#if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
 APTR AllocVecPooled(APTR pool, ULONG length)
 {
   ULONG *mem;
@@ -46,7 +46,7 @@ APTR AllocVecPooled(APTR pool, ULONG length)
 
 ///
 /// FreeVecPooled()
-#if !defined(__amigaos4__) && !defined(__MORPHOS__)
+#if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
 void FreeVecPooled(APTR pool, APTR mem)
 {
   ULONG *memptr, length;
