@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.31 RELEASE ############################################################
+
+2009-10-24 Jens Langner <Jens.Langner@light-speed.de>
+
+  * misc: final release preparations
+
 2009-10-21 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ImportHook.c: the import hooks didn't set the allocation size of the

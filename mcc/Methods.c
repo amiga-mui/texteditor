@@ -144,7 +144,7 @@ IPTR mMarkText(struct InstData *data, struct MUIP_TextEditor_MarkText *msg)
 
 ///
 /// mClearText()
-ULONG mClearText(struct IClass *cl, Object *obj, UNUSED Msg msg)
+IPTR mClearText(struct IClass *cl, Object *obj, UNUSED Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
   struct line_node *newcontents;
@@ -188,7 +188,7 @@ ULONG mClearText(struct IClass *cl, Object *obj, UNUSED Msg msg)
 
 ///
 /// mToggleCursor()
-ULONG mToggleCursor(struct IClass *cl, Object *obj, UNUSED Msg msg)
+IPTR mToggleCursor(struct IClass *cl, Object *obj, UNUSED Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
 
@@ -214,7 +214,7 @@ ULONG mToggleCursor(struct IClass *cl, Object *obj, UNUSED Msg msg)
 
 ///
 /// mInputTrigger()
-ULONG mInputTrigger(struct IClass *cl, Object *obj, UNUSED Msg msg)
+IPTR mInputTrigger(struct IClass *cl, Object *obj, UNUSED Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
 
