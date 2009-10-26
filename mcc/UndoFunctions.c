@@ -370,6 +370,7 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
       ULONG i;
 
       // free the oldest stored action and forget about it
+      D(DBF_UNDO, "undo buffer is full, loose the oldest step");
       FreeUndoStep(data, &data->undoSteps[0]);
       data->nextUndoStep--;
       data->usedUndoSteps--;
@@ -380,7 +381,19 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
 
       // signal the user that something in the undo buffer was lost
       setFlag(data->flags, FLG_UndoLost);
-      D(DBF_UNDO, "one undo step was lost");
+    }
+    else
+    {
+      ULONG i;
+
+      // adding something new to the undo buffer will erase all previously
+      // performed redo's
+      for(i = data->nextUndoStep; i < data->usedUndoSteps; i++)
+      {
+        D(DBF_UNDO, "free not yet redone step %ld", i);
+        FreeUndoStep(data, &data->undoSteps[i]);
+      }
+      data->usedUndoSteps = data->nextUndoStep;
     }
 
     action = &data->undoSteps[data->nextUndoStep];
@@ -396,11 +409,10 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
     // as we are about to set something new for an undo
     // operation we have to signal that redo operation
     // is cleared now.
-    if(data->nextUndoStep == data->usedUndoSteps)
-      set(data->object, MUIA_TextEditor_RedoAvailable, FALSE);
-
     // and we definitely have something to undo now
-    set(data->object, MUIA_TextEditor_UndoAvailable, TRUE);
+    SetAttrs(data->object, MUIA_TextEditor_RedoAvailable, FALSE,
+                           MUIA_TextEditor_UndoAvailable, TRUE,
+                           TAG_DONE);
 
     action->x = data->CPos_X;
     action->y = LineNr(data, data->actualline);
