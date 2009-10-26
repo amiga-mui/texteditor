@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-10-26 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/UndoFunctions.c: adding a new entry to the undo buffer will erase any
+    previously done redo action. This is what all text editors do. Additionally
+    this fixes a double free of memory upon cleanup.
+
 #### v15.31 RELEASE ############################################################
 
 2009-10-24 Jens Langner <Jens.Langner@light-speed.de>
