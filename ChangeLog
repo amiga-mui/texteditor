@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2009-11-09 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/GetSetAttrs.c: modifying the MUIA_TextEditor_AutoClip attribute treated
+    the tag as if it was TRUE always thus making it impossible to deactivate it.
+    This fixes YAM bug #2894042.
+
 2009-10-26 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/UndoFunctions.c: adding a new entry to the undo buffer will erase any
