@@ -266,12 +266,13 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
         if(ti_Data)
           setFlag(data->flags, FLG_AutoClip);
         else
-          setFlag(data->flags, FLG_AutoClip);
+          clearFlag(data->flags, FLG_AutoClip);
       break;
 
       case MUIA_TextEditor_ColorMap:
         data->colormap = (ULONG *)ti_Data;
         break;
+
       case MUIA_TextEditor_InVirtualGroup:
         if(ti_Data)
           setFlag(data->flags, FLG_InVGrp);
