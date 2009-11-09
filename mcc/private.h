@@ -458,8 +458,8 @@ void RequestInput(struct InstData *);
 void RejectInput(struct InstData *);
 
 // EditorStuff.c
-BOOL PasteClip(struct InstData *, LONG x, struct line_node *line);
-BOOL SplitLine(struct InstData *, LONG x, struct line_node *, BOOL, struct UserAction *);
+BOOL PasteClip(struct InstData *, LONG , struct line_node *);
+BOOL SplitLine(struct InstData *, LONG , struct line_node *, BOOL, struct UserAction *);
 BOOL MergeLines(struct InstData *, struct line_node *);
 BOOL RemoveChars(struct InstData *, LONG, struct line_node *, LONG);
 BOOL PasteChars(struct InstData *, LONG, struct line_node *, LONG, const char *, struct UserAction *);
@@ -647,6 +647,8 @@ enum
   FLG_AutoClip       = 1L << 18,
   FLG_Activated      = 1L << 19, // the gadget was activated by MUIM_GoActive()
   FLG_ActiveOnClick  = 1L << 20, // should the gadget activated on click
+  FLG_PasteStyles    = 1L << 21, // respect styles when pasting text
+  FLG_PasteColors    = 1L << 22, // respect colors when pasting text
 
   FLG_NumberOf
 };

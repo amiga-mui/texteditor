@@ -21,6 +21,8 @@ TextEditor.mcc/MUIA_TextEditor_ImportWrap
 TextEditor.mcc/MUIA_TextEditor_InsertMode         (not yet implemented...)
 TextEditor.mcc/MUIA_TextEditor_InVirtualGroup
 TextEditor.mcc/MUIA_TextEditor_KeyUpFocus
+TextEditor.mcc/MUIA_TextEditor_PasteColors
+TextEditor.mcc/MUIA_TextEditor_PasteStyles
 TextEditor.mcc/MUIA_TextEditor_Pen
 TextEditor.mcc/MUIA_TextEditor_Prop_DeltaFactor
 TextEditor.mcc/MUIA_TextEditor_Prop_Entries
@@ -616,6 +618,30 @@ TextEditor.mcc/MUIM_TextEditor_Search
         window's default object in case the user pressed the UP cursor key and
         the texteditor was already at the very first line.
 
+TextEditor.mcc/MUIA_TextEditor_PasteColors
+
+    NAME
+        MUIA_TextEditor_PasteColors -- [ISG], BOOL
+
+    FUNCTION
+        Setting this tag to FALSE will ignore any color information upon pasting
+        a text clip from the clipboard.
+
+    SEE ALSO
+        MUIA_TextEditor_PasteStyles
+
+TextEditor.mcc/MUIA_TextEditor_PasteStyles
+
+    NAME
+        MUIA_TextEditor_PasteStyles -- [ISG], BOOL
+
+    FUNCTION
+        Setting this tag to FALSE will ignore any style information upon pasting
+        a text clip from the clipboard.
+
+    SEE ALSO
+        MUIA_TextEditor_PasteColors
+
 TextEditor.mcc/MUIA_TextEditor_Pen
 
     NAME
@@ -1107,9 +1133,9 @@ TextEditor.mcc/MUIM_TextEditor_Search
     SYNOPSIS
         DoMethod(obj, MUIM_TextEditor_ExportBlock, ULONG flags);
 
-        DoMethod(obj, MUIM_TextEditor_ExportBlock, 
-                    MUIF_TextEditor_ExportBlock_TakeBlock, 
-                    ULONG startx, ULONG starty, 
+        DoMethod(obj, MUIM_TextEditor_ExportBlock,
+                    MUIF_TextEditor_ExportBlock_TakeBlock,
+                    ULONG startx, ULONG starty,
                     ULONG stopx, ULONG stopy);
 
     FUNCTION
@@ -1129,10 +1155,10 @@ TextEditor.mcc/MUIM_TextEditor_Search
             line where the current cursor is on will be exported.
 
           MUIF_TextEditor_ExportBlock_TakeBlock:
-            Passing this flag the method will accept 4 ULONG coordinates, 
-            startx, starty, stopx, stopy. Passing after this flag these 
-            coordinates permitts to retrieve a block of text without it is 
-            currently marked. useful to analize a block without user sees a 
+            Passing this flag the method will accept 4 ULONG coordinates,
+            startx, starty, stopx, stopy. Passing after this flag these
+            coordinates permitts to retrieve a block of text without it is
+            currently marked. useful to analize a block without user sees a
             similar behaviour marking a block.
 
     RESULT
@@ -1430,7 +1456,7 @@ TextEditor.mcc/MUIM_TextEditor_Search
           If you want the search to be case sensitive, then set this flag.
 
          MUIF_TextEditor_Search_Backwards
-          With this flag TextEditor will perform a backward search from 
+          With this flag TextEditor will perform a backward search from
           cursor position.
 
     RESULT

@@ -209,13 +209,17 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
         SHOWVALUE(DBF_CLIPBOARD, line->line.Styles);
         if(line->line.Styles != NULL)
         {
-          allocatedStyles = line->line.allocatedStyles;
+          // check whether styles are wanted when pasting the clip
+          if(isFlagSet(data->flags, FLG_PasteStyles))
+          {
+            allocatedStyles = line->line.allocatedStyles;
 
-          if((styles = AllocVecPooled(data->mypool, allocatedStyles * sizeof(*styles))) != NULL)
-            memcpy(styles, line->line.Styles, allocatedStyles * sizeof(*styles));
+            if((styles = AllocVecPooled(data->mypool, allocatedStyles * sizeof(*styles))) != NULL)
+              memcpy(styles, line->line.Styles, allocatedStyles * sizeof(*styles));
 
-          FreeVec(line->line.Styles);
-          line->line.Styles = NULL;
+            FreeVec(line->line.Styles);
+            line->line.Styles = NULL;
+          }
 
           // we found styles, this mean the clip was created by ourselves
           ownclip = TRUE;
@@ -224,13 +228,17 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
         SHOWVALUE(DBF_CLIPBOARD, line->line.Colors);
         if(line->line.Colors != NULL)
         {
-          allocatedColors = line->line.allocatedColors;
+          // check whether colors are wanted when pasting the clip
+          if(isFlagSet(data->flags, FLG_PasteColors))
+          {
+            allocatedColors = line->line.allocatedColors;
 
-          if((colors = AllocVecPooled(data->mypool, allocatedColors * sizeof(*colors))) != NULL)
-            memcpy(colors, line->line.Colors, allocatedColors * sizeof(*colors));
+            if((colors = AllocVecPooled(data->mypool, allocatedColors * sizeof(*colors))) != NULL)
+              memcpy(colors, line->line.Colors, allocatedColors * sizeof(*colors));
 
-          FreeVec(line->line.Colors);
-          line->line.Colors = NULL;
+            FreeVec(line->line.Colors);
+            line->line.Colors = NULL;
+          }
 
           // we found colors, this mean the clip was created by ourselves
           ownclip = TRUE;

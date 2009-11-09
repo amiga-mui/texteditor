@@ -192,6 +192,14 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = data->maxUndoSteps;
       break;
 
+    case MUIA_TextEditor_PasteStyles:
+      ti_Data = isFlagSet(data->flags, FLG_PasteStyles);
+    break;
+
+    case MUIA_TextEditor_PasteColors:
+      ti_Data = isFlagSet(data->flags, FLG_PasteColors);
+    break;
+
     default:
       LEAVE();
       return(DoSuperMethodA(cl, obj, (Msg)msg));
@@ -690,6 +698,20 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
         data->userUndoBufferSize = TRUE;
         ResizeUndoBuffer(data, ti_Data);
         break;
+
+      case MUIA_TextEditor_PasteStyles:
+        if(ti_Data)
+          setFlag(data->flags, FLG_PasteStyles);
+        else
+          clearFlag(data->flags, FLG_PasteStyles);
+      break;
+
+      case MUIA_TextEditor_PasteColors:
+        if(ti_Data)
+          setFlag(data->flags, FLG_PasteColors);
+        else
+          clearFlag(data->flags, FLG_PasteColors);
+      break;
     }
   }
 
