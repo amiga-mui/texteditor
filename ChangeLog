@@ -7,6 +7,9 @@ $URL$
 
 2009-11-09 Thore Böckelmann <tboeckel@gmx.de>
 
+  * mcc/misc: implemented MUIA_TextEditor_PasteColors/Styles to enable/disable
+    pasting text with color and style information. This fulfils feature request
+    #2807448.
   * mcc/GetSetAttrs.c: modifying the MUIA_TextEditor_AutoClip attribute treated
     the tag as if it was TRUE always thus making it impossible to deactivate it.
     This fixes YAM bug #2894042.

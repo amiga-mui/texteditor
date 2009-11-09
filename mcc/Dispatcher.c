@@ -156,6 +156,8 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             data->ExportHook = &ExportHookPlain;
             setFlag(data->flags, FLG_AutoClip);
             setFlag(data->flags, FLG_ActiveOnClick);
+            setFlag(data->flags, FLG_PasteStyles);
+            setFlag(data->flags, FLG_PasteColors);
 
             if(FindTagItem(MUIA_Background, msg->ops_AttrList))
               setFlag(data->flags, FLG_OwnBackground);
