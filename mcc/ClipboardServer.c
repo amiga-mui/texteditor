@@ -908,6 +908,13 @@ BOOL StartClipboardServer(void)
 
     // create the server process
     // this must *NOT* be a child process
+    #if defined(__amigaos4__)
+    // set a minimum stack size of 8K, no matter what the user has set
+    DosControlTags(DC_MinProcStackR, &oldStackSize,
+                   DC_MinProcStackW, 8192,
+                   TAG_DONE);
+    #endif
+
     serverProcess = CreateNewProcTags(NP_Entry, ClipboardServer,
                                       NP_Name, "TextEditor.mcc clipboard server",
                                       NP_Priority, 1,
@@ -940,6 +947,12 @@ BOOL StartClipboardServer(void)
         success = TRUE;
       }
     }
+
+    #if defined(__amigaos4__)
+    // restore the old minimum stack size
+    DosControlTags(DC_MinProcStackW, oldStackSize,
+                   TAG_DONE);
+    #endif
   }
 
   RETURN(success);
