@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-02-10 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/AllocBitMap.c: the CyberGraphics semaphore check was done without the
+    necessary Forbid()/Permit() pair. Although it is absolutely unlikely that
+    the semaphore will be removed it is better to follow the rules. This fixes
+    bug #2948533.
+
 2009-11-28 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ClipboardServer.c: decreased the stack size from 16K to 8K as the server
