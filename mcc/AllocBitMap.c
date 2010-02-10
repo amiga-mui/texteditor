@@ -51,11 +51,14 @@ struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG width), REG(d1, LONG he
   {
     if(friend != NULL)
     {
+      // FindSemaphore() must be called in Forbid()den state
+      Forbid();
       if(FindSemaphore((char *)"cybergraphics.library") != NULL &&
          (GetBitMapAttr(friend,BMA_FLAGS) & BMF_INTERLEAVED) == 0)
         flags |= BMF_MINPLANES;
       else
         friend = NULL;
+      Permit();
     }
 
     bm = AllocBitMap(width,height,depth,flags,friend);
