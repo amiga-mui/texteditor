@@ -1191,6 +1191,19 @@ TextEditor.mcc/MUIM_TextEditor_Search
         and an optional value for all operations can be supplied via
         'value'.
 
+        For the start/stop values these special values can be used
+        together with normal integer values:
+
+          MUIV_TextEditor_SetBlock_Min:
+            The value of the start/stop parameter where this special
+            value is used will be set to the minimum available (e.g.
+            start of line for startx).
+
+          MUIV_TextEditor_SetBlock_Max:
+            The value of the start/stop parameter where this special
+            value is used will be set to the maximum available (e.g.
+            end of line for stopx).
+
         Possible flags for the 'operation' variable are:
 
           MUIF_TextEditor_SetBlock_Color:
@@ -1219,7 +1232,8 @@ TextEditor.mcc/MUIM_TextEditor_Search
             (see MUIA_TextEditor_Flow for possible values)
 
     RESULT
-        TRUE if operation succeeded, FALSE if it failed.
+        TRUE if operation succeeded, FALSE if it failed (e.g. invalid
+        start or stop values have been specified)
 
     NOTE
         When combining multiple operations via flags, care have to be
