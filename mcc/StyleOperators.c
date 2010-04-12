@@ -163,11 +163,14 @@ void AddStyleToLine(struct InstData *data, LONG x, struct line_node *line, LONG 
         usedStyles++;
       }
     }
+
     if(styles != NULL)
     {
       while(styles->column != EOS && styles->column <= x+length)
       {
-        if(styles->style != style && styles->style != (UWORD)~style)
+        UWORD invstyle = ~style;
+
+        if(styles->style != style && styles->style != invstyle)
         {
           newstyles->column = styles->column;
           newstyles->style = styles->style;
