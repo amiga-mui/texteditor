@@ -1,3 +1,7 @@
+#ifdef __AROS__
+#include "libraries/muiaros.h"
+#else
+
 /***************************************************************************
 **
 ** MUI - MagicUserInterface
@@ -9,7 +13,7 @@
 ** Class Tree
 ****************************************************************************
 **
-** rootclass                    (BOOPSI's base class)
+** rootclass                   (BOOPSI's base class)
 ** +--Notify                   (implements notification mechanism)
 ** !  +--Family                (handles multiple children)
 ** !  !  +--Menustrip          (describes a complete menu strip)
@@ -106,8 +110,6 @@
 #ifndef LIBRARIES_MUI_H
 #define LIBRARIES_MUI_H
 
-#ifndef MBX /* private */
-
 #ifndef EXEC_TYPES_H
 #include <exec/types.h>
 #endif
@@ -136,7 +138,6 @@
   #endif
 #endif
 
-#endif /* private */
 
 
 
@@ -402,14 +403,6 @@ struct MUI_Command
 #define MUII_MARKBACKGROUND 145
 #define MUII_BARBLOCK       146
 #define MUII_BARDETAIL      147
-#ifdef MBX /* private */
-#define MUII_SHINETHROUGH   148 /* private */
-#define MUII_LASTPAT        148 /* private */
-#else /* private */
-#define MUII_LASTPAT        147
-#endif /* private */
-
-
 
 /***************************************************************************
 ** Special values for some methods
@@ -481,9 +474,6 @@ struct MUI_Command
 #define MUIV_DragReport_Continue 1
 #define MUIV_DragReport_Lock     2
 #define MUIV_DragReport_Refresh  3
-
-#define MUIV_CreateBitMapBuffer_HideFrame (1<<0) /* private */
-#define MUIV_CreateBitMapBuffer_OldStyle  (1<<1) /* private */
 
 #define MUIV_CreateBubble_DontHidePointer (1<<0)
 
@@ -608,7 +598,6 @@ struct MUI_InputHandlerNode
 #define MUIIHNF_TIMER_SCALE10   (1<<1) /* ihn_Millis is in 1/100 seconds instead */
 #define MUIIHNF_TIMER_SCALE100  (1<<2) /* ihn_Millis is in 1/10 seconds instead */
                                        /* setting both SCALE10|SCALE100 makes ihn_Millis 1/1 seconds */
-#define MUIIHNF_ISENABLED       (1<<3) /* private */
 
 
 
@@ -619,16 +608,8 @@ struct MUI_InputHandlerNode
 struct MUI_EventHandlerNode
 {
     struct MinNode ehn_Node;
-    #ifdef MBX            /* private */
-    /* we rebuild a CaOS ListNode here since used with Enqueue() */ /* private */
-    STRPTR  ln_Name;      /* private */
-    UWORD   ln_Type;      /* private */
-    WORD    ehn_Priority; /* private */
-    WORD    ehn_Reserved; /* private */
-    #else                 /* private */
     BYTE           ehn_Reserved; /* don't touch! */
     BYTE           ehn_Priority; /* event handlers are inserted according to their priority. */
-    #endif                /* private */
     UWORD          ehn_Flags;    /* certain flags, see below for definitions. */
     Object        *ehn_Object;   /* object which should receive MUIM_HandleEvent. */
     struct IClass *ehn_Class;    /* if !=NULL, MUIM_HandleEvent is invoked on exactly this class with CoerceMethod(). */
@@ -1140,15 +1121,15 @@ struct MUI_List_TestPos_Result
 
 #ifndef __cplusplus
 
-#define get(obj,attr,store) GetAttr(attr,obj,(ULONG *)(void *)store)
-#define set(obj,attr,value) SetAttrs(obj,attr,value,TAG_DONE)
-#define nnset(obj,attr,value) SetAttrs(obj,MUIA_NoNotify,TRUE,attr,value,TAG_DONE)
+#define get(obj, attr, store) GetAttr((attr), (obj), (ULONG *)(void *)(store))
+#define set(obj, attr, value) SetAttrs((obj), (attr), value, TAG_DONE)
+#define nnset(obj, attr, value) SetAttrs((obj), MUIA_NoNotify, TRUE, (attr), (value), TAG_DONE)
 
-#define setmutex(obj,n)     set(obj,MUIA_Radio_Active,n)
-#define setcycle(obj,n)     set(obj,MUIA_Cycle_Active,n)
-#define setstring(obj,s)    set(obj,MUIA_String_Contents,s)
-#define setcheckmark(obj,b) set(obj,MUIA_Selected,b)
-#define setslider(obj,l)    set(obj,MUIA_Numeric_Value,l)
+#define setmutex(obj, n)     set(obj, MUIA_Radio_Active, (n))
+#define setcycle(obj, n)     set(obj, MUIA_Cycle_Active, (n))
+#define setstring(obj, s)    set(obj, MUIA_String_Contents, (s))
+#define setcheckmark(obj, b) set(obj, MUIA_Selected, (b))
+#define setslider(obj, l)    set(obj, MUIA_Numeric_Value, (l))
 
 #endif
 
@@ -1226,16 +1207,10 @@ extern char MUIC_Notify[];
 
 #define MUIM_CallHook                       0x8042b96b /* V4  */
 #define MUIM_Export                         0x80420f1c /* V12 */
-#define MUIM_FindObject                     0x8042038f /* private */ /* V13 */
 #define MUIM_FindUData                      0x8042c196 /* V8  */
 #define MUIM_GetConfigItem                  0x80423edb /* V11 */
-#define MUIM_GetSettingsClassID             0x8042e1cd /* private */ /* V20 */
 #define MUIM_GetUData                       0x8042ed0c /* V8  */
-#define MUIM_GlobalSetup                    0x8042d532 /* private */ /* V4  */
 #define MUIM_Import                         0x8042d012 /* V12 */
-#define MUIM_KamelleDD_Move                 0x8042a4d8 /* private */ /* V17 */
-#define MUIM_KamelleDD_Start                0x804234d2 /* private */ /* V17 */
-#define MUIM_KamelleDD_Stop                 0x8042ba10 /* private */ /* V17 */
 #define MUIM_KillNotify                     0x8042d240 /* V4  */
 #define MUIM_KillNotifyObj                  0x8042b145 /* V16 */
 #define MUIM_MultiSet                       0x8042d356 /* V7  */
@@ -1249,16 +1224,10 @@ extern char MUIC_Notify[];
 #define MUIM_WriteString                    0x80424bf4 /* V6  */
 struct  MUIP_CallHook                       { ULONG MethodID; struct Hook *Hook; ULONG param1; /* ... */ };
 struct  MUIP_Export                         { ULONG MethodID; Object *dataspace; };
-struct  MUIP_FindObject                     { ULONG MethodID; Object *findme; }; /* private */
 struct  MUIP_FindUData                      { ULONG MethodID; ULONG udata; };
 struct  MUIP_GetConfigItem                  { ULONG MethodID; ULONG id; ULONG *storage; };
-struct  MUIP_GetSettingsClassID             { ULONG MethodID; }; /* private */
 struct  MUIP_GetUData                       { ULONG MethodID; ULONG udata; ULONG attr; ULONG *storage; };
-struct  MUIP_GlobalSetup                    { ULONG MethodID; struct MUI_GlobalInfo *mgi; }; /* private */
 struct  MUIP_Import                         { ULONG MethodID; Object *dataspace; };
-struct  MUIP_KamelleDD_Move                 { ULONG MethodID; LONG x; LONG y; Object *dest; }; /* private */
-struct  MUIP_KamelleDD_Start                { ULONG MethodID; LONG x; LONG y; }; /* private */
-struct  MUIP_KamelleDD_Stop                 { ULONG MethodID; LONG x; LONG y; Object *dest; }; /* private */
 struct  MUIP_KillNotify                     { ULONG MethodID; ULONG TrigAttr; };
 struct  MUIP_KillNotifyObj                  { ULONG MethodID; ULONG TrigAttr; Object *dest; };
 struct  MUIP_MultiSet                       { ULONG MethodID; ULONG attr; ULONG val; APTR obj; /* ... */ };
@@ -1275,7 +1244,6 @@ struct  MUIP_WriteString                    { ULONG MethodID; char *str; char *m
 
 #define MUIA_ApplicationObject              0x8042d3ee /* V4  ..g Object *          */
 #define MUIA_AppMessage                     0x80421955 /* V5  ..g struct AppMessage * */
-#define MUIA_HelpFile                       0x80423a6e /* V4  isg STRPTR            */ /* private */
 #define MUIA_HelpLine                       0x8042a825 /* V4  isg LONG              */
 #define MUIA_HelpNode                       0x80420b85 /* V4  isg STRPTR            */
 #define MUIA_NoNotify                       0x804237f9 /* V7  .s. BOOL              */
@@ -1302,14 +1270,12 @@ extern char MUIC_Family[];
 #define MUIM_Family_AddHead                 0x8042e200 /* V8  */
 #define MUIM_Family_AddTail                 0x8042d752 /* V8  */
 #define MUIM_Family_Insert                  0x80424d34 /* V8  */
-#define MUIM_Family_MutualExclude           0x8042c399 /* private */ /* V9  */
 #define MUIM_Family_Remove                  0x8042f8a9 /* V8  */
 #define MUIM_Family_Sort                    0x80421c49 /* V8  */
 #define MUIM_Family_Transfer                0x8042c14a /* V8  */
 struct  MUIP_Family_AddHead                 { ULONG MethodID; Object *obj; };
 struct  MUIP_Family_AddTail                 { ULONG MethodID; Object *obj; };
 struct  MUIP_Family_Insert                  { ULONG MethodID; Object *obj; Object *pred; };
-struct  MUIP_Family_MutualExclude           { ULONG MethodID; Object *originator; ULONG exclude; }; /* private */
 struct  MUIP_Family_Remove                  { ULONG MethodID; Object *obj; };
 struct  MUIP_Family_Sort                    { ULONG MethodID; Object *obj[1]; };
 struct  MUIP_Family_Transfer                { ULONG MethodID; Object *family; };
@@ -1333,26 +1299,14 @@ extern char MUIC_Menustrip[];
 
 /* Methods */
 
-#define MUIM_Menustrip_CreatePopmenuList    0x8042b4c5 /* private */ /* V20 */
-#define MUIM_Menustrip_DeletePopmenuList    0x80421c0e /* private */ /* V20 */
 #define MUIM_Menustrip_ExitChange           0x8042ce4d /* V20 */
-#define MUIM_Menustrip_FindShortcut         0x8042d045 /* private */ /* V20 */
 #define MUIM_Menustrip_InitChange           0x8042dcd9 /* V20 */
-#define MUIM_Menustrip_TriggerPopmenu       0x80420859 /* private */ /* V20 */
-#define MUIM_Menustrip_Update               0x8042ed51 /* private */ /* V8  */
-struct  MUIP_Menustrip_CreatePopmenuList    { ULONG MethodID; Object *singlemenu; ULONG flags; }; /* private */
-struct  MUIP_Menustrip_DeletePopmenuList    { ULONG MethodID; struct MUIP_Popmenu_Item *pmi; }; /* private */
 struct  MUIP_Menustrip_ExitChange           { ULONG MethodID; };
-struct  MUIP_Menustrip_FindShortcut         { ULONG MethodID; STRPTR shortcut; }; /* private */
 struct  MUIP_Menustrip_InitChange           { ULONG MethodID; };
-struct  MUIP_Menustrip_TriggerPopmenu       { ULONG MethodID; Object *menuitem; struct MUIP_Popmenu_Item *pmi; Object *winobj; }; /* private */
-struct  MUIP_Menustrip_Update               { ULONG MethodID; Object *item; int level; }; /* private */
 
 /* Attributes */
 
-#define MUIA_Menustrip_ChangeID             0x804250ec /* V20 ... LONG              */ /* private */
 #define MUIA_Menustrip_Enabled              0x8042815b /* V8  isg BOOL              */
-#define MUIA_Menustrip_Updated              0x80424f8b /* V20 ... LONG              */ /* private */
 
 
 
@@ -1385,17 +1339,12 @@ extern char MUIC_Menuitem[];
 
 /* Methods */
 
-#define MUIM_Menuitem_FillPopmenu           0x8042fbcf /* private */ /* V20 */
-#define MUIM_Menuitem_WriteStructure        0x804241d4 /* private */ /* V8  */
-struct  MUIP_Menuitem_FillPopmenu           { ULONG MethodID; APTR pool; struct MUIP_Popmenu_Item *pmi; }; /* private */
-struct  MUIP_Menuitem_WriteStructure        { ULONG MethodID; struct MenuItem *mi; }; /* private */
 
 /* Attributes */
 
 #define MUIA_Menuitem_Checked               0x8042562a /* V8  isg BOOL              */
 #define MUIA_Menuitem_Checkit               0x80425ace /* V8  isg BOOL              */
 #define MUIA_Menuitem_CommandString         0x8042b9cc /* V16 isg BOOL              */
-#define MUIA_Menuitem_CopyStrings           0x8042dc1b /* V16 i.. BOOL              */ /* private */
 #define MUIA_Menuitem_Enabled               0x8042ae0f /* V8  isg BOOL              */
 #define MUIA_Menuitem_Exclude               0x80420bc6 /* V8  isg LONG              */
 #define MUIA_Menuitem_Shortcut              0x80422030 /* V8  isg STRPTR            */
@@ -1419,41 +1368,25 @@ extern char MUIC_Application[];
 /* Methods */
 
 #define MUIM_Application_AboutMUI           0x8042d21d /* V14 */
-#define MUIM_Application_Activate           0x8042a2e1 /* private */ /* V20 */
 #define MUIM_Application_AddInputHandler    0x8042f099 /* V11 */
 #define MUIM_Application_CheckRefresh       0x80424d68 /* V11 */
-#define MUIM_Application_CloseConfigWindow  0x8042a08c /* private */ /* V11 */
-#define MUIM_Application_ClosePublic        0x80429d2f /* private */ /* V4  */
-#define MUIM_Application_ConfigNotify       0x8042fe91 /* private */ /* V11 */
 #ifdef MUI_OBSOLETE
 #define MUIM_Application_GetMenuCheck       0x8042c0a7 /* V4  */
 #endif /* MUI_OBSOLETE */
 #ifdef MUI_OBSOLETE
 #define MUIM_Application_GetMenuState       0x8042a58f /* V4  */
 #endif /* MUI_OBSOLETE */
-#define MUIM_Application_IdentifyLayer      0x8042f5e1 /* private */ /* V11 */
-#define MUIM_Application_ImageObject        0x8042ba68 /* private */ /* V11 */
 #ifdef MUI_OBSOLETE
 #define MUIM_Application_Input              0x8042d0f5 /* V4  */
 #endif /* MUI_OBSOLETE */
 #define MUIM_Application_InputBuffered      0x80427e59 /* V4  */
-#define MUIM_Application_KillPushMethod     0x80429954 /* private */ /* V15 */
 #define MUIM_Application_Load               0x8042f90d /* V4  */
-#define MUIM_Application_LoadConfig         0x8042c862 /* private */ /* V11 */
 #define MUIM_Application_NewInput           0x80423ba6 /* V11 */
 #define MUIM_Application_OpenConfigWindow   0x804299ba /* V11 */
-#define MUIM_Application_OpenPublic         0x80426b99 /* private */ /* V4  */
-#define MUIM_Application_PreConfig          0x80425e4b /* private */ /* V18 */
 #define MUIM_Application_PushMethod         0x80429ef8 /* V4  */
-#define MUIM_Application_RawKeyHandler      0x8042295f /* private */ /* V20 */
-#define MUIM_Application_RefreshConfig      0x8042c58b /* private */ /* V11 */
-#define MUIM_Application_RefreshScreen      0x804278d2 /* private */ /* V20 */
 #define MUIM_Application_RemInputHandler    0x8042e7af /* V11 */
 #define MUIM_Application_ReturnID           0x804276ef /* V4  */
 #define MUIM_Application_Save               0x804227ef /* V4  */
-#define MUIM_Application_SaveConfig         0x80420b19 /* private */ /* V11 */
-#define MUIM_Application_ScreenNotify       0x8042c3c7 /* private */ /* V20 */
-#define MUIM_Application_SetAppIcon         0x8042c5b9 /* private */ /* V18 */
 #define MUIM_Application_SetConfigItem      0x80424a80 /* V11 */
 #ifdef MUI_OBSOLETE
 #define MUIM_Application_SetMenuCheck       0x8042a707 /* V4  */
@@ -1461,59 +1394,25 @@ extern char MUIC_Application[];
 #ifdef MUI_OBSOLETE
 #define MUIM_Application_SetMenuState       0x80428bef /* V4  */
 #endif /* MUI_OBSOLETE */
-#define MUIM_Application_SetPushMethodDelay 0x80423713 /* private */ /* V20 */
 #define MUIM_Application_ShowHelp           0x80426479 /* V4  */
-#define MUIM_Application_SnapshotWindow     0x8042df8a /* private */ /* V11 */
-#define MUIM_Application_SyncRexx           0x80426e36 /* private */ /* V10 */
-#define MUIM_Application_WelcomeObject      0x80424a8b /* private */ /* V11 */
-#define MUIM_Application_WindowCheckO       0x80423a3d /* private */ /* V4  */
-#define MUIM_GetMenuCheckMark               0x804205b2 /* private */ /* V4  */
-#define MUIM_GetMenuState                   0x80421526 /* private */ /* V4  */
-#define MUIM_SetMenuCheckMark               0x804233d4 /* private */ /* V4  */
-#define MUIM_SetMenuState                   0x80426697 /* private */ /* V4  */
 struct  MUIP_Application_AboutMUI           { ULONG MethodID; Object *refwindow; };
-struct  MUIP_Application_Activate           { ULONG MethodID; }; /* private */
 struct  MUIP_Application_AddInputHandler    { ULONG MethodID; struct MUI_InputHandlerNode *ihnode; };
 struct  MUIP_Application_CheckRefresh       { ULONG MethodID; };
-struct  MUIP_Application_CloseConfigWindow  { ULONG MethodID; ULONG flags; }; /* private */
-struct  MUIP_Application_ClosePublic        { ULONG MethodID; }; /* private */
-struct  MUIP_Application_ConfigNotify       { ULONG MethodID; }; /* private */
 struct  MUIP_Application_GetMenuCheck       { ULONG MethodID; ULONG MenuID; };
 struct  MUIP_Application_GetMenuState       { ULONG MethodID; ULONG MenuID; };
-struct  MUIP_Application_IdentifyLayer      { ULONG MethodID; struct Layer *layer; }; /* private */
-struct  MUIP_Application_ImageObject        { ULONG MethodID; LONG width; LONG height; }; /* private */
 struct  MUIP_Application_Input              { ULONG MethodID; ULONG *signal; };
 struct  MUIP_Application_InputBuffered      { ULONG MethodID; };
-struct  MUIP_Application_KillPushMethod     { ULONG MethodID; Object *o; ULONG id; }; /* private */
 struct  MUIP_Application_Load               { ULONG MethodID; STRPTR name; };
-struct  MUIP_Application_LoadConfig         { ULONG MethodID; char *name; ULONG flags; }; /* private */
 struct  MUIP_Application_NewInput           { ULONG MethodID; ULONG *signal; };
 struct  MUIP_Application_OpenConfigWindow   { ULONG MethodID; ULONG flags; STRPTR classid; };
-struct  MUIP_Application_OpenPublic         { ULONG MethodID; }; /* private */
-struct  MUIP_Application_PreConfig          { ULONG MethodID; Object *configdata; }; /* private */
 struct  MUIP_Application_PushMethod         { ULONG MethodID; Object *dest; LONG count; /* ... */ };
-struct  MUIP_Application_RawKeyHandler      { ULONG MethodID; struct IntuiMessage *imsg; }; /* private */
-struct  MUIP_Application_RefreshConfig      { ULONG MethodID; }; /* private */
-struct  MUIP_Application_RefreshScreen      { ULONG MethodID; }; /* private */
 struct  MUIP_Application_RemInputHandler    { ULONG MethodID; struct MUI_InputHandlerNode *ihnode; };
 struct  MUIP_Application_ReturnID           { ULONG MethodID; ULONG retid; };
 struct  MUIP_Application_Save               { ULONG MethodID; STRPTR name; };
-struct  MUIP_Application_SaveConfig         { ULONG MethodID; char *name; ULONG flags; }; /* private */
-struct  MUIP_Application_ScreenNotify       { ULONG MethodID; struct MUI_PubScreenDesc *desc; }; /* private */
-struct  MUIP_Application_SetAppIcon         { ULONG MethodID; LONG x; LONG y; struct DiskObject *dobj; char *title; }; /* private */
 struct  MUIP_Application_SetConfigItem      { ULONG MethodID; ULONG item; APTR data; };
 struct  MUIP_Application_SetMenuCheck       { ULONG MethodID; ULONG MenuID; LONG stat; };
 struct  MUIP_Application_SetMenuState       { ULONG MethodID; ULONG MenuID; LONG stat; };
-struct  MUIP_Application_SetPushMethodDelay { ULONG MethodID; ULONG id; LONG millisecs; }; /* private */
 struct  MUIP_Application_ShowHelp           { ULONG MethodID; Object *window; char *name; char *node; LONG line; };
-struct  MUIP_Application_SnapshotWindow     { ULONG MethodID; char *filename; ULONG id; ULONG flags; }; /* private */
-struct  MUIP_Application_SyncRexx           { ULONG MethodID; char *command; }; /* private */
-struct  MUIP_Application_WelcomeObject      { ULONG MethodID; }; /* private */
-struct  MUIP_Application_WindowCheckO       { ULONG MethodID; Object *win; }; /* private */
-struct  MUIP_GetMenuCheckMark               { ULONG MethodID; ULONG MenuID; }; /* private */
-struct  MUIP_GetMenuState                   { ULONG MethodID; ULONG MenuID; }; /* private */
-struct  MUIP_SetMenuCheckMark               { ULONG MethodID; ULONG MenuID; LONG stat; }; /* private */
-struct  MUIP_SetMenuState                   { ULONG MethodID; ULONG MenuID; LONG stat; }; /* private */
 
 /* Attributes */
 
@@ -1525,12 +1424,7 @@ struct  MUIP_SetMenuState                   { ULONG MethodID; ULONG MenuID; LONG
 #define MUIA_Application_BrokerPort         0x8042e0ad /* V6  ..g struct MsgPort *  */
 #define MUIA_Application_BrokerPri          0x8042c8d0 /* V6  i.g LONG              */
 #define MUIA_Application_Commands           0x80428648 /* V4  isg struct MUI_Command * */
-#define MUIA_Application_Config             0x804261ca /* V4  ..g struct MUI_Configuration * */ /* private */
 #define MUIA_Application_Copyright          0x8042ef4d /* V4  i.g STRPTR            */
-#define MUIA_Application_Data               0x80429dda /* V4  ..g APTR              */ /* private */
-#define MUIA_Application_DefConfig          0x8042c8af /* V9  i.. struct MUI_Configuration * */ /* private */
-#define MUIA_Application_DefConfigHook      0x804270a3 /* V9  i.. struct Hook *     */ /* private */
-#define MUIA_Application_DefConfigSize      0x8042e0c1 /* V9  i.. LONG              */ /* private */
 #define MUIA_Application_Description        0x80421fc6 /* V4  i.g STRPTR            */
 #define MUIA_Application_DiskObject         0x804235cb /* V4  isg struct DiskObject * */
 #define MUIA_Application_DoubleStart        0x80423bc6 /* V4  ..g BOOL              */
@@ -1538,18 +1432,12 @@ struct  MUIP_SetMenuState                   { ULONG MethodID; ULONG MenuID; LONG
 #define MUIA_Application_ForceQuit          0x804257df /* V8  ..g BOOL              */
 #define MUIA_Application_HelpFile           0x804293f4 /* V8  isg STRPTR            */
 #define MUIA_Application_Iconified          0x8042a07f /* V4  .sg BOOL              */
-#define MUIA_Application_IconifyTitle       0x80422cb8 /* V18 isg STRPTR            */ /* private */
-#define MUIA_Application_LightSleep         0x80423a69 /* V4  .s. BOOL              */ /* private */
 #ifdef MUI_OBSOLETE
 #define MUIA_Application_Menu               0x80420e1f /* V4  i.g struct NewMenu *  */
 #endif /* MUI_OBSOLETE */
 #define MUIA_Application_MenuAction         0x80428961 /* V4  ..g ULONG             */
 #define MUIA_Application_MenuHelp           0x8042540b /* V4  ..g ULONG             */
 #define MUIA_Application_Menustrip          0x804252d9 /* V8  i.. Object *          */
-#define MUIA_Application_MsgPort            0x8042d4ef /* V4  ..g struct MsgPort *  */ /* private */
-#define MUIA_Application_Originator         0x80424cda /* V16 ..g Object *          */ /* private */
-#define MUIA_Application_Package            0x804248a3 /* V18 i.. ULONG             */ /* private */
-#define MUIA_Application_PubScreenName      0x80427690 /* V4  ..g char *            */ /* private */
 #define MUIA_Application_RexxHook           0x80427c42 /* V7  isg struct Hook *     */
 #define MUIA_Application_RexxMsg            0x8042fd88 /* V4  ..g struct RxMsg *    */
 #define MUIA_Application_RexxString         0x8042d711 /* V4  .s. STRPTR            */
@@ -1578,10 +1466,7 @@ extern char MUIC_Window[];
 
 /* Methods */
 
-#define MUIM_Window_ActionIconify           0x80422cc0 /* private */ /* V18 */
 #define MUIM_Window_AddEventHandler         0x804203b7 /* V16 */
-#define MUIM_Window_CalcMinMax              0x80427c9b /* private */ /* V11 */
-#define MUIM_Window_CheckRefresh            0x80426771 /* private */ /* V11 */
 #define MUIM_Window_Cleanup                 0x8042ab26 /* V18 */
 #ifdef MUI_OBSOLETE
 #define MUIM_Window_GetMenuCheck            0x80420414 /* V4  */
@@ -1589,15 +1474,7 @@ extern char MUIC_Window[];
 #ifdef MUI_OBSOLETE
 #define MUIM_Window_GetMenuState            0x80420d2f /* V4  */
 #endif /* MUI_OBSOLETE */
-#define MUIM_Window_HandleRMB               0x80421786 /* private */ /* V20 */
-#define MUIM_Window_HandleWinborderMenu     0x80427358 /* private */ /* V20 */
-#define MUIM_Window_HideBubble              0x8042174e /* private */ /* V13 */
-#define MUIM_Window_Input                   0x80426a85 /* private */ /* V4  */
-#define MUIM_Window_LockMode                0x80423e12 /* private */ /* V20 */
-#define MUIM_Window_OlliHack                0x8042926f /* private */ /* V18 */
-#define MUIM_Window_Recalc                  0x80425ebe /* private */ /* V4  */
 #define MUIM_Window_RemEventHandler         0x8042679e /* V16 */
-#define MUIM_Window_ResyncBubbles           0x80426688 /* private */ /* V20 */
 #define MUIM_Window_ScreenToBack            0x8042913d /* V4  */
 #define MUIM_Window_ScreenToFront           0x804227a4 /* V4  */
 #ifdef MUI_OBSOLETE
@@ -1610,35 +1487,20 @@ extern char MUIC_Window[];
 #define MUIM_Window_SetMenuState            0x80422b5e /* V4  */
 #endif /* MUI_OBSOLETE */
 #define MUIM_Window_Setup                   0x8042c34c /* V18 */
-#define MUIM_Window_ShowBubble              0x8042671f /* private */ /* V11 */
-#define MUIM_Window_ShowHelp                0x80424240 /* private */ /* V11 */
 #define MUIM_Window_Snapshot                0x8042945e /* V11 */
 #define MUIM_Window_ToBack                  0x8042152e /* V4  */
 #define MUIM_Window_ToFront                 0x8042554f /* V4  */
-struct  MUIP_Window_ActionIconify           { ULONG MethodID; }; /* private */
 struct  MUIP_Window_AddEventHandler         { ULONG MethodID; struct MUI_EventHandlerNode *ehnode; };
-struct  MUIP_Window_CalcMinMax              { ULONG MethodID; Object *special; }; /* private */
-struct  MUIP_Window_CheckRefresh            { ULONG MethodID; }; /* private */
 struct  MUIP_Window_Cleanup                 { ULONG MethodID; };
 struct  MUIP_Window_GetMenuCheck            { ULONG MethodID; ULONG MenuID; };
 struct  MUIP_Window_GetMenuState            { ULONG MethodID; ULONG MenuID; };
-struct  MUIP_Window_HandleRMB               { ULONG MethodID; struct IntuiMessage *imsg; }; /* private */
-struct  MUIP_Window_HandleWinborderMenu     { ULONG MethodID; }; /* private */
-struct  MUIP_Window_HideBubble              { ULONG MethodID; }; /* private */
-struct  MUIP_Window_Input                   { ULONG MethodID; struct IntuiMessage *imsg; LONG muikey; }; /* private */
-struct  MUIP_Window_LockMode                { ULONG MethodID; BOOL onoff; }; /* private */
-struct  MUIP_Window_OlliHack                { ULONG MethodID; Object *newwin; }; /* private */
-struct  MUIP_Window_Recalc                  { ULONG MethodID; }; /* private */
 struct  MUIP_Window_RemEventHandler         { ULONG MethodID; struct MUI_EventHandlerNode *ehnode; };
-struct  MUIP_Window_ResyncBubbles           { ULONG MethodID; }; /* private */
 struct  MUIP_Window_ScreenToBack            { ULONG MethodID; };
 struct  MUIP_Window_ScreenToFront           { ULONG MethodID; };
 struct  MUIP_Window_SetCycleChain           { ULONG MethodID; Object *obj[1]; };
 struct  MUIP_Window_SetMenuCheck            { ULONG MethodID; ULONG MenuID; LONG stat; };
 struct  MUIP_Window_SetMenuState            { ULONG MethodID; ULONG MenuID; LONG stat; };
 struct  MUIP_Window_Setup                   { ULONG MethodID; };
-struct  MUIP_Window_ShowBubble              { ULONG MethodID; Object *mo; LONG x; LONG y; }; /* private */
-struct  MUIP_Window_ShowHelp                { ULONG MethodID; }; /* private */
 struct  MUIP_Window_Snapshot                { ULONG MethodID; LONG flags; };
 struct  MUIP_Window_ToBack                  { ULONG MethodID; };
 struct  MUIP_Window_ToFront                 { ULONG MethodID; };
@@ -1646,69 +1508,46 @@ struct  MUIP_Window_ToFront                 { ULONG MethodID; };
 /* Attributes */
 
 #define MUIA_Window_Activate                0x80428d2f /* V4  isg BOOL              */
-#define MUIA_Window_ActivationPriority      0x8042b7a9 /* V20 isg ULONG             */ /* private */
 #define MUIA_Window_ActiveObject            0x80427925 /* V4  .sg Object *          */
-#define MUIA_Window_AlphaValue              0x80421dfa /* V20 isg ULONG             */ /* private */
 #define MUIA_Window_AltHeight               0x8042cce3 /* V4  i.g LONG              */
 #define MUIA_Window_AltLeftEdge             0x80422d65 /* V4  i.g LONG              */
 #define MUIA_Window_AltTopEdge              0x8042e99b /* V4  i.g LONG              */
 #define MUIA_Window_AltWidth                0x804260f4 /* V4  i.g LONG              */
-#define MUIA_Window_Application             0x80428dbb /* V11 ..g Object *          */ /* private */
 #define MUIA_Window_AppWindow               0x804280cf /* V5  i.. BOOL              */
 #define MUIA_Window_Backdrop                0x8042c0bb /* V4  i.. BOOL              */
 #define MUIA_Window_BackfillHook            0x80428863 /* V20 i.. struct Hook *     */
-#define MUIA_Window_Background              0x804253aa /* V4  i.. char *            */ /* private */
 #define MUIA_Window_Borderless              0x80429b79 /* V4  i.. BOOL              */
 #define MUIA_Window_CloseGadget             0x8042a110 /* V4  i.. BOOL              */
 #define MUIA_Window_CloseRequest            0x8042e86e /* V4  ..g BOOL              */
 #define MUIA_Window_DefaultObject           0x804294d7 /* V4  isg Object *          */
 #define MUIA_Window_DepthGadget             0x80421923 /* V4  i.. BOOL              */
 #define MUIA_Window_DisableKeys             0x80424c36 /* V15 isg ULONG             */
-#define MUIA_Window_DoClose                 0x8042954a /* V4  .s. BOOL              */ /* private */
 #define MUIA_Window_DragBar                 0x8042045d /* V4  i.. BOOL              */
-#define MUIA_Window_DrawInfo                0x80423726 /* V4  ..g ULONG             */ /* private */
 #define MUIA_Window_FancyDrawing            0x8042bd0e /* V8  isg BOOL              */
-#define MUIA_Window_FillBackDraw            0x80427028 /* V20 isg BOOL              */ /* private */
-#define MUIA_Window_FixFocus                0x8042f814 /* V13 isg Object *          */ /* private */
-#define MUIA_Window_Frontdrop               0x80426411 /* V20 isg BOOL              */ /* private */
 #define MUIA_Window_Height                  0x80425846 /* V4  i.g LONG              */
 #define MUIA_Window_ID                      0x804201bd /* V4  isg ULONG             */
 #define MUIA_Window_InputEvent              0x804247d8 /* V4  ..g struct InputEvent * */
-#define MUIA_Window_IsPopup                 0x8042b5aa /* V4  i.g BOOL              */ /* private */
 #define MUIA_Window_IsSubWindow             0x8042b5aa /* V4  isg BOOL              */
 #define MUIA_Window_LeftEdge                0x80426c65 /* V4  i.g LONG              */
-#define MUIA_Window_LightSleep              0x8042be05 /* V4  .s. BOOL              */ /* private */
 #ifdef MUI_OBSOLETE
 #define MUIA_Window_Menu                    0x8042db94 /* V4  i.. struct NewMenu *  */
 #endif /* MUI_OBSOLETE */
 #define MUIA_Window_MenuAction              0x80427521 /* V8  isg ULONG             */
 #define MUIA_Window_Menustrip               0x8042855e /* V8  i.g Object *          */
-#define MUIA_Window_MouseEnabled            0x80429b2d /* V20 i.. BOOL              */ /* private */
 #define MUIA_Window_MouseObject             0x8042bf9b /* V10 ..g Object *          */
 #define MUIA_Window_NeedsMouseObject        0x8042372a /* V10 i.. BOOL              */
-#define MUIA_Window_NeverActive             0x8042290a /* V20 isg BOOL              */ /* private */
 #define MUIA_Window_NoMenus                 0x80429df5 /* V4  is. BOOL              */
 #define MUIA_Window_Open                    0x80428aa0 /* V4  .sg BOOL              */
 #define MUIA_Window_PublicScreen            0x804278e4 /* V6  isg STRPTR            */
 #define MUIA_Window_RefWindow               0x804201f4 /* V4  is. Object *          */
-#define MUIA_Window_Remember                0x8042f6b6 /* V4  i.. BOOL              */ /* private */
 #define MUIA_Window_RootObject              0x8042cba5 /* V4  isg Object *          */
 #define MUIA_Window_Screen                  0x8042df4f /* V4  isg struct Screen *   */
 #define MUIA_Window_ScreenTitle             0x804234b0 /* V5  isg STRPTR            */
-#define MUIA_Window_ShowAbout               0x80429c1e /* V11 isg BOOL              */ /* private */
-#define MUIA_Window_ShowIconify             0x8042bc26 /* V11 isg BOOL              */ /* private */
-#define MUIA_Window_ShowJump                0x80422f40 /* V11 isg BOOL              */ /* private */
-#define MUIA_Window_ShowPopup               0x8042324e /* V11 isg BOOL              */ /* private */
-#define MUIA_Window_ShowPrefs               0x8042e262 /* V11 isg BOOL              */ /* private */
-#define MUIA_Window_ShowSnapshot            0x80423c55 /* V11 isg BOOL              */ /* private */
 #define MUIA_Window_SizeGadget              0x8042e33d /* V4  i.. BOOL              */
 #define MUIA_Window_SizeRight               0x80424780 /* V4  i.. BOOL              */
 #define MUIA_Window_Sleep                   0x8042e7db /* V4  .sg BOOL              */
-#define MUIA_Window_Timeout                 0x80425d29 /* V20 isg BOOL              */ /* private */
 #define MUIA_Window_Title                   0x8042ad3d /* V4  isg STRPTR            */
 #define MUIA_Window_TopEdge                 0x80427c66 /* V4  i.g LONG              */
-#define MUIA_Window_TopMenuPos              0x8042861b /* V20 isg LONG              */ /* private */
-#define MUIA_Window_Transparency            0x8042ac47 /* V20 isg ULONG             */ /* private */
 #define MUIA_Window_UseBottomBorderScroller 0x80424e79 /* V13 isg BOOL              */
 #define MUIA_Window_UseLeftBorderScroller   0x8042433e /* V13 isg BOOL              */
 #define MUIA_Window_UseRightBorderScroller  0x8042c05e /* V13 isg BOOL              */
@@ -1778,8 +1617,6 @@ extern char MUIC_Aboutmui[];
 
 /* Methods */
 
-#define MUIM_Aboutwindow_Register           0x8042a312 /* private */ /* V11 */
-struct  MUIP_Aboutwindow_Register           { ULONG MethodID; }; /* private */
 
 /* Attributes */
 
@@ -1799,22 +1636,15 @@ extern char MUIC_Area[];
 
 /* Methods */
 
-#define MUIM_AdjustLayout                   0x80424d50 /* private */ /* V11 */
 #define MUIM_AskMinMax                      0x80423874 /* Custom Class */ /* V4  */
-#define MUIM_Backfill                       0x80428d73 /* private */ /* V11 */
 #define MUIM_CheckShortHelp                 0x80423c79 /* V20 */
 #define MUIM_Cleanup                        0x8042d985 /* Custom Class */ /* V4  */
 #define MUIM_ContextMenuBuild               0x80429d2e /* V11 */
 #define MUIM_ContextMenuChoice              0x80420f0e /* V11 */
-#define MUIM_CreateBitMapBuffer             0x80424f05 /* private */ /* V18 */
 #define MUIM_CreateBubble                   0x80421c41 /* V18 */
-#define MUIM_CreateDragImage                0x8042eb6f /* private */ /* V18 */
 #define MUIM_CreateShortHelp                0x80428e93 /* V11 */
-#define MUIM_DeleteBitMapBuffer             0x80428daf /* private */ /* V18 */
 #define MUIM_DeleteBubble                   0x804211af /* V18 */
-#define MUIM_DeleteDragImage                0x80423037 /* private */ /* V18 */
 #define MUIM_DeleteShortHelp                0x8042d35a /* V11 */
-#define MUIM_Disable                        0x8042af9f /* private */ /* V11 */
 #define MUIM_DoDrag                         0x804216bb /* V20 */
 #define MUIM_DragBegin                      0x8042c03a /* V11 */
 #define MUIM_DragDrop                       0x8042c555 /* V11 */
@@ -1823,35 +1653,20 @@ extern char MUIC_Area[];
 #define MUIM_DragReport                     0x8042edad /* V11 */
 #define MUIM_Draw                           0x80426f3f /* Custom Class */ /* V4  */
 #define MUIM_DrawBackground                 0x804238ca /* V11 */
-#define MUIM_Enable                         0x80428f6c /* private */ /* V11 */
-#define MUIM_GoActive                       0x8042491a /* private */ /* V8  */
-#define MUIM_GoInactive                     0x80422c0c /* private */ /* V8  */
 #define MUIM_HandleEvent                    0x80426d66 /* Custom Class */ /* V16 */
 #define MUIM_HandleInput                    0x80422a1a /* Custom Class */ /* V4  */
 #define MUIM_Hide                           0x8042f20f /* Custom Class */ /* V4  */
-#define MUIM_Hittest                        0x8042f8a4 /* private */ /* V11 */
-#define MUIM_KillFrame                      0x80421407 /* private */ /* V4  */
-#define MUIM_Layout                         0x8042845b /* private */ /* V4  */
-#define MUIM_Redraw                         0x8042fa0c /* private */ /* V4  */
 #define MUIM_Setup                          0x80428354 /* Custom Class */ /* V4  */
 #define MUIM_Show                           0x8042cc84 /* Custom Class */ /* V4  */
-#define MUIM_WhichObject                    0x8042867c /* private */ /* V11 */
-struct  MUIP_AdjustLayout                   { ULONG MethodID; LONG pass; }; /* private */
 struct  MUIP_AskMinMax                      { ULONG MethodID; struct MUI_MinMax *MinMaxInfo; }; /* Custom Class */
-struct  MUIP_Backfill                       { ULONG MethodID; LONG left; LONG top; LONG right; LONG bottom; LONG xoffset; LONG yoffset; }; /* private */
 struct  MUIP_CheckShortHelp                 { ULONG MethodID; STRPTR help; LONG mx; LONG my; };
 struct  MUIP_Cleanup                        { ULONG MethodID; }; /* Custom Class */
 struct  MUIP_ContextMenuBuild               { ULONG MethodID; LONG mx; LONG my; };
 struct  MUIP_ContextMenuChoice              { ULONG MethodID; Object *item; };
-struct  MUIP_CreateBitMapBuffer             { ULONG MethodID; LONG *reswidth; LONG *resheight; ULONG flags; LONG clipleft; LONG cliptop; LONG clipwidth; LONG clipheight; LONG layoutwidth; LONG layoutheight; }; /* private */
 struct  MUIP_CreateBubble                   { ULONG MethodID; LONG x; LONG y; char *txt; ULONG flags; };
-struct  MUIP_CreateDragImage                { ULONG MethodID; LONG touchx; LONG touchy; ULONG flags; }; /* private */
 struct  MUIP_CreateShortHelp                { ULONG MethodID; LONG mx; LONG my; };
-struct  MUIP_DeleteBitMapBuffer             { ULONG MethodID; struct BitMap *bitmap; }; /* private */
 struct  MUIP_DeleteBubble                   { ULONG MethodID; APTR bubble; };
-struct  MUIP_DeleteDragImage                { ULONG MethodID; struct MUI_DragImage *di; }; /* private */
 struct  MUIP_DeleteShortHelp                { ULONG MethodID; STRPTR help; };
-struct  MUIP_Disable                        { ULONG MethodID; }; /* private */
 struct  MUIP_DoDrag                         { ULONG MethodID; LONG touchx; LONG touchy; ULONG flags; };
 struct  MUIP_DragBegin                      { ULONG MethodID; Object *obj; };
 struct  MUIP_DragDrop                       { ULONG MethodID; Object *obj; LONG x; LONG y; };
@@ -1860,19 +1675,11 @@ struct  MUIP_DragQuery                      { ULONG MethodID; Object *obj; };
 struct  MUIP_DragReport                     { ULONG MethodID; Object *obj; LONG x; LONG y; LONG update; };
 struct  MUIP_Draw                           { ULONG MethodID; ULONG flags; }; /* Custom Class */
 struct  MUIP_DrawBackground                 { ULONG MethodID; LONG left; LONG top; LONG width; LONG height; LONG xoffset; LONG yoffset; LONG flags; };
-struct  MUIP_Enable                         { ULONG MethodID; }; /* private */
-struct  MUIP_GoActive                       { ULONG MethodID; ULONG flags; }; /* private */
-struct  MUIP_GoInactive                     { ULONG MethodID; ULONG flags; }; /* private */
 struct  MUIP_HandleEvent                    { ULONG MethodID; struct IntuiMessage *imsg; LONG muikey; }; /* Custom Class */
 struct  MUIP_HandleInput                    { ULONG MethodID; struct IntuiMessage *imsg; LONG muikey; }; /* Custom Class */
 struct  MUIP_Hide                           { ULONG MethodID; }; /* Custom Class */
-struct  MUIP_Hittest                        { ULONG MethodID; LONG x; LONG y; }; /* private */
-struct  MUIP_KillFrame                      { ULONG MethodID; }; /* private */
-struct  MUIP_Layout                         { ULONG MethodID; LONG left; LONG top; LONG width; LONG height; ULONG flags; }; /* private */
-struct  MUIP_Redraw                         { ULONG MethodID; }; /* private */
 struct  MUIP_Setup                          { ULONG MethodID; struct MUI_RenderInfo *RenderInfo; }; /* Custom Class */
 struct  MUIP_Show                           { ULONG MethodID; struct LongRect *clip; }; /* Custom Class */
-struct  MUIP_WhichObject                    { ULONG MethodID; LONG x; LONG y; }; /* private */
 
 /* Attributes */
 
@@ -1881,11 +1688,7 @@ struct  MUIP_WhichObject                    { ULONG MethodID; LONG x; LONG y; };
 #define MUIA_ContextMenu                    0x8042b704 /* V11 isg Object *          */
 #define MUIA_ContextMenuTrigger             0x8042a2c1 /* V11 ..g Object *          */
 #define MUIA_ControlChar                    0x8042120b /* V4  isg char              */
-#define MUIA_CustomBackfill                 0x80420a63 /* V11 isg BOOL              */ /* private */
-#define MUIA_CustomFont                     0x80423fc5 /* V20 i.. STRPTR            */ /* private */
 #define MUIA_CycleChain                     0x80421ce7 /* V11 isg LONG              */
-#define MUIA_DefHeight                      0x80427dd9 /* V4  ... LONG              */ /* private */
-#define MUIA_DefWidth                       0x8042c7fe /* V4  ... LONG              */ /* private */
 #define MUIA_Disabled                       0x80423661 /* V4  isg BOOL              */
 #define MUIA_Draggable                      0x80420b6e /* V11 isg BOOL              */
 #define MUIA_Dropable                       0x8042fbce /* V11 isg BOOL              */
@@ -1912,13 +1715,8 @@ struct  MUIP_WhichObject                    { ULONG MethodID; LONG x; LONG y; };
 #define MUIA_InnerTop                       0x80421eb6 /* V4  i.g LONG              */
 #define MUIA_InputMode                      0x8042fb04 /* V4  i.. LONG              */
 #define MUIA_LeftEdge                       0x8042bec6 /* V4  ..g LONG              */
-#define MUIA_LeftOffset                     0x8042f7c3 /* V4  ..g LONG              */ /* private */
 #define MUIA_MaxHeight                      0x804293e4 /* V11 i.. LONG              */
 #define MUIA_MaxWidth                       0x8042f112 /* V11 i.. LONG              */
-#define MUIA_Maybe                          0x80429705 /* V4  ... BOOL              */ /* private */
-#define MUIA_NeedsLayoutMethod              0x80422e90 /* V20 .s. BOOL              */ /* private */
-#define MUIA_ObjectType                     0x8042c070 /* V4  is. LONG              */ /* private */
-#define MUIA_PageTitles                     0x80427219 /* V4  ... BOOL              */ /* private */
 #define MUIA_Pressed                        0x80423535 /* V4  ..g BOOL              */
 #define MUIA_RightEdge                      0x8042ba82 /* V4  ..g LONG              */
 #define MUIA_Selected                       0x8042654b /* V4  isg BOOL              */
@@ -1927,7 +1725,6 @@ struct  MUIP_WhichObject                    { ULONG MethodID; LONG x; LONG y; };
 #define MUIA_ShowSelState                   0x8042caac /* V4  i.. BOOL              */
 #define MUIA_Timer                          0x80426435 /* V4  ..g LONG              */
 #define MUIA_TopEdge                        0x8042509b /* V4  ..g LONG              */
-#define MUIA_TopOffset                      0x8042eb12 /* V4  ..g LONG              */ /* private */
 #define MUIA_VertDisappear                  0x8042d12f /* V11 isg LONG              */
 #define MUIA_VertWeight                     0x804298d0 /* V4  isg WORD              */
 #define MUIA_Weight                         0x80421d1f /* V4  i.. WORD              */
@@ -1982,7 +1779,6 @@ extern char MUIC_Dtpic[];
 
 /* Attributes */
 
-#define MUIA_Dtpic_Name                     0x80423d72 /* V18 i.. STRPTR            */ /* private */
 
 
 
@@ -1998,8 +1794,6 @@ extern char MUIC_Rectangle[];
 
 /* Attributes */
 
-#define MUIA_Rectangle_BarHalf              0x8042a6f4 /* V20 isg BOOL              */ /* private */
-#define MUIA_Rectangle_BarInvert            0x8042f50d /* V20 isg BOOL              */ /* private */
 #define MUIA_Rectangle_BarTitle             0x80426689 /* V11 i.g STRPTR            */
 #define MUIA_Rectangle_HBar                 0x8042c943 /* V7  i.g BOOL              */
 #define MUIA_Rectangle_VBar                 0x80422204 /* V7  i.g BOOL              */
@@ -2040,7 +1834,6 @@ extern char MUIC_Image[];
 #define MUIA_Image_FreeHoriz                0x8042da84 /* V4  i.. BOOL              */
 #define MUIA_Image_FreeVert                 0x8042ea28 /* V4  i.. BOOL              */
 #define MUIA_Image_OldImage                 0x80424f3d /* V4  i.. struct Image *    */
-#define MUIA_Image_Scalable                 0x8042e966 /* V4  i.. BOOL              */ /* private */
 #define MUIA_Image_Spec                     0x804233d5 /* V4  i.. char *            */
 #define MUIA_Image_State                    0x8042a3ad /* V4  is. LONG              */
 
@@ -2058,14 +1851,9 @@ extern char MUIC_Menubar[];
 
 /* Methods */
 
-#define MUIM_Menubar_Attach                 0x80421010 /* private */ /* V20 */
-#define MUIM_Menubar_Detach                 0x80425957 /* private */ /* V20 */
-struct  MUIP_Menubar_Attach                 { ULONG MethodID; }; /* private */
-struct  MUIP_Menubar_Detach                 { ULONG MethodID; }; /* private */
 
 /* Attributes */
 
-#define MUIA_Menubar_Strip                  0x8042a41f /* V20 isg Object *          */ /* private */
 
 
 
@@ -2084,22 +1872,15 @@ extern char MUIC_Bitmap[];
 #define MUIA_Bitmap_Alpha                   0x80423e71 /* V20 isg ULONG             */
 #define MUIA_Bitmap_Bitmap                  0x804279bd /* V8  isg struct BitMap *   */
 #define MUIA_Bitmap_Height                  0x80421560 /* V8  isg LONG              */
-#define MUIA_Bitmap_JPegData                0x8042f8dd /* V20 isg UBYTE *           */ /* private */
-#define MUIA_Bitmap_JPegSize                0x8042bc4f /* V20 isg LONG              */ /* private */
 #define MUIA_Bitmap_MappingTable            0x8042e23d /* V8  isg UBYTE *           */
-#define MUIA_Bitmap_PNGData                 0x8042f4ba /* V20 isg UBYTE *           */ /* private */
-#define MUIA_Bitmap_PNGSize                 0x8042a0ea /* V20 isg LONG              */ /* private */
 #define MUIA_Bitmap_Precision               0x80420c74 /* V11 isg LONG              */
 #define MUIA_Bitmap_RawData                 0x8042f61a /* V20 isg APTR              */
 #define MUIA_Bitmap_RawDataFormat           0x80429b85 /* V20 isg ULONG             */
 #define MUIA_Bitmap_RemappedBitmap          0x80423a47 /* V11 ..g struct BitMap *   */
-#define MUIA_Bitmap_RemappedPens            0x804239e0 /* V20 ..g UBYTE *           */ /* private */
 #define MUIA_Bitmap_SourceColors            0x80425360 /* V8  isg ULONG *           */
 #define MUIA_Bitmap_Transparent             0x80422805 /* V8  isg LONG              */
 #define MUIA_Bitmap_UseFriend               0x804239d8 /* V11 i.. BOOL              */
 #define MUIA_Bitmap_Width                   0x8042eb3a /* V8  isg LONG              */
-#define MUIA_Bitmap_XOffset                 0x8042077c /* V20 isg LONG              */ /* private */
-#define MUIA_Bitmap_YOffset                 0x8042a4c3 /* V20 isg LONG              */ /* private */
 
 #define MUIV_Bitmap_RawDataFormat_CLUT8 0
 #define MUIV_Bitmap_RawDataFormat_RGB24 1
@@ -2137,13 +1918,10 @@ extern char MUIC_Text[];
 
 /* Attributes */
 
-#define MUIA_Text_Array                     0x80428b9d /* V4  ... STRPTR *          */ /* private */
-#define MUIA_Text_ArrayPos                  0x80428398 /* V4  ... LONG              */ /* private */
 #define MUIA_Text_Contents                  0x8042f8dc /* V4  isg STRPTR            */
 #define MUIA_Text_ControlChar               0x8042e6d0 /* V20 isg char              */
 #define MUIA_Text_Copy                      0x80427727 /* V20 i.. BOOL              */
 #define MUIA_Text_HiChar                    0x804218ff /* V4  i.. char              */
-#define MUIA_Text_HiIndex                   0x804214f5 /* V11 i.. LONG              */ /* private */
 #define MUIA_Text_PreParse                  0x8042566d /* V4  isg STRPTR            */
 #define MUIA_Text_SetMax                    0x80424d0a /* V4  i.. BOOL              */
 #define MUIA_Text_SetMin                    0x80424e10 /* V4  i.. BOOL              */
@@ -2163,9 +1941,7 @@ extern char MUIC_Gadget[];
 
 /* Attributes */
 
-#define MUIA_Gadget_Foreign                 0x804232d2 /* V13 .s. BOOL              */ /* private */
 #define MUIA_Gadget_Gadget                  0x8042ec1a /* V11 ..g struct Gadget *   */
-#define MUIA_Gadget_Window                  0x804282bc /* V11 ..g struct Gadget *   */ /* private */
 
 
 
@@ -2181,8 +1957,6 @@ extern char MUIC_String[];
 
 /* Methods */
 
-#define MUIM_String_BoopsiForward           0x80424137 /* private */ /* V13 */
-struct  MUIP_String_BoopsiForward           { ULONG MethodID; ULONG BoopsiID; }; /* private */
 
 /* Attributes */
 
@@ -2193,17 +1967,13 @@ struct  MUIP_String_BoopsiForward           { ULONG MethodID; ULONG BoopsiID; };
 #define MUIA_String_BufferPos               0x80428b6c /* V4  .sg LONG              */
 #define MUIA_String_Contents                0x80428ffd /* V4  isg STRPTR            */
 #define MUIA_String_DisplayPos              0x8042ccbf /* V4  .sg LONG              */
-#define MUIA_String_DoBoopsiForward         0x80427467 /* V18 isg BOOL              */ /* private */
 #define MUIA_String_EditHook                0x80424c33 /* V7  isg struct Hook *     */
 #define MUIA_String_Format                  0x80427484 /* V4  i.g LONG              */
-#define MUIA_String_HistoryEntries          0x8042e4a2 /* V11 isg LONG              */ /* private */
 #define MUIA_String_Integer                 0x80426e8a /* V4  isg ULONG             */
 #define MUIA_String_LonelyEditHook          0x80421569 /* V11 isg BOOL              */
 #define MUIA_String_MaxLen                  0x80424984 /* V4  i.g LONG              */
-#define MUIA_String_Popup                   0x80420d71 /* V9  i.. Object *          */ /* private */
 #define MUIA_String_Reject                  0x8042179c /* V4  isg STRPTR            */
 #define MUIA_String_Secret                  0x80428769 /* V4  i.g BOOL              */
-#define MUIA_String_Self                    0x804288e1 /* V16 ..g LONG              */ /* private */
 
 #define MUIV_String_Format_Left 0
 #define MUIV_String_Format_Center 1
@@ -2224,7 +1994,6 @@ extern char MUIC_Boopsi[];
 
 #define MUIA_Boopsi_Class                   0x80426999 /* V4  isg struct IClass *   */
 #define MUIA_Boopsi_ClassID                 0x8042bfa3 /* V4  isg char *            */
-#define MUIA_Boopsi_Dumbness                0x80428aa2 /* V11 i.. ULONG             */ /* private */
 #define MUIA_Boopsi_MaxHeight               0x8042757f /* V4  isg ULONG             */
 #define MUIA_Boopsi_MaxWidth                0x8042bcb1 /* V4  isg ULONG             */
 #define MUIA_Boopsi_MinHeight               0x80422c93 /* V4  isg ULONG             */
@@ -2257,18 +2026,10 @@ struct  MUIP_Prop_Increase                  { ULONG MethodID; LONG amount; };
 
 /* Attributes */
 
-#define MUIA_Prop_Delta                     0x8042c5f4 /* V4  is. LONG              */ /* private */
-#define MUIA_Prop_DeltaFactor               0x80427c5e /* V4  isg LONG              */ /* private */
-#define MUIA_Prop_DoSmooth                  0x804236ce /* V4  i.. BOOL              */ /* private */
-#define MUIA_Prop_Dynamic                   0x8042bdd6 /* V20 isg LONG              */ /* private */
 #define MUIA_Prop_Entries                   0x8042fbdb /* V4  isg LONG              */
 #define MUIA_Prop_First                     0x8042d4b2 /* V4  isg LONG              */
 #define MUIA_Prop_Horiz                     0x8042f4f3 /* V4  i.g BOOL              */
-#define MUIA_Prop_Pressed                   0x80422cd7 /* V6  ..g BOOL              */ /* private */
-#define MUIA_Prop_Quiet                     0x804274a6 /* V4  .s. BOOL              */ /* private */
-#define MUIA_Prop_Refresh                   0x80429839 /* V4  ... BOOL              */ /* private */
 #define MUIA_Prop_Slider                    0x80429c3a /* V4  isg BOOL              */
-#define MUIA_Prop_TrueFirst                 0x804205dc /* V16 ..g LONG              */ /* private */
 #define MUIA_Prop_UseWinBorder              0x8042deee /* V13 i.. LONG              */
 #define MUIA_Prop_Visible                   0x8042fea6 /* V4  isg LONG              */
 
@@ -2315,8 +2076,6 @@ extern char MUIC_Scale[];
 /* Attributes */
 
 #define MUIA_Scale_Horiz                    0x8042919a /* V4  isg BOOL              */
-#define MUIA_Scale_Max                      0x80426288 /* V4  isg LONG              */ /* private */
-#define MUIA_Scale_Min                      0x80426c4a /* V4  isg LONG              */ /* private */
 
 
 
@@ -2336,7 +2095,6 @@ extern char MUIC_Colorfield[];
 #define MUIA_Colorfield_Green               0x80424466 /* V4  isg ULONG             */
 #define MUIA_Colorfield_Pen                 0x8042713a /* V4  ..g ULONG             */
 #define MUIA_Colorfield_Red                 0x804279f6 /* V4  isg ULONG             */
-#define MUIA_Colorfield_Reference           0x8042dc22 /* V4  i.. Object *          */ /* private */
 #define MUIA_Colorfield_RGB                 0x8042677a /* V4  isg ULONG *           */
 
 
@@ -2354,59 +2112,44 @@ extern char MUIC_List[];
 /* Methods */
 
 #define MUIM_List_Clear                     0x8042ad89 /* V4  */
-#define MUIM_List_CreateDragMap             0x80424534 /* private */ /* V11 */
 #define MUIM_List_CreateImage               0x80429804 /* V11 */
 #define MUIM_List_DeleteImage               0x80420f58 /* V11 */
 #define MUIM_List_Exchange                  0x8042468c /* V4  */
-#define MUIM_List_FreeDragMap               0x80425a68 /* private */ /* V11 */
 #define MUIM_List_GetEntry                  0x804280ec /* V4  */
 #define MUIM_List_Insert                    0x80426c87 /* V4  */
 #define MUIM_List_InsertSingle              0x804254d5 /* V7  */
 #define MUIM_List_Jump                      0x8042baab /* V4  */
 #define MUIM_List_Move                      0x804253c2 /* V9  */
 #define MUIM_List_NextSelected              0x80425f17 /* V6  */
-#define MUIM_List_QueryColumnWidth          0x8042e09e /* private */ /* V11 */
 #define MUIM_List_Redraw                    0x80427993 /* V4  */
-#define MUIM_List_RedrawIfSimple            0x8042083f /* private */ /* V4  */
 #define MUIM_List_Remove                    0x8042647e /* V4  */
 #define MUIM_List_Select                    0x804252d8 /* V4  */
-#define MUIM_List_SetDropMark               0x80429e97 /* private */ /* V11 */
 #define MUIM_List_Sort                      0x80422275 /* V4  */
 #define MUIM_List_TestPos                   0x80425f48 /* V11 */
 struct  MUIP_List_Clear                     { ULONG MethodID; };
-struct  MUIP_List_CreateDragMap             { ULONG MethodID; LONG touchx; LONG touchy; LONG pos; }; /* private */
 struct  MUIP_List_CreateImage               { ULONG MethodID; Object *obj; ULONG flags; };
 struct  MUIP_List_DeleteImage               { ULONG MethodID; APTR listimg; };
 struct  MUIP_List_Exchange                  { ULONG MethodID; LONG pos1; LONG pos2; };
-struct  MUIP_List_FreeDragMap               { ULONG MethodID; struct DragMap *dragmap; }; /* private */
 struct  MUIP_List_GetEntry                  { ULONG MethodID; LONG pos; APTR *entry; };
 struct  MUIP_List_Insert                    { ULONG MethodID; APTR *entries; LONG count; LONG pos; };
 struct  MUIP_List_InsertSingle              { ULONG MethodID; APTR entry; LONG pos; };
 struct  MUIP_List_Jump                      { ULONG MethodID; LONG pos; };
 struct  MUIP_List_Move                      { ULONG MethodID; LONG from; LONG to; };
 struct  MUIP_List_NextSelected              { ULONG MethodID; LONG *pos; };
-struct  MUIP_List_QueryColumnWidth          { ULONG MethodID; LONG num; }; /* private */
 struct  MUIP_List_Redraw                    { ULONG MethodID; LONG pos; };
-struct  MUIP_List_RedrawIfSimple            { ULONG MethodID; LONG pos; }; /* private */
 struct  MUIP_List_Remove                    { ULONG MethodID; LONG pos; };
 struct  MUIP_List_Select                    { ULONG MethodID; LONG pos; LONG seltype; LONG *state; };
-struct  MUIP_List_SetDropMark               { ULONG MethodID; LONG pos; }; /* private */
 struct  MUIP_List_Sort                      { ULONG MethodID; };
 struct  MUIP_List_TestPos                   { ULONG MethodID; LONG x; LONG y; struct MUI_List_TestPos_Result *res; };
 
 /* Attributes */
 
 #define MUIA_List_Active                    0x8042391c /* V4  isg LONG              */
-#define MUIA_List_ActiveYKo                 0x8042b56e /* V4  ... LONG              */ /* private */
 #define MUIA_List_AdjustHeight              0x8042850d /* V4  i.. BOOL              */
-#define MUIA_List_AdjustMinWidth            0x8042408a /* V4  i.. BOOL              */ /* private */
 #define MUIA_List_AdjustWidth               0x8042354a /* V4  i.. BOOL              */
-#define MUIA_List_Array                     0x8042a616 /* V10 ..g ULONG *           */ /* private */
 #define MUIA_List_AutoVisible               0x8042a445 /* V11 isg BOOL              */
 #define MUIA_List_CompareHook               0x80425c14 /* V4  is. struct Hook *     */
 #define MUIA_List_ConstructHook             0x8042894f /* V4  is. struct Hook *     */
-#define MUIA_List_CopyHook                  0x8042c0b3 /* V4  i.. struct Hook *     */ /* private */
-#define MUIA_List_CursorType                0x8042c53e /* V4  is. LONG              */ /* private */
 #define MUIA_List_DestructHook              0x804297ce /* V4  is. struct Hook *     */
 #define MUIA_List_DisplayHook               0x8042b4d5 /* V4  is. struct Hook *     */
 #define MUIA_List_DragSortable              0x80426099 /* V11 isg BOOL              */
@@ -2415,23 +2158,16 @@ struct  MUIP_List_TestPos                   { ULONG MethodID; LONG x; LONG y; st
 #define MUIA_List_First                     0x804238d4 /* V4  ..g LONG              */
 #define MUIA_List_Format                    0x80423c0a /* V4  isg STRPTR            */
 #define MUIA_List_InsertPosition            0x8042d0cd /* V9  ..g LONG              */
-#define MUIA_List_LineHeight                0x80425880 /* V20 ..g ULONG             */ /* private */
 #define MUIA_List_MinLineHeight             0x8042d1c3 /* V4  i.. LONG              */
 #define MUIA_List_MultiTestHook             0x8042c2c6 /* V4  is. struct Hook *     */
 #define MUIA_List_Pool                      0x80423431 /* V13 i.. APTR              */
 #define MUIA_List_PoolPuddleSize            0x8042a4eb /* V13 i.. ULONG             */
 #define MUIA_List_PoolThreshSize            0x8042c48c /* V13 i.. ULONG             */
-#define MUIA_List_PreAllocCount             0x80429ca2 /* V20 i.. ULONG             */ /* private */
 #define MUIA_List_Quiet                     0x8042d8c7 /* V4  .s. BOOL              */
 #define MUIA_List_ShowDropMarks             0x8042c6f3 /* V11 isg BOOL              */
-#define MUIA_List_Source                    0x8042beba /* V4  i.. Object *          */ /* private */
 #define MUIA_List_SourceArray               0x8042c0a0 /* V4  i.. APTR              */
-#define MUIA_List_Stretch                   0x804281f5 /* V4  i.. LONG              */ /* private */
 #define MUIA_List_Title                     0x80423e66 /* V6  isg char *            */
-#define MUIA_List_TopPixel                  0x80429df3 /* V4  ..g LONG              */ /* private */
-#define MUIA_List_TotalPixel                0x8042a8f5 /* V4  ..g LONG              */ /* private */
 #define MUIA_List_Visible                   0x8042191f /* V4  ..g LONG              */
-#define MUIA_List_VisiblePixel              0x804273e9 /* V4  ..g LONG              */ /* private */
 
 #define MUIV_List_Active_Off -1
 #define MUIV_List_Active_Top -2
@@ -2495,8 +2231,6 @@ extern char MUIC_Scrmodelist[];
 
 /* Attributes */
 
-#define MUIA_Scrmodelist_PropertyFlags      0x804216bd /* V4  isg STRPTR            */ /* private */
-#define MUIA_Scrmodelist_PropertyMask       0x8042ef0e /* V4  isg STRPTR            */ /* private */
 
 
 
@@ -2512,13 +2246,7 @@ extern char MUIC_Dirlist[];
 
 /* Methods */
 
-#define MUIM_Dirlist_AskSlave               0x8042b0e8 /* private */ /* V4  */
-#define MUIM_Dirlist_Enter                  0x804209f0 /* private */ /* V20 */
-#define MUIM_Dirlist_Parent                 0x804213f3 /* private */ /* V20 */
 #define MUIM_Dirlist_ReRead                 0x80422d71 /* V4  */
-struct  MUIP_Dirlist_AskSlave               { ULONG MethodID; }; /* private */
-struct  MUIP_Dirlist_Enter                  { ULONG MethodID; char *dir; }; /* private */
-struct  MUIP_Dirlist_Parent                 { ULONG MethodID; }; /* private */
 struct  MUIP_Dirlist_ReRead                 { ULONG MethodID; };
 
 /* Attributes */
@@ -2565,35 +2293,25 @@ extern char MUIC_Numeric[];
 /* Methods */
 
 #define MUIM_Numeric_Decrease               0x804243a7 /* V11 */
-#define MUIM_Numeric_GetPixelSize           0x8042a2f2 /* private */ /* V11 */
 #define MUIM_Numeric_Increase               0x80426ecd /* V11 */
 #define MUIM_Numeric_ScaleToValue           0x8042032c /* V11 */
-#define MUIM_Numeric_SetAutoReset           0x80421ecc /* private */ /* V11 */
 #define MUIM_Numeric_SetDefault             0x8042ab0a /* V11 */
 #define MUIM_Numeric_Stringify              0x80424891 /* V11 */
-#define MUIM_Numeric_StringifyValue         0x8042148f /* private */ /* V11 */
 #define MUIM_Numeric_ValueToScale           0x80423e4f /* V11 */
-#define MUIM_Numeric_ValueToScale2          0x804224b1 /* private */ /* V20 */
 struct  MUIP_Numeric_Decrease               { ULONG MethodID; LONG amount; };
-struct  MUIP_Numeric_GetPixelSize           { ULONG MethodID; LONG *width; LONG *height; struct TextFont *font; }; /* private */
 struct  MUIP_Numeric_Increase               { ULONG MethodID; LONG amount; };
 struct  MUIP_Numeric_ScaleToValue           { ULONG MethodID; LONG scalemin; LONG scalemax; LONG scale; };
-struct  MUIP_Numeric_SetAutoReset           { ULONG MethodID; }; /* private */
 struct  MUIP_Numeric_SetDefault             { ULONG MethodID; };
 struct  MUIP_Numeric_Stringify              { ULONG MethodID; LONG value; };
-struct  MUIP_Numeric_StringifyValue         { ULONG MethodID; }; /* private */
 struct  MUIP_Numeric_ValueToScale           { ULONG MethodID; LONG scalemin; LONG scalemax; };
-struct  MUIP_Numeric_ValueToScale2          { ULONG MethodID; LONG scalemin; LONG scalemax; }; /* private */
 
 /* Attributes */
 
-#define MUIA_Numeric_AutoReset              0x80426652 /* V11 isg BOOL              */ /* private */
 #define MUIA_Numeric_CheckAllSizes          0x80421594 /* V11 isg BOOL              */
 #define MUIA_Numeric_Default                0x804263e8 /* V11 isg LONG              */
 #define MUIA_Numeric_Format                 0x804263e9 /* V11 isg STRPTR            */
 #define MUIA_Numeric_Max                    0x8042d78a /* V11 isg LONG              */
 #define MUIA_Numeric_Min                    0x8042e404 /* V11 isg LONG              */
-#define MUIA_Numeric_QValue                 0x8042d608 /* V11 isg LONG              */ /* private */
 #define MUIA_Numeric_Reverse                0x8042f2a0 /* V11 isg BOOL              */
 #define MUIA_Numeric_RevLeftRight           0x804294a7 /* V11 isg BOOL              */
 #define MUIA_Numeric_RevUpDown              0x804252dd /* V11 isg BOOL              */
@@ -2662,7 +2380,6 @@ extern char MUIC_Slider[];
 #define MUIA_Slider_Min                     0x8042e404 /* V4  isg LONG              */
 #endif /* MUI_OBSOLETE */
 #define MUIA_Slider_Quiet                   0x80420b26 /* V6  i.. BOOL              */
-#define MUIA_Slider_QuietLevel              0x8042c7a9 /* V11 isg LONG              */ /* private */
 #ifdef MUI_OBSOLETE
 #define MUIA_Slider_Reverse                 0x8042f2a0 /* V4  isg BOOL              */
 #endif /* MUI_OBSOLETE */
@@ -2682,9 +2399,6 @@ extern char MUIC_Framedisplay[];
 
 /* Attributes */
 
-#define MUIA_Framedisplay_ShowSpacing       0x80428a94 /* V11 isg BOOL              */ /* private */
-#define MUIA_Framedisplay_Spec              0x80421794 /* V11 isg struct MUI_FrameSpec * */ /* private */
-#define MUIA_Framedisplay_Thickness         0x804298f3 /* V11 i.. LONG              */ /* private */
 
 
 
@@ -2711,13 +2425,6 @@ extern char MUIC_Imagedisplay[];
 
 /* Attributes */
 
-#define MUIA_Imagedisplay_Balance           0x80424c09 /* V20 isg LONG              */ /* private */
-#define MUIA_Imagedisplay_BalanceBlue       0x80422195 /* V20 isg LONG              */ /* private */
-#define MUIA_Imagedisplay_BalanceGreen      0x8042b221 /* V20 isg LONG              */ /* private */
-#define MUIA_Imagedisplay_BalanceRed        0x80425674 /* V20 isg LONG              */ /* private */
-#define MUIA_Imagedisplay_Spec              0x8042a547 /* V11 isg struct MUI_ImageSpec * */ /* private */
-#define MUIA_Imagedisplay_UseDefSize        0x8042186d /* V11 i.. BOOL              */ /* private */
-#define MUIA_Imagedisplay_UseFancyStuff     0x8042a004 /* V20 i.. BOOL              */ /* private */
 
 
 
@@ -2747,15 +2454,12 @@ extern char MUIC_Pendisplay[];
 #define MUIM_Pendisplay_SetColormap         0x80426c80 /* V13 */
 #define MUIM_Pendisplay_SetMUIPen           0x8042039d /* V13 */
 #define MUIM_Pendisplay_SetRGB              0x8042c131 /* V13 */
-#define MUIM_Pendisplay_SetSysPen           0x804261e1 /* private */ /* V13 */
 struct  MUIP_Pendisplay_SetColormap         { ULONG MethodID; LONG colormap; };
 struct  MUIP_Pendisplay_SetMUIPen           { ULONG MethodID; LONG muipen; };
 struct  MUIP_Pendisplay_SetRGB              { ULONG MethodID; ULONG red; ULONG green; ULONG blue; };
-struct  MUIP_Pendisplay_SetSysPen           { ULONG MethodID; LONG syspen; }; /* private */
 
 /* Attributes */
 
-#define MUIA_Pendisplay_BackReference       0x80428974 /* V13 .s. Object *          */ /* private */
 #define MUIA_Pendisplay_Pen                 0x8042a748 /* V13 ..g ULONG             */
 #define MUIA_Pendisplay_Reference           0x8042dc24 /* V13 isg Object *          */
 #define MUIA_Pendisplay_RGBcolor            0x8042a1a9 /* V11 isg struct MUI_RGBcolor * */
@@ -2786,28 +2490,14 @@ extern char MUIC_Group[];
 
 /* Methods */
 
-#define MUIM_Group_Balance                  0x80425906 /* private */ /* V11 */
-#define MUIM_Group_BuildCycleList           0x8042b22e /* private */ /* V11 */
-#define MUIM_Group_ClearCycleFlags          0x8042c520 /* private */ /* V11 */
 #define MUIM_Group_ExitChange               0x8042d1cc /* V11 */
-#define MUIM_Group_ExitChange2              0x8042e541 /* private */ /* V12 */
 #define MUIM_Group_InitChange               0x80420887 /* V11 */
-#define MUIM_Group_MoveAround               0x80421f7b /* private */ /* V4  */
 #define MUIM_Group_MoveMember               0x8042ff4e /* V16 */
 #define MUIM_Group_Sort                     0x80427417 /* V4  */
-#define MUIM_Group_TestXY                   0x804250d4 /* private */ /* V4  */
-#define MUIM_Group_Transfer                 0x8042fb67 /* private */ /* V4  */
-struct  MUIP_Group_Balance                  { ULONG MethodID; Object *bal; LONG clickx; LONG clicky; LONG mode; LONG mousex; LONG mousey; }; /* private */
-struct  MUIP_Group_BuildCycleList           { ULONG MethodID; Object **chain; LONG count; }; /* private */
-struct  MUIP_Group_ClearCycleFlags          { ULONG MethodID; }; /* private */
 struct  MUIP_Group_ExitChange               { ULONG MethodID; };
-struct  MUIP_Group_ExitChange2              { ULONG MethodID; ULONG flags; }; /* private */
 struct  MUIP_Group_InitChange               { ULONG MethodID; };
-struct  MUIP_Group_MoveAround               { ULONG MethodID; LONG col; LONG row; LONG x; LONG y; LONG dx; LONG dy; }; /* private */
 struct  MUIP_Group_MoveMember               { ULONG MethodID; Object *o; LONG pos; };
 struct  MUIP_Group_Sort                     { ULONG MethodID; Object *obj[1]; };
-struct  MUIP_Group_TestXY                   { ULONG MethodID; LONG x; LONG y; }; /* private */
-struct  MUIP_Group_Transfer                 { ULONG MethodID; Object *group; }; /* private */
 
 /* Attributes */
 
@@ -2819,14 +2509,12 @@ struct  MUIP_Group_Transfer                 { ULONG MethodID; Object *group; }; 
 #define MUIA_Group_Horiz                    0x8042536b /* V4  i.. BOOL              */
 #define MUIA_Group_HorizSpacing             0x8042c651 /* V4  isg LONG              */
 #define MUIA_Group_LayoutHook               0x8042c3b2 /* V11 i.. struct Hook *     */
-#define MUIA_Group_PageMax                  0x8042d777 /* V4  i.. BOOL              */ /* private */
 #define MUIA_Group_PageMode                 0x80421a5f /* V5  i.. BOOL              */
 #define MUIA_Group_Rows                     0x8042b68f /* V4  is. LONG              */
 #define MUIA_Group_SameHeight               0x8042037e /* V4  i.. BOOL              */
 #define MUIA_Group_SameSize                 0x80420860 /* V4  i.. BOOL              */
 #define MUIA_Group_SameWidth                0x8042b3ec /* V4  i.. BOOL              */
 #define MUIA_Group_Spacing                  0x8042866d /* V4  is. LONG              */
-#define MUIA_Group_Type                     0x8042e866 /* V11 ..g LONG              */ /* private */
 #define MUIA_Group_VertSpacing              0x8042e1bf /* V4  isg LONG              */
 
 #define MUIV_Group_ActivePage_First 0
@@ -2859,10 +2547,6 @@ extern char MUIC_Menudisplay[];
 
 /* Methods */
 
-#define MUIM_Menudisplay_Pop                0x804248d6 /* private */ /* V20 */
-#define MUIM_Menudisplay_SetMenu            0x8042f7a7 /* private */ /* V20 */
-struct  MUIP_Menudisplay_Pop                { ULONG MethodID; Object *txt; }; /* private */
-struct  MUIP_Menudisplay_SetMenu            { ULONG MethodID; Object *strip; }; /* private */
 
 
 /****************************************************************************/
@@ -2877,24 +2561,15 @@ extern char MUIC_Mccprefs[];
 
 /* Methods */
 
-#define MUIM_Mccprefs_CheckClass            0x8042925a /* private */ /* V20 */
 #define MUIM_Mccprefs_ConfigToGadgets       0x80427043 /* V11 */
-#define MUIM_Mccprefs_FindExtraTitle        0x8042b1e8 /* private */ /* V20 */
-#define MUIM_Mccprefs_FindGadget            0x8042df61 /* private */ /* V20 */
 #define MUIM_Mccprefs_GadgetsToConfig       0x80425242 /* V11 */
 #define MUIM_Mccprefs_RegisterGadget        0x80424828 /* V20 */
-#define MUIM_Mccprefs_SetContextMenus       0x804289f2 /* private */ /* V20 */
-struct  MUIP_Mccprefs_CheckClass            { ULONG MethodID; STRPTR classname; }; /* private */
 struct  MUIP_Mccprefs_ConfigToGadgets       { ULONG MethodID; Object *configdata; };
-struct  MUIP_Mccprefs_FindExtraTitle        { ULONG MethodID; Object *gadget; }; /* private */
-struct  MUIP_Mccprefs_FindGadget            { ULONG MethodID; ULONG id; }; /* private */
 struct  MUIP_Mccprefs_GadgetsToConfig       { ULONG MethodID; Object *configdata; };
 struct  MUIP_Mccprefs_RegisterGadget        { ULONG MethodID; Object *gadget; ULONG id; ULONG flags; STRPTR title; };
-struct  MUIP_Mccprefs_SetContextMenus       { ULONG MethodID; Object *pagemenu; Object *gadgetmenu; }; /* private */
 
 /* Attributes */
 
-#define MUIA_Mccprefs_SettingsObject        0x804270f8 /* V20 i.. Object *          */ /* private */
 
 
 
@@ -2927,18 +2602,10 @@ extern char MUIC_Penadjust[];
 
 /* Methods */
 
-#define MUIM_Penadjust_Update               0x8042bdfe /* private */ /* V11 */
-struct  MUIP_Penadjust_Update               { ULONG MethodID; LONG type; }; /* private */
 
 /* Attributes */
 
-#define MUIA_Penadjust_DoColormap           0x8042deed /* V11 i.. BOOL              */ /* private */
-#define MUIA_Penadjust_DoMUIpens            0x804289e7 /* V11 i.. BOOL              */ /* private */
-#define MUIA_Penadjust_DoRGB                0x80424beb /* V11 i.. BOOL              */ /* private */
-#define MUIA_Penadjust_DoSyspens            0x80424097 /* V11 i.. BOOL              */ /* private */
 #define MUIA_Penadjust_PSIMode              0x80421cbb /* V11 i.. BOOL              */
-#define MUIA_Penadjust_Spec                 0x80420d9f /* V11 isg struct MUI_PenSpec * */ /* private */
-#define MUIA_Penadjust_Terminate            0x8042e0b0 /* V11 ..g BOOL              */ /* private */
 
 
 
@@ -2956,23 +2623,11 @@ extern char MUIC_Settingsgroup[];
 
 #define MUIM_Settingsgroup_ConfigToGadgets  0x80427043 /* V11 */
 #define MUIM_Settingsgroup_GadgetsToConfig  0x80425242 /* V11 */
-#define MUIM_Settingsgroup_GetMenuTitle     0x80428152 /* private */ /* V20 */
-#define MUIM_Settingsgroup_Init             0x8042558b /* private */ /* V20 */
-#define MUIM_Settingsgroup_MakeTimeSlider   0x804276de /* private */ /* V20 */
-#define MUIM_Settingsgroup_State            0x8042b9f9 /* private */ /* V11 */
 struct  MUIP_Settingsgroup_ConfigToGadgets  { ULONG MethodID; Object *configdata; };
 struct  MUIP_Settingsgroup_GadgetsToConfig  { ULONG MethodID; Object *configdata; };
-struct  MUIP_Settingsgroup_GetMenuTitle     { ULONG MethodID; Object *cmobj; Object *cm; }; /* private */
-struct  MUIP_Settingsgroup_Init             { ULONG MethodID; LONG group; Object *gadgetmenu; Object *settingsobj; }; /* private */
-struct  MUIP_Settingsgroup_MakeTimeSlider   { ULONG MethodID; ULONG tags; }; /* private */
-struct  MUIP_Settingsgroup_State            { ULONG MethodID; LONG disable; }; /* private */
 
 /* Attributes */
 
-#define MUIA_Settingsgroup_AppTitle         0x80428f3b /* V20 i.. STRPTR            */ /* private */
-#define MUIA_Settingsgroup_GadgetMenu       0x8042ca26 /* V11 i.. Object *          */ /* private */
-#define MUIA_Settingsgroup_Group            0x8042633c /* V11 i.. LONG              */ /* private */
-#define MUIA_Settingsgroup_SettingsObject   0x804270f8 /* V11 i.. Object *          */ /* private */
 
 
 
@@ -2999,31 +2654,9 @@ extern char MUIC_Settings[];
 
 /* Methods */
 
-#define MUIM_Settings_GetConfig             0x80428604 /* private */ /* V11 */
-#define MUIM_Settings_MenuAction            0x8042016f /* private */ /* V11 */
-#define MUIM_Settings_Multiview             0x804276f4 /* private */ /* V16 */
-#define MUIM_Settings_Profile               0x8042251a /* private */ /* V13 */
-#define MUIM_Settings_SetConfig             0x8042a106 /* private */ /* V11 */
-#define MUIM_Settings_SetGroup              0x8042de52 /* private */ /* V11 */
-#define MUIM_Settings_SetTitle              0x804272e4 /* private */ /* V20 */
-#define MUIM_Settings_Special               0x8042b662 /* private */ /* V11 */
-struct  MUIP_Settings_GetConfig             { ULONG MethodID; }; /* private */
-struct  MUIP_Settings_MenuAction            { ULONG MethodID; LONG id; Object *mcp; Object *menuitem; }; /* private */
-struct  MUIP_Settings_Multiview             { ULONG MethodID; char *filename; char *options; }; /* private */
-struct  MUIP_Settings_Profile               { ULONG MethodID; char *comline; }; /* private */
-struct  MUIP_Settings_SetConfig             { ULONG MethodID; Object *configdata; LONG refresh; }; /* private */
-struct  MUIP_Settings_SetGroup              { ULONG MethodID; }; /* private */
-struct  MUIP_Settings_SetTitle              { ULONG MethodID; }; /* private */
-struct  MUIP_Settings_Special               { ULONG MethodID; LONG val; }; /* private */
 
 /* Attributes */
 
-#define MUIA_Settings_Application           0x8042affc /* V20 i.. Object *          */ /* private */
-#define MUIA_Settings_Disable               0x8042d533 /* V11 .s. BOOL              */ /* private */
-#define MUIA_Settings_Hash                  0x80426692 /* V20 i.g ULONG             */ /* private */
-#define MUIA_Settings_Local                 0x80426f4d /* V11 i.g Object *          */ /* private */
-#define MUIA_Settings_LonelyPage            0x8042900d /* V20 i.. ULONG             */ /* private */
-#define MUIA_Settings_Welcome               0x8042877b /* V11 i.. Object *          */ /* private */
 
 
 
@@ -3039,13 +2672,9 @@ extern char MUIC_Frameadjust[];
 
 /* Methods */
 
-#define MUIM_Frameadjust_Update             0x8042a35e /* private */ /* V11 */
-struct  MUIP_Frameadjust_Update             { ULONG MethodID; LONG frame; LONG sel; LONG left; LONG right; LONG top; LONG bottom; }; /* private */
 
 /* Attributes */
 
-#define MUIA_Frameadjust_Spec               0x8042965c /* V11 isg struct MUI_FrameSpec * */ /* private */
-#define MUIA_Frameadjust_Terminate          0x80422034 /* V11 ..g BOOL              */ /* private */
 
 
 
@@ -3061,22 +2690,9 @@ extern char MUIC_Imageadjust[];
 
 /* Methods */
 
-#define MUIM_Imageadjust_ObjToSpec          0x8042dec0 /* private */ /* V11 */
-#define MUIM_Imageadjust_SpecToObj          0x8042d6e0 /* private */ /* V11 */
-struct  MUIP_Imageadjust_ObjToSpec          { ULONG MethodID; }; /* private */
-struct  MUIP_Imageadjust_SpecToObj          { ULONG MethodID; char *spec; }; /* private */
 
 /* Attributes */
 
-#define MUIA_Imageadjust_DoAlien            0x804230f3 /* V11 i.. BOOL              */ /* private */
-#define MUIA_Imageadjust_DoBuiltin          0x80420d96 /* V11 i.. BOOL              */ /* private */
-#define MUIA_Imageadjust_DoExternal         0x80421132 /* V11 i.. BOOL              */ /* private */
-#define MUIA_Imageadjust_DoGradient         0x80420519 /* V20 i.. BOOL              */ /* private */
-#define MUIA_Imageadjust_DoPattern          0x8042b676 /* V11 i.. BOOL              */ /* private */
-#define MUIA_Imageadjust_DoPen              0x804231a4 /* V11 i.. BOOL              */ /* private */
-#define MUIA_Imageadjust_Spec               0x804279e1 /* V11 isg struct MUI_ImageSpec * */ /* private */
-#define MUIA_Imageadjust_Terminate          0x80428417 /* V11 ..g BOOL              */ /* private */
-#define MUIA_Imageadjust_Type               0x80422f2b /* V11 i.. LONG              */ /* private */
 
 #define MUIV_Imageadjust_Type_All 0
 #define MUIV_Imageadjust_Type_Image 1
@@ -3096,32 +2712,12 @@ extern char MUIC_Virtgroup[];
 
 /* Methods */
 
-#define MUIM_Virtgroup_AutoMove             0x8042b368 /* private */ /* V18 */
-#define MUIM_Virtgroup_Correct              0x8042bcd2 /* private */ /* V11 */
-#define MUIM_Virtgroup_GetClip              0x8042a0d6 /* private */ /* V4  */
-#define MUIM_Virtgroup_InstallClip          0x80425b5c /* private */ /* V11 */
-#define MUIM_Virtgroup_MakeVisible          0x8042d2d2 /* private */ /* V4  */
-#define MUIM_Virtgroup_RemoveClip           0x8042da52 /* private */ /* V11 */
-#define MUIM_Virtgroup_Smoothie             0x8042acbc /* private */ /* V20 */
-#define MUIM_Virtgroup_Update               0x8042ffbf /* private */ /* V11 */
-struct  MUIP_Virtgroup_AutoMove             { ULONG MethodID; }; /* private */
-struct  MUIP_Virtgroup_Correct              { ULONG MethodID; LONG width; LONG height; LONG failwidth; LONG failheight; LONG offsx; LONG offsy; }; /* private */
-struct  MUIP_Virtgroup_GetClip              { ULONG MethodID; struct Rectangle *rect; }; /* private */
-struct  MUIP_Virtgroup_InstallClip          { ULONG MethodID; }; /* private */
-struct  MUIP_Virtgroup_MakeVisible          { ULONG MethodID; Object *obj; ULONG flags; }; /* private */
-struct  MUIP_Virtgroup_RemoveClip           { ULONG MethodID; }; /* private */
-struct  MUIP_Virtgroup_Smoothie             { ULONG MethodID; }; /* private */
-struct  MUIP_Virtgroup_Update               { ULONG MethodID; LONG layout; }; /* private */
 
 /* Attributes */
 
-#define MUIA_Virtgroup_FreeHoriz            0x8042dcde /* V9  i.. BOOL              */ /* private */
-#define MUIA_Virtgroup_FreeVert             0x80422da9 /* V9  i.. BOOL              */ /* private */
 #define MUIA_Virtgroup_Height               0x80423038 /* V6  ..g LONG              */
 #define MUIA_Virtgroup_Input                0x80427f7e /* V11 i.. BOOL              */
 #define MUIA_Virtgroup_Left                 0x80429371 /* V6  isg LONG              */
-#define MUIA_Virtgroup_Scrollgroup          0x80420e88 /* V11 .s. Object *          */ /* private */
-#define MUIA_Virtgroup_Smooth               0x8042b7c7 /* V20 isg LONG              */ /* private */
 #define MUIA_Virtgroup_Top                  0x80425200 /* V6  isg LONG              */
 #define MUIA_Virtgroup_Width                0x80427c49 /* V6  ..g LONG              */
 
@@ -3139,8 +2735,6 @@ extern char MUIC_Scrollgroup[];
 
 /* Methods */
 
-#define MUIM_Scrollgroup_Inform             0x804218a6 /* private */ /* V11 */
-struct  MUIP_Scrollgroup_Inform             { ULONG MethodID; LONG xpos; LONG ypos; LONG viswidth; LONG visheight; LONG width; LONG height; }; /* private */
 
 /* Attributes */
 
@@ -3186,12 +2780,9 @@ extern char MUIC_Listview[];
 /* Attributes */
 
 #define MUIA_Listview_ClickColumn           0x8042d1b3 /* V7  ..g LONG              */
-#define MUIA_Listview_ClickColumnX          0x8042a18c /* V15 ..g LONG              */ /* private */
 #define MUIA_Listview_DefClickColumn        0x8042b296 /* V7  isg LONG              */
 #define MUIA_Listview_DoubleClick           0x80424635 /* V4  i.g BOOL              */
-#define MUIA_Listview_DragBounds            0x80428dde /* V11 isg Object *          */ /* private */
 #define MUIA_Listview_DragType              0x80425cd3 /* V11 isg LONG              */
-#define MUIA_Listview_HandleRMB             0x804234c4 /* V20 isg BOOL              */ /* private */
 #define MUIA_Listview_Input                 0x8042682d /* V4  i.. BOOL              */
 #define MUIA_Listview_List                  0x8042bcce /* V4  i.g Object *          */
 #define MUIA_Listview_MultiSelect           0x80427e08 /* V7  i.. LONG              */
@@ -3241,7 +2832,6 @@ extern char MUIC_Cycle[];
 
 #define MUIA_Cycle_Active                   0x80421788 /* V4  isg LONG              */
 #define MUIA_Cycle_Entries                  0x80420629 /* V4  i.. STRPTR *          */
-#define MUIA_Cycle_Textmode                 0x8042a47a /* V20 i.. BOOL              */ /* private */
 
 #define MUIV_Cycle_Active_Next -1
 #define MUIV_Cycle_Active_Prev -2
@@ -3259,14 +2849,10 @@ extern char MUIC_Coloradjust[];
 
 /* Methods */
 
-#define MUIM_Coloradjust_Preset             0x8042497e /* private */ /* V13 */
-struct  MUIP_Coloradjust_Preset             { ULONG MethodID; LONG num; }; /* private */
 
 /* Attributes */
 
 #define MUIA_Coloradjust_Blue               0x8042b8a3 /* V4  isg ULONG             */
-#define MUIA_Coloradjust_DoField            0x8042855b /* V11 i.. BOOL              */ /* private */
-#define MUIA_Coloradjust_DoPages            0x80429a08 /* V11 i.. BOOL              */ /* private */
 #define MUIA_Coloradjust_Green              0x804285ab /* V4  isg ULONG             */
 #define MUIA_Coloradjust_ModeID             0x8042ec59 /* V4  isg ULONG             */
 #define MUIA_Coloradjust_Red                0x80420eaa /* V4  isg ULONG             */
@@ -3306,10 +2892,8 @@ extern char MUIC_Popstring[];
 
 #define MUIM_Popstring_Close                0x8042dc52 /* V7  */
 #define MUIM_Popstring_Open                 0x804258ba /* V7  */
-#define MUIM_Popstring_ReallyClose          0x8042303d /* private */ /* V7  */
 struct  MUIP_Popstring_Close                { ULONG MethodID; LONG result; };
 struct  MUIP_Popstring_Open                 { ULONG MethodID; };
-struct  MUIP_Popstring_ReallyClose          { ULONG MethodID; LONG result; }; /* private */
 
 /* Attributes */
 
@@ -3333,14 +2917,6 @@ extern char MUIC_Pubscreenadjust[];
 
 /* Methods */
 
-#define MUIM_Pubscreenadjust_GetScreen      0x80421671 /* private */ /* V20 */
-#define MUIM_Pubscreenadjust_SetScreen      0x8042e582 /* private */ /* V20 */
-#define MUIM_Pubscreenadjust_Startup        0x8042cf5b /* private */ /* V20 */
-#define MUIM_Pubscreenadjust_Update         0x8042fd1e /* private */ /* V20 */
-struct  MUIP_Pubscreenadjust_GetScreen      { ULONG MethodID; struct MUI_PubScreenDesc *desc; }; /* private */
-struct  MUIP_Pubscreenadjust_SetScreen      { ULONG MethodID; struct MUI_PubScreenDesc *desc; }; /* private */
-struct  MUIP_Pubscreenadjust_Startup        { ULONG MethodID; }; /* private */
-struct  MUIP_Pubscreenadjust_Update         { ULONG MethodID; LONG level; }; /* private */
 
 
 /****************************************************************************/
@@ -3355,12 +2931,9 @@ extern char MUIC_Pubscreenpanel[];
 
 /* Methods */
 
-#define MUIM_Pubscreenpanel_Update          0x8042a5e7 /* private */ /* V20 */
-struct  MUIP_Pubscreenpanel_Update          { ULONG MethodID; LONG level; }; /* private */
 
 /* Attributes */
 
-#define MUIA_Pubscreenpanel_ScreenName      0x80428ffd /* V20 isg STRPTR            */ /* private */
 
 
 
@@ -3376,28 +2949,6 @@ extern char MUIC_Pubscreenlist[];
 
 /* Methods */
 
-#define MUIM_Pubscreenlist_Activate         0x804218f3 /* private */ /* V20 */
-#define MUIM_Pubscreenlist_CloneScreen      0x804249b5 /* private */ /* V20 */
-#define MUIM_Pubscreenlist_DeleteScreen     0x8042213a /* private */ /* V20 */
-#define MUIM_Pubscreenlist_EditScreen       0x8042ca95 /* private */ /* V20 */
-#define MUIM_Pubscreenlist_Finish           0x8042f24b /* private */ /* V20 */
-#define MUIM_Pubscreenlist_NewScreen        0x8042d0a2 /* private */ /* V20 */
-#define MUIM_Pubscreenlist_OpenCloseJump    0x80422344 /* private */ /* V20 */
-#define MUIM_Pubscreenlist_UndoScreen       0x8042d31f /* private */ /* V20 */
-#define MUIM_Pubscreenlist_Update           0x80425e2e /* private */ /* V20 */
-#define MUIM_Pubscreenlist_UpdateGadgets    0x8042efff /* private */ /* V20 */
-#define MUIM_Pubscreenlist_UpdateSelection  0x804291c8 /* private */ /* V20 */
-struct  MUIP_Pubscreenlist_Activate         { ULONG MethodID; char *name; }; /* private */
-struct  MUIP_Pubscreenlist_CloneScreen      { ULONG MethodID; }; /* private */
-struct  MUIP_Pubscreenlist_DeleteScreen     { ULONG MethodID; }; /* private */
-struct  MUIP_Pubscreenlist_EditScreen       { ULONG MethodID; }; /* private */
-struct  MUIP_Pubscreenlist_Finish           { ULONG MethodID; Object *panel; ULONG ok; }; /* private */
-struct  MUIP_Pubscreenlist_NewScreen        { ULONG MethodID; }; /* private */
-struct  MUIP_Pubscreenlist_OpenCloseJump    { ULONG MethodID; ULONG type; }; /* private */
-struct  MUIP_Pubscreenlist_UndoScreen       { ULONG MethodID; }; /* private */
-struct  MUIP_Pubscreenlist_Update           { ULONG MethodID; ULONG type; ULONG screenid; Object *originator; }; /* private */
-struct  MUIP_Pubscreenlist_UpdateGadgets    { ULONG MethodID; }; /* private */
-struct  MUIP_Pubscreenlist_UpdateSelection  { ULONG MethodID; }; /* private */
 
 /* Attributes */
 
@@ -3441,7 +2992,6 @@ extern char MUIC_Poplist[];
 /* Attributes */
 
 #define MUIA_Poplist_Array                  0x8042084c /* V8  i.. char **           */
-#define MUIA_Poplist_ListObject             0x80426211 /* V20 i.. Object *          */ /* private */
 
 
 
@@ -3457,10 +3007,6 @@ extern char MUIC_Popscreen[];
 
 /* Attributes */
 
-#define MUIA_Popscreen_ShowCurrent          0x804238a7 /* V11 i.. BOOL              */ /* private */
-#define MUIA_Popscreen_ShowDefault          0x804295ca /* V11 i.. BOOL              */ /* private */
-#define MUIA_Popscreen_ShowFrontmost        0x804261a3 /* V11 i.. BOOL              */ /* private */
-#define MUIA_Popscreen_ShowMUI              0x804298bf /* V11 i.. BOOL              */ /* private */
 
 
 
@@ -3519,12 +3065,6 @@ extern char MUIC_Applist[];
 
 /* Methods */
 
-#define MUIM_Applist_Find                   0x8042e50f /* private */ /* V11 */
-#define MUIM_Applist_Forward                0x8042615c /* private */ /* V11 */
-#define MUIM_Applist_GetHead                0x80420918 /* private */ /* V20 */
-struct  MUIP_Applist_Find                   { ULONG MethodID; ULONG tag; char *data; }; /* private */
-struct  MUIP_Applist_Forward                { ULONG MethodID; ULONG fwid; /* ... */ }; /* private */
-struct  MUIP_Applist_GetHead                { ULONG MethodID; }; /* private */
 
 
 /****************************************************************************/
@@ -3539,10 +3079,6 @@ extern char MUIC_Cclist[];
 
 /* Methods */
 
-#define MUIM_Cclist_AddMCC                  0x80421bc7 /* private */ /* V16 */
-#define MUIM_Cclist_Update                  0x8042f821 /* private */ /* V16 */
-struct  MUIP_Cclist_AddMCC                  { ULONG MethodID; struct MUI_CustomClass *mcc; }; /* private */
-struct  MUIP_Cclist_Update                  { ULONG MethodID; Object *list; }; /* private */
 
 
 /****************************************************************************/
@@ -3559,32 +3095,22 @@ extern char MUIC_Dataspace[];
 
 #define MUIM_Dataspace_Add                  0x80423366 /* V11 */
 #define MUIM_Dataspace_Clear                0x8042b6c9 /* V11 */
-#define MUIM_Dataspace_Compare              0x8042b393 /* private */ /* V11 */
-#define MUIM_Dataspace_Filter               0x8042e075 /* private */ /* V11 */
 #define MUIM_Dataspace_Find                 0x8042832c /* V11 */
-#define MUIM_Dataspace_Iterate              0x80421873 /* private */ /* V11 */
 #define MUIM_Dataspace_Merge                0x80423e2b /* V11 */
 #define MUIM_Dataspace_ReadIFF              0x80420dfb /* V11 */
 #define MUIM_Dataspace_Remove               0x8042dce1 /* V11 */
-#define MUIM_Dataspace_Trim                 0x8042032e /* private */ /* V11 */
 #define MUIM_Dataspace_WriteIFF             0x80425e8e /* V11 */
 struct  MUIP_Dataspace_Add                  { ULONG MethodID; APTR data; LONG len; ULONG id; };
 struct  MUIP_Dataspace_Clear                { ULONG MethodID; };
-struct  MUIP_Dataspace_Compare              { ULONG MethodID; Object *obj; }; /* private */
-struct  MUIP_Dataspace_Filter               { ULONG MethodID; ULONG id; }; /* private */
 struct  MUIP_Dataspace_Find                 { ULONG MethodID; ULONG id; };
-struct  MUIP_Dataspace_Iterate              { ULONG MethodID; struct DataspaceEntry **counter; }; /* private */
 struct  MUIP_Dataspace_Merge                { ULONG MethodID; Object *dataspace; };
 struct  MUIP_Dataspace_ReadIFF              { ULONG MethodID; struct IFFHandle *handle; };
 struct  MUIP_Dataspace_Remove               { ULONG MethodID; ULONG id; };
-struct  MUIP_Dataspace_Trim                 { ULONG MethodID; Object *dataspace; }; /* private */
 struct  MUIP_Dataspace_WriteIFF             { ULONG MethodID; struct IFFHandle *handle; ULONG type; ULONG id; };
 
 /* Attributes */
 
 #define MUIA_Dataspace_Pool                 0x80424cf9 /* V11 i.. APTR              */
-#define MUIA_Dataspace_UseExFilter          0x80424be8 /* V11 isg BOOL              */ /* private */
-#define MUIA_Dataspace_UseFilter            0x8042b377 /* V11 isg BOOL              */ /* private */
 
 
 
@@ -3600,19 +3126,9 @@ extern char MUIC_Configdata[];
 
 /* Methods */
 
-#define MUIM_Configdata_Check               0x80421162 /* private */ /* V18 */
-#define MUIM_Configdata_Get                 0x8042539a /* private */ /* V11 */
-#define MUIM_Configdata_Set                 0x80428b0e /* private */ /* V11 */
-struct  MUIP_Configdata_Check               { ULONG MethodID; ULONG id; }; /* private */
-struct  MUIP_Configdata_Get                 { ULONG MethodID; ULONG id; ULONG *storage; }; /* private */
-struct  MUIP_Configdata_Set                 { ULONG MethodID; ULONG id; ULONG value; }; /* private */
 
 /* Attributes */
 
-#define MUIA_Configdata_FilterID            0x80420444 /* V11 .s. LONG              */ /* private */
-#define MUIA_Configdata_FilterObject        0x8042801a /* V20 .s. Object *          */ /* private */
-#define MUIA_Configdata_InitGlobal          0x80425017 /* V11 i.. BOOL              */ /* private */
-#define MUIA_Configdata_MasterObject        0x8042e03a /* V11 isg Object *          */ /* private */
 
 
 
@@ -3639,16 +3155,9 @@ extern char MUIC_Audiocontrols[];
 
 /* Methods */
 
-#define MUIM_Audiocontrols_Update           0x80427301 /* V20 */
-struct  MUIP_Audiocontrols_Update           { ULONG MethodID; Object *what; };
 
 /* Attributes */
 
-#define MUIA_Audiocontrols_Balance          0x80421fff /* V20 isg LONG              */
-#define MUIA_Audiocontrols_Channel          0x80423e7a /* V20 isg LONG              */
-#define MUIA_Audiocontrols_Mute             0x80426b53 /* V20 isg BOOL              */
-#define MUIA_Audiocontrols_Title            0x8042a720 /* V20 isg LONG              */
-#define MUIA_Audiocontrols_Volume           0x8042015a /* V20 isg LONG              */
 
 
 
@@ -3664,7 +3173,6 @@ extern char MUIC_Audiomixer[];
 
 /* Attributes */
 
-#define MUIA_Audiomixer_DummyFooBar         0x80423076 /* V20 isg LONG              */
 
 
 
@@ -3680,35 +3188,9 @@ extern char MUIC_Popmenu[];
 
 /* Methods */
 
-#define MUIM_Popmenu_ConstructSubMenu       0xad00200d /* private */ /* V20 */
-#define MUIM_Popmenu_DestructSubMenu        0xad00200e /* private */ /* V20 */
-#define MUIM_Popmenu_GetNextResult          0xad002012 /* private */ /* V20 */
-#define MUIM_Popmenu_HandleIMsg             0xad00200f /* private */ /* V20 */
-#define MUIM_Popmenu_Open                   0xad002010 /* private */ /* V20 */
-#define MUIM_Popmenu_Select                 0xad002011 /* private */ /* V20 */
-struct  MUIP_Popmenu_ConstructSubMenu       { ULONG MethodID; struct MUIP_Popmenu_Item *entry; }; /* private */
-struct  MUIP_Popmenu_DestructSubMenu        { ULONG MethodID; }; /* private */
-struct  MUIP_Popmenu_GetNextResult          { ULONG MethodID; }; /* private */
-struct  MUIP_Popmenu_HandleIMsg             { ULONG MethodID; struct IntuiMessage *imsg; }; /* private */
-struct  MUIP_Popmenu_Open                   { ULONG MethodID; struct Window *window; }; /* private */
-struct  MUIP_Popmenu_Select                 { ULONG MethodID; struct MUIP_Popmenu_Item *entry; }; /* private */
 
 /* Attributes */
 
-#define MUIA_Popmenu_Active                 0xad002008 /* V20 .s. UWORD             */ /* private */
-#define MUIA_Popmenu_AppObj                 0xad00200c /* V20 .s. Object *          */ /* private */
-#define MUIA_Popmenu_Menu                   0xad002001 /* V20 .s. struct MUIP_Popmenu_Item * */ /* private */
-#define MUIA_Popmenu_MinWidth               0xad002002 /* V20 .s. UWORD             */ /* private */
-#define MUIA_Popmenu_MultiSelect            0xad002003 /* V20 .s. BOOL              */ /* private */
-#define MUIA_Popmenu_Parent                 0xad002004 /* V20 .s. Object *          */ /* private */
-#define MUIA_Popmenu_PosX                   0xad002005 /* V20 .s. UWORD             */ /* private */
-#define MUIA_Popmenu_PosX_Type              0xad002006 /* V20 .s. ULONG             */ /* private */
-#define MUIA_Popmenu_PosY                   0xad002007 /* V20 .s. UWORD             */ /* private */
-#define MUIA_Popmenu_PosY_Type              0xad002009 /* V20 .s. ULONG             */ /* private */
-#define MUIA_Popmenu_ShadowThickness        0xad002013 /* V20 .s. UWORD             */ /* private */
-#define MUIA_Popmenu_StayPressed            0xad00200a /* V20 .s. BOOL              */ /* private */
-#define MUIA_Popmenu_Stickyness             0xad002014 /* V20 .s. UWORD             */ /* private */
-#define MUIA_Popmenu_Type                   0xad00200b /* V20 .s. BOOL              */ /* private */
 
 #define MUIV_Popmenu_Active_First -3
 #define MUIV_Popmenu_Active_Last -2
@@ -3760,7 +3242,7 @@ struct  MUIP_Popmenu_Select                 { ULONG MethodID; struct MUIP_Popmen
 
 struct MUI_GlobalInfo
 {
-	Object *mgi_ConfigData; /* private4 */
+	ULONG priv0;
 	Object *mgi_ApplicationObject;
 
 	/* ... private data follows ... */
@@ -3774,10 +3256,10 @@ struct MUI_NotifyData
 	struct MUI_GlobalInfo *mnd_GlobalInfo;
 	ULONG                  mnd_UserData;
 	ULONG                  mnd_ObjectID;
-	struct MinList *       mnd_NotifyList; /* private4 */
-	Object *               mnd_Parent;     /* private4 */
-	char *                 mnd_HelpNode;   /* private4 */
-	ULONG                  mnd_HelpLine;   /* private4 */
+	ULONG priv1;
+	ULONG priv2;
+	ULONG priv3;
+	ULONG priv4;
 };
 
 
@@ -3808,8 +3290,8 @@ struct MUI_LayoutMsg
 	{
 		LONG Width;
 		LONG Height;
-		LONG OffsetX; /* private4 */
-		LONG OffsetY; /* private4 */
+		ULONG priv5;
+		ULONG priv6;
 	} lm_Layout;   /* size (and result) for MUILM_LAYOUT                       */
 };
 
@@ -3824,7 +3306,7 @@ struct MUI_LayoutMsg
 struct MUI_AreaData
 {
 	struct MUI_RenderInfo *mad_RenderInfo;     /* RenderInfo for this object */
-	struct MUI_Image      *mad_Background;     /* private4 */
+	ULONG priv7;
 	struct TextFont       *mad_Font;           /* Font */
 	struct MUI_MinMax      mad_MinMax;         /* min/max/default sizes */
 	struct IBox            mad_Box;            /* position and dimension */
@@ -3833,18 +3315,6 @@ struct MUI_AreaData
 	BYTE                   mad_subwidth;       /* frame & innerspacing add. width  */
 	BYTE                   mad_subheight;      /* frame & innerspacing add. height */
 	ULONG                  mad_Flags;          /* see definitions below */
-	WORD                   mad_HorizWeight;    /* private */
-	WORD                   mad_VertWeight;     /* private */
-	WORD                   mad_HorizDisappear; /* private */
-	WORD                   mad_VertDisappear;  /* private */
-	ULONG                  mad_IDCMPFlags;     /* private */
-	STRPTR                 mad_BackSpec;       /* private */
-	struct TextFont       *mad_FontSpec;       /* private */
-	CONST_STRPTR           mad_ShortHelp;      /* private */
-	LONG                   mad_FixWidth;       /* private */
-	LONG                   mad_FixHeight;      /* private */
-	LONG                   mad_VirtualTop;     /* private */
-	ULONG                  mad_Flags2;         /* private */
 
 	/* ... private data follows ... */
 };
@@ -3853,42 +3323,6 @@ struct MUI_AreaData
 
 #define MADF_DRAWOBJECT        (1<< 0) /* completely redraw yourself */
 #define MADF_DRAWUPDATE        (1<< 1) /* only update yourself */
-#define MADF_DRAWACTIVE        (1<< 2) /* private */
-#define MADF_DRAGGABLE         (1<< 3) /* private */
-#define MADF_CUSTOMBACKFILL    (1<< 4) /* private */
-#define MADF_CYCLECHAIN        (1<< 5) /* private */
-#define MADF_FIXMEANSMAX       (1<< 6) /* private */
-#define MADF_KNOWSACTIVE       (1<< 7) /* private */
-#define MADF_GROUP             (1<< 8) /* private */
-#define MADF_SHOWME            (1<< 9) /* private */
-#define MADF_PARTIAL           (1<<10) /* private */
-#define MADF_DRAWOUTER         (1<<11) /* private */
-#define MADF_DRAWCHILD         (1<<12) /* private */
-#define MADF_DROPABLE          (1<<13) /* private */
-#define MADF_VISIBLE           (1<<14) /* private */
-#define MADF_DISABLED          (1<<15) /* private */
-#define MADF_SHOWSELSTATE      (1<<16) /* private */
-#define MADF_PRESSED           (1<<17) /* private */
-#define MADF_SELECTED          (1<<18) /* private */
-#define MADF_PAGETITLES        (1<<19) /* private */
-#define MADF_FILLAREA          (1<<20) /* private */
-#define MADF_FIXWIDTHTXT       (1<<21) /* private */
-#define MADF_FIXHEIGHTTXT      (1<<22) /* private */
-#define MADF_INNERLEFTGIVEN    (1<<23) /* private */
-#define MADF_INNERTOPGIVEN     (1<<24) /* private */
-#define MADF_INNERRIGHTGIVEN   (1<<25) /* private */
-#define MADF_INNERBOTTOMGIVEN  (1<<26) /* private */
-#define MADF_FRAMEPHANTOMHORIZ (1<<27) /* private */
-#define MADF_DRAWDROPBOX       (1<<28) /* private */
-#define MADF_INVIRTUAL         (1<<29) /* private */
-#define MADF_VIRTUAL           (1<<30) /* private */
-#define MADF_FRAMEOFFSET       (1<<31) /* private */
-
-#define MADF_DRAWALL    (MADF_DRAWACTIVE | MADF_DRAWOUTER | MADF_DRAWOBJECT) /* private */
-#define MADF_DRAWMASK   (MADF_DRAWOUTER | MADF_DRAWOBJECT | MADF_DRAWCHILD | MADF_DRAWUPDATE | MADF_DRAWACTIVE) /* private */
-
-#define MADF2_CUSTOMFONT (1<< 0) /* private */
-
 
 /* MUI's draw pens */
 
@@ -3905,65 +3339,23 @@ struct MUI_AreaData
 
 /* Mask for pens from MUI_ObtainPen() */
 
-#ifdef MBX /* private */
-#define MUIPEN_MASK 0xffffffff /* private */
-#define MUIPEN(pen) (pen) /* private */
-#else /* private */
 #define MUIPEN_MASK 0x0000ffff
 #define MUIPEN(pen) ((pen) & MUIPEN_MASK)
-#endif /* private */
 
 /* Information on display environment */
 
-#define MAXCLIPCOUNT 10 /* private */
 struct MUI_RenderInfo
 {
 	Object          *mri_WindowObject;  /* valid between MUIM_Setup/MUIM_Cleanup */
 
 	struct Screen   *mri_Screen;        /* valid between MUIM_Setup/MUIM_Cleanup */
 	struct DrawInfo *mri_DrawInfo;      /* valid between MUIM_Setup/MUIM_Cleanup */
-	#ifdef MBX /* private */
-	LONG *mri_Pens; /* private */
-	#else /* private */
 	UWORD           *mri_Pens;          /* valid between MUIM_Setup/MUIM_Cleanup */
-	#endif /* private */
 	struct Window   *mri_Window;        /* valid between MUIM_Show/MUIM_Hide */
 	struct RastPort *mri_RastPort;      /* valid between MUIM_Show/MUIM_Hide */
 
 	ULONG            mri_Flags;         /* valid between MUIM_Setup/MUIM_Cleanup */
 
-	struct MUI_ScreenInfo    *mri_ScreenInfo;           /* private */
-	struct TextFont          *mri_ListFont;             /* private */
-	struct TextFont          *mri_NormalFont;           /* private */
-	struct TextFont          *mri_TinyFont;             /* private */
-	struct TextFont          *mri_FixedFont;            /* private */
-	struct TextFont          *mri_TitleFont;            /* private */
-	struct TextFont          *mri_BigFont;              /* private */
-	struct TextFont          *mri_ButtonFont;           /* private */
-	struct TextFont          *mri_SliderFont;           /* private */
-	APTR                      mri_SkipBackground;       /* private */
-	LONG                      mri_ClipCount;            /* private */
-	Object                   *mri_ConfigData;           /* private */
-	Object                   *mri_ActiveObject;         /* private */
-	LONG                      mri_ActiveObjectPen;      /* private */
-	struct Region            *mri_ClipStack[MAXCLIPCOUNT]; /* private */
-	struct TextFont          *mri_GaugeFont;            /* private */
-	#ifdef USE_CGXHOOKS                   /* private */
-	struct CGXHook *mri_ColorImposeHook;  /* private */
-	struct CGXHook *mri_BitMapImposeHook; /* private */
-	struct CGXHook *mri_BalanceHook;      /* private */
-	#endif                                /* private */
-	struct TextFont          *mri_MenudisplayFont;            /* private */
-	#ifdef MBX /* private */
-	LONG mri_PenArray[MPEN_COUNT]; /* private */
-	#else /* private */
-	WORD mri_PenArray[MPEN_COUNT]; /* private */
-	#endif /* private */
-	struct RastPort          *mri_FakeRP;               /* private */
-	#ifdef USE_NEWREGIONS /* private */
-	RegionHeap_p mri_RegionHeap; /* private */
-	struct Rectangle mri_RefreshRect; /* private */
-	#endif /* private */
 	/* ... private data follows ... */
 };
 
@@ -3998,10 +3390,6 @@ struct MUI_RenderInfo
 ** old-style planar display.
 */
 #define MUIMRI_PLANAR (1<<4)
-
-#define MUIMRI_RESIZEREDRAW (1<<5) /* private */
-#define MUIMRI_CLONE (1<<6) /* private */
-
 
 /* the following macros can be used to get pointers to an objects
    GlobalInfo and RenderInfo structures. */
@@ -4085,7 +3473,6 @@ enum
 #ifndef MUI_NOSHORTCUTS
 
 #define _app(obj)         (muiGlobalInfo(obj)->mgi_ApplicationObject) /* valid between MUIM_Setup/Cleanup */
-#define _cfg(obj)         (muiGlobalInfo(obj)->mgi_ConfigData)        /* private */
 #define _win(obj)         (muiRenderInfo(obj)->mri_WindowObject)      /* valid between MUIM_Setup/Cleanup */
 #define _dri(obj)         (muiRenderInfo(obj)->mri_DrawInfo)          /* valid between MUIM_Setup/Cleanup */
 #define _screen(obj)      (muiRenderInfo(obj)->mri_Screen)            /* valid between MUIM_Setup/Cleanup */
@@ -4102,22 +3489,6 @@ enum
 #define _addtop(obj)      (muiAreaData(obj)->mad_addtop   )           /* valid during MUIM_Draw */
 #define _subwidth(obj)    (muiAreaData(obj)->mad_subwidth )           /* valid during MUIM_Draw */
 #define _subheight(obj)   (muiAreaData(obj)->mad_subheight)           /* valid during MUIM_Draw */
-#define _fakerp(obj)      (&muiRenderInfo(obj)->mri_FakeRP) /* private */
-#define _size(obj,d)      (((struct MUI_Size *)&((muiAreaData(obj)->mad_Box.Width)))->size[d]) /* private */
-#define _ltpos(obj,d)     (((struct MUI_Pos  *)&((muiAreaData(obj)->mad_Box.Left )))->pos[d] ) /* private */
-#define _ltadd(obj,d)     (((struct MUI_Add  *)&((muiAreaData(obj)->mad_addleft  )))->add[d] ) /* private */
-#define _whsub(obj,d)     (((struct MUI_Add  *)&((muiAreaData(obj)->mad_subwidth )))->add[d] ) /* private */
-#define _msize(obj,d)     (_size(obj,d)-_whsub(obj,d))                                         /* private */
-#define _mltpos(obj,d)    (_ltpos(obj,d)+_ltadd(obj,d))                                        /* private */
-#define _mrbpos(obj,d)    (_mltpos(obj,d)+_msize(obj,d)-1)                                     /* private */
-#define _vleft(obj)       (_left(obj))                       /* private */
-#define _vtop(obj)        (muiAreaData(obj)->mad_VirtualTop) /* private */
-#define _vright(obj)      (_vleft(obj)+_width(obj)-1)        /* private */
-#define _vbottom(obj)     (_vtop(obj)+_height(obj)-1)        /* private */
-#define _vmleft(obj)      (_vleft(obj)+_addleft(obj))        /* private */
-#define _vmtop(obj)       (_vtop(obj)+_addtop(obj))          /* private */
-#define _vmright(obj)     (_vmleft(obj)+_mwidth(obj)-1)      /* private */
-#define _vmbottom(obj)    (_vmtop(obj)+_mheight(obj)-1)      /* private */
 #define _mleft(obj)       (_left(obj)+_addleft(obj))                  /* valid during MUIM_Draw */
 #define _mtop(obj)        (_top(obj)+_addtop(obj))                    /* valid during MUIM_Draw */
 #define _mwidth(obj)      (_width(obj)-_subwidth(obj))                /* valid during MUIM_Draw */
@@ -4131,45 +3502,9 @@ enum
 #define _maxheight(obj)   (muiAreaData(obj)->mad_MinMax.MaxHeight)    /* valid between MUIM_Show/Hide */
 #define _defwidth(obj)    (muiAreaData(obj)->mad_MinMax.DefWidth)     /* valid between MUIM_Show/Hide */
 #define _defheight(obj)   (muiAreaData(obj)->mad_MinMax.DefHeight)    /* valid between MUIM_Show/Hide */
-#define _minmax(obj)      (&(muiAreaData(obj)->mad_MinMax)) /* private */
-#define _minsize(obj,dim) (((struct MUI_MinMaxArray *)&(muiAreaData(obj)->mad_MinMax))->MinSize[dim]) /* private */
-#define _maxsize(obj,dim) (((struct MUI_MinMaxArray *)&(muiAreaData(obj)->mad_MinMax))->MaxSize[dim]) /* private */
-#define _defsize(obj,dim) (((struct MUI_MinMaxArray *)&(muiAreaData(obj)->mad_MinMax))->DefSize[dim]) /* private */
-#define _hweight(obj)     (muiAreaData(obj)->mad_HorizWeight) /* private */
-#define _vweight(obj)     (muiAreaData(obj)->mad_VertWeight) /* private */
-#define _weight(obj,dim)  (((struct MUI_Weight *)&((muiAreaData(obj)->mad_HorizWeight)))->weight[dim]) /* private */
-#define _idcmpflags(obj)  (muiAreaData(obj)->mad_IDCMPFlags) /* private */
-#define _gidcmpflags(obj) (_groupdata(obj)->gidcmp) /* private */
-#define _background(obj)  (muiAreaData(obj)->mad_Background) /* private */
-#define _backspec(obj)    (muiAreaData(obj)->mad_BackSpec) /* private */
-#define _fontspec(obj)    (muiAreaData(obj)->mad_FontSpec) /* private */
-#define _hdis(obj)        (muiAreaData(obj)->mad_HorizDisappear) /* private */
-#define _vdis(obj)        (muiAreaData(obj)->mad_VertDisappear) /* private */
-#define _shorthelp(obj)   (muiAreaData(obj)->mad_ShortHelp) /* private */
-#define _parent(obj)      (muiNotifyData(obj)->mnd_Parent) /* private */
-#define _helpnode(obj)    (muiNotifyData(obj)->mnd_HelpNode) /* private */
-#define _helpline(obj)    (muiNotifyData(obj)->mnd_HelpLine) /* private */
 #define _flags(obj)       (muiAreaData(obj)->mad_Flags)
-#define _controlchar(obj) (((struct AreaData *)muiAreaData(obj))->ControlChar) /* private */
-#define _contextmenu(obj) (((struct AreaData *)muiAreaData(obj))->ContextMenu) /* private */
-#define _isvisible(obj)   (_flags(obj) & MADF_VISIBLE) /* private */
-#define _isdisabled(obj)  (_flags(obj) & MADF_DISABLED) /* private */
-#define _isinvirtual(obj) (_flags(obj) & MADF_INVIRTUAL) /* private */
-#define _isvirtual(obj)   (_flags(obj) & MADF_VIRTUAL) /* private */
-#define _isselected(obj)  (_flags(obj) & MADF_SELECTED) /* private */
-#define _isgroup(obj)     (_flags(obj) & MADF_GROUP) /* private */
-#define _isdraggable(obj) (_flags(obj) & MADF_DRAGGABLE) /* private */
-#define _isdropable(obj)  (_flags(obj) & MADF_DROPABLE) /* private */
-#define _ispartial(obj)   (_flags(obj) & MADF_PARTIAL) /* private */
-#define _needslayout(obj) (_idcmpflags(obj) & IDCMP_LONELYMESSAGE) /* private */
 
 #endif
-
-#define _get(x,f)        ((x) & (f)) /* private */
-#define _set(x,f)        (x)|=(f) /* private */
-#define _clr(x,f)        (x)&=~(f) /* private */
-#define _setclr(x,b,f)   if (b) _set(x,f); else _clr(x,f) /* private */
-
 
 /* MUI_CustomClass returned by MUI_CreateCustomClass() */
 
@@ -4185,15 +3520,9 @@ struct MUI_CustomClass
 	struct IClass *mcc_Super;           /* pointer to super class   */
 	struct IClass *mcc_Class;           /* pointer to the new class */
 
-	#ifdef __MORPHOS__                      /* private */
-	struct EmulLibEntry mcc_GateDispatcher; /* private */
-	#endif                                  /* private */
-
 	/* ... private data follows ... */
 };
 
-
-#define MUI_GOACTIVE_KEYFOCUS (1<<0) /* private */
 
 #if defined(__PPC__)
   #if defined(__GNUC__)
@@ -4204,3 +3533,5 @@ struct MUI_CustomClass
 #endif
 
 #endif /* MUI_H */
+
+#endif /* __AROS__ */
