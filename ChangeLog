@@ -7,6 +7,11 @@ $URL$
 
 2010-04-12 Jens Langner <Jens.Langner@light-speed.de>
 
+  * mcc/SetBlock.c: reworked the whole text boundary checking before the SetBlock
+    operations because it was largely broken and potentially caused crashed in case
+    a developer requested operations outside avaiable text areas. In addition two
+    new special values MUIV_TextEditor_SetBlock_Min/Max allow now to specify the
+    start/stop values for minimum and maximum.
   * mcc/StyleOperators.c: fixed a minor compiler warning where the in-place
     invertation via '~' caused a compiler warning with GCC 4.4+
 
