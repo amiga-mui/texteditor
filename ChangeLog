@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-04-17 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcc/EditorStuff.c, mcc/UndoFunctions.c: removed the "highlight" warnings by
+    implementing the undo/redo of highlighted lines as well. However, Does this
+    really change something? And what about colored text? How can be undo/redo
+    colored text as well?
+
 2010-04-12 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/misc: added 32bit truecolor prefs image done by Martin 'Mason' Merz.

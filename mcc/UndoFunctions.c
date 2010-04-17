@@ -98,7 +98,7 @@ BOOL Undo(struct InstData *data)
         action->del.style = GetStyle(data->CPos_X, data->actualline);
         action->del.flow = data->actualline->line.Flow;
         action->del.separator = data->actualline->line.Separator;
-        #warning is buffer->del.highlight missing here?
+        action->del.highlight = data->actualline->line.Highlight;
         RemoveChars(data, data->CPos_X, data->actualline, 1);
       }
       break;
@@ -440,7 +440,7 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
         action->del.style = GetStyle(data->CPos_X, data->actualline);
         action->del.flow = data->actualline->line.Flow;
         action->del.separator = data->actualline->line.Separator;
-        #warning is buffer->del.highlight missing here?
+        action->del.highlight = data->actualline->line.Highlight;
       }
       break;
 
