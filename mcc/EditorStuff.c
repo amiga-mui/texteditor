@@ -1231,7 +1231,7 @@ static void UpdateChange(struct InstData *data, LONG x, struct line_node *line, 
       AddStyleToLine(data, x, line, 1, isFlagSet(style, UNDERLINE) ? UNDERLINE : ~UNDERLINE);
       line->line.Flow = buffer->del.flow;
       line->line.Separator = buffer->del.separator;
-      #warning is buffer->del.highlight missing here?
+      line->line.Highlight = buffer->del.highlight;
     }
   }
   else
