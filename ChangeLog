@@ -9,6 +9,7 @@ $URL$
 
   * Debug.c: added new debug flags DBF_IMPORT and DBF_EXPORT to debug the import
     and export hook functions.
+  * ImportHook.c: added some debug messages to the plain text import hook.
 
 2010-04-17 Jens Langner <Jens.Langner@light-speed.de>
 
