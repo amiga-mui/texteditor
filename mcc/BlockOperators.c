@@ -110,6 +110,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
           struct LineStyle *styles = emsg.Styles;
           struct LineStyle *oldstyles = startline->line.Styles;
 
+          // apply any active style
           if(isFlagSet(startstyle, BOLD))
           {
             styles->column = 1;
@@ -129,9 +130,11 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
             styles++;
           }
 
+          // skip all styles until the block starts
           while(oldstyles->column <= startx)
             oldstyles++;
 
+          // copy all styles until the end of the block
           while(oldstyles->column != EOS)
           {
             styles->column = oldstyles->column - startx;
@@ -140,6 +143,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
             oldstyles++;
           }
 
+          // terminate the style array
           styles->column = EOS;
         }
       }
@@ -148,20 +152,26 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
 
       if(startline->line.Colors != NULL && startline->line.Colors[0].column != EOC)
       {
-        // allocate space for all old colors and 2 new colors
+        // allocate space for all old colors and up to 2 new colors
         if((emsg.Colors = (struct LineColor *)AllocVecPooled(data->mypool, (startline->line.usedColors+2) * sizeof(struct LineColor))) != NULL)
         {
           UWORD startcolor = (startx != 0) ? GetColor(startx, startline) : 0;
           struct LineColor *colors = emsg.Colors;
           struct LineColor *oldcolors = startline->line.Colors;
 
-          colors->column = 1;
-          colors->color = startcolor;
-          colors++;
+          // apply the active color
+          if(startcolor != 0)
+          {
+            colors->column = 1;
+            colors->color = startcolor;
+            colors++;
+          }
 
+          // skip all colors until the block starts
           while(oldcolors->column <= startx)
             oldcolors++;
 
+          // copy all colors until the end of the block
           while(oldcolors->column != EOC)
           {
             colors->column = oldcolors->column - startx;
@@ -170,6 +180,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
             oldcolors++;
           }
 
+          // terminate the color array
           colors->column = EOC;
         }
       }
@@ -226,6 +237,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
           struct LineStyle *styles = emsg.Styles;
           struct LineStyle *oldstyles = stopline->line.Styles;
 
+          // copy all styles until the end of the block
           while(oldstyles->column <= stopx)
           {
             styles->column = oldstyles->column;
@@ -234,6 +246,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
             oldstyles++;
           }
 
+          // unapply any still active styles
           if(isFlagSet(stopstyle, BOLD))
           {
             styles->column = stopx+1;
@@ -253,6 +266,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
             styles++;
           }
 
+          // terminate the style array
           styles->column = EOS;
         }
       }
@@ -268,6 +282,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
           struct LineColor *colors = emsg.Colors;
           struct LineColor *oldcolors = stopline->line.Colors;
 
+          // copy all colors until the end of the block
           while(oldcolors->column <= stopx)
           {
             colors->column = oldcolors->column;
@@ -276,10 +291,15 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
             oldcolors++;
           }
 
-          colors->column = stopx+1;
-          colors->color = stopcolor;
-          colors++;
+          // unapply the active color
+          if(stopcolor != 0)
+          {
+            colors->column = stopx+1;
+            colors->color = 0;
+            colors++;
+          }
 
+          // terminate the color array
           colors->column = EOC;
         }
       }
@@ -327,6 +347,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
           struct LineStyle *styles = emsg.Styles;
           struct LineStyle *oldstyles = startline->line.Styles;
 
+          // apply any active style
           if(isFlagSet(startstyle, BOLD))
           {
             styles->column = 1;
@@ -346,9 +367,11 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
             styles++;
           }
 
+          // skip all styles until the block starts
           while(oldstyles->column <= startx)
             oldstyles++;
 
+          // copy all styles until the end of the block
           while(oldstyles->column <= stopx)
           {
             styles->column = oldstyles->column - startx;
@@ -357,6 +380,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
             oldstyles++;
           }
 
+          // unapply any still active styles
           if(isFlagSet(stopstyle, BOLD))
           {
             styles->column = stopx-startx+1;
@@ -376,6 +400,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
             styles++;
           }
 
+          // terminate the style array
           styles->column = EOS;
         }
       }
@@ -384,7 +409,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
 
       if(startline->line.Colors != NULL && startline->line.Colors[0].column != EOC)
       {
-        // allocate space for all old colors and 3 new colors
+        // allocate space for all old colors and up to 3 new colors
         if((emsg.Colors = (struct LineColor *)AllocVecPooled(data->mypool, (startline->line.usedColors+3) * sizeof(struct LineColor))) != NULL)
         {
           UWORD startcolor = (startx != 0) ? GetColor(startx, startline) : 0;
@@ -392,13 +417,19 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
           struct LineColor *colors = emsg.Colors;
           struct LineColor *oldcolors = startline->line.Colors;
 
-          colors->column = 1;
-          colors->color = startcolor;
-          colors++;
+          // apply the active color
+          if(startcolor != 0)
+          {
+            colors->column = 1;
+            colors->color = startcolor;
+            colors++;
+          }
 
+          // skip all colors until the block starts
           while(oldcolors->column <= startx)
             oldcolors++;
 
+          // copy all colors until the end of the block
           while(oldcolors->column <= stopx)
           {
             colors->column = oldcolors->column - startx;
@@ -407,10 +438,15 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
             oldcolors++;
           }
 
-          colors->column = stopx-startx+1;
-          colors->color = stopcolor;
-          colors++;
+          // unapply the active color
+          if(stopcolor != 0)
+          {
+            colors->column = stopx-startx+1;
+            colors->color = 0;
+            colors++;
+          }
 
+          // terminate the color array
           colors->column = EOC;
         }
       }
