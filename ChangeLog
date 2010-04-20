@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-04-20 Thore Böckelmann <tboeckel@gmx.de>
+
+  * Debug.c: added new debug flags DBF_IMPORT and DBF_EXPORT to debug the import
+    and export hook functions.
+
 2010-04-17 Jens Langner <Jens.Langner@light-speed.de>
 
   * mcc/EditorStuff.c, mcc/UndoFunctions.c: removed the "highlight" warnings by
