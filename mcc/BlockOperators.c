@@ -103,11 +103,10 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
     {
       if(startline->line.Styles != NULL && startline->line.Styles[0].column != EOS)
       {
-        UWORD startstyle = GetStyle(startx, startline);
-
         // allocate space for all old styles and up to 4 new styles
         if((emsg.Styles = (struct LineStyle *)AllocVecPooled(data->mypool, (startline->line.usedStyles+4) * sizeof(struct LineStyle))) != NULL)
         {
+          UWORD startstyle = GetStyle(startx, startline);
           struct LineStyle *styles = emsg.Styles;
           struct LineStyle *oldstyles = startline->line.Styles;
 
@@ -320,8 +319,8 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
     {
       if(startline->line.Styles != NULL && startline->line.Styles->column != EOS)
       {
-        // allocate space for all old styles and up to 4 new styles
-        if((emsg.Styles = (struct LineStyle *)AllocVecPooled(data->mypool, (startline->line.usedStyles+4) * sizeof(struct LineStyle))) != NULL)
+        // allocate space for all old styles and up to 7 new styles
+        if((emsg.Styles = (struct LineStyle *)AllocVecPooled(data->mypool, (startline->line.usedStyles+7) * sizeof(struct LineStyle))) != NULL)
         {
           UWORD startstyle = GetStyle(startx, startline);
           UWORD stopstyle = GetStyle(stopx, stopline);
