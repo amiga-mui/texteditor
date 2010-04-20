@@ -18,6 +18,7 @@ $URL$
   * ImportHook.c: optimized the import hook a bit to only apply real style
     changes instead of every style operation. Furthermore we ensure that all
     applied styles are unapplied at the end of the imported text.
+  * BlockOperators.c: all applied colors changes are unapplied correctly.
 
 2010-04-17 Jens Langner <Jens.Langner@light-speed.de>
 
