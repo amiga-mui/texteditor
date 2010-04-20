@@ -31,7 +31,7 @@
 #include "Debug.h"
 
 /// FreeUndoStep()
-// free the memory occupated an undo step
+// free the memory occupated by an undo step
 static void FreeUndoStep(struct InstData *data, struct UserAction *step)
 {
   ENTER();
@@ -41,6 +41,7 @@ static void FreeUndoStep(struct InstData *data, struct UserAction *step)
     if(step->clip != NULL)
     {
       FreeVecPooled(data->mypool, step->clip);
+      // clear the pointer
       step->clip = NULL;
     }
   }
@@ -298,6 +299,8 @@ BOOL Redo(struct InstData *data)
         InsertText(data, action->clip, TRUE);
         data->ImportHook = oldhook;
         FreeVecPooled(data->mypool, action->clip);
+        // clear the pointer
+        action->clip = NULL;
 
         action->blk.x = data->CPos_X;
         action->blk.y = LineNr(data, data->actualline);
