@@ -30,3 +30,12 @@ Items that ought to be implemented in future TextEditor.mcc releases:
 * Change all import/export hooks to use a flex template whereever possible.
 * Inline image display
 * Fix background rendering when certain types of gradients are used.
+
+
+Items that ought to be fixed in future TextEditor.mcc releases:
+--------------------------------------------------------------------
+* Pasting a colored text clip and then repeatedly undoing and redoing this
+  stop will let the line's color information array grow without representing
+  any real color changes. This must be something when merging two lines after
+  inserting the text in the redo operation. Styles are correctly applied and
+  unapplied without duplicate entries.
