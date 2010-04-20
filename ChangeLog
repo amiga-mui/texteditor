@@ -13,6 +13,8 @@ $URL$
   * BlockOperators.c: added the missing color handling when deleting a marked
     block and restoring it afterwards using the Undo function. I hope I didn't
     miss any case. This stuff is still far from being easy to understand.
+  * UndoFunctions.c: a pointer was not cleared after a FreeVecPooled() call and
+    might have been freed a second time and thus causing crashes.
 
 2010-04-17 Jens Langner <Jens.Langner@light-speed.de>
 
