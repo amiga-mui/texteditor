@@ -127,6 +127,8 @@ void SetupDebug(void)
       { "style",     DBF_STYLE     },
       { "spell",     DBF_SPELL     },
       { "block",     DBF_BLOCK     },
+      { "import",    DBF_IMPORT    },
+      { "export",    DBF_IMPORT    },
       { "all",       DBF_ALL       },
       { NULL,        0             }
     };
