@@ -331,31 +331,40 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
           {
             case 'b':
             {
-              newStyle.column = dest - dest_start + 1;
-              newStyle.style = BOLD;
-              D(DBF_IMPORT, "adding bold style at column %ld", newStyle.column);
-              AddToGrow(&style_grow, &newStyle);
-              setFlag(state, BOLD);
+              if(isFlagClear(state, BOLD))
+              {
+                newStyle.column = dest - dest_start + 1;
+                newStyle.style = BOLD;
+                D(DBF_IMPORT, "adding bold style at column %ld", newStyle.column);
+                AddToGrow(&style_grow, &newStyle);
+                setFlag(state, BOLD);
+              }
             }
             break;
 
             case 'i':
             {
-              newStyle.column = dest - dest_start + 1;
-              newStyle.style = ITALIC;
-              D(DBF_IMPORT, "adding italic style at column %ld", newStyle.column);
-              AddToGrow(&style_grow, &newStyle);
-              setFlag(state, ITALIC);
+              if(isFlagClear(state, ITALIC))
+              {
+                newStyle.column = dest - dest_start + 1;
+                newStyle.style = ITALIC;
+                D(DBF_IMPORT, "adding italic style at column %ld", newStyle.column);
+                AddToGrow(&style_grow, &newStyle);
+                setFlag(state, ITALIC);
+              }
             }
             break;
 
             case 'u':
             {
-              newStyle.column = dest - dest_start + 1;
-              newStyle.style = UNDERLINE;
-              D(DBF_IMPORT, "adding underline style at column %ld", newStyle.column);
-              AddToGrow(&style_grow, &newStyle);
-              setFlag(state, UNDERLINE);
+              if(isFlagClear(state, UNDERLINE))
+              {
+                newStyle.column = dest - dest_start + 1;
+                newStyle.style = UNDERLINE;
+                D(DBF_IMPORT, "adding underline style at column %ld", newStyle.column);
+                AddToGrow(&style_grow, &newStyle);
+                setFlag(state, UNDERLINE);
+              }
             }
             break;
 
@@ -499,6 +508,15 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
       // terminate the color array, but only if there are any colors at all
       if(color_grow.itemCount > 0)
       {
+        // ensure that we terminate the clip with color 0
+        if(isFlagSet(state, COLOURED))
+        {
+          D(DBF_IMPORT, "removing color as termination");
+          newColor.column = strlen(line->Contents)+1;
+          newColor.color = 0;
+          AddToGrow(&color_grow, &newColor);
+        }
+
         newColor.column = EOC;
         newColor.color = 0;
         AddToGrow(&color_grow, &newColor);
@@ -512,6 +530,31 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
       // terminate the style array, but only if there are any styles at all
       if(style_grow.itemCount > 0)
       {
+        UWORD lastColumn = strlen(line->Contents)+1;
+
+        // ensure that we terminate the clip with plain style
+        if(isFlagSet(state, BOLD))
+        {
+          D(DBF_IMPORT, "removing bold style as termination");
+          newStyle.column = lastColumn;
+          newStyle.style = ~BOLD;
+          AddToGrow(&style_grow, &newStyle);
+        }
+        if(isFlagSet(state, ITALIC))
+        {
+          D(DBF_IMPORT, "removing italic style as termination");
+          newStyle.column = lastColumn;
+          newStyle.style = ~ITALIC;
+          AddToGrow(&style_grow, &newStyle);
+        }
+        if(isFlagSet(state, UNDERLINE))
+        {
+          D(DBF_IMPORT, "removing underline style as termination");
+          newStyle.column = lastColumn;
+          newStyle.style = ~UNDERLINE;
+          AddToGrow(&style_grow, &newStyle);
+        }
+
         newStyle.column = EOS;
         newStyle.style = 0;
         AddToGrow(&style_grow, &newStyle);
