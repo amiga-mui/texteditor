@@ -10,6 +10,9 @@ $URL$
   * Debug.c: added new debug flags DBF_IMPORT and DBF_EXPORT to debug the import
     and export hook functions.
   * ImportHook.c: added some debug messages to the plain text import hook.
+  * BlockOperators.c: added the missing color handling when deleting a marked
+    block and restoring it afterwards using the Undo function. I hope I didn't
+    miss any case. This stuff is still far from being easy to understand.
 
 2010-04-17 Jens Langner <Jens.Langner@light-speed.de>
 
