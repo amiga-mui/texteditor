@@ -154,6 +154,24 @@ static char *FindEOL(char *src, int *tabs_ptr)
 }
 
 ///
+/// InitGrow()
+/************************************************************************
+ Initialize a grow structure
+*************************************************************************/
+static void InitGrow(struct grow *grow, APTR pool, int itemSize)
+{
+  ENTER();
+
+  grow->array = NULL;
+  grow->itemSize = itemSize;
+  grow->itemCount = 0;
+  grow->maxItemCount = 0;
+  grow->pool = pool;
+
+  LEAVE();
+}
+
+///
 /// AddToGrow()
 /************************************************************************
  Adds two new values to the given grow. This function guarantees
@@ -287,14 +305,8 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
       struct LineStyle newStyle;
       struct LineColor newColor;
 
-      memset(&color_grow,0,sizeof(color_grow));
-      memset(&style_grow,0,sizeof(style_grow));
-
-      color_grow.pool = msg->PoolHandle;
-      color_grow.itemSize = sizeof(newColor);
-
-      style_grow.pool = msg->PoolHandle;
-      style_grow.itemSize = sizeof(newStyle);
+      InitGrow(&style_grow, msg->PoolHandle, sizeof(newStyle));
+      InitGrow(&color_grow, msg->PoolHandle, sizeof(newColor));
 
       // remember the allocation size
       line->allocatedContents = allocatedContents;
@@ -321,6 +333,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
             {
               newStyle.column = dest - dest_start + 1;
               newStyle.style = BOLD;
+              D(DBF_IMPORT, "adding bold style at column %ld", newStyle.column);
               AddToGrow(&style_grow, &newStyle);
               setFlag(state, BOLD);
             }
@@ -330,6 +343,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
             {
               newStyle.column = dest - dest_start + 1;
               newStyle.style = ITALIC;
+              D(DBF_IMPORT, "adding italic style at column %ld", newStyle.column);
               AddToGrow(&style_grow, &newStyle);
               setFlag(state, ITALIC);
             }
@@ -339,6 +353,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
             {
               newStyle.column = dest - dest_start + 1;
               newStyle.style = UNDERLINE;
+              D(DBF_IMPORT, "adding underline style at column %ld", newStyle.column);
               AddToGrow(&style_grow, &newStyle);
               setFlag(state, UNDERLINE);
             }
@@ -356,6 +371,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
               {
                 newStyle.column = dest - dest_start + 1;
                 newStyle.style = ~BOLD;
+                D(DBF_IMPORT, "removing bold style at column %ld", newStyle.column);
                 AddToGrow(&style_grow, &newStyle);
                 clearFlag(state, BOLD);
               }
@@ -363,6 +379,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
               {
                 newStyle.column = dest - dest_start + 1;
                 newStyle.style = ~ITALIC;
+                D(DBF_IMPORT, "removing italic style at column %ld", newStyle.column);
                 AddToGrow(&style_grow, &newStyle);
                 clearFlag(state, ITALIC);
               }
@@ -370,6 +387,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
               {
                 newStyle.column = dest - dest_start + 1;
                 newStyle.style = ~UNDERLINE;
+                D(DBF_IMPORT, "removing italic style at column %ld", newStyle.column);
                 AddToGrow(&style_grow, &newStyle);
                 clearFlag(state, UNDERLINE);
               }
@@ -379,18 +397,21 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
             case 'l':
             {
               line->Flow = MUIV_TextEditor_Flow_Left;
+              D(DBF_IMPORT, "left aligned text flow");
             }
             break;
 
             case 'c':
             {
               line->Flow = MUIV_TextEditor_Flow_Center;
+              D(DBF_IMPORT, "centered flow");
             }
             break;
 
             case 'r':
             {
               line->Flow = MUIV_TextEditor_Flow_Right;
+              D(DBF_IMPORT, "right aligned text flow");
             }
             break;
 
@@ -408,6 +429,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
                   {
                     newColor.column = dest - dest_start + 1;
                     newColor.color = pen;
+                    D(DBF_IMPORT, "adding color %ld at column %ld", newColor.color, newColor.column);
                     AddToGrow(&color_grow, &newColor);
 
                     if(pen == 0)
@@ -482,6 +504,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
         AddToGrow(&color_grow, &newColor);
       }
 
+      D(DBF_IMPORT, "added %ld color sections", color_grow.itemCount);
       line->Colors = (struct LineColor *)color_grow.array;
       line->allocatedColors = color_grow.maxItemCount;
       line->usedColors = color_grow.itemCount;
@@ -494,6 +517,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
         AddToGrow(&style_grow, &newStyle);
       }
 
+      D(DBF_IMPORT, "added %ld style sections", style_grow.itemCount);
       line->Styles = (struct LineStyle *)style_grow.array;
       line->allocatedStyles = style_grow.maxItemCount;
       line->usedStyles = style_grow.itemCount;
@@ -586,14 +610,8 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
       struct LineStyle newStyle;
       struct LineColor newColor;
 
-      memset(&color_grow,0,sizeof(color_grow));
-      memset(&style_grow,0,sizeof(style_grow));
-
-      color_grow.pool = msg->PoolHandle;
-      color_grow.itemSize = sizeof(newColor);
-
-      style_grow.pool = msg->PoolHandle;
-      style_grow.itemSize = sizeof(newStyle);
+      InitGrow(&style_grow, msg->PoolHandle, sizeof(newStyle));
+      InitGrow(&color_grow, msg->PoolHandle, sizeof(newColor));
 
       // remember the allocation size
       line->allocatedContents = allocatedContents;
