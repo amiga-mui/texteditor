@@ -519,88 +519,88 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
     }
     else
     {
-      struct LineStyle *styles;
-      struct LineStyle *styles1 = line->line.Styles;
-      struct LineStyle *styles2 = line->next->line.Styles;
-      struct LineColor *colors;
-      struct LineColor *colors1 = line->line.Colors;
-      struct LineColor *colors2 = line->next->line.Colors;
+      struct LineStyle *mergedStyles;
+      struct LineStyle *line1Styles = line->line.Styles;
+      struct LineStyle *line2Styles = line->next->line.Styles;
+      struct LineColor *mergedColors;
+      struct LineColor *line1Colors = line->line.Colors;
+      struct LineColor *line2Colors = line->next->line.Colors;
       ULONG allocStyles;
       ULONG allocColors;
 
       allocStyles = 3 + line->line.usedStyles + line->next->line.usedStyles;
 
-      if((styles = AllocVecPooled(data->mypool, allocStyles * sizeof(*styles))) != NULL)
+      if((mergedStyles = AllocVecPooled(data->mypool, allocStyles * sizeof(*mergedStyles))) != NULL)
       {
-        struct LineStyle *t_styles = styles;
+        struct LineStyle *t_mergedStyles = mergedStyles;
         ULONG usedStyles = 0;
         UWORD style = 0;
 
-        if(styles2 != NULL)
+        if(line2Styles != NULL)
         {
-          struct LineStyle *t_styles2 = styles2;
+          struct LineStyle *t_line2Styles = line2Styles;
 
           // collect all styles which start at the beginning of the line to be appended
-          while(t_styles2->column == 1)
+          while(t_line2Styles->column == 1)
           {
-            D(DBF_STYLE, "appending style 0x%04lx", t_styles->style);
-            if(t_styles->style > 0xff)
-              style &= t_styles2->style;
+            D(DBF_STYLE, "appending style 0x%04lx", t_mergedStyles->style);
+            if(t_mergedStyles->style > 0xff)
+              style &= t_line2Styles->style;
             else
-              style |= t_styles2->style;
+              style |= t_line2Styles->style;
 
-            t_styles2++;
+            t_line2Styles++;
           }
         }
 
-        if(styles1 != NULL)
+        if(line1Styles != NULL)
         {
-          while(styles1->column != EOS)
+          while(line1Styles->column != EOS)
           {
-            if(styles1->column == line->line.Length && ((~styles1->style & style) == (styles1->style ^ 0xffff)))
+            if(line1Styles->column == line->line.Length && ((~line1Styles->style & style) == (line1Styles->style ^ 0xffff)))
             {
-              D(DBF_STYLE, "ignoring style 0x%04lx at column %ld (1)", styles1->style, styles1->column);
-              style &= styles1->style;
-              styles1++;
+              D(DBF_STYLE, "ignoring style 0x%04lx at column %ld (1)", line1Styles->style, line1Styles->column);
+              style &= line1Styles->style;
+              line1Styles++;
             }
             else
             {
-              D(DBF_STYLE, "prepending style 0x%04lx at column %ld", styles1->style, styles1->column);
-              styles->column = styles1->column;
-              styles->style = styles1->style;
-              styles1++;
-              styles++;
+              D(DBF_STYLE, "prepending style 0x%04lx at column %ld", line1Styles->style, line1Styles->column);
+              mergedStyles->column = line1Styles->column;
+              mergedStyles->style = line1Styles->style;
+              line1Styles++;
+              mergedStyles++;
               usedStyles++;
             }
           }
           FreeVecPooled(data->mypool, line->line.Styles);
         }
 
-        if(styles2 != NULL)
+        if(line2Styles != NULL)
         {
-          while(styles2->column != EOS)
+          while(line2Styles->column != EOS)
           {
-            if(styles2->column == 1 && (styles2->style & style) == 0)
+            if(line2Styles->column == 1 && (line2Styles->style & style) == 0)
             {
-              D(DBF_STYLE, "ignoring style 0x%04lx at column %ld (2)", styles2->style, styles2->column);
-              styles2++;
+              D(DBF_STYLE, "ignoring style 0x%04lx at column %ld (2)", line2Styles->style, line2Styles->column);
+              line2Styles++;
             }
             else
             {
-              D(DBF_STYLE, "appending style 0x%04lx at column %ld from column %ld", styles2->style, styles2->column + line->line.Length - 1, styles2->column);
-              styles->column = styles2->column + line->line.Length - 1;
-              styles->style = styles2->style;
-              styles2++;
-              styles++;
+              D(DBF_STYLE, "appending style 0x%04lx at column %ld from column %ld", line2Styles->style, line2Styles->column + line->line.Length - 1, line2Styles->column);
+              mergedStyles->column = line2Styles->column + line->line.Length - 1;
+              mergedStyles->style = line2Styles->style;
+              line2Styles++;
+              mergedStyles++;
               usedStyles++;
             }
           }
           FreeVecPooled(data->mypool, line->next->line.Styles);
         }
-        styles->column = EOS;
+        mergedStyles->column = EOS;
         usedStyles++;
 
-        line->line.Styles = t_styles;
+        line->line.Styles = t_mergedStyles;
         line->line.allocatedStyles = allocStyles;
         line->line.usedStyles = usedStyles;
         if(usedStyles > allocStyles)
@@ -612,53 +612,53 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
 
       allocColors = 3 + line->line.usedColors + line->next->line.usedColors;
 
-      if((colors = AllocVecPooled(data->mypool, allocColors * sizeof(*colors))) != NULL)
+      if((mergedColors = AllocVecPooled(data->mypool, allocColors * sizeof(*mergedColors))) != NULL)
       {
-        struct LineColor *t_colors = colors;
+        struct LineColor *t_mergedColors = mergedColors;
         ULONG usedColors = 0;
         UWORD end_color = 0;
 
-        if(colors1 != NULL)
+        if(line1Colors != NULL)
         {
-          while(colors1->column < line->line.Length && colors1->column != EOC)
+          while(line1Colors->column != EOC && line1Colors->column < line->line.Length)
           {
-            colors->column = colors1->column;
-            end_color = colors1->color;
-            colors->color = colors1->color;
-            colors1++;
-            colors++;
+            mergedColors->column = line1Colors->column;
+            end_color = line1Colors->color;
+            mergedColors->color = line1Colors->color;
+            line1Colors++;
+            mergedColors++;
             usedColors++;
           }
           FreeVecPooled(data->mypool, line->line.Colors);
         }
 
-        if(end_color != 0 && (colors2 == NULL || colors2->column != 1))
+        if(end_color != 0 && (line2Colors == NULL || (line2Colors->column != 1 && line2Colors->column < EOC)))
         {
-          colors->column = line->line.Length;
-          colors->color = 0;
-          colors++;
+          mergedColors->column = line->line.Length;
+          mergedColors->color = 0;
+          mergedColors++;
           usedColors++;
         }
 
-        if(colors2 != NULL)
+        if(line2Colors != NULL)
         {
-          if(colors2->column == 1 && colors2->color == end_color)
-            colors2++;
+          if(line2Colors->column == 1 && line2Colors->color == end_color)
+            line2Colors++;
 
-          while(colors2->column != EOC)
+          while(line2Colors->column != EOC)
           {
-            colors->column = colors2->column + line->line.Length - 1;
-            colors->color = colors2->color;
-            colors2++;
-            colors++;
+            mergedColors->column = line2Colors->column + line->line.Length - 1;
+            mergedColors->color = line2Colors->color;
+            line2Colors++;
+            mergedColors++;
             usedColors++;
           }
           FreeVecPooled(data->mypool, line->next->line.Colors);
         }
-        colors->column = EOC;
+        mergedColors->column = EOC;
         usedColors++;
 
-        line->line.Colors = t_colors;
+        line->line.Colors = t_mergedColors;
         line->line.allocatedColors = allocColors;
         line->line.usedColors = usedColors;
         if(usedColors > allocColors)
