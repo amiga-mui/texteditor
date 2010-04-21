@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.32 RELEASE ############################################################
+
+2010-04-21 Jens Langner <Jens.Langner@light-speed.de>
+
+  * misc: final 15.32 release preparations
+
 2010-04-21 Thore Böckelmann <tboeckel@gmx.de>
 
   * EditorStuff.c: slight optimization to shift style and color changes only if
