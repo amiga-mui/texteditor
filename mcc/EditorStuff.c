@@ -162,6 +162,9 @@ void DumpLine(struct line_node *line)
     }
   }
 
+  if(line->line.Highlight == TRUE)
+    D(DBF_DUMP, "line is highlighted");
+
   LEAVE();
 }
 #else
@@ -244,6 +247,9 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
           ownclip = TRUE;
         }
 
+        SHOWVALUE(DBF_CLIPBOARD, line->line.Highlight);
+        SHOWVALUE(DBF_CLIPBOARD, line->line.Flow);
+        SHOWVALUE(DBF_CLIPBOARD, line->line.Separator);
         SHOWVALUE(DBF_CLIPBOARD, line->line.Contents);
         if(line->line.Contents != NULL)
         {
