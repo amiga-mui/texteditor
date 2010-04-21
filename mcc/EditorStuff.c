@@ -549,7 +549,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
           // collect all styles which start at the beginning of the line to be appended
           while(t_line2Styles->column == 1)
           {
-            D(DBF_STYLE, "appending style 0x%04lx", t_mergedStyles->style);
+            D(DBF_STYLE, "collecting style 0x%04lx", t_mergedStyles->style);
             if(t_mergedStyles->style > 0xff)
               style &= t_line2Styles->style;
             else
@@ -616,7 +616,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
         }
       }
 
-      allocColors = 3 + line->line.usedColors + line->next->line.usedColors;
+      allocColors = 4 + line->line.usedColors + line->next->line.usedColors;
 
       if((mergedColors = AllocVecPooled(data->mypool, allocColors * sizeof(*mergedColors))) != NULL)
       {
@@ -628,6 +628,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
         {
           while(line1Colors->column != EOC && line1Colors->column < line->line.Length)
           {
+            D(DBF_STYLE, "applying color change from %ld to %ld in column %ld (1)", end_color, line1Colors->color, line1Colors->column);
             mergedColors->column = line1Colors->column;
             end_color = line1Colors->color;
             mergedColors->color = line1Colors->color;
@@ -638,10 +639,12 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
           FreeVecPooled(data->mypool, line->line.Colors);
         }
 
-        if(end_color != 0 && (line2Colors == NULL || (line2Colors->column != 1 && line2Colors->column < EOC)))
+        if(end_color != 0 && (line2Colors == NULL || (line2Colors->column != 1 && line2Colors->column != EOC)))
         {
+          D(DBF_STYLE, "resetting color in column %ld (1)", line->line.Length - 1);
           mergedColors->column = line->line.Length;
           mergedColors->color = 0;
+          end_color = 0;
           mergedColors++;
           usedColors++;
         }
@@ -649,18 +652,34 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
         if(line2Colors != NULL)
         {
           if(line2Colors->column == 1 && line2Colors->color == end_color)
+          {
+            D(DBF_STYLE, "skipping 1st color change of 2nd line");
             line2Colors++;
+          }
 
           while(line2Colors->column != EOC)
           {
+            D(DBF_STYLE, "applying color change from %ld to %ld in column %ld (2)", end_color, line2Colors->color, line2Colors->column + line->line.Length - 1);
             mergedColors->column = line2Colors->column + line->line.Length - 1;
+            end_color = line2Colors->color;
             mergedColors->color = line2Colors->color;
             line2Colors++;
             mergedColors++;
             usedColors++;
           }
           FreeVecPooled(data->mypool, line->next->line.Colors);
+
+          if(end_color != 0)
+          {
+            D(DBF_STYLE, "resetting color in column %ld (2)", newbufferSize - line->next->line.Length - 1);
+            mergedColors->column = newbufferSize - line->next->line.Length - 1;
+            mergedColors->color = 0;
+            end_color = 0;
+            mergedColors++;
+            usedColors++;
+          }
         }
+
         mergedColors->column = EOC;
         usedColors++;
 
@@ -676,7 +695,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
     }
 
     line->line.Contents = newbuffer;
-    line->line.Length  = strlen(newbuffer);
+    line->line.Length = strlen(newbuffer);
     line->line.allocatedContents = newbufferSize;
 
     next = line->next;
@@ -1359,6 +1378,9 @@ BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG len
 {
   ENTER();
 
+  D(DBF_DUMP, "before remove");
+  DumpLine(line);
+
   // check if there are any style changes at all
   if(line->line.Styles != NULL && line->line.Styles[0].column != EOS)
   {
@@ -1480,6 +1502,9 @@ BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG len
   }
 
   UpdateChange(data, x, line, length, NULL, NULL);
+
+  D(DBF_DUMP, "after remove");
+  DumpLine(line);
 
   RETURN(TRUE);
   return(TRUE);
