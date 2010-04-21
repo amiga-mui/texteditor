@@ -1359,15 +1359,19 @@ BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG len
 {
   ENTER();
 
+  // check if there are any style changes at all
   if(line->line.Styles != NULL && line->line.Styles[0].column != EOS)
   {
     UWORD start_style = GetStyle(x-1, line);
     UWORD end_style = GetStyle(x+length, line);
     ULONG c = 0, store;
 
+    // skip all styles before the the starting column
     while(line->line.Styles[c].column <= x)
       c++;
 
+    // if the style differs between the start and the end of the range
+    // then we must add style changes accordingly
     if(start_style != end_style)
     {
       UWORD turn_off = start_style & ~end_style;
@@ -1411,29 +1415,41 @@ BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG len
       }
     }
 
+    // remember the current style change column
     store = c;
+    // skip all style changes until we reach the end of the range
     while(line->line.Styles[c].column <= x+length+1)
       c++;
 
-    while(line->line.Styles[c].column != EOS)
+    if(c != store)
     {
-      line->line.Styles[store].column = line->line.Styles[c].column-length;
-      line->line.Styles[store].style = line->line.Styles[c].style;
-      c++;
-      store++;
+      // move all remaining style changes towards the beginning
+      while(line->line.Styles[c].column != EOS)
+      {
+        line->line.Styles[store].column = line->line.Styles[c].column-length;
+        line->line.Styles[store].style = line->line.Styles[c].style;
+        c++;
+        store++;
+      }
+
+      // put a new style termination
+      line->line.Styles[store].column = EOS;
     }
-    line->line.Styles[store].column = EOS;
   }
 
+  // check if there are any color changes at all
   if(line->line.Colors != NULL && line->line.Colors[0].column != EOC)
   {
     UWORD start_color = (x != 0) ? GetColor(x-1, line) : 0;
     UWORD end_color = GetColor(x+length, line);
     ULONG c = 0, store;
 
+    // skip all colors before the the starting column
     while(line->line.Colors[c].column <= x)
       c++;
 
+    // if the colors differs between the start and the end of the range
+    // then we must add color changes accordingly
     if(start_color != end_color)
     {
       line->line.Colors[c].column = x+1;
@@ -1441,18 +1457,26 @@ BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG len
       c++;
     }
 
+    // remember the current color change column
     store = c;
+    // skip all color changes until we reach the end of the range
     while(line->line.Colors[c].column <= x+length+1)
       c++;
 
-    while(line->line.Colors[c].column != EOC)
+    if(c != store)
     {
-      line->line.Colors[store].column = line->line.Colors[c].column-length;
-      line->line.Colors[store].color = line->line.Colors[c].color;
-      c++;
-      store++;
+      // move all remaining color changes towards the beginning
+      while(line->line.Colors[c].column != EOC)
+      {
+        line->line.Colors[store].column = line->line.Colors[c].column-length;
+        line->line.Colors[store].color = line->line.Colors[c].color;
+        c++;
+        store++;
+      }
+
+      // put a new color termination
+      line->line.Colors[store].column = EOC;
     }
-    line->line.Colors[store].column = EOC;
   }
 
   UpdateChange(data, x, line, length, NULL, NULL);
