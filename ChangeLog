@@ -9,6 +9,9 @@ $URL$
 
   * EditorStuff.c: slight optimization to shift style and color changes only if
     they need to be shifted when deleting text.
+  * BlockOperators.c: fixed the increasing amount of color changes without real
+    color changes being applied. Blocks with color changes must be correctly
+    terminated with a color change back to the default color.
 
 2010-04-20 Thore Böckelmann <tboeckel@gmx.de>
 

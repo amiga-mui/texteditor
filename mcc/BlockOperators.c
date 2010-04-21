@@ -152,18 +152,18 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
 
       if(startline->line.Colors != NULL && startline->line.Colors[0].column != EOC)
       {
-        // allocate space for all old colors and up to 2 new colors
-        if((emsg.Colors = (struct LineColor *)AllocVecPooled(data->mypool, (startline->line.usedColors+2) * sizeof(struct LineColor))) != NULL)
+        // allocate space for all old colors and up to 3 new colors
+        if((emsg.Colors = (struct LineColor *)AllocVecPooled(data->mypool, (startline->line.usedColors+3) * sizeof(struct LineColor))) != NULL)
         {
-          UWORD startcolor = (startx != 0) ? GetColor(startx, startline) : 0;
+          UWORD lastcolor = (startx != 0) ? GetColor(startx, startline) : 0;
           struct LineColor *colors = emsg.Colors;
           struct LineColor *oldcolors = startline->line.Colors;
 
           // apply the active color
-          if(startcolor != 0)
+          if(lastcolor != 0)
           {
             colors->column = 1;
-            colors->color = startcolor;
+            colors->color = lastcolor;
             colors++;
           }
 
@@ -172,12 +172,26 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
             oldcolors++;
 
           // copy all colors until the end of the block
-          while(oldcolors->column != EOC)
+          while(oldcolors->column <= stopx)
           {
-            colors->column = oldcolors->column - startx;
-            colors->color = oldcolors->color;
-            colors++;
+            // apply real color changes only
+          	if(oldcolors->color != lastcolor)
+          	{
+              colors->column = oldcolors->column - startx;
+              colors->color = oldcolors->color;
+              colors++;
+              // remember this color change
+              lastcolor = oldcolors->color;
+            }
             oldcolors++;
+          }
+
+          // unapply the last active color
+          if(lastcolor != 0)
+          {
+            colors->column = strlen(startline->line.Contents)-startx+1;
+            colors->color = 0;
+            colors++;
           }
 
           // terminate the color array
@@ -278,21 +292,27 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
         // allocate space for all old colors and 2 new colors
         if((emsg.Colors = (struct LineColor *)AllocVecPooled(data->mypool, (startline->line.usedColors+2) * sizeof(struct LineColor))) != NULL)
         {
-          UWORD stopcolor = GetColor(stopx, stopline);
+          UWORD lastcolor = 0;
           struct LineColor *colors = emsg.Colors;
           struct LineColor *oldcolors = stopline->line.Colors;
 
           // copy all colors until the end of the block
           while(oldcolors->column <= stopx)
           {
-            colors->column = oldcolors->column;
-            colors->color = oldcolors->color;
-            colors++;
+            // apply real color changes only
+          	if(oldcolors->color != lastcolor)
+          	{
+              colors->column = oldcolors->column;
+              colors->color = oldcolors->color;
+              colors++;
+              // remember this color change
+              lastcolor = oldcolors->color;
+            }
             oldcolors++;
           }
 
-          // unapply the active color
-          if(stopcolor != 0)
+          // unapply the last active color
+          if(lastcolor != 0)
           {
             colors->column = stopx+1;
             colors->color = 0;
@@ -412,16 +432,15 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
         // allocate space for all old colors and up to 3 new colors
         if((emsg.Colors = (struct LineColor *)AllocVecPooled(data->mypool, (startline->line.usedColors+3) * sizeof(struct LineColor))) != NULL)
         {
-          UWORD startcolor = (startx != 0) ? GetColor(startx, startline) : 0;
-          UWORD stopcolor = GetColor(stopx, stopline);
+          UWORD lastcolor = (startx != 0) ? GetColor(startx, startline) : 0;
           struct LineColor *colors = emsg.Colors;
           struct LineColor *oldcolors = startline->line.Colors;
 
           // apply the active color
-          if(startcolor != 0)
+          if(lastcolor != 0)
           {
             colors->column = 1;
-            colors->color = startcolor;
+            colors->color = lastcolor;
             colors++;
           }
 
@@ -432,14 +451,20 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
           // copy all colors until the end of the block
           while(oldcolors->column <= stopx)
           {
-            colors->column = oldcolors->column - startx;
-            colors->color = oldcolors->color;
-            colors++;
+            // apply real color changes only
+          	if(oldcolors->color != lastcolor)
+          	{
+              colors->column = oldcolors->column - startx;
+              colors->color = oldcolors->color;
+              colors++;
+              // remember this color change
+              lastcolor = oldcolors->color;
+            }
             oldcolors++;
           }
 
-          // unapply the active color
-          if(stopcolor != 0)
+          // unapply the last active color
+          if(lastcolor != 0)
           {
             colors->column = stopx-startx+1;
             colors->color = 0;
@@ -496,6 +521,8 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
     emsg.failure = FALSE;
     text = (STRPTR)CallHookA(&ExportHookPlain, NULL, &emsg);
   }
+
+  SHOWSTRING(DBF_ALWAYS, text);
 
   RETURN(text);
   return text;
