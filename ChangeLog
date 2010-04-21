@@ -12,6 +12,11 @@ $URL$
   * BlockOperators.c: fixed the increasing amount of color changes without real
     color changes being applied. Blocks with color changes must be correctly
     terminated with a color change back to the default color.
+  * EditorStuff.c: finally fixed a long standing coloring bug. This one occured
+    when inserting a colored clip into a line without any color changes yet.
+    After undoing and redoing this operation the line was colored until the end,
+    because the implict color change at the end of the clip was not correctly
+    handled. This is really weird stuff!
 
 2010-04-20 Thore Böckelmann <tboeckel@gmx.de>
 
