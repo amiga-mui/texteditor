@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-04-21 Thore Böckelmann <tboeckel@gmx.de>
+
+  * EditorStuff.c: slight optimization to shift style and color changes only if
+    they need to be shifted when deleting text.
+
 2010-04-20 Thore Böckelmann <tboeckel@gmx.de>
 
   * Debug.c: added new debug flags DBF_IMPORT and DBF_EXPORT to debug the import
