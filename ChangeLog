@@ -29,6 +29,8 @@ $URL$
     erasing a marked block for the same reasons as for the Backspace key.
   * UndoFunctions.c: correctly free a ET_DELETEBLOCK_NOMOVE clip like it is done
     for ET_DELETEBLOCK clips.
+  * HandleInput.c, UndoFunctions.c: erasing a character with DEL will leave the
+    cursor at the same position when undoing this operation.
 
 2010-04-21 Thore Böckelmann <tboeckel@gmx.de>
 
