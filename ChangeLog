@@ -7,9 +7,14 @@ $URL$
 
 #### v15.32 RELEASE ############################################################
 
-2010-04-21 Jens Langner <Jens.Langner@light-speed.de>
+2010-04-xx Jens Langner <Jens.Langner@light-speed.de>
 
   * misc: final 15.32 release preparations
+
+2010-04-22 Thore Böckelmann <tboeckel@gmx.de>
+
+  * ColorOperators.c, StyleOperators.c: the GetColor() and GetStyle() functions
+    now handle invalid positions internally.
 
 2010-04-21 Thore Böckelmann <tboeckel@gmx.de>
 
