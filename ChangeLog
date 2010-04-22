@@ -25,6 +25,8 @@ $URL$
     overkill on the first sight. But the former backspace handling did not take
     any coloring into account and undoing such an operation resulted in lost
     colors.
+  * HandleInput.c: erasing a single character using the DEL is now handled like
+    erasing a marked block for the same reasons as for the Backspace key.
 
 2010-04-21 Thore Böckelmann <tboeckel@gmx.de>
 

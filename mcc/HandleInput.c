@@ -1275,7 +1275,7 @@ void Key_Backspace(struct InstData *data)
       block.stopline = data->actualline;
       block.stopx = data->CPos_X+1;
 
-      // add this block to the Undo buffer
+      // add this single character block to the Undo buffer
       AddToUndoBuffer(data, ET_DELETEBLOCK, &block);
 
       // erase the character
@@ -1312,16 +1312,25 @@ void Key_Delete(struct InstData *data)
 
     if(data->actualline->line.Length > (ULONG)(data->CPos_X+1))
     {
-      AddToUndoBuffer(data, ET_DELETECHAR, &data->actualline->line.Contents[data->CPos_X]);
+      struct marking block;
+
+      // define a block which consists of a single character only
+      block.enabled = TRUE;
+      block.startline = data->actualline;
+      block.startx = data->CPos_X;
+      block.stopline = data->actualline;
+      block.stopx = data->CPos_X+1;
+
+      // add this single character block to the Undo buffer
+      AddToUndoBuffer(data, ET_DELETEBLOCK, &block);
+
+      // erase the character
       RemoveChars(data, data->CPos_X, data->actualline, 1);
     }
-    else
+    else if(data->actualline->next != NULL)
     {
-      if(data->actualline->next != NULL)
-      {
-        AddToUndoBuffer(data, ET_MERGELINES, NULL);
-        MergeLines(data, data->actualline);
-      }
+      AddToUndoBuffer(data, ET_MERGELINES, NULL);
+      MergeLines(data, data->actualline);
     }
   }
 
