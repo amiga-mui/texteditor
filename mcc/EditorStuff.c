@@ -1322,35 +1322,35 @@ BOOL PasteChars(struct InstData *data, LONG x, struct line_node *line, LONG leng
 {
   ENTER();
 
-  if(line->line.Styles != NULL)
+  if(line->line.Styles != NULL && line->line.Styles[0].column != EOS)
   {
-    if(line->line.Styles[0].column != EOS)
-    {
-      ULONG c = 0;
+    ULONG c = 0;
 
-      while(line->line.Styles[c].column <= x+1)
-        c++;
-      while(line->line.Styles[c].column != EOS)
-      {
-        line->line.Styles[c].column += length;
-        c++;
-      }
+    // skip all styles up to the given position
+    while(line->line.Styles[c].column <= x+1)
+      c++;
+
+    // move all style positions by the given length
+    while(line->line.Styles[c].column != EOS)
+    {
+      line->line.Styles[c].column += length;
+      c++;
     }
   }
 
-  if(line->line.Colors != NULL)
+  if(line->line.Colors != NULL && line->line.Colors[0].column != EOC)
   {
-    if(line->line.Colors[0].column != EOC)
-    {
-      ULONG c = 0;
+    ULONG c = 0;
 
-      while(line->line.Colors[c].column <= x+1)
-        c++;
-      while(line->line.Colors[c].column != EOC)
-      {
-        line->line.Colors[c].column += length;
-        c++;
-      }
+    // skip all colors up to the given position
+    while(line->line.Colors[c].column <= x+1)
+      c++;
+
+    // move all color positions by the given length
+    while(line->line.Colors[c].column != EOC)
+    {
+      line->line.Colors[c].column += length;
+      c++;
     }
   }
 
@@ -1378,7 +1378,7 @@ BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG len
 {
   ENTER();
 
-  D(DBF_DUMP, "before remove");
+  D(DBF_DUMP, "before remove %ld %ld", x, length);
   DumpLine(line);
 
   // check if there are any style changes at all
@@ -1443,20 +1443,17 @@ BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG len
     while(line->line.Styles[c].column <= x+length+1)
       c++;
 
-    if(c != store)
+    // move all remaining style changes towards the beginning
+    while(line->line.Styles[c].column != EOS)
     {
-      // move all remaining style changes towards the beginning
-      while(line->line.Styles[c].column != EOS)
-      {
-        line->line.Styles[store].column = line->line.Styles[c].column-length;
-        line->line.Styles[store].style = line->line.Styles[c].style;
-        c++;
-        store++;
-      }
-
-      // put a new style termination
-      line->line.Styles[store].column = EOS;
+      line->line.Styles[store].column = line->line.Styles[c].column-length;
+      line->line.Styles[store].style = line->line.Styles[c].style;
+      c++;
+      store++;
     }
+
+    // put a new style termination
+    line->line.Styles[store].column = EOS;
   }
 
   // check if there are any color changes at all
@@ -1485,20 +1482,17 @@ BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG len
     while(line->line.Colors[c].column <= x+length+1)
       c++;
 
-    if(c != store)
+    // move all remaining color changes towards the beginning
+    while(line->line.Colors[c].column != EOC)
     {
-      // move all remaining color changes towards the beginning
-      while(line->line.Colors[c].column != EOC)
-      {
-        line->line.Colors[store].column = line->line.Colors[c].column-length;
-        line->line.Colors[store].color = line->line.Colors[c].color;
-        c++;
-        store++;
-      }
-
-      // put a new color termination
-      line->line.Colors[store].column = EOC;
+      line->line.Colors[store].column = line->line.Colors[c].column-length;
+      line->line.Colors[store].color = line->line.Colors[c].color;
+      c++;
+      store++;
     }
+
+    // put a new color termination
+    line->line.Colors[store].column = EOC;
   }
 
   UpdateChange(data, x, line, length, NULL, NULL);
