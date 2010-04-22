@@ -155,7 +155,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
         // allocate space for all old colors and up to 3 new colors
         if((emsg.Colors = (struct LineColor *)AllocVecPooled(data->mypool, (startline->line.usedColors+3) * sizeof(struct LineColor))) != NULL)
         {
-          UWORD lastcolor = (startx != 0) ? GetColor(startx, startline) : 0;
+          UWORD lastcolor = GetColor(startx, startline);
           struct LineColor *colors = emsg.Colors;
           struct LineColor *oldcolors = startline->line.Colors;
 
@@ -432,7 +432,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
         // allocate space for all old colors and up to 3 new colors
         if((emsg.Colors = (struct LineColor *)AllocVecPooled(data->mypool, (startline->line.usedColors+3) * sizeof(struct LineColor))) != NULL)
         {
-          UWORD lastcolor = (startx != 0) ? GetColor(startx, startline) : 0;
+          UWORD lastcolor = GetColor(startx, startline);
           struct LineColor *colors = emsg.Colors;
           struct LineColor *oldcolors = startline->line.Colors;
 

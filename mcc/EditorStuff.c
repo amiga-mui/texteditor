@@ -1462,7 +1462,7 @@ BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG len
   // check if there are any color changes at all
   if(line->line.Colors != NULL && line->line.Colors[0].column != EOC)
   {
-    UWORD start_color = (x != 0) ? GetColor(x-1, line) : 0;
+    UWORD start_color = GetColor(x-1, line);
     UWORD end_color = GetColor(x+length, line);
     ULONG c = 0, store;
 
