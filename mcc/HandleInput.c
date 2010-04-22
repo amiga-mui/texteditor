@@ -1265,27 +1265,31 @@ void Key_Backspace(struct InstData *data)
     {
       struct marking block;
 
+      // move the cursor position one to the left
       data->CPos_X--;
 
+      // define a block which consists of a single character only
       block.enabled = TRUE;
       block.startline = data->actualline;
       block.startx = data->CPos_X;
       block.stopline = data->actualline;
       block.stopx = data->CPos_X+1;
 
+      // add this block to the Undo buffer
       AddToUndoBuffer(data, ET_DELETEBLOCK, &block);
+
+      // erase the character
       RemoveChars(data, data->CPos_X, data->actualline, 1);
     }
-    else
+    else if(data->actualline->previous != NULL)
     {
-      if(data->actualline->previous)
-      {
-        data->actualline = data->actualline->previous;
-        data->CPos_X = data->actualline->line.Length-1;
-        AddToUndoBuffer(data, ET_BACKSPACEMERGE, NULL);
-        ScrollIntoDisplay(data);
-        MergeLines(data, data->actualline);
-      }
+      // merge two lines to a single line by appending
+      // the current line to the previous
+      data->actualline = data->actualline->previous;
+      data->CPos_X = data->actualline->line.Length-1;
+      AddToUndoBuffer(data, ET_BACKSPACEMERGE, NULL);
+      ScrollIntoDisplay(data);
+      MergeLines(data, data->actualline);
     }
 
     ScrollIntoDisplay(data);
