@@ -26,16 +26,16 @@
 #include "Debug.h"
 
 /// GetColor()
-UWORD GetColor(UWORD x, struct line_node *line)
+UWORD GetColor(LONG x, struct line_node *line)
 {
   UWORD color = 0;
   struct LineColor *colors = line->line.Colors;
 
   ENTER();
 
-  if(colors != NULL)
+  if(colors != NULL && x >= 0)
   {
-    while(colors->column <= x+1)
+    while(colors->column != EOC && colors->column <= x+1)
     {
       color = colors->color;
       colors++;

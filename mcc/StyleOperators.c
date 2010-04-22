@@ -81,11 +81,11 @@ UWORD GetStyle(LONG x, struct line_node *line)
 
   ENTER();
 
-  if(line->line.Styles != NULL)
+  if(line->line.Styles != NULL && x >= 0)
   {
     struct LineStyle *styles = line->line.Styles;
 
-    while(styles->column <= x+1)
+    while(styles->column != EOS && styles->column <= x+1)
     {
       if(styles->style > 0xff)
         style &= styles->style;
