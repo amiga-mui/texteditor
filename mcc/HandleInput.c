@@ -1322,7 +1322,7 @@ void Key_Delete(struct InstData *data)
       block.stopx = data->CPos_X+1;
 
       // add this single character block to the Undo buffer
-      AddToUndoBuffer(data, ET_DELETEBLOCK, &block);
+      AddToUndoBuffer(data, ET_DELETEBLOCK_NOMOVE, &block);
 
       // erase the character
       RemoveChars(data, data->CPos_X, data->actualline, 1);

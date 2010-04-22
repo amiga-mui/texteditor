@@ -450,6 +450,7 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
       break;
 
       case ET_DELETEBLOCK:
+      case ET_DELETEBLOCK_NOMOVE:
       {
         STRPTR text;
         struct marking *block = (struct marking *)eventData;
@@ -461,7 +462,7 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
           action->y = LineNr(data, block->startline);
           action->clip = text;
 
-          if(isFlagSet(data->flags, FLG_FreezeCrsr))
+          if(eventtype == ET_DELETEBLOCK && isFlagSet(data->flags, FLG_FreezeCrsr))
             action->type = ET_DELETEBLOCK_NOMOVE;
         }
         else
