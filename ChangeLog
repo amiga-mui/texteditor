@@ -20,6 +20,11 @@ $URL$
   * BlockOperators.c: deleting a multiline block would have dropped any coloring
     information and thus the block would be restored uncolored at an Undo
     operation.
+  * HandleInput.c, UndoFunctions.c: erasing a single character using the
+    Backspace key is now handled like erasing a marked block. This seems to be
+    overkill on the first sight. But the former backspace handling did not take
+    any coloring into account and undoing such an operation resulted in lost
+    colors.
 
 2010-04-21 Thore Böckelmann <tboeckel@gmx.de>
 

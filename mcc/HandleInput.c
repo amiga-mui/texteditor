@@ -1263,8 +1263,17 @@ void Key_Backspace(struct InstData *data)
   {
     if(data->CPos_X > 0)
     {
+      struct marking block;
+
       data->CPos_X--;
-      AddToUndoBuffer(data, ET_BACKSPACECHAR, &data->actualline->line.Contents[data->CPos_X]);
+
+      block.enabled = TRUE;
+      block.startline = data->actualline;
+      block.startx = data->CPos_X;
+      block.stopline = data->actualline;
+      block.stopx = data->CPos_X+1;
+
+      AddToUndoBuffer(data, ET_DELETEBLOCK, &block);
       RemoveChars(data, data->CPos_X, data->actualline, 1);
     }
     else
