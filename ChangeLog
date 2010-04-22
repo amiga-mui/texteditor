@@ -17,6 +17,9 @@ $URL$
     now handle invalid positions internally.
   * ExportHook.c: cleaned up the plain export function a bit for better under-
     standing.
+  * BlockOperators.c: deleting a multiline block would have dropped any coloring
+    information and thus the block would be restored uncolored at an Undo
+    operation.
 
 2010-04-21 Thore Böckelmann <tboeckel@gmx.de>
 

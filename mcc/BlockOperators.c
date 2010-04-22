@@ -103,6 +103,8 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
     {
       if(startline->line.Styles != NULL && startline->line.Styles[0].column != EOS)
       {
+        D(DBF_BLOCK, "export styles");
+
         // allocate space for all old styles and up to 4 new styles
         if((emsg.Styles = (struct LineStyle *)AllocVecPooled(data->mypool, (startline->line.usedStyles+4) * sizeof(struct LineStyle))) != NULL)
         {
@@ -134,7 +136,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
           while(oldstyles->column <= startx)
             oldstyles++;
 
-          // copy all styles until the end of the block
+          // copy all styles until the end of the line
           while(oldstyles->column != EOS)
           {
             styles->column = oldstyles->column - startx;
@@ -152,6 +154,8 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
 
       if(startline->line.Colors != NULL && startline->line.Colors[0].column != EOC)
       {
+        D(DBF_BLOCK, "export colors");
+
         // allocate space for all old colors and up to 3 new colors
         if((emsg.Colors = (struct LineColor *)AllocVecPooled(data->mypool, (startline->line.usedColors+3) * sizeof(struct LineColor))) != NULL)
         {
@@ -171,8 +175,8 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
           while(oldcolors->column <= startx)
             oldcolors++;
 
-          // copy all colors until the end of the block
-          while(oldcolors->column <= stopx)
+          // copy all colors until the end of the line
+          while(oldcolors->column != EOC)
           {
             // apply real color changes only
           	if(oldcolors->color != lastcolor)
@@ -242,6 +246,8 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
     D(DBF_BLOCK, "exporting last line, stopping at %ld", stopx);
     if(emsg.failure == FALSE && stopx > 0 && (emsg.Contents = AllocVecPooled(data->mypool, stopx+1)) != NULL)
     {
+      D(DBF_BLOCK, "export styles");
+
       if(stopline->line.Styles != NULL && stopline->line.Styles[0].column != EOS)
       {
         // allocate space for all old styles and up to 4 new styles
@@ -289,6 +295,8 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
 
       if(stopline->line.Colors != NULL && stopline->line.Colors[0].column != EOC)
       {
+        D(DBF_BLOCK, "export colors");
+
         // allocate space for all old colors and 2 new colors
         if((emsg.Colors = (struct LineColor *)AllocVecPooled(data->mypool, (startline->line.usedColors+2) * sizeof(struct LineColor))) != NULL)
         {
