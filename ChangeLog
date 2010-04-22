@@ -15,6 +15,8 @@ $URL$
 
   * ColorOperators.c, StyleOperators.c: the GetColor() and GetStyle() functions
     now handle invalid positions internally.
+  * ExportHook.c: cleaned up the plain export function a bit for better under-
+    standing.
 
 2010-04-21 Thore Böckelmann <tboeckel@gmx.de>
 
