@@ -36,7 +36,7 @@ static void FreeUndoStep(struct InstData *data, struct UserAction *step)
 {
   ENTER();
 
-  if(step->type == ET_DELETEBLOCK || step->type == ET_PASTEBLOCK)
+  if(step->type == ET_DELETEBLOCK || step->type == ET_DELETEBLOCK_NOMOVE || step->type == ET_PASTEBLOCK)
   {
     if(step->clip != NULL)
     {
