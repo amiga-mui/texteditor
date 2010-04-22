@@ -104,14 +104,6 @@ BOOL Undo(struct InstData *data)
       }
       break;
 
-      case ET_BACKSPACECHAR:
-      {
-        D(DBF_UNDO, "undo BACKSPACECHAR");
-        PasteChars(data, data->CPos_X, data->actualline, 1, (char *)&action->del.character, action);
-        data->CPos_X++;
-      }
-      break;
-
       case ET_DELETECHAR:
       {
         D(DBF_UNDO, "undo DELETECHAR");
@@ -267,10 +259,9 @@ BOOL Redo(struct InstData *data)
       }
       break;
 
-      case ET_BACKSPACECHAR:
       case ET_DELETECHAR:
       {
-        D(DBF_UNDO, "redo BACKSPACECHAR/DELETECHAR");
+        D(DBF_UNDO, "redo DELETECHAR");
         RemoveChars(data, data->CPos_X, data->actualline, 1);
       }
       break;
@@ -434,11 +425,10 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
       break;
 
       case ET_DELETECHAR:
-      case ET_BACKSPACECHAR:
       {
         STRPTR str = (STRPTR)eventData;
 
-        D(DBF_UNDO, "add undo DELETECHAR/BACKSPACECHAR");
+        D(DBF_UNDO, "add undo DELETECHAR");
         action->del.character = str[0];
         action->del.style = GetStyle(data->CPos_X, data->actualline);
         action->del.flow = data->actualline->line.Flow;
