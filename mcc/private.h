@@ -449,7 +449,7 @@ void ClientWriteLine(IPTR session, struct line_node *line);
 LONG ClientReadLine(IPTR session, struct line_node **line, ULONG *cset);
 
 // ColorOperators.c
-UWORD GetColor(UWORD, struct line_node *);
+UWORD GetColor(LONG, struct line_node *);
 void AddColor(struct InstData *, struct marking *, UWORD);
 
 // Dispatcher.c
