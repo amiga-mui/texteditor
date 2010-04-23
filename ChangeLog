@@ -11,6 +11,10 @@ $URL$
 
   * misc: final 15.32 release preparations
 
+2010-04-23 Ilkka Lehtoranta <ilkleht@yahoo.com>
+
+  * mcp/misc: use bzip2 compressed 32bit prefs image on MorphOS 2.
+
 2010-04-22 Thore Böckelmann <tboeckel@gmx.de>
 
   * ColorOperators.c, StyleOperators.c: the GetColor() and GetStyle() functions
