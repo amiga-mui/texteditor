@@ -6,6 +6,7 @@
 
 
 extern const unsigned long icon32[];
+extern const unsigned char icondata[]; // bzip2 compressed ARGB data
 #define ICON32_WIDTH 24
 #define ICON32_HEIGHT 20
 #define ICON32_DEPTH 32
