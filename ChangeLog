@@ -11,6 +11,11 @@ $URL$
 
   * misc: final 15.32 release preparations
 
+2010-04-24 Thore Böckelmann <tboeckel@gmx.de>
+
+  * include/mccinit.c: updated to latest version. This fixes the stack swapping
+    for AROS.
+
 2010-04-23 Ilkka Lehtoranta <ilkleht@yahoo.com>
 
   * mcp/misc: use bzip2 compressed 32bit prefs image on MorphOS 2.
