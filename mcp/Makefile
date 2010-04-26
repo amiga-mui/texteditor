@@ -182,8 +182,7 @@ COBJS = locale.o \
         KeyStorage.o \
         ObjectCreator.o \
         Debug.o \
-        icon32.o \
-        iconraw.o \
+        icon.o \
         vastubs.o
 
 TOBJS = Preference.o
