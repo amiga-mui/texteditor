@@ -56,6 +56,7 @@ const UBYTE icon8_body[168] = {
 0x55,0x54,0x00, };
 #endif
 
+#ifdef USE_ICON8_BITMAP
 const struct BitMap icon8_bitmap =
 {
   4, 14, 0, ICON8_DEPTH, 0,
@@ -64,3 +65,4 @@ const struct BitMap icon8_bitmap =
     (UBYTE *)icon8_body+(2*14*4),
     NULL, NULL, NULL, NULL, NULL }
 };
+#endif
