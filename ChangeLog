@@ -11,6 +11,12 @@ $URL$
 
   * misc: final 15.32 release preparations
 
+2010-04-26 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/misc: merged all converted image data into one file, moved the image
+    files to a separate subdirectory, combined the prefs icon generation for
+    all platform into one function.
+
 2010-04-24 Thore Böckelmann <tboeckel@gmx.de>
 
   * include/mccinit.c: updated to latest version. This fixes the stack swapping
