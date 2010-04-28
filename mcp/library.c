@@ -76,7 +76,9 @@ static VOID ClassExpunge(UNUSED struct Library *base);
 #define USE_ICON8_BODY
 
 #include "icon.h"
+#if defined(__MORPHOS__)
 #include <mui/Rawimage_mcc.h>
+#endif
 
 #define ICON8OBJECT \
   BodychunkObject,\
