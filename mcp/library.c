@@ -76,59 +76,49 @@ static VOID ClassExpunge(UNUSED struct Library *base);
 #define USE_ICON8_BODY
 
 #include "icon.h"
+
 #if defined(__MORPHOS__)
 #include <mui/Rawimage_mcc.h>
 #else
 #include <mui/NBitmap_mcc.h>
 #endif
 
-#define ICON8OBJECT \
-  BodychunkObject,\
-    MUIA_FixWidth,              ICON8_WIDTH,\
-    MUIA_FixHeight,             ICON8_HEIGHT,\
-    MUIA_Bitmap_Width,          ICON8_WIDTH ,\
-    MUIA_Bitmap_Height,         ICON8_HEIGHT,\
-    MUIA_Bodychunk_Depth,       ICON8_DEPTH,\
-    MUIA_Bodychunk_Body,        (UBYTE *)icon8_body,\
-    MUIA_Bodychunk_Compression, ICON8_COMPRESSION,\
-    MUIA_Bodychunk_Masking,     ICON8_MASKING,\
-    MUIA_Bitmap_SourceColors,   (ULONG *)icon8_colors,\
-    MUIA_Bitmap_Transparent,    0,\
-  End
-
 static Object *get_prefs_image(void)
 {
   Object *obj;
 
-  #if defined(__MORPHOS__)
-  obj = RawimageObject,
-    MUIA_Rawimage_Data, icon32,
+  #if !defined(__MORPHOS__)
+  obj = NBitmapObject,
+    MUIA_FixWidth,              ICON32_WIDTH,
+    MUIA_FixHeight,             ICON32_HEIGHT,
+    MUIA_NBitmap_RawData,       icon32,
+    MUIA_NBitmap_RawDataFormat, MUIV_NBitmap_RawDataFormat_ARGB32,
+    MUIA_NBitmap_RawDataWidth,  ICON32_WIDTH,
+    MUIA_NBitmap_RawDataHeight, ICON32_HEIGHT,
   End;
   #else
   obj = RawimageObject,
-    MUIA_FixWidth,            ICON32_WIDTH,
-    MUIA_FixHeight,           ICON32_HEIGHT,
-    MUIA_Rawimage_Data,       icon32,
-    MUIA_Rawimage_DataFormat, MUIV_Rawimage_DataFormat_ARGB32,
-    MUIA_Rawimage_Width,      ICON32_WIDTH,
-    MUIA_Rawimage_Height,     ICON32_HEIGHT,
+    MUIA_Rawimage_Data, icon32,
   End;
-
-  if(obj == NULL)
-  {
-    obj = NBitmapObject,
-      MUIA_FixWidth,              ICON32_WIDTH,
-      MUIA_FixHeight,             ICON32_HEIGHT,
-      MUIA_NBitmap_RawData,       icon32,
-      MUIA_NBitmap_RawDataFormat, MUIV_NBitmap_RawDataFormat_ARGB32,
-      MUIA_NBitmap_RawDataWidth,  ICON32_WIDTH,
-      MUIA_NBitmap_RawDataHeight, ICON32_HEIGHT,
-    End;
-  }
   #endif
 
+  // if the 32bit image data couldn't be loaded
+  // we fall back to the 8bit icon
   if(obj == NULL)
-    obj = ICON8OBJECT;
+  {
+    obj = BodychunkObject,\
+            MUIA_FixWidth,              ICON8_WIDTH,\
+            MUIA_FixHeight,             ICON8_HEIGHT,\
+            MUIA_Bitmap_Width,          ICON8_WIDTH ,\
+            MUIA_Bitmap_Height,         ICON8_HEIGHT,\
+            MUIA_Bodychunk_Depth,       ICON8_DEPTH,\
+            MUIA_Bodychunk_Body,        (UBYTE *)icon8_body,\
+            MUIA_Bodychunk_Compression, ICON8_COMPRESSION,\
+            MUIA_Bodychunk_Masking,     ICON8_MASKING,\
+            MUIA_Bitmap_SourceColors,   (ULONG *)icon8_colors,\
+            MUIA_Bitmap_Transparent,    0,\
+          End;
+  }
 
   return obj;
 }

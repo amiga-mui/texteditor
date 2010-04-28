@@ -5,11 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
-#### v15.32 RELEASE ############################################################
+2010-04-28 Jens Langner <Jens.Langner@light-speed.de>
 
-2010-04-xx Jens Langner <Jens.Langner@light-speed.de>
-
-  * misc: final 15.32 release preparations
+  * mcp/icon.c: now the new NBitmap.mcc is explicitly used for displaying the
+    32bit raw image data on OS3 and OS4.
 
 2010-04-28 Thore Böckelmann <tboeckel@gmx.de>
 
