@@ -11,6 +11,11 @@ $URL$
 
   * misc: final 15.32 release preparations
 
+2010-04-28 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/library: implemented experimental fallback to NBitmap.mcc for raw image
+    data in case Rawimage.mui is not available.
+
 2010-04-27 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/library: all systems now try to create a truecolor prefs image using
