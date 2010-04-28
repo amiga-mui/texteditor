@@ -89,12 +89,12 @@ static Object *get_prefs_image(void)
 
   #if !defined(__MORPHOS__)
   obj = NBitmapObject,
-    MUIA_FixWidth,              ICON32_WIDTH,
-    MUIA_FixHeight,             ICON32_HEIGHT,
-    MUIA_NBitmap_RawData,       icon32,
-    MUIA_NBitmap_RawDataFormat, MUIV_NBitmap_RawDataFormat_ARGB32,
-    MUIA_NBitmap_RawDataWidth,  ICON32_WIDTH,
-    MUIA_NBitmap_RawDataHeight, ICON32_HEIGHT,
+    MUIA_FixWidth,       ICON32_WIDTH,
+    MUIA_FixHeight,      ICON32_HEIGHT,
+    MUIA_NBitmap_Type,   MUIV_NBitmap_Type_ARGB32,
+    MUIA_NBitmap_Normal, icon32,
+    MUIA_NBitmap_Width,  ICON32_WIDTH,
+    MUIA_NBitmap_Height, ICON32_HEIGHT,
   End;
   #else
   obj = RawimageObject,
@@ -107,17 +107,17 @@ static Object *get_prefs_image(void)
   if(obj == NULL)
   {
     obj = BodychunkObject,\
-            MUIA_FixWidth,              ICON8_WIDTH,\
-            MUIA_FixHeight,             ICON8_HEIGHT,\
-            MUIA_Bitmap_Width,          ICON8_WIDTH ,\
-            MUIA_Bitmap_Height,         ICON8_HEIGHT,\
-            MUIA_Bodychunk_Depth,       ICON8_DEPTH,\
-            MUIA_Bodychunk_Body,        (UBYTE *)icon8_body,\
-            MUIA_Bodychunk_Compression, ICON8_COMPRESSION,\
-            MUIA_Bodychunk_Masking,     ICON8_MASKING,\
-            MUIA_Bitmap_SourceColors,   (ULONG *)icon8_colors,\
-            MUIA_Bitmap_Transparent,    0,\
-          End;
+      MUIA_FixWidth,              ICON8_WIDTH,\
+      MUIA_FixHeight,             ICON8_HEIGHT,\
+      MUIA_Bitmap_Width,          ICON8_WIDTH ,\
+      MUIA_Bitmap_Height,         ICON8_HEIGHT,\
+      MUIA_Bodychunk_Depth,       ICON8_DEPTH,\
+      MUIA_Bodychunk_Body,        (UBYTE *)icon8_body,\
+      MUIA_Bodychunk_Compression, ICON8_COMPRESSION,\
+      MUIA_Bodychunk_Masking,     ICON8_MASKING,\
+      MUIA_Bitmap_SourceColors,   (ULONG *)icon8_colors,\
+      MUIA_Bitmap_Transparent,    0,\
+    End;
   }
 
   return obj;
