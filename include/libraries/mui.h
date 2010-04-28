@@ -28,6 +28,7 @@
 ** !     +--Image              (image display)
 ** !     +--Bitmap             (draws bitmaps)
 ** !     !  \--Bodychunk       (makes bitmap from ILBM body chunk)
+** !     +--Rawimage           (draws raw image data)
 ** !     +--Text               (text display)
 ** !     +--Gadget             (base class for intuition gadgets)
 ** !     !  +--String          (string gadget)
@@ -736,6 +737,7 @@ struct MUI_List_TestPos_Result
 #define ImageObject         MUI_NewObject(MUIC_Image
 #define BitmapObject        MUI_NewObject(MUIC_Bitmap
 #define BodychunkObject     MUI_NewObject(MUIC_Bodychunk
+#define RawimageObject      MUI_NewObject(MUIC_Rawimage
 #define NotifyObject        MUI_NewObject(MUIC_Notify
 #define ApplicationObject   MUI_NewObject(MUIC_Application
 #define TextObject          MUI_NewObject(MUIC_Text
@@ -3205,6 +3207,30 @@ extern char MUIC_Popmenu[];
 #define MUIV_Popmenu_Type_Cycle 2
 #define MUIV_Popmenu_Type_Popup 3
 #define MUIV_Popmenu_Type_Other 255
+
+
+/****************************************************************************/
+/** Rawimage                                                               **/
+/****************************************************************************/
+
+#ifdef _DCC
+extern char MUIC_Rawimage[];
+#else
+#define MUIC_Rawimage "Rawimage.mui"
+#endif
+
+/* Attributes */
+
+#define MUIA_Rawimage_Alpha                 0x8042e72e /* V20 isg ULONG             */
+#define MUIA_Rawimage_CLUT                  0x8042be74 /* V20 isg ULONG *           */
+#define MUIA_Rawimage_Data                  0x80422919 /* V20 isg APTR              */
+#define MUIA_Rawimage_DataFormat            0x8042a6e8 /* V20 isg ULONG             */
+#define MUIA_Rawimage_Height                0x8042f5bd /* V20 isg LONG              */
+#define MUIA_Rawimage_Width                 0x8042f98c /* V20 isg LONG              */
+
+#define MUIV_Rawimage_DataFormat_CLUT8 0
+#define MUIV_Rawimage_DataFormat_RGB24 1
+#define MUIV_Rawimage_DataFormat_ARGB32 2
 
 
 /*****************************************/
