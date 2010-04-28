@@ -1,19 +1,35 @@
-/*
- * $Id$
- */
+/***************************************************************************
 
+ TextEditor.mcc - Textediting MUI Custom Class
+ Copyright (C) 1997-2000 Allan Odgaard
+ Copyright (C) 2005-2010 by TextEditor.mcc Open Source Team
 
-#if defined(__MORPHOS__)
-// bzip2 compressed ARGB data
-extern const unsigned char icon32[];
-#else
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ TextEditor class Support Site:  http://www.sf.net/projects/texteditor-mcc
+
+ $Id$
+
+***************************************************************************/
+
+#if !defined(__MORPHOS__)
 // uncompressed ARGB data
 extern const unsigned long icon32[];
-#endif
-#define ICON32_WIDTH 24
+#define ICON32_WIDTH  24
 #define ICON32_HEIGHT 20
-#define ICON32_DEPTH 32
-
+#define ICON32_DEPTH  32
+#else
+// bzip2 compressed ARGB data
+extern const unsigned char icon32[];
+#endif
 
 #ifdef USE_ICON8_COLORS
 const ULONG icon8_colors[24] =
