@@ -78,6 +78,8 @@ static VOID ClassExpunge(UNUSED struct Library *base);
 #include "icon.h"
 #if defined(__MORPHOS__)
 #include <mui/Rawimage_mcc.h>
+#else
+#include <mui/NBitmap_mcc.h>
 #endif
 
 #define ICON8OBJECT \
@@ -111,6 +113,18 @@ static Object *get_prefs_image(void)
     MUIA_Rawimage_Width,      ICON32_WIDTH,
     MUIA_Rawimage_Height,     ICON32_HEIGHT,
   End;
+
+  if(obj == NULL)
+  {
+    obj = NBitmapObject,
+      MUIA_FixWidth,              ICON32_WIDTH,
+      MUIA_FixHeight,             ICON32_HEIGHT,
+      MUIA_NBitmap_RawData,       icon32,
+      MUIA_NBitmap_RawDataFormat, MUIV_NBitmap_RawDataFormat_ARGB32,
+      MUIA_NBitmap_RawDataWidth,  ICON32_WIDTH,
+      MUIA_NBitmap_RawDataHeight, ICON32_HEIGHT,
+    End;
+  }
   #endif
 
   if(obj == NULL)
