@@ -45,21 +45,16 @@
 #define MUIA_NBitmap_Height         0xa94f0007UL
 #define MUIA_NBitmap_MaxWidth       0xa94f0008UL
 #define MUIA_NBitmap_MaxHeight      0xa94f0009UL
-#define MUIA_NBitmap_RawData        0xa94f000aUL
-#define MUIA_NBitmap_RawDataFormat  0xa94f000bUL
-#define MUIA_NBitmap_RawDataWidth   0xa94f000cUL
-#define MUIA_NBitmap_RawDataHeight  0xa94f000dUL
-#define MUIA_NBitmap_RawDataCLUT    0xa94f000eUL
-#define MUIA_NBitmap_RawDataAlpha   0xa94f000fUL
+#define MUIA_NBitmap_CLUT           0xa94f000aUL
+#define MUIA_NBitmap_Alpha          0xa94f000bUL
 
 /* source types */
 #define MUIV_NBitmap_Type_File      0
 #define MUIV_NBitmap_Type_DTObject  1
+#define MUIV_NBitmap_Type_CLUT8     2
+#define MUIV_NBitmap_Type_RGB24     3
+#define MUIV_NBitmap_Type_ARGB32    4
 
-/* rawdata formats */
-#define MUIV_NBitmap_RawDataFormat_CLUT8  0
-#define MUIV_NBitmap_RawDataFormat_RGB24  1
-#define MUIV_NBitmap_RawDataFormat_ARGB32 2
 
 /* macros */
 #define NBitmapFile(filename)       NBitmapObject, \
