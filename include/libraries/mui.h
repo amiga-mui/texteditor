@@ -737,7 +737,9 @@ struct MUI_List_TestPos_Result
 #define ImageObject         MUI_NewObject(MUIC_Image
 #define BitmapObject        MUI_NewObject(MUIC_Bitmap
 #define BodychunkObject     MUI_NewObject(MUIC_Bodychunk
+#if !defined(__MORPHOS__)
 #define RawimageObject      MUI_NewObject(MUIC_Rawimage
+#endif
 #define NotifyObject        MUI_NewObject(MUIC_Notify
 #define ApplicationObject   MUI_NewObject(MUIC_Application
 #define TextObject          MUI_NewObject(MUIC_Text
@@ -3213,6 +3215,7 @@ extern char MUIC_Popmenu[];
 /** Rawimage                                                               **/
 /****************************************************************************/
 
+#if !defined(__MORPHOS__)
 #ifdef _DCC
 extern char MUIC_Rawimage[];
 #else
@@ -3231,7 +3234,7 @@ extern char MUIC_Rawimage[];
 #define MUIV_Rawimage_DataFormat_CLUT8 0
 #define MUIV_Rawimage_DataFormat_RGB24 1
 #define MUIV_Rawimage_DataFormat_ARGB32 2
-
+#endif
 
 /*****************************************/
 /* End of automatic header file creation */
