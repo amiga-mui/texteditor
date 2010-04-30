@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-04-30 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/library.c: added version check for NBitmap.mcc. Only version V15.8+ can
+    handle raw image data.
+
 2010-04-28 Jens Langner <Jens.Langner@light-speed.de>
 
   * mcp/icon.c: now the new NBitmap.mcc is explicitly used for displaying the

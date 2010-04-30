@@ -63,6 +63,10 @@ struct LocaleBase *LocaleBase = NULL;
 struct LocaleIFace *ILocale = NULL;
 #endif
 
+#if !defined(__MORPHOS__)
+static BOOL nbitmapCanHandleRawData;
+#endif
+
 /******************************************************************************/
 /* define the functions used by the startup code ahead of including mccinit.c */
 /******************************************************************************/
@@ -88,14 +92,21 @@ static Object *get_prefs_image(void)
   Object *obj;
 
   #if !defined(__MORPHOS__)
-  obj = NBitmapObject,
-    MUIA_FixWidth,       ICON32_WIDTH,
-    MUIA_FixHeight,      ICON32_HEIGHT,
-    MUIA_NBitmap_Type,   MUIV_NBitmap_Type_ARGB32,
-    MUIA_NBitmap_Normal, icon32,
-    MUIA_NBitmap_Width,  ICON32_WIDTH,
-    MUIA_NBitmap_Height, ICON32_HEIGHT,
-  End;
+  if(nbitmapCanHandleRawData == TRUE)
+  {
+    obj = NBitmapObject,
+      MUIA_FixWidth,       ICON32_WIDTH,
+      MUIA_FixHeight,      ICON32_HEIGHT,
+      MUIA_NBitmap_Type,   MUIV_NBitmap_Type_ARGB32,
+      MUIA_NBitmap_Normal, icon32,
+      MUIA_NBitmap_Width,  ICON32_WIDTH,
+      MUIA_NBitmap_Height, ICON32_HEIGHT,
+    End;
+  }
+  else
+  {
+    obj = NULL;
+  }
   #else
   obj = RawimageObject,
     MUIA_Rawimage_Data, icon32,
@@ -138,6 +149,28 @@ static BOOL ClassInit(UNUSED struct Library *base)
     // open the TextEditor.mcp catalog
     OpenCat();
 
+    #if !defined(__MORPHOS__)
+    {
+      struct Library *nbitmapMcc;
+
+      nbitmapCanHandleRawData = FALSE;
+
+      // we need at least NBitmap.mcc V15.8 to be able to let it handle raw image data
+      if((nbitmapMcc = OpenLibrary("NBitmap.mcc", 0)) != NULL)
+      {
+        SHOWVALUE(DBF_ALWAYS, nbitmapMcc->lib_Version);
+        SHOWVALUE(DBF_ALWAYS, nbitmapMcc->lib_Revision);
+
+        if(nbitmapMcc->lib_Version > 15 || (nbitmapMcc->lib_Version == 15 && nbitmapMcc->lib_Revision >= 8))
+          nbitmapCanHandleRawData = TRUE;
+
+        CloseLibrary(nbitmapMcc);
+      }
+
+      SHOWVALUE(DBF_ALWAYS, nbitmapCanHandleRawData);
+    }
+    #endif
+
     // Initialize the subclasses
     if(CreateSubClasses())
       return TRUE;
@@ -147,7 +180,7 @@ static BOOL ClassInit(UNUSED struct Library *base)
     LocaleBase  = NULL;
   }
 
-  return FALSE ;
+  return FALSE;
 }
 
 
