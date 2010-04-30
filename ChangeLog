@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.32 RELEASE ############################################################
+
+2010-04-30 Jens Langner <Jens.Langner@light-speed.de>
+
+  * misc: final v15.32 release preparations
+
 2010-04-30 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/library.c: added version check for NBitmap.mcc. Only version V15.8+ can
