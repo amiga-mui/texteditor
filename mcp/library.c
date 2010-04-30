@@ -156,7 +156,7 @@ static BOOL ClassInit(UNUSED struct Library *base)
       nbitmapCanHandleRawData = FALSE;
 
       // we need at least NBitmap.mcc V15.8 to be able to let it handle raw image data
-      if((nbitmapMcc = OpenLibrary("NBitmap.mcc", 0)) != NULL)
+      if((nbitmapMcc = OpenLibrary("mui/NBitmap.mcc", 0)) != NULL)
       {
         SHOWVALUE(DBF_ALWAYS, nbitmapMcc->lib_Version);
         SHOWVALUE(DBF_ALWAYS, nbitmapMcc->lib_Revision);
