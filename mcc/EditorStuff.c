@@ -39,7 +39,7 @@
 #include <proto/locale.h>
 
 ///utf8_to_ansi()
-static char *utf8_to_ansi(struct InstData *data, STRPTR src)
+static char *utf8_to_ansi(STRPTR src)
 {
    static struct KeyMap *keymap;
    CONST_STRPTR ptr;
@@ -81,7 +81,9 @@ static char *utf8_to_ansi(struct InstData *data, STRPTR src)
    }
    while (octets > 0);
 
-   dst = AllocVecPooled(data->mypool, strlength);
+   // the new string must be AllocVec()'d instead of AllocVecPooled()'d, because
+   // we handle data from the clipboard server which also uses AllocVec()
+   dst = AllocVec(strlength, SHARED_MEMFLAG);
 
    if (dst)
    {
@@ -117,7 +119,8 @@ static char *utf8_to_ansi(struct InstData *data, STRPTR src)
       }
       while (octets > 0);
 
-      FreeVecPooled(data->mypool, src);   // Free original buffer
+      // free original buffer
+      FreeVec(src);
    }
 
    if(dst == NULL)
@@ -220,6 +223,7 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
             if((styles = AllocVecPooled(data->mypool, allocatedStyles * sizeof(*styles))) != NULL)
               memcpy(styles, line->line.Styles, allocatedStyles * sizeof(*styles));
 
+            // the clipboard server used AllocVec() before
             FreeVec(line->line.Styles);
             line->line.Styles = NULL;
           }
@@ -239,6 +243,7 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
             if((colors = AllocVecPooled(data->mypool, allocatedColors * sizeof(*colors))) != NULL)
               memcpy(colors, line->line.Colors, allocatedColors * sizeof(*colors));
 
+            // the clipboard server used AllocVec() before
             FreeVec(line->line.Colors);
             line->line.Colors = NULL;
           }
@@ -270,10 +275,10 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
             #if defined(__MORPHOS__)
             if(codeset == CODESET_UTF8 && IS_MORPHOS2)
             {
-              // convert UTF8 string
-              contents = utf8_to_ansi(data, contents);
+              // convert UTF8 string to ANSI
+              line->line.Contents = utf8_to_ansi(line->line.Contents);
               // and update the contents pointer as well
-              line->line.Contents = contents;
+              contents = line->line.Contents;
             }
             #endif
 
@@ -352,7 +357,8 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
             }
           }
 
-          FreeVecPooled(data->mypool, line->line.Contents);
+          // the clipboard server used AllocVec() before
+          FreeVec(line->line.Contents);
           line->line.Contents = NULL;
         }
 
