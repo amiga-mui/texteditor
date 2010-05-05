@@ -347,7 +347,7 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
             }
           }
 
-          FreeVec(line->line.Contents);
+          FreeVecPooled(data->mypool, line->line.Contents);
           line->line.Contents = NULL;
         }
 
