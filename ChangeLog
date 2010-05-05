@@ -9,6 +9,8 @@ $URL$
 
   * mcc/EditorStuff.c: fixed a wrong deallocation which might have lead to a
     crash (FreeVec instead of FreeVecPooled).
+  * mcc/EditorStuff.c: after converting a text clip from UTF8 the line content
+    pointer is now updated correctly. This fixes bug #2995825.
 
 #### v15.32 RELEASE ############################################################
 

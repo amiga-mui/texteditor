@@ -269,7 +269,12 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
 
             #if defined(__MORPHOS__)
             if(codeset == CODESET_UTF8 && IS_MORPHOS2)
+            {
+              // convert UTF8 string
               contents = utf8_to_ansi(data, contents);
+              // and update the contents pointer as well
+              line->line.Contents = contents;
+            }
             #endif
 
             SHOWSTRING(DBF_CLIPBOARD, contents);
