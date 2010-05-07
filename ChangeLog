@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-05-07 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/InitConfig.c: fixed wrong pen allocation.
+
 2010-05-05 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: fixed a wrong deallocation which might have lead to a
