@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-05-10 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/AllocBitMap.c: fixed wrong freeing of a memory block in case another
+    allocation failed. This only could affect classic systems.
+
 2010-05-07 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/InitConfig.c: fixed wrong pen allocation.
