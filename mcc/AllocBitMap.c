@@ -78,7 +78,7 @@ struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG width), REG(d1, LONG he
       }
       else
       {
-        FreeMem(bm,sizeof(*bm));
+        FreeVec(bm);
         bm = NULL;
       }
     }
