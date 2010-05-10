@@ -361,9 +361,7 @@ void CleanupSelectPointer(struct InstData *data)
       E(DBF_ALWAYS, "pointer was still active upon MUIM_Cleanup!!");
     #endif
 
-    #if defined(__amigaos4__) || defined(__MORPHOS__)
-    DisposeObject(data->PointerObj);
-    #elif defined(__MORPHOS__)
+    #if defined(__amigaos4__)
     DisposeObject(data->PointerObj);
     #else
     if(((struct Library *)IntuitionBase)->lib_Version >= 39)
