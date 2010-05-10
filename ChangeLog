@@ -9,6 +9,9 @@ $URL$
 
   * mcc/AllocBitMap.c: fixed wrong freeing of a memory block in case another
     allocation failed. This only could affect classic systems.
+  * mcc/AllocFunctions.c: integrated the OS3.0 Alloc/FreeVecPooled() functions
+    as well as the AllocLine()/FreeLine() functions into the memory tracking
+    framework.
 
 2010-05-07 Thore Böckelmann <tboeckel@gmx.de>
 
