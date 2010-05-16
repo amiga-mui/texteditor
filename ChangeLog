@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.33 RELEASE ############################################################
+
+2010-05-16 Jens Langner <Jens.Langner@light-speed.de>
+
+  * misc: final v15.33 release preparations
+
 2010-05-10 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/AllocBitMap.c: fixed wrong freeing of a memory block in case another
