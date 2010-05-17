@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-05-17 Thore Böckelmann <tboeckel@gmx.de>
+
+ * mcc/SpellChecker.c: slightly improved the setup of the Rexx messages to avoid
+   accessing possible NULL pointers.
+
 #### v15.33 RELEASE ############################################################
 
 2010-05-16 Jens Langner <Jens.Langner@light-speed.de>
