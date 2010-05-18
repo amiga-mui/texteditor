@@ -60,7 +60,7 @@ BOOL Undo(struct InstData *data)
   D(DBF_UNDO, "before maxUndoSteps=%ld nextUndoStep=%ld usedUndoSteps=%ld", data->maxUndoSteps, data->nextUndoStep, data->usedUndoSteps);
 
   // check if there is something in the undo buffer available
-  if(data->nextUndoStep > 0)
+  if(isFlagClear(data->flags, FLG_ReadOnly) && data->nextUndoStep > 0)
   {
     struct UserAction *action;
     BOOL moveCursor = TRUE;
@@ -210,9 +210,11 @@ BOOL Undo(struct InstData *data)
 
   D(DBF_UNDO, "after  maxUndoSteps=%ld nextUndoStep=%ld usedUndoSteps=%ld", data->maxUndoSteps, data->nextUndoStep, data->usedUndoSteps);
 
+
   RETURN(success);
   return success;
 }
+
 ///
 /// Redo()
 BOOL Redo(struct InstData *data)
@@ -224,7 +226,7 @@ BOOL Redo(struct InstData *data)
   D(DBF_UNDO, "before maxUndoSteps=%ld nextUndoStep=%ld usedUndoSteps=%ld", data->maxUndoSteps, data->nextUndoStep, data->usedUndoSteps);
 
   // check if there something to redo at all
-  if(data->nextUndoStep < data->usedUndoSteps)
+  if(isFlagClear(data->flags, FLG_ReadOnly) && data->nextUndoStep < data->usedUndoSteps)
   {
     struct UserAction *action;
 
@@ -353,7 +355,7 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
 
   D(DBF_UNDO, "before maxUndoSteps=%ld nextUndoStep=%ld usedUndoSteps=%ld", data->maxUndoSteps, data->nextUndoStep, data->usedUndoSteps);
 
-  if(data->maxUndoSteps > 0)
+  if(isFlagClear(data->flags, FLG_ReadOnly) && data->maxUndoSteps > 0)
   {
     struct UserAction *action;
 
