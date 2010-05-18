@@ -13,6 +13,7 @@ $URL$
    the deleted text to the undo buffer. This fixes bug #3003238.
  * mcc/UndoFunctions.c: trying to perform any undo/redo action on a ready-only
    instance will let this action fail.
+ * added stuff for automated build of release archives.
 
 2010-05-17 Thore Böckelmann <tboeckel@gmx.de>
 

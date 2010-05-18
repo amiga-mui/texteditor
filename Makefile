@@ -25,30 +25,41 @@ all: mcc mcp demo
 
 .PHONY: mcc
 mcc:
-	@$(MAKE) -C mcc --no-print-directory
+	@$(MAKE) OS=os3 -C mcc --no-print-directory
+	@$(MAKE) OS=os4 -C mcc --no-print-directory
+	@$(MAKE) OS=mos -C mcc --no-print-directory
 
 .PHONY: mcp
 mcp:
-	@$(MAKE) -C mcp --no-print-directory
+	@$(MAKE) OS=os3 -C mcp --no-print-directory
+	@$(MAKE) OS=os4 -C mcp --no-print-directory
+	@$(MAKE) OS=mos -C mcp --no-print-directory
 
 .PHONY: demo
 demo:
-	@$(MAKE) -C demo --no-print-directory
+	@$(MAKE) OS=os3 -C demo --no-print-directory
+	@$(MAKE) OS=os4 -C demo --no-print-directory
+	@$(MAKE) OS=mos -C demo --no-print-directory
 
 .PHONY: clean
 clean:
-	@$(MAKE) -C mcc --no-print-directory clean
-	@$(MAKE) -C mcp --no-print-directory clean
-	@$(MAKE) -C demo --no-print-directory clean
+	@$(MAKE) OS=os3 -C mcc --no-print-directory clean
+	@$(MAKE) OS=os4 -C mcp --no-print-directory clean
+	@$(MAKE) OS=mos -C demo --no-print-directory clean
 
 .PHONY: cleanall
 cleanall:
-	@$(MAKE) -C mcc --no-print-directory cleanall
-	@$(MAKE) -C mcp --no-print-directory cleanall
-	@$(MAKE) -C demo --no-print-directory cleanall
+	@$(MAKE) OS=os3 -C mcc --no-print-directory cleanall
+	@$(MAKE) OS=os4 -C mcp --no-print-directory cleanall
+	@$(MAKE) OS=mos -C demo --no-print-directory cleanall
 
 .PHONY: install
 install:
-	@$(MAKE) -C mcc --no-print-directory install
-	@$(MAKE) -C mcp --no-print-directory install
-	@$(MAKE) -C demo --no-print-directory install
+	@$(MAKE) OS=os3 -C mcc --no-print-directory install
+	@$(MAKE) OS=os4 -C mcp --no-print-directory install
+	@$(MAKE) OS=mos -C demo --no-print-directory install
+
+.PHONY: release
+release:
+	@sh tools/bumprev.sh all
+	@sh tools/mkrelease.sh

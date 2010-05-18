@@ -70,7 +70,7 @@ struct MUIMasterIFace *IMUIMaster;
 struct RexxSysIFace *IRexxSys;
 #endif
 
-#ifndef MUIA_Application_UsedClasses 
+#ifndef MUIA_Application_UsedClasses
 #define MUIA_Application_UsedClasses  0x8042e9a7  /* V20 STRPTR * i.. */
 #endif
 #define MUIV_RunARexxScript           0xad800000
