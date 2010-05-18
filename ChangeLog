@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-05-18 Thore Böckelmann <tboeckel@gmx.de>
+
+ * mcc/UndoFunctions.c: use memmove() instead of memcpy() to shift the undo
+   steps as the buffers definitely do overlap due to the in-place operation.
+
 2010-05-17 Thore Böckelmann <tboeckel@gmx.de>
 
  * mcc/SpellChecker.c: slightly improved the setup of the Rexx messages to avoid
