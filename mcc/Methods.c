@@ -155,14 +155,14 @@ IPTR mClearText(struct IClass *cl, Object *obj, UNUSED Msg msg)
   {
     if(Init_LineNode(data, newcontents, NULL, "\n") == TRUE)
     {
-      if(data->maxUndoSteps != 0)
+      if(isFlagClear(data->flags, FLG_ReadOnly) && data->maxUndoSteps != 0)
       {
         struct  marking newblock;
 
         newblock.startx = 0;
         newblock.startline = data->firstline;
         newblock.stopline = data->firstline;
-        while(newblock.stopline->next)
+        while(newblock.stopline->next != NULL)
         {
           newblock.stopline = newblock.stopline->next;
         }

@@ -9,6 +9,8 @@ $URL$
 
  * mcc/UndoFunctions.c: use memmove() instead of memcpy() to shift the undo
    steps as the buffers definitely do overlap due to the in-place operation.
+ * mcc/Methods.c: clearing the text of a read-only instance will no longer add
+   the deleted text to the undo buffer. This fixes bug #3003238.
 
 2010-05-17 Thore Böckelmann <tboeckel@gmx.de>
 
