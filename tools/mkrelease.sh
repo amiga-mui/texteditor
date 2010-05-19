@@ -2,32 +2,6 @@
 
 ############################################################################
 #
-# YAM - Yet Another Mailer
-# Copyright (C) 1995-2000 by Marcel Beck <mbeck@mcc.ch>
-# Copyright (C) 2000-2010 by YAM Open Source Team
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-#
-# YAM Official Support Site :  http://www.mcc.ch
-# YAM OpenSource project    :  http://sourceforge.net/projects/mccos/
-#
-# $Id: mkrelease.sh 4679 2010-04-20 08:59:49Z thboeckel $
-#
-############################################################################
-############################################################################
-#
 # TextEditor.mcc - Textediting MUI Custom Class
 # Copyright (C) 1997-2000 Allan Odgaard
 # Copyright (C) 2005-2010 by TextEditor.mcc Open Source Team
@@ -114,5 +88,5 @@ releaserev=`grep "#define LIB_REVISION" mcc/version.h| awk '{ print $3 }'`
 echo "  MK MCC_TextEditor-$releasever.$releaserev.lha"
 find release -nowarn -name ".svn" -exec rm -rf {} \; 2>/dev/null
 pushd release >/dev/null
-lha -aq ../MCC_TextEditor-$releasever.$releaserev.lha *
+lha -aq2 ../MCC_TextEditor-$releasever.$releaserev.lha *
 popd >/dev/null
