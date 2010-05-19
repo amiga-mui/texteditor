@@ -59,7 +59,10 @@ install:
 	@$(MAKE) OS=os4 -C mcp --no-print-directory install
 	@$(MAKE) OS=mos -C demo --no-print-directory install
 
+.PHONY: bumprev
+bumprev:
+	@sh tools/bumprev.sh all
+
 .PHONY: release
 release:
-	@sh tools/bumprev.sh all
 	@sh tools/mkrelease.sh
