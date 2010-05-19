@@ -18,7 +18,7 @@
 #
 # TextEditor class Support Site:  http://www.sf.net/projects/texteditor-mcc
 #
-# $Id: version.h 647 2010-05-16 11:46:34Z damato $
+# $Id$
 #
 ############################################################################
 
@@ -83,7 +83,7 @@ cp doc/MCC_TextEditor.guide "release/MCC_TextEditor/Docs/"
 cp mcp/locale/TextEditor_mcp.cd "release/MCC_TextEditor/Locale/"
 
 releasever=`grep "#define LIB_VERSION" mcc/version.h | awk '{ print $3 }'`
-releaserev=`grep "#define LIB_REVISION" mcc/version.h| awk '{ print $3 }'`
+releaserev=`grep "#define LIB_REVISION" mcc/version.h | awk '{ print $3 }'`
 
 echo "  MK MCC_TextEditor-$releasever.$releaserev.lha"
 find release -nowarn -name ".svn" -exec rm -rf {} \; 2>/dev/null
