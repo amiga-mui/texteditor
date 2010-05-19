@@ -367,6 +367,7 @@ int main(void)
                                       LIB_COPYRIGHT "\n"
                                       "\33l\n\33[s:9]\n"
                                       "For feedback write to: Duff@DIKU.DK\n"
+                                      "\33b\33p[1]1\33p[2]2\33p[3]3\33p[4]4\33p[5]5\33p[6]6\33p[7]7\33p[8]8 Testtext\33n\n"
                                       "For the latest version, try: \33p[7]\33uhttp://www.DIKU.dk/students/duff/texteditor/\33n\n"
                                       "\n"
                                       "\33hThis gadget is not \33ifreeware\33n. You may not use it in your own programs without a licence. A licence can be obtained thru the author.\n"

@@ -46,8 +46,7 @@ make -C mcc release
 make -C mcp release
 make -C demo release
 
-#for os in os3 os4 mos aros-i386 aros-ppc aros-x86_64; do
-for os in os3 os4 mos; do
+for os in os3 os4 mos aros-i386 aros-ppc aros-x86_64; do
 	case $os in
 	    os3)         fullsys="AmigaOS3";;
 	    os4)         fullsys="AmigaOS4";;
@@ -57,30 +56,30 @@ for os in os3 os4 mos; do
 	    aros-x86_64) fullsys="AROS-x86_64";;
 	esac
 	mkdir -p "release/MCC_TextEditor/Libs/MUI/$fullsys"
-	cp demo/bin_$os/TextEditor-Demo "release/MCC_TextEditor/Demos/TextEditor-Demo-$fullsys"
-	cp dist/MCC_TextEditor/Demos/TextEditor-Demo.info "release/MCC_TextEditor/Demos/TextEditor-Demo-$fullsys.info"
-	cp mcc/bin_$os/TextEditor.mcc "release/MCC_TextEditor/Libs/MUI/$fullsys/"
-	cp mcp/bin_$os/TextEditor.mcp "release/MCC_TextEditor/Libs/MUI/$fullsys/"
+	cp -a demo/bin_$os/TextEditor-Demo "release/MCC_TextEditor/Demos/TextEditor-Demo-$fullsys"
+	cp -a dist/MCC_TextEditor/Demos/TextEditor-Demo.info "release/MCC_TextEditor/Demos/TextEditor-Demo-$fullsys.info"
+	cp -a mcc/bin_$os/TextEditor.mcc "release/MCC_TextEditor/Libs/MUI/$fullsys/"
+	cp -a mcp/bin_$os/TextEditor.mcp -a "release/MCC_TextEditor/Libs/MUI/$fullsys/"
 done
 
 make -C mcp catalogs
 for language in czech danish french german russian swedish; do
 	mkdir -p "release/MCC_TextEditor/Locale/Catalogs/$language"
-	cp mcp/locale/$language.catalog "release/MCC_TextEditor/Locale/Catalogs/$language/TextEditor_mcp.catalog"
+	cp -a mcp/locale/$language.catalog "release/MCC_TextEditor/Locale/Catalogs/$language/TextEditor_mcp.catalog"
 done
 
-cp -R dist/* "release/"
+cp -a -R dist/* "release/"
 rm "release/MCC_TextEditor/Demos/TextEditor-Demo.info"
-cp AUTHORS ChangeLog COPYING "release/MCC_TextEditor/"
-cp doc/MCC_TextEditor.readme "release/MCC_TextEditor/ReadMe"
-cp demo/*.ilbm "release/MCC_TextEditor/Demos/"
-cp -R demo/rexx/* "release/MCC_TextEditor/Demos/Rexx/"
-cp doc/MCC_TextEditor.doc "release/MCC_TextEditor/Developer/Autodocs/"
-cp demo/*.c "release/MCC_TextEditor/Developer/C/Examples/"
-cp demo/Makefile "release/MCC_TextEditor/Developer/C/Examples/"
-cp include/mui/TextEditor_mcc.h "release/MCC_TextEditor/Developer/C/include/mui/"
-cp doc/MCC_TextEditor.guide "release/MCC_TextEditor/Docs/"
-cp mcp/locale/TextEditor_mcp.cd "release/MCC_TextEditor/Locale/"
+cp -a AUTHORS ChangeLog COPYING "release/MCC_TextEditor/"
+cp -a doc/MCC_TextEditor.readme "release/MCC_TextEditor/ReadMe"
+cp -a demo/*.ilbm "release/MCC_TextEditor/Demos/"
+cp -a -R demo/rexx/* "release/MCC_TextEditor/Demos/Rexx/"
+cp -a doc/MCC_TextEditor.doc "release/MCC_TextEditor/Developer/Autodocs/"
+cp -a demo/*.c "release/MCC_TextEditor/Developer/C/Examples/"
+cp -a demo/Makefile "release/MCC_TextEditor/Developer/C/Examples/"
+cp -a include/mui/TextEditor_mcc.h "release/MCC_TextEditor/Developer/C/include/mui/"
+cp -a doc/MCC_TextEditor.guide "release/MCC_TextEditor/Docs/"
+cp -a mcp/locale/TextEditor_mcp.cd "release/MCC_TextEditor/Locale/"
 
 releasever=`grep "#define LIB_VERSION" mcc/version.h | awk '{ print $3 }'`
 releaserev=`grep "#define LIB_REVISION" mcc/version.h | awk '{ print $3 }'`
@@ -88,5 +87,5 @@ releaserev=`grep "#define LIB_REVISION" mcc/version.h | awk '{ print $3 }'`
 echo "  MK MCC_TextEditor-$releasever.$releaserev.lha"
 find release -nowarn -name ".svn" -exec rm -rf {} \; 2>/dev/null
 pushd release >/dev/null
-lha -aq2 ../MCC_TextEditor-$releasever.$releaserev.lha *
+lha -aq ../MCC_TextEditor-$releasever.$releaserev.lha *
 popd >/dev/null
