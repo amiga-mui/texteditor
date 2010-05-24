@@ -195,7 +195,8 @@ CATALOGS = $(LOCALE)/czech.catalog \
            $(LOCALE)/french.catalog \
            $(LOCALE)/german.catalog \
            $(LOCALE)/russian.catalog \
-           $(LOCALE)/swedish.catalog
+           $(LOCALE)/swedish.catalog \
+           $(LOCALE)/polish.catalog
 
 
 # different options per target OS
