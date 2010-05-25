@@ -5,6 +5,14 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-05-25 Matthias Rustler <mrustler@gmx.de>
+
+  * mcp/mmakefile.src: icon.c added
+  * mcp/locale/TextEditor_mcp.cd: one string corrected
+  * mcp/locale/french.ct: there was a more recent version
+    in the AROS source
+  * include/mccinit.c: updated with fixes for AROS V1 API
+
 2010-05-25 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleARexx.c: fixed a NULL pointer access when the "SELECTNONE"
