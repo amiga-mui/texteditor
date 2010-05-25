@@ -313,7 +313,7 @@ static ULONG CallFunction(struct InstData *data, UWORD function, IPTR *args, con
       {
         STRPTR buffer;
 
-        if((buffer = AllocVec(data->actualline->line.Length+1, MEMF_SHARED)))
+        if((buffer = AllocVec(data->actualline->line.Length+1, MEMF_SHARED)) != NULL)
         {
           memcpy(buffer, data->actualline->line.Contents, data->actualline->line.Length);
 
@@ -328,7 +328,7 @@ static ULONG CallFunction(struct InstData *data, UWORD function, IPTR *args, con
       {
         STRPTR buffer;
 
-        if((buffer = AllocVec(16, MEMF_SHARED)))
+        if((buffer = AllocVec(16, MEMF_SHARED)) != NULL)
         {
           LONG pos = 0;
 
@@ -413,7 +413,7 @@ static ULONG CallFunction(struct InstData *data, UWORD function, IPTR *args, con
         data->blockinfo.startline = actual;
         data->blockinfo.startx = 0;
 
-        while(actual->next)
+        while(actual->next != NULL)
           actual = actual->next;
 
         data->blockinfo.stopline = actual;
@@ -430,6 +430,8 @@ static ULONG CallFunction(struct InstData *data, UWORD function, IPTR *args, con
           data->blockinfo.enabled = FALSE;
           MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
         }
+        else
+          W(DBF_BLOCK, "no text selected (startline=%08lx, stopline=%08lx)", data->blockinfo.startline, data->blockinfo.stopline);
       }
       break;
     }
