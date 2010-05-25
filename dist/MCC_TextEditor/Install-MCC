@@ -1,0 +1,626 @@
+;
+; $VER: Install-MCC 1.0 (25.05.2010)
+;
+; $Id$
+;
+; History:
+;
+;   1.0   25.5.2010: initial release
+;
+
+
+;----------------------------------------------------------------------------
+; /// Setting up
+; Bultin language
+; Bit  0 = English
+; Bit  1 = German
+; Bit  2 = French
+; Bit  3 = Spanish
+; Bit  4 = Danish
+; Bit  5 = Italian
+; Bit  6 = Dutch
+; Bit  7 = Norwegian
+; Bit  8 = Swedish
+; Bit  9 = Polish
+; Bit 10 = Finnish
+; Bit 11 = Hungarian
+; Bit 12 = Greek
+; Bit 13 = Turkish
+; Bit 14 = Russian
+; Bit 15 = Czech
+(set #def_lang_english             $0001)
+(set #def_lang_german              $0002)
+(set #def_lang_french              $0004)
+(set #def_lang_spanish             $0008)
+(set #def_lang_danish              $0010)
+(set #def_lang_italian             $0020)
+(set #def_lang_dutch               $0040)
+(set #def_lang_norwegian           $0080)
+(set #def_lang_swedish             $0100)
+(set #def_lang_polish              $0200)
+(set #def_lang_finnish             $0400)
+(set #def_lang_hungarian           $0800)
+(set #def_lang_greek               $1000)
+(set #def_lang_turkish             $2000)
+(set #def_lang_russian             $4000)
+(set #def_lang_czech               $8000)
+; ///
+
+;----------------------------------------------------------------------------
+;/// ***** constant strings, do not change these!!
+(set #MCC_name "TextEditor")
+(set #MCP_languages %1100001100010111)
+
+;----------------------------------------------------------------------------
+;/// default language detection
+(set #i 0)
+(while (<> @language (select #i "russian" "suomi" "czech" "polski" "svenska" "nederlands" "greek" "français" "italiano" "dansk" "deutsch" @language))
+    (set #i (+ #i 1))
+)
+(if (= #i 12) ; LANGUAGE
+    (set #language "english")
+    (set #language @language)
+)
+
+(set #i 0)
+(set #language_default %1000000000000000) ; LANGUAGE
+(while (<> #language (select #i "czech" "russian" "türkçe" "greek" "magyar" "suomi" "polski" "svenska" "norsk" "nederlands" "italiano" "dansk" "español" "français" "deutsch" #language))
+    (
+        (set #language_default (shiftright #language_default 1))
+        (set #i (+ #i 1))
+    )
+)
+
+;----------------------------------------------------------------------------
+;/// ***** English
+(set #acknowledgeOS (cat "Please acknowledge the automatic\n"
+                         "detection of your operating system:"))
+(set #lang_catalog  (cat "Which catalog file do you want to install?\n"
+                         "(English language is built-in)"))
+(set #done          (cat "\n"
+                         #MCC_name ".mcc has been successfully installed.\n"))
+
+; ///
+; /// ***** Deutsch
+(if (= @language "deutsch")
+    (
+        (set #acknowledgeOS (cat "Bitte bestätigen Sie die automatische\n"
+                                 "Ermittlung Ihres Betriebssystems:"))
+        (set #lang_catalog  (cat "Welche catalog-Datei wollen Sie installieren?\n"
+                                 "(Englisch ist eingebaut)"))
+        (set #done          (cat "\n"
+                                 #MCC_name ".mcc wurde erfolgreich installiert.\n"))
+    )
+)
+; ///
+
+;----------------------------------------------------------------------------
+; /// Checking environment
+(set EXEC_ver (getversion "exec.library" (resident)))
+(set NEWLIB_ver (getversion "newlib.library" (resident)))
+(set AROS_ver (getversion "aros.library" (resident)))
+
+; we use newlib.library to check whether we are running on AmigaOS 4.x
+(if (>= NEWLIB_ver (* 4 65536))
+    (set #detectedSystem 1)
+    (
+        ; we are not running on AmigaOS 4.x
+        (if (>= AROS_ver (* 40 65536))
+            (set #detectedSystem 3)
+            (
+                ; we are not running on AROS
+                ; now check if we are running on MorphOS (exec.library V50+) or on AmigaOS 3.x
+                (if (>= EXEC_ver (* 50 65536))
+                    (set #detectedSystem 2)
+                    (set #detectedSystem 0)
+                )
+            )
+        )
+    )
+)
+
+(set #detectedSystem
+    (askchoice
+        (prompt #acknowledgeOS)
+        (help @askchoice-help)
+        (choices "AmigaOS 3.x"
+                 "AmigaOS 4.x"
+                 "MorphOS 1.x/2.x"
+                 "AROS i386"
+                 "AROS PPC"
+                 "AROS x86_64"
+        )
+        (default #detectedSystem)
+    )
+)
+; finally convert the system number into a string for easier understanding
+(set #detectedSystem
+    (select #detectedSystem "os3" "os4" "mos" "aros-i386" "aros-ppc" "aros-x86_64")
+)
+
+(if (= #detectedSystem "os4")
+    ; AmigaOS 4.x uses english locale names only
+    (
+        (set #cat_name_english               "english")
+        (set #cat_name_german                "german")
+        (set #cat_name_french                "french")
+        (set #cat_name_spanish               "spanish")
+        (set #cat_name_danish                "danish")
+        (set #cat_name_italian               "italian")
+        (set #cat_name_dutch                 "dutch")
+        (set #cat_name_norwegian             "norwegian")
+        (set #cat_name_swedish               "swedish")
+        (set #cat_name_polish                "polish")
+        (set #cat_name_finnish               "finnish")
+        (set #cat_name_hungarian             "hungarian")
+        (set #cat_name_greek                 "greek")
+        (set #cat_name_turkish               "turkish")
+        (set #cat_name_russian               "russian")
+        (set #cat_name_czech                 "czech")
+    )
+    ; all other systems use localized locale names
+    (
+        (set #cat_name_english               "english")
+        (set #cat_name_german                "deutsch")
+        (set #cat_name_french                "français")
+        (set #cat_name_spanish               "español")
+        (set #cat_name_danish                "dansk")
+        (set #cat_name_italian               "italiano")
+        (set #cat_name_dutch                 "nederlands")
+        (set #cat_name_norwegian             "norsk")
+        (set #cat_name_swedish               "svenska")
+        (set #cat_name_polish                "polski")
+        (set #cat_name_finnish               "suomio")
+        (set #cat_name_hungarian             "magyar")
+        (set #cat_name_greek                 "greek")
+        (set #cat_name_turkish               "türkçe")
+        (set #cat_name_russian               "russian")
+        (set #cat_name_czech                 "czech")
+    )
+)
+
+; set up the source and destination path
+(if (= #detectedSystem "os3")
+    (
+        (set #MCC_source "Libs/MUI/AmigaOS3")
+        (set #MCC_dest "MUI:libs/mui")
+    )
+)
+(if (= #detectedSystem "os4")
+    (
+        (set #MCC_source "Libs/MUI/AmigaOS4")
+        (set #MCC_dest "MUI:libs/mui")
+    )
+)
+(if (= #detectedSystem "mos")
+    (
+        (set #MCC_source "Libs/MUI/MorphOS")
+        (set #MCC_dest "SYS:Classes/MUI")
+    )
+)
+(if (= #detectedSystem "aros-i386")
+    (
+        (set #MCC_source "Libs/MUI/AROS-i386")
+        (set #MCC_dest "SYS:Classes/Zune")
+    )
+)
+(if (= #detectedSystem "aros-ppc")
+    (
+        (set #MCC_source "Libs/MUI/AROS-ppc")
+        (set #MCC_dest "SYS:Classes/Zune")
+    )
+)
+(if (= #detectedSystem "aros-x86_64")
+    (
+        (set #MCC_source "Libs/MUI/AROS-x86_64")
+        (set #MCC_dest "SYS:Classes/Zune")
+    )
+)
+
+; ///
+; /// Let's ask user for anything
+(complete 10)
+
+(if (= #detectedSystem "os4")
+    ; AmigaOS 4.x can handle different accents of one language (i.e. british english)
+    (set catalog_lang
+        (askoptions
+            (prompt #lang_catalog)
+            (help @askoptions-help)
+            (choices
+                (if (in #MCP_languages 0)
+                    (cat #prop "English")
+                    ("")
+                )
+                (if (in #MCP_languages 1)
+                    (cat #prop "Deutsch")
+                    ("")
+                )
+                (if (in #MCP_languages 2)
+                    (cat #prop "Français")
+                    ("")
+                )
+                (if (in #MCP_languages 3)
+                    (cat #prop "Español")
+                    ("")
+                )
+                (if (in #MCP_languages 4)
+                    (cat #prop "Dansk")
+                    ("")
+                )
+                (if (in #MCP_languages 5)
+                    (cat #prop "Italiano")
+                    ("")
+                )
+                (if (in #MCP_languages 6)
+                    (cat #prop "Nederlands")
+                    ("")
+                )
+                (if (in #MCP_languages 7)
+                    (cat #prop "Norsk")
+                    ("")
+                )
+                (if (in #MCP_languages 8)
+                    (cat #prop "Svenska")
+                    ("")
+                )
+                (if (in #MCP_languages 9)
+                    (cat #prop "Polski")
+                    ("")
+                )
+                (if (in #MCP_languages 10)
+                    (cat #prop "Suomi")
+                    ("")
+                )
+                (if (in #MCP_languages 11)
+                    (cat #prop "Magyar")
+                    ("")
+                )
+                (if (in #MCP_languages 12)
+                    (cat #prop "ÅëëçíéêÜ")
+                    ("")
+                )
+                (if (in #MCP_languages 13)
+                    (cat #prop "Türkçe")
+                    ("")
+                )
+                (if (in #MCP_languages 14)
+                    (cat #prop "Russian")
+                    ("")
+                )
+                (if (in #MCP_languages 15)
+                    (cat #prop "Czech")
+                    ("")
+                )
+            )
+            (default #language_default)
+        )
+    )
+    ; but AmigaOS 3.x, MorphOS and AROS can not
+    (set catalog_lang
+        (askoptions
+            (prompt #lang_catalog)
+            (help @askoptions-help)
+            (choices
+                (if (in #MCP_languages 0)
+                    (cat #prop "English")
+                    ("")
+                )
+                (if (in #MCP_languages 1)
+                    (cat #prop "Deutsch")
+                    ("")
+                )
+                (if (in #MCP_languages 2)
+                    (cat #prop "Français")
+                    ("")
+                )
+                (if (in #MCP_languages 3)
+                    (cat #prop "Español")
+                    ("")
+                )
+                (if (in #MCP_languages 4)
+                    (cat #prop "Dansk")
+                    ("")
+                )
+                (if (in #MCP_languages 5)
+                    (cat #prop "Italiano")
+                    ("")
+                )
+                (if (in #MCP_languages 6)
+                    (cat #prop "Nederlands")
+                    ("")
+                )
+                (if (in #MCP_languages 7)
+                    (cat #prop "Norsk")
+                    ("")
+                )
+                (if (in #MCP_languages 8)
+                    (cat #prop "Svenska")
+                    ("")
+                )
+                (if (in #MCP_languages 9)
+                    (cat #prop "Polski")
+                    ("")
+                )
+                (if (in #MCP_languages 10)
+                    (cat #prop "Suomi")
+                    ("")
+                )
+                (if (in #MCP_languages 11)
+                    (cat #prop "Magyar")
+                    ("")
+                )
+                (if (in #MCP_languages 12)
+                    (cat #prop "ÅëëçíéêÜ")
+                    ("")
+                )
+                (if (in #MCP_languages 13)
+                    (cat #prop "Türkçe")
+                    ("")
+                )
+                (if (in #MCP_languages 14)
+                    (cat #prop "Russian")
+                    ("")
+                )
+                (if (in #MCP_languages 15)
+                    (cat #prop "Czech")
+                    ("")
+                )
+            )
+            (default #language_default)
+        )
+    )
+)
+
+; ///
+; /// Here we go!
+(complete 33)
+
+; copy the .mcc and .mcp files
+(foreach #MCC_source "#?.mc?"
+    (copylib
+        (prompt @each-name)
+        (source (tackon #MCC_source @each-name))
+        (dest #MCC_dest)
+        (confirm)
+        (help @copylib-help)
+    )
+)
+
+(complete 66)
+
+; check if there were any catalogs selected at all
+(if (<> 0 catalog_lang)
+    (
+        ; copy the .cd file for people wanting to translate
+        (if (not (exists (tackon "LOCALE:Catalogs" (cat #MCC_name "_mcp.cd"))))
+            (copyfiles
+                (source (tackon "Locale" #MCC_name "_mcp.cd"))
+                (dest "LOCALE:Catalogs")
+                (infos)
+                (noposition)
+                (help @copyfiles-help)
+            )
+        )
+
+        ; german catalog file
+        (if (bitand catalog_lang #def_lang_german)
+            (
+                (makedir (tackon "LOCALE:Catalogs" #cat_name_german))
+
+                (copyfiles
+                     (source "Locale/Catalogs/german")
+                     (choices (cat #MCC_name "_mcp.catalog"))
+                     (dest (tackon "LOCALE:Catalogs" #cat_name_german))
+                )
+            )
+        )
+
+        ; french catalog file
+        (if (bitand catalog_lang #def_lang_french)
+            (
+                (makedir (tackon "LOCALE:Catalogs" #cat_name_french))
+
+                (copyfiles
+                    (source "Locale/Catalogs/french")
+                    (choices (cat #MCC_name "_mcp.catalog"))
+                    (dest (tackon "LOCALE:Catalogs" #cat_name_french))
+                )
+            )
+        )
+
+        ; spanish catalog file
+        (if (bitand catalog_lang #def_lang_spanish)
+            (
+                (makedir (tackon "LOCALE:Catalogs" #cat_name_spanish))
+
+                (copyfiles
+                    (source "Locale/Catalogs/spanish")
+                    (choices (cat #MCC_name "_mcp.catalog"))
+                    (dest (tackon "LOCALE:Catalogs" #cat_name_spanish))
+                )
+            )
+        )
+
+        ; danish catalog file
+        (if (bitand catalog_lang #def_lang_danish)
+            (
+                (makedir (tackon "LOCALE:Catalogs" #cat_name_danish))
+
+                (copyfiles
+                    (source "Locale/Catalogs/danish")
+                    (choices (cat #MCC_name "_mcp.catalog"))
+                    (dest (tackon "LOCALE:Catalogs" #cat_name_danish))
+                )
+            )
+        )
+
+        ; italian catalog file
+        (if (bitand catalog_lang #def_lang_italian)
+            (
+                (makedir (tackon "LOCALE:Catalogs" #cat_name_italian))
+
+                (copyfiles
+                    (source "Locale/Catalogs/italian")
+                    (choices (cat #MCC_name "_mcp.catalog"))
+                    (dest (tackon "LOCALE:Catalogs" #cat_name_italian))
+                )
+            )
+        )
+
+        ; dutch catalog file
+        (if (bitand catalog_lang #def_lang_dutch)
+            (
+                (makedir (tackon "LOCALE:Catalogs" #cat_name_dutch))
+
+                (copyfiles
+                    (source "Locale/Catalogs/dutch")
+                    (choices (cat #MCC_name "_mcp.catalog"))
+                    (dest (tackon "LOCALE:Catalogs" #cat_name_dutch))
+                )
+            )
+        )
+
+        ; norwegian catalog file
+        (if (bitand catalog_lang #def_lang_norwegian)
+            (
+                (makedir (tackon "LOCALE:Catalogs" #cat_name_norwegian))
+
+                (copyfiles
+                    (source "Locale/Catalogs/norwegian")
+                    (choices (cat #MCC_name "_mcp.catalog"))
+                    (dest (tackon "LOCALE:Catalogs" #cat_name_norwegian))
+                )
+            )
+        )
+
+        ; swedish catalog file
+        (if (bitand catalog_lang #def_lang_swedish)
+            (
+                (makedir (tackon "LOCALE:Catalogs" #cat_name_swedish))
+
+                (copyfiles
+                    (source "Locale/Catalogs/swedish")
+                    (choices (cat #MCC_name "_mcp.catalog"))
+                    (dest (tackon "LOCALE:Catalogs" #cat_name_swedish))
+                )
+            )
+        )
+
+        ; polish catalog file
+        (if (bitand catalog_lang #def_lang_polish)
+            (
+                (makedir (tackon "LOCALE:Catalogs" #cat_name_polish))
+
+                (copyfiles
+                    (source "Locale/Catalogs/polish")
+                    (choices (cat #MCC_name "_mcp.catalog"))
+                    (dest (tackon "LOCALE:Catalogs" #cat_name_polish))
+                )
+            )
+        )
+
+        ; finnish catalog file
+        (if (bitand catalog_lang #def_lang_finnish)
+            (
+                (makedir (tackon "LOCALE:Catalogs" #cat_name_finnish))
+
+                (copyfiles
+                    (source "Locale/Catalogs/finnish")
+                    (choices (cat #MCC_name "_mcp.catalog"))
+                    (dest (tackon "LOCALE:Catalogs" #cat_name_finnish))
+                )
+            )
+        )
+
+        ; hungarian catalog file
+        (if (bitand catalog_lang #def_lang_hungarian)
+            (
+                (makedir (tackon "LOCALE:Catalogs" #cat_name_hungarian))
+
+                (copyfiles
+                    (source "Locale/Catalogs/hungarian")
+                    (choices (cat #MCC_name "_mcp.catalog"))
+                    (dest (tackon "LOCALE:Catalogs" #cat_name_hungarian))
+                )
+            )
+        )
+
+        ; greek catalog file
+        (if (bitand catalog_lang #def_lang_greek)
+            (
+                (makedir (tackon "LOCALE:Catalogs" #cat_name_greek))
+
+                (copyfiles
+                    (source "Locale/Catalogs/greek")
+                    (choices (cat #MCC_name "_mcp.catalog"))
+                    (dest (tackon "LOCALE:Catalogs" #cat_name_greek))
+                )
+            )
+        )
+
+        ; turkish catalog file
+        (if (bitand catalog_lang #def_lang_turkish)
+            (
+                (makedir (tackon "LOCALE:Catalogs" #cat_name_turkish))
+
+                (copyfiles
+                    (source "Locale/Catalogs/turkish")
+                    (choices (cat #MCC_name "_mcp.catalog"))
+                    (dest (tackon "LOCALE:Catalogs" #cat_name_turkish))
+                )
+            )
+        )
+
+        ; russian catalog file
+        (if (bitand catalog_lang #def_lang_russian)
+            (
+                (makedir (tackon "LOCALE:Catalogs" #cat_name_russian))
+
+                (copyfiles
+                    (source "Locale/Catalogs/russian")
+                    (choices (cat #MCC_name "_mcp.catalog"))
+                    (dest (tackon "LOCALE:Catalogs" #cat_name_russian))
+                )
+            )
+        )
+
+        ; czech catalog file
+        (if (bitand catalog_lang #def_lang_czech)
+            (
+                (makedir (tackon "LOCALE:Catalogs" #cat_name_czech))
+
+                (copyfiles
+                    (source "Locale/Catalogs/czech")
+                    (choices (cat #MCC_name "_mcp.catalog"))
+                    (dest (tackon "LOCALE:Catalogs" #cat_name_czech))
+                )
+            )
+        )
+
+        ; now the accented languages follow
+        ; NOTE: only AmigaOS 4.x supports these!!
+        ;(if (= #detectedSystem "os4")
+        ;    ; english-british catalog file
+        ;    (if (bitand catalog_lang #def_lang_english_british)
+        ;        (
+        ;            (makedir (tackon "LOCALE:Catalogs" #cat_name_english_british))
+        ;
+        ;            (copyfiles
+        ;                (source "Locale/Catalogs/english-british")
+        ;                (choices (cat #MCC_name "_mcp.catalog"))
+        ;                (dest (tackon "LOCALE:Catalogs" #cat_name_english_british))
+        ;            )
+        ;        )
+        ;    )
+        ;)
+     )
+)
+
+(complete 100)
+
+(message #done)
+
+; /// ********************
+;----------------------------------------------------------------------------
+(exit (QUIET))
