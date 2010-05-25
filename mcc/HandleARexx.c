@@ -425,8 +425,11 @@ static ULONG CallFunction(struct InstData *data, UWORD function, IPTR *args, con
 
       case SELECTNONE:
       {
-        data->blockinfo.enabled = FALSE;
-        MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
+        if(data->blockinfo.startline != NULL && data->blockinfo.stopline != NULL)
+        {
+          data->blockinfo.enabled = FALSE;
+          MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
+        }
       }
       break;
     }
