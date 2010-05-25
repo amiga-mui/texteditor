@@ -19,6 +19,7 @@ FILES := library \
 	 Dispatcher \
 	 Keybindings \
 	 KeyStorage \
+	 icon \
 	 ObjectCreator \
 	 Debug \
 	 vastubs
@@ -50,8 +51,7 @@ workbench-classes-zune-texteditor-mcp-locale : $(LOCALE_C) $(LOCALE_H) \
     $(TARGETDIR)/svenska/TextEditor_mcp.catalog \
     $(TARGETDIR)/français/TextEditor_mcp.catalog \
     $(TARGETDIR)/dansk/TextEditor_mcp.catalog \
-    $(TARGETDIR)/russian/TextEditor_mcp.catalog \
-    $(TARGETDIR)/polish/TextEditor_mcp.catalog
+    $(TARGETDIR)/russian/TextEditor_mcp.catalog
 
 $(LOCALE_H): locale/TextEditor_mcp.cd C_h.sd
 	@$(FLEXCAT) $(SRCDIR)/$(CURDIR)/locale/TextEditor_mcp.cd $(LOCALE_H)=$(SRCDIR)/$(CURDIR)/C_h.sd
@@ -83,9 +83,6 @@ $(TARGETDIR)/russian/TextEditor_mcp.catalog: $(SRCDIR)/$(CURDIR)/locale/russian.
 	@$(MKDIR) $(TARGETDIR)/russian
 	@$(FLEXCAT) $(SRCDIR)/$(CURDIR)/locale/TextEditor_mcp.cd $< CATALOG $@
 
-$(TARGETDIR)/polish/TextEditor_mcp.catalog: $(SRCDIR)/$(CURDIR)/locale/polish.ct
-	@$(MKDIR) $(TARGETDIR)/polish
-	@$(FLEXCAT) $(SRCDIR)/$(CURDIR)/locale/TextEditor_mcp.cd $< CATALOG $@
 
 #MM
 texteditor-mcp-clean :
