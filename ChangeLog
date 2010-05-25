@@ -10,6 +10,7 @@ $URL$
   * mcc/HandleARexx.c: fixed a NULL pointer access when the "SELECTNONE"
     command was invoked without any text being selected before. This closes
     YAM bug #165.
+  * mcp/locale/polish.ct: added missing final LF character.
 
 2010-05-24 Mariusz Danilewicz <mandi@interia.pl>
 
