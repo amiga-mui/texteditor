@@ -5,11 +5,17 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-05-25 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/HandleARexx.c: fixed a NULL pointer access when the "SELECTNONE"
+    command was invoked without any text being selected before. This closes
+    YAM bug #165.
+
 2010-05-24 Mariusz Danilewicz <mandi@interia.pl>
 
- * mcp\locale\polish.ct: added Polish translation
- * tools\mkrelease.sh: added generating Polish catalog to release
- * mcp\makefile and mmakefile.src: added generating Polish catalog
+  * mcp\locale\polish.ct: added Polish translation
+  * tools\mkrelease.sh: added generating Polish catalog to release
+  * mcp\makefile and mmakefile.src: added generating Polish catalog
 
 2010-05-20 Thore Böckelmann <tboeckel@gmx.de>
 
