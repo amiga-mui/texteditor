@@ -11,6 +11,9 @@ $URL$
     command was invoked without any text being selected before. This closes
     YAM bug #165.
   * mcp/locale/polish.ct: added missing final LF character.
+  * dist/Install-MCC: added the first version of a generic MCC Installer script.
+    To use this script for other classes only the name and the set of supported
+    languages needs to be adapted.
 
 2010-05-24 Mariusz Danilewicz <mandi@interia.pl>
 
