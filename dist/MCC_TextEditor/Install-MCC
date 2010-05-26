@@ -45,10 +45,10 @@
 ;----------------------------------------------------------------------------
 ; /// default language detection
 (set #i 0)
-(while (<> @language (select #i "russian" "suomi" "czech" "polski" "svenska" "nederlands" "greek" "français" "italiano" "dansk" "deutsch" @language))
+(while (<> @language (select #i "deutsch" @language))
     (set #i (+ #i 1))
 )
-(if (= #i 12) ; LANGUAGE
+(if (= #i 2) ; LANGUAGE
     (set #language "english")
     (set #language @language)
 )
