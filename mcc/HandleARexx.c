@@ -425,7 +425,7 @@ static ULONG CallFunction(struct InstData *data, UWORD function, IPTR *args, con
 
       case SELECTNONE:
       {
-        if(data->blockinfo.startline != NULL && data->blockinfo.stopline != NULL)
+        if(data->blockinfo.enabled == TRUE)
         {
           data->blockinfo.enabled = FALSE;
           MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
