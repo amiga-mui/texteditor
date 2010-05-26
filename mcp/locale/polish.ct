@@ -730,8 +730,8 @@ Domy¶lny kolor kursora.
 MSG_HELP_CURSOR_SELECTED
 Kolor u¿ywany do wy¶wietlania\n\
 kursora w zaznaczonym tek¶cie.
-Color to be used for the cursor\n\
-in selected text.
+; Color to be used for the cursor\n\
+; in selected text.
 ;
 MSG_HELP_CURSOR_INACTIVE
 Kolor u¿ywany do wy¶wietlania\n\
