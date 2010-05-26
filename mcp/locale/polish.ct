@@ -1,4 +1,4 @@
-## version $VER: texteditor_mcp.catalog 2.0 (24.05.2010)
+## version $VER: texteditor_mcp.catalog 2.0 (26.05.2010)
 ## language polski
 ## codeset 5
 ## chunk AUTH Mariusz Danilewicz <mandi@interia.pl>
@@ -729,9 +729,9 @@ Domy¶lny kolor kursora.
 ;
 MSG_HELP_CURSOR_SELECTED
 Kolor u¿ywany do wy¶wietlania\n\
-zaznaczonego tekstu.
-; Color to use to print\n\
-; selected text.
+kursora w zaznaczonym tek¶cie.
+Color to be used for the cursor\n\
+in selected text.
 ;
 MSG_HELP_CURSOR_INACTIVE
 Kolor u¿ywany do wy¶wietlania\n\

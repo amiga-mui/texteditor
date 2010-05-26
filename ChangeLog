@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-05-26 Mariusz Danilewicz <mandi@interia.pl>
+
+  * mcp/locale/polish.ct: translation of MSG_HELP_CURSOR_SELECTED corrected
+
 2010-05-25 Matthias Rustler <mrustler@gmx.de>
 
   * mcp/mmakefile.src: icon.c added
