@@ -11,6 +11,7 @@ $URL$
     instead of being defined statically. Furthermore the .mcc name must be
     specified in the script's icon as application name. This makes it possible
     to use the script for arbitrary classes without modification.
+  * dist/icons: set some reasonable default icon positions.
 
 2010-05-26 Thore Böckelmann <tboeckel@gmx.de>
 
