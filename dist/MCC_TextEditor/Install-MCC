@@ -1,5 +1,5 @@
 ;
-; $VER: Install-MCC 1.2 (26.05.2010)
+; $VER: Install-MCC 1.3 (27.05.2010)
 ;
 ; $Id$
 ;
@@ -9,7 +9,11 @@
 ;   1.1   26.5.2010: easier definition of supported languages
 ;   1.2   26.5.2010: added support for multiple catalog files per language
 ;                    and added british english as supported language
-
+;   1.3   27.5.2010: the supported languages are now collected dynamically
+;                    instead of being defined statically. Furthermore the
+;                    .mcc name must be specified in the script's icon as
+;                    application name. This makes it possible to use the
+;                    script for arbitrary classes without modification.
 
 ;----------------------------------------------------------------------------
 ; /// language bit definition, do not change these!!
@@ -30,20 +34,8 @@
 (set #lang_russian             14)
 (set #lang_czech               15)
 (set #lang_english_british     16)
+(set #lang_maximum             17)
 ; ///
-
-;----------------------------------------------------------------------------
-; /// MCC name and supported language defintion
-(set #MCC_name "TextEditor")
-(set #MCP_languages (bitor (shiftleft 1 #lang_english)
-                           (shiftleft 1 #lang_german)
-                           (shiftleft 1 #lang_french)
-                           (shiftleft 1 #lang_danish)
-                           (shiftleft 1 #lang_swedish)
-                           (shiftleft 1 #lang_polish)
-                           (shiftleft 1 #lang_russian)
-                           (shiftleft 1 #lang_czech)
-))
 
 ;----------------------------------------------------------------------------
 ; /// default language detection
@@ -57,15 +49,29 @@
 )
 
 (set #i 0)
-(set #language_default %1000000000000000) ; LANGUAGE
+(set #defaultLanguages %1000000000000000)
 (while (<> #language (select #i "czech" "russian" "türkçe" "greek" "magyar" "suomi" "polski" "svenska" "norsk" "nederlands" "italiano" "dansk" "español" "français" "deutsch" #language))
     (
-        (set #language_default (shiftright #language_default 1))
         (set #i (+ #i 1))
+        (set #defaultLanguages (shiftright #defaultLanguages 1))
     )
 )
 ; always add english as default language
-(set #language_default (bitor #language_default (shiftleft 1 #lang_english)))
+(set #defaultLanguages (bitor #defaultLanguages (shiftleft 1 #lang_english)))
+
+; scan the Locale/Catalogs directory for supported languages
+(set #supportedLanguages %0000000000000000)
+(foreach "Locale/Catalogs" "#?"
+    (set #i 0)
+    (while (<> @each-name (select #i "english" "german" "french" "spanish" "danish" "italian" "dutch" "norwegian" "swedish" "polish" "finnish" "hungarian" "greek" "turkish" "russian" "czech" @each-name))
+        (set #i (+ #i 1))
+    )
+    (if (<> #lang_maximum #i)
+        (set #supportedLanguages (bitor #supportedLanguages (shiftleft 1 #i)))
+    )
+)
+; always add english as default supported language
+(set #supportedLanguages (bitor #supportedLanguages (shiftleft 1 #lang_english)))
 
 ;----------------------------------------------------------------------------
 ; /// ***** English
@@ -76,7 +82,7 @@
         (set #lang_catalog  (cat "Which catalog file do you want to install?\n"
                                  "(English language is built-in)"))
         (set #done          (cat "\n"
-                                 #MCC_name ".mcc has been successfully installed.\n"))
+                                 @app-name " has been successfully installed.\n"))
     )
 )
 
@@ -89,7 +95,7 @@
         (set #lang_catalog  (cat "Welche catalog-Datei wollen Sie installieren?\n"
                                  "(Englisch ist eingebaut)"))
         (set #done          (cat "\n"
-                                 #MCC_name ".mcc wurde erfolgreich installiert.\n"))
+                                 @app-name " wurde erfolgreich installiert.\n"))
     )
 )
 ; ///
@@ -228,76 +234,76 @@
         (prompt #lang_catalog)
         (help @askoptions-help)
         (choices
-            (if (in #MCP_languages #lang_english)
+            (if (in #supportedLanguages #lang_english)
                 (cat #prop "English")
                 ("")
             )
-            (if (in #MCP_languages #lang_german)
+            (if (in #supportedLanguages #lang_german)
                 (cat #prop "Deutsch")
                 ("")
             )
-            (if (in #MCP_languages #lang_french)
+            (if (in #supportedLanguages #lang_french)
                 (cat #prop "Français")
                 ("")
             )
-            (if (in #MCP_languages #lang_spanish)
+            (if (in #supportedLanguages #lang_spanish)
                 (cat #prop "Español")
                 ("")
             )
-            (if (in #MCP_languages #lang_danish)
+            (if (in #supportedLanguages #lang_danish)
                 (cat #prop "Dansk")
                 ("")
             )
-            (if (in #MCP_languages #lang_italian)
+            (if (in #supportedLanguages #lang_italian)
                 (cat #prop "Italiano")
                 ("")
             )
-            (if (in #MCP_languages #lang_dutch)
+            (if (in #supportedLanguages #lang_dutch)
                 (cat #prop "Nederlands")
                 ("")
             )
-            (if (in #MCP_languages #lang_norwegian)
+            (if (in #supportedLanguages #lang_norwegian)
                 (cat #prop "Norsk")
                 ("")
             )
-            (if (in #MCP_languages #lang_swedish)
+            (if (in #supportedLanguages #lang_swedish)
                 (cat #prop "Svenska")
                 ("")
             )
-            (if (in #MCP_languages #lang_polish)
+            (if (in #supportedLanguages #lang_polish)
                 (cat #prop "Polski")
                 ("")
             )
-            (if (in #MCP_languages #lang_finnish)
+            (if (in #supportedLanguages #lang_finnish)
                 (cat #prop "Suomi")
                 ("")
             )
-            (if (in #MCP_languages #lang_hungarian)
+            (if (in #supportedLanguages #lang_hungarian)
                 (cat #prop "Magyar")
                 ("")
             )
-            (if (in #MCP_languages #lang_greek)
+            (if (in #supportedLanguages #lang_greek)
                 (cat #prop "ÅëëçíéêÜ")
                 ("")
             )
-            (if (in #MCP_languages #lang_turkish)
+            (if (in #supportedLanguages #lang_turkish)
                 (cat #prop "Türkçe")
                 ("")
             )
-            (if (in #MCP_languages #lang_russian)
+            (if (in #supportedLanguages #lang_russian)
                 (cat #prop "Russian")
                 ("")
             )
-            (if (in #MCP_languages #lang_czech)
+            (if (in #supportedLanguages #lang_czech)
                 (cat #prop "Czech")
                 ("")
             )
-            (if (and (in #MCP_languages #lang_english_british) (= #detectedSystem "os4"))
+            (if (and (in #supportedLanguages #lang_english_british) (= #detectedSystem "os4"))
                 (cat #prop "English (british)")
                 ("")
             )
         )
-        (default #language_default)
+        (default #defaultLanguages)
     )
 )
 
