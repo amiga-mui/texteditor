@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-05-31 Thore Böckelmann <tboeckel@gmx.de>
+
+  * MixedFunctions.c: fixed a possible memory leak.
+
 2010-05-27 Thore Böckelmann <tboeckel@gmx.de>
 
   * dist/Install-MCC: the supported languages are now collected dynamically

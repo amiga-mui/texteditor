@@ -80,17 +80,19 @@ void FreeTextMem(struct InstData *data, struct line_node *line)
 {
   ENTER();
 
-  while(line)
+  while(line != NULL)
   {
-    struct  line_node *tline = line;
+    struct line_node *tline = line->next;
 
     FreeVecPooled(data->mypool, line->line.Contents);
     if(line->line.Styles != NULL)
       FreeVecPooled(data->mypool, line->line.Styles);
+    if(line->line.Colors != NULL)
+      FreeVecPooled(data->mypool, line->line.Colors);
 
-    line = line->next;
+    FreeLine(data, line);
 
-    FreeLine(data, tline);
+    line = tline;
   }
 
   LEAVE();
