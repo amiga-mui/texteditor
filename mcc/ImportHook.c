@@ -174,14 +174,13 @@ static void InitGrow(struct grow *grow, APTR pool, int itemSize)
 ///
 /// AddToGrow()
 /************************************************************************
- Adds two new values to the given grow. This function guarantees
- that there is at least space for 2 additional values.
+ Adds a new item to the given grow structure.
 *************************************************************************/
 static void AddToGrow(struct grow *grow, void *newItem)
 {
   ENTER();
 
-  if(grow->itemCount+1 >= grow->maxItemCount)
+  if(grow->itemCount+1 > grow->maxItemCount)
   {
     char *new_array;
 
@@ -200,6 +199,7 @@ static void AddToGrow(struct grow *grow, void *newItem)
     }
   }
 
+  // copy the new item to the grow structure only if there is space left
   if(grow->itemCount < grow->maxItemCount)
   {
     memcpy(&grow->array[grow->itemCount * grow->itemSize], newItem, grow->itemSize);

@@ -80,6 +80,7 @@ enum
   InsTEXT, UNDO, REDO, GETLINE, GETCURSOR, MARK, DELETE, BACKSPACE,
   KILLLINE, TOUPPER, TOLOWER, SELECTALL, SELECTNONE
 };
+
 #define MaxArgs 8
 
 /// CallFunction()
@@ -99,21 +100,27 @@ static ULONG CallFunction(struct InstData *data, UWORD function, IPTR *args, con
     switch(function)
     {
       case CURSOR:
+      {
         if(*args++)
           new_y -= 1;
         if(*args)
           new_y += 1;
-        break;
+      }
+      break;
 
       case NEXT:
+      {
         if(args[3])
           new_y += data->maxlines;
-        break;
+      }
+      break;
 
       case PREVIOUS:
+      {
         if(args[3])
           new_y -= data->maxlines;
-        break;
+      }
+      break;
     }
   }
 
@@ -169,7 +176,7 @@ static ULONG CallFunction(struct InstData *data, UWORD function, IPTR *args, con
         {
           STRPTR buffer;
 
-          if((buffer = AllocVec(16, MEMF_SHARED)))
+          if((buffer = AllocVec(16, MEMF_SHARED)) != NULL)
           {
             set(data->object, MUIA_TextEditor_CursorY, *(ULONG *)*args);
 
@@ -187,7 +194,7 @@ static ULONG CallFunction(struct InstData *data, UWORD function, IPTR *args, con
         {
           STRPTR buffer;
 
-          if((buffer = AllocVec(16, MEMF_SHARED)))
+          if((buffer = AllocVec(16, MEMF_SHARED)) != NULL)
           {
             set(data->object, MUIA_TextEditor_CursorX, *(ULONG *)*args);
             // return the current column number, this may differ from the input value!
@@ -288,7 +295,7 @@ static ULONG CallFunction(struct InstData *data, UWORD function, IPTR *args, con
       {
         if(*txtargs)
         {
-            struct Hook *oldhook = data->ImportHook;
+          struct Hook *oldhook = data->ImportHook;
 
           data->ImportHook = &ImPlainHook;
           DoMethod(data->object, MUIM_TextEditor_InsertText, txtargs, MUIV_TextEditor_InsertText_Cursor);
