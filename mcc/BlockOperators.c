@@ -656,7 +656,7 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, s
 
       if(NoCut == FALSE)
       {
-        struct line_node *cc_startline = c_startline;
+        struct line_node *cc_startline = c_startline->next;
 
         FreeVecPooled(data->mypool, c_startline->line.Contents);
         if(c_startline->line.Styles != NULL)
@@ -664,11 +664,12 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, s
         if(c_startline->line.Colors != NULL)
           FreeVecPooled(data->mypool, c_startline->line.Colors);
         data->totallines -= c_startline->visual;
-        c_startline = c_startline->next;
 
         //D(DBF_STARTUP, "FreeLine %08lx", cc_startline);
 
-        FreeLine(data, cc_startline);
+        FreeLine(data, c_startline);
+
+        c_startline = cc_startline;
       }
       else
         c_startline = c_startline->next;

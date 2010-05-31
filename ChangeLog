@@ -10,6 +10,8 @@ $URL$
   * mcc/MixedFunctions.c: fixed a possible memory leak.
   * mcc/EditorStuff.c, mcc/Dispatcher.c: replaced some free line loops by a call
     to FreeTextMem().
+  * mcc/BlockOperators.c, mcc/ImportHook.c, mcc/HandleARexx.c: minor code
+    cleanup.
 
 2010-05-27 Thore Böckelmann <tboeckel@gmx.de>
 
