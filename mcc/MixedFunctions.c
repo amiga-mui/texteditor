@@ -120,8 +120,7 @@ BOOL Init_LineNode(struct InstData *data, struct line_node *line, struct line_no
   // and allocate yet another additional byte for the trailing NUL byte
   if((ctext = AllocVecPooled(data->mypool, textlength+1)) != NULL)
   {
-    memcpy(ctext, text, textlength);
-    ctext[textlength] = 0;
+    strlcpy(ctext, text, textlength+1);
 
     line->next = NULL;
     line->previous = previous;
