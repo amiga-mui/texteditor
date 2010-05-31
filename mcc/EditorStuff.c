@@ -437,7 +437,7 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
     else
     {
       // in case of an error we free all imported lines so far
-      FreeTextMem(importedLines);
+      FreeTextMem(data, importedLines);
 
       switch(error)
       {
