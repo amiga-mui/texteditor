@@ -193,7 +193,6 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
 static IPTR mDispose(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
-  struct line_node *line;
 
   ENTER();
 
