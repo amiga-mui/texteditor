@@ -7,7 +7,9 @@ $URL$
 
 2010-05-31 Thore Böckelmann <tboeckel@gmx.de>
 
-  * MixedFunctions.c: fixed a possible memory leak.
+  * mcc/MixedFunctions.c: fixed a possible memory leak.
+  * mcc/EditorStuff.c, mcc/Dispatcher.c: replaced some free line loops by a call
+    to FreeTextMem().
 
 2010-05-27 Thore Böckelmann <tboeckel@gmx.de>
 
