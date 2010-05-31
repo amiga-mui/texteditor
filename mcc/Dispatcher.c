@@ -203,21 +203,7 @@ static IPTR mDispose(struct IClass *cl, Object *obj, Msg msg)
   data->blockinfo.stopline = NULL;
 
   // free all lines with their contents
-  line = data->firstline;
-  while(line != NULL)
-  {
-    struct line_node *next = line->next;
-
-    if(line->line.Styles != NULL)
-      FreeVecPooled(data->mypool, line->line.Styles);
-    if(line->line.Colors != NULL)
-      FreeVecPooled(data->mypool, line->line.Colors);
-    if(line->line.Contents != NULL)
-      FreeVecPooled(data->mypool, line->line.Contents);
-    FreeLine(data, line);
-
-    line = next;
-  }
+  FreeTextMem(data, data->firstline);
   data->firstline = NULL;
 
   if(data->mylocale != NULL)

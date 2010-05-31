@@ -436,26 +436,8 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
     }
     else
     {
-      struct line_node *line = importedLines;
-
       // in case of an error we free all imported lines so far
-      while(line != NULL)
-      {
-        struct line_node *next = line->next;
-
-        D(DBF_CLIPBOARD, "freeing %ld colors", line->line.allocatedColors);
-        if(line->line.Colors != NULL)
-          FreeVecPooled(data->mypool, line->line.Colors);
-        D(DBF_CLIPBOARD, "freeing %ld styles", line->line.allocatedStyles);
-        if(line->line.Styles != NULL)
-          FreeVecPooled(data->mypool, line->line.Styles);
-        D(DBF_CLIPBOARD, "freeing contents");
-        if(line->line.Contents != NULL)
-          FreeVecPooled(data->mypool, line->line.Contents);
-        D(DBF_CLIPBOARD, "freeing line");
-        FreeLine(data, line);
-        line = next;
-      }
+      FreeTextMem(importedLines);
 
       switch(error)
       {
