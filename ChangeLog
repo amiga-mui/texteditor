@@ -12,6 +12,8 @@ $URL$
     to FreeTextMem().
   * mcc/BlockOperators.c, mcc/ImportHook.c, mcc/HandleARexx.c: minor code
     cleanup.
+  * mcc/EditorStuff.c: use memmove() instead of strlcpy() when removing text
+    from a line, because the regions might overlap.
 
 2010-05-27 Thore Böckelmann <tboeckel@gmx.de>
 
