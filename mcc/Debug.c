@@ -538,23 +538,22 @@ BOOL matchAllocFunc(const char *allocFunc, const char *freeFunc)
 
   while((q = strchr(p, '|')) != NULL)
   {
-	char tmp[16];
+    char tmp[16];
 
     // we have to handle more than one possible function name
-	strlcpy(tmp, p, ((size_t)(q-p)+1 < sizeof(tmp)) ? (size_t)(q-p)+1 : sizeof(tmp));
-	if(strcmp(allocFunc, tmp) == 0)
-	{
+    strlcpy(tmp, p, ((size_t)(q-p)+1 < sizeof(tmp)) ? (size_t)(q-p)+1 : sizeof(tmp));
+    if(strcmp(allocFunc, tmp) == 0)
+    {
       match = TRUE;
       break;
-	}
-	p = q+1;
-	q = strchr(p, '|');
+    }
+    p = q+1;
   }
 
   if(match == FALSE)
   {
     // compare the last or only function name
-    match = (strcmp(p, freeFunc) == 0);
+    match = (strcmp(allocFunc, p) == 0);
   }
 
   return match;
