@@ -1254,7 +1254,7 @@ static void UpdateChange(struct InstData *data, LONG x, struct line_node *line, 
   }
   else
   {
-    memmove(&line->line.Contents[x], &line->line.Contents[x+length], length+1);
+    strlcpy(&line->line.Contents[x], &line->line.Contents[x+length], line->line.Length-length);
     width -= length;
     line->line.Length -= length;
   }
