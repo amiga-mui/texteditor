@@ -8,6 +8,8 @@ $URL$
 2010-06-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mccinit.c: added CleanupDebug() call to expunge function.
+  * Debug.c, misc: implemented a basic check to verify that stuff is being freed
+    using the correct function, i.e. FreeVec() for AllocVec()'ed memory.
 
 2010-05-31 Thore Böckelmann <tboeckel@gmx.de>
 
