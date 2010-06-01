@@ -82,7 +82,7 @@ void FreeTextMem(struct InstData *data, struct line_node *line)
 
   while(line != NULL)
   {
-    struct line_node *tline = line->next;
+    struct line_node *next = line->next;
 
     FreeVecPooled(data->mypool, line->line.Contents);
     if(line->line.Styles != NULL)
@@ -92,7 +92,7 @@ void FreeTextMem(struct InstData *data, struct line_node *line)
 
     FreeLine(data, line);
 
-    line = tline;
+    line = next;
   }
 
   LEAVE();

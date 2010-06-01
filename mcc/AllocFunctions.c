@@ -45,7 +45,7 @@ APTR AllocVecPooled(APTR pool, ULONG length)
   RETURN(mem);
   return(mem);
 }
-#endif // !__amigaos4__ && !__MORPHOS__
+#endif // !__amigaos4__ && !__MORPHOS__ && !__AROS__
 
 ///
 /// FreeVecPooled()
@@ -56,7 +56,7 @@ void FreeVecPooled(APTR pool, APTR mem)
 
   ENTER();
 
-  UNMEMTRACK(mem);
+  UNMEMTRACK("AllocVecPooled", mem);
   memptr = &((ULONG *)mem)[-1];
   length = *memptr;
 
@@ -64,7 +64,7 @@ void FreeVecPooled(APTR pool, APTR mem)
 
   LEAVE();
 }
-#endif // !__amigaos4__ && !__MORPHOS__
+#endif // !__amigaos4__ && !__MORPHOS__ && !__AROS__
 
 ///
 /// AllocLine()
@@ -112,8 +112,8 @@ void FreeLine(struct InstData *data, struct line_node *line)
   }
 
   // finally free the line itself
-  UNMEMTRACK(line);
   FreeVecPooled(data->mypool, line);
+  UNMEMTRACK("AllocLine", line);
 
   LEAVE();
 }

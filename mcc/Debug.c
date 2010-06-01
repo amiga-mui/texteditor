@@ -490,6 +490,7 @@ struct DbgMallocNode
 static struct MinList DbgMallocList[256];
 static struct SignalSemaphore DbgMallocListSema;
 static ULONG DbgMallocCount;
+static ULONG DbgUnsuitableFreeCount;
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a)         (sizeof(a) / sizeof(a[0]))
@@ -523,6 +524,40 @@ static struct DbgMallocNode *findDbgMallocNode(const void *ptr)
   }
 
   return result;
+}
+
+///
+/// matchAllocFunc
+// check wether the used allocation function matches a set of given function names
+// separated by '|', i.e. "malloc|calloc|strdup"
+BOOL matchAllocFunc(const char *allocFunc, const char *freeFunc)
+{
+  BOOL match = FALSE;
+  const char *p = freeFunc;
+  const char *q;
+
+  while((q = strchr(p, '|')) != NULL)
+  {
+	char tmp[16];
+
+    // we have to handle more than one possible function name
+	strlcpy(tmp, p, ((size_t)(q-p)+1 < sizeof(tmp)) ? (size_t)(q-p)+1 : sizeof(tmp));
+	if(strcmp(allocFunc, tmp) == 0)
+	{
+      match = TRUE;
+      break;
+	}
+	p = q+1;
+	q = strchr(p, '|');
+  }
+
+  if(match == FALSE)
+  {
+    // compare the last or only function name
+    match = (strcmp(p, freeFunc) == 0);
+  }
+
+  return match;
 }
 
 ///
@@ -560,7 +595,7 @@ void _MEMTRACK(const char *file, const int line, const char *func, void *ptr, si
 ///
 /// _UNMEMTRACK
 // remove a node from the memory tracking lists
-void _UNMEMTRACK(const char *file, const int line, const void *ptr)
+void _UNMEMTRACK(const char *file, const int line, const char *func, const void *ptr)
 {
   if(isFlagSet(debug_classes, DBC_MTRACK) && ptr != NULL)
   {
@@ -572,6 +607,12 @@ void _UNMEMTRACK(const char *file, const int line, const void *ptr)
     if((dmn = findDbgMallocNode(ptr)) != NULL)
     {
       Remove((struct Node *)dmn);
+
+      if(matchAllocFunc(dmn->func, func) == FALSE)
+      {
+        _DPRINTF(DBC_WARNING, DBF_ALWAYS, file, line, "free of tracked memory area 0x%08lx with unsuitable function (allocated with %s, freed with %s counterpart)", ptr, dmn->func, func);
+        DbgUnsuitableFreeCount++;
+      }
 
       FreeVec(dmn);
 
@@ -602,6 +643,7 @@ static void SetupDbgMalloc(void)
       NewList((struct List *)&DbgMallocList[i]);
 
     DbgMallocCount = 0;
+    DbgUnsuitableFreeCount = 0;
 
     InitSemaphore(&DbgMallocListSema);
   }
@@ -622,26 +664,33 @@ static void CleanupDbgMalloc(void)
 
     ObtainSemaphore(&DbgMallocListSema);
 
-    if(DbgMallocCount != 0)
+    if(DbgMallocCount != 0 || DbgUnsuitableFreeCount != 0)
     {
-      ULONG i;
-
-      E(DBF_ALWAYS, "there are still %ld unfreed memory trackings", DbgMallocCount);
-      for(i = 0; i < ARRAY_SIZE(DbgMallocList); i++)
+      if(DbgMallocCount != 0)
       {
-        struct DbgMallocNode *dmn;
+        ULONG i;
 
-        while((dmn = (struct DbgMallocNode *)RemHead((struct List *)&DbgMallocList[i])) != NULL)
+        E(DBF_ALWAYS, "there are still %ld unfreed memory trackings", DbgMallocCount);
+        for(i = 0; i < ARRAY_SIZE(DbgMallocList); i++)
         {
-          _DPRINTF(DBC_ERROR, DBF_ALWAYS, dmn->file, dmn->line, "unfreed memory tracking: 0x%08lx, size/type %ld, func (%s)", dmn->memory, dmn->size, dmn->func);
+          struct DbgMallocNode *dmn;
 
-          // We only free the node structure here but not dmn->memory itself.
-          // First of all, this is because the allocation could have been done
-          // by other functions than malloc() and calling free() for these will
-          // cause havoc. And second the c-library's startup code will/should
-          // free all further pending allocations upon program termination.
-          FreeVec(dmn);
+          while((dmn = (struct DbgMallocNode *)RemHead((struct List *)&DbgMallocList[i])) != NULL)
+          {
+            _DPRINTF(DBC_ERROR, DBF_ALWAYS, dmn->file, dmn->line, "unfreed memory tracking: 0x%08lx, size/type %ld, func (%s)", dmn->memory, dmn->size, dmn->func);
+
+            // We only free the node structure here but not dmn->memory itself.
+            // First of all, this is because the allocation could have been done
+            // by other functions than malloc() and calling free() for these will
+            // cause havoc. And second the c-library's startup code will/should
+            // free all further pending allocations upon program termination.
+            FreeVec(dmn);
+          }
         }
+      }
+      if(DbgUnsuitableFreeCount != 0)
+      {
+        E(DBF_ALWAYS, "there were %ld unsuitable freeing calls", DbgUnsuitableFreeCount);
       }
     }
     else
