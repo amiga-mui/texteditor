@@ -781,8 +781,6 @@ static SAVEDS ASM LONG ClipboardServer(UNUSED REG(a0, STRPTR args), UNUSED REG(d
   struct ExecIFace *IExec = (struct ExecIFace *)SysBase->MainInterface;
   #endif
 
-  ENTER();
-
   me = (struct Process *)FindTask(NULL);
   WaitPort(&me->pr_MsgPort);
   msg = GetMsg(&me->pr_MsgPort);
@@ -878,7 +876,6 @@ static SAVEDS ASM LONG ClipboardServer(UNUSED REG(a0, STRPTR args), UNUSED REG(d
 
   Forbid();
 
-  LEAVE();
   return 0;
 }
 

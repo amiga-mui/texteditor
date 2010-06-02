@@ -11,6 +11,8 @@ $URL$
     apropriate strlcpy() calls.
   * mcc/AllocFunctions.c, mcc/#?VecPooled.c, mcc/Makefile: moved the
     #?VecPooled()functions for OS3 to separate files.
+  * mcc/ClipboardServer.c: removed the ENTER()/LEAVE() macro calls from the
+    server process' function as these are cluttering up the debug log.
 
 2010-06-01 Thore Böckelmann <tboeckel@gmx.de>
 
