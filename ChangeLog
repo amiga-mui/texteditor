@@ -9,6 +9,8 @@ $URL$
 
   * mcc/EditorStuff.c, mcc/HandleARexx.c: replaced some memcpy() calls by more
     apropriate strlcpy() calls.
+  * mcc/AllocFunctions.c, mcc/#?VecPooled.c, mcc/Makefile: moved the
+    #?VecPooled()functions for OS3 to separate files.
 
 2010-06-01 Thore Böckelmann <tboeckel@gmx.de>
 
