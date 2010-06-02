@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-06-02 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/EditorStuff.c, mcc/HandleARexx.c: replaced some memcpy() calls by more
+    apropriate strlcpy() calls.
+
 2010-06-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mccinit.c: added CleanupDebug() call to expunge function.

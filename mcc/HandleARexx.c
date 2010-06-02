@@ -322,10 +322,7 @@ static ULONG CallFunction(struct InstData *data, UWORD function, IPTR *args, con
 
         if((buffer = AllocVec(data->actualline->line.Length+1, MEMF_SHARED)) != NULL)
         {
-          memcpy(buffer, data->actualline->line.Contents, data->actualline->line.Length);
-
-          buffer[data->actualline->line.Length] = '\0';
-
+          strlcpy(buffer, data->actualline->line.Contents, data->actualline->line.Length+1);
           result = (ULONG)buffer;
         }
         break;
@@ -547,9 +544,7 @@ IPTR mHandleARexx(struct IClass *cl, Object *obj, struct MUIP_TextEditor_ARexxCm
           {
             struct RDArgs *ra_result = NULL;
 
-            memcpy(buffer, txtargs, length);
-            buffer[length] = '\n';
-            buffer[length+1] = '\0';
+            snprintf(buffer, length+2, "%s\n", txtargs);
 
             myrdargs->RDA_Source.CS_Buffer = buffer;
             myrdargs->RDA_Source.CS_Length = length+1;
