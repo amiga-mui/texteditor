@@ -253,7 +253,7 @@ ifeq ($(OS), os3)
   LDLIBS  += -ldebug -lmui
 
   # additional object files required
-  COBJS += vastubs.o
+  COBJS += vastubs.o AllocVecPooled.o FreeVecPooled.o
 
 else
 ifeq ($(OS), mos)

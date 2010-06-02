@@ -420,12 +420,9 @@ void SAVEDS ASM MUIG_FreeBitMap(REG(a0, struct BitMap *));
 #define SHARED_MEMFLAG          MEMF_ANY
 #endif
 
+// AllocFunctions.c
 struct line_node *AllocLine(struct InstData *);
 void FreeLine(struct InstData *, struct line_node *);
-#if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
-APTR AllocVecPooled(APTR, ULONG);
-void FreeVecPooled(APTR, APTR);
-#endif
 
 // BlockOperators.c
 STRPTR GetBlock(struct InstData *, struct marking *);
@@ -586,6 +583,13 @@ void ResetUndoBuffer(struct InstData *);
 void ResizeUndoBuffer(struct InstData *, ULONG);
 BOOL Undo(struct InstData *);
 BOOL Redo(struct InstData *);
+
+#if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
+// AllocVecPooled.c
+APTR AllocVecPooled(APTR, ULONG);
+// FreeVecPooled.c
+void FreeVecPooled(APTR, APTR);
+#endif
 
 #if defined(DEBUG)
 void DumpLine(struct line_node *line);
