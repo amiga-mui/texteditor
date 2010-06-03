@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-05-25 Matthias Rustler <mrustler@gmx.de>
+
+  * Fixes for 64-bit AROS: changed some ULONG to IPTR to get rid of warnings like
+    "conversion from/to pointer to/from integer with different size"
+
 2010-06-03 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: fixed an off-by-one string copying.
