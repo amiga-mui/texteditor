@@ -83,7 +83,7 @@ LONG cmap[8];
 
 HOOKPROTONH(ARexxHookCode, LONG, Object *app, struct RexxMsg *rexxmsg)
 {
-  LONG result;
+  IPTR result;
 
   result = DoMethod(editorgad, MUIM_TextEditor_ARexxCmd, rexxmsg->rm_Args[0]);
 
@@ -266,7 +266,7 @@ int main(VOID)
   Object *slider;
   IPTR argarray[6] = { 0,0,0,0,0,0 };
 
-  if((args = ReadArgs("Filename/F,EMail/S,MIME/S,MIMEQuoted/S,SkipHeader/S,Fixed/S", (LONG *)argarray, NULL)))
+  if((args = ReadArgs("Filename/F,EMail/S,MIME/S,MIMEQuoted/S,SkipHeader/S,Fixed/S", (IPTR *)argarray, NULL)))
   {
     if(OpenLibs() == TRUE)
     {
