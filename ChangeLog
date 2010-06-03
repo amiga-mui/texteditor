@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-06-03 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/EditorStuff.c: fixed an off-by-one string copying.
+
 2010-06-02 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c, mcc/HandleARexx.c: replaced some memcpy() calls by more

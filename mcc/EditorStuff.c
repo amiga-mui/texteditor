@@ -496,7 +496,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
   if((newbuffer = AllocVecPooled(data->mypool, newbufferSize)) != NULL)
   {
     // substract one character, because we don't need the first line's trailing LF anymore
-    strlcpy(newbuffer, line->line.Contents, line->line.Length-1);
+    strlcpy(newbuffer, line->line.Contents, line->line.Length);
     // append the second line, including its trailing LF
     strlcat(newbuffer, line->next->line.Contents, newbufferSize);
 
