@@ -186,6 +186,7 @@ COBJS = AllocBitMap.o \
         ExportBlock.o \
         ExportText.o \
         GetSetAttrs.o \
+        Grow.o \
         HandleARexx.o \
         HandleInput.o \
         InitConfig.o \
