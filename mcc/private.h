@@ -194,11 +194,7 @@ struct LineNode
   ULONG    Length;        // The length of the line (including the '\n')
   ULONG allocatedContents;
   struct LineStyle *Styles; // Set this to the styles used for this line (allocated via the poolhandle). The array is terminated by an (EOS,0) marker
-  ULONG allocatedStyles;
-  ULONG usedStyles;
   struct LineColor *Colors; // The colors to use (allocated via the poolhandle). The array is terminated by an (EOC,0) marker
-  ULONG allocatedColors;
-  ULONG usedColors;
   BOOL     Highlight;     // Set this to TRUE if you want the line to be highlighted
   UWORD    Flow;          // Use the MUIV_TextEditor_Flow_xxx values...
   UWORD    Separator;     // See definitions below
@@ -287,6 +283,17 @@ struct ImportMessage
   struct  LineNode *linenode; /* Pointer to a linenode, which you should fill out */
   APTR    PoolHandle;         /* A poolhandle, all allocations done for styles or contents must be made from this pool, and the size of the allocation must be stored in the first LONG */
   ULONG   ImportWrap;         /* For your use only (reflects MUIA_TextEditor_ImportWrap) */
+};
+
+struct Grow
+{
+  char *array;
+
+  int itemSize;
+  int itemCount;
+  int maxItemCount;
+
+  APTR pool;
 };
 
 struct InstData
@@ -470,6 +477,12 @@ IPTR mExportText(struct IClass *, Object *, struct MUIP_TextEditor_ExportText *)
 IPTR mGet(struct IClass *, Object *, struct opGet *);
 IPTR mSet(struct IClass *, Object *, struct opSet *);
 
+// Grow.c
+void InitGrow(struct Grow *grow, APTR pool, int itemSize);
+void FreeGrow(struct Grow *grow);
+void AddToGrow(struct Grow *grow, void *newItem);
+void RemoveFromGrow(struct Grow *grow);
+
 // HandleARexx.c
 IPTR mHandleARexx(struct IClass *, Object *, struct MUIP_TextEditor_ARexxCmd *);
 
@@ -590,6 +603,9 @@ APTR AllocVecPooled(APTR, ULONG);
 // FreeVecPooled.c
 void FreeVecPooled(APTR, APTR);
 #endif
+
+APTR _AllocVecPooled(APTR, ULONG);
+void _FreeVecPooled(APTR, APTR);
 
 #if defined(DEBUG)
 void DumpLine(struct line_node *line);

@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-06-07 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/misc: replaced all hand crafted style and color array allocations by
+    growing arrays which are resized on demand. This makes buffer overruns
+    due to imprecise size calculation impossible and should fix the random
+    crashes.
+
 2010-05-25 Matthias Rustler <mrustler@gmx.de>
 
   * Fixes for 64-bit AROS: changed some ULONG to IPTR to get rid of warnings like
