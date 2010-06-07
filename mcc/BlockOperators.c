@@ -203,6 +203,9 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
             newColor.column = oldcolors->column - startx;
             newColor.color = oldcolors->color;
             AddToGrow(&colorGrow, &newColor);
+
+            // remember this color change
+            lastcolor = oldcolors->color;
           }
           oldcolors++;
         }
