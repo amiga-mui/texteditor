@@ -680,7 +680,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
           struct LineColor newColor;
 
           D(DBF_STYLE, "resetting color in column %ld (2)", newbufferSize - line->next->line.Length - 1);
-          newColor.column = newbufferSize - line->line.Length - 1;
+          newColor.column = newbufferSize - line->next->line.Length - 1;
           newColor.color = 0;
           AddToGrow(&colorGrow, &newColor);
 
