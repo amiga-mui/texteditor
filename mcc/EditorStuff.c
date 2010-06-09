@@ -144,25 +144,31 @@ void DumpLine(struct line_node *line)
   if(line->line.Styles != NULL)
   {
     struct LineStyle *styles = line->line.Styles;
+    int numStyles = 0;
 
     D(DBF_DUMP, "styles:");
     while(styles->column != EOS)
     {
       D(DBF_DUMP, "style 0x%04lx starting at column %3ld", styles->style, styles->column);
       styles++;
+      numStyles++;
     }
+    D(DBF_DUMP, "%ld style changes", numStyles);
   }
 
   if(line->line.Colors != NULL)
   {
     struct LineColor *colors = line->line.Colors;
+    int numColors = 0;
 
     D(DBF_DUMP, "colors:");
     while(colors->column != EOC)
     {
       D(DBF_DUMP, "color %3ld starting at column %3ld", colors->color, colors->column);
       colors++;
+      numColors++;
     }
+    D(DBF_DUMP, "%ld color changes", numColors);
   }
 
   if(line->line.Highlight == TRUE)
@@ -1397,16 +1403,23 @@ BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG len
   // check if there are any style changes at all
   if(line->line.Styles != NULL && line->line.Styles[0].column != EOS)
   {
+    struct Grow styleGrow;
     UWORD start_style = GetStyle(x-1, line);
     UWORD end_style = GetStyle(x+length, line);
-    ULONG c = 0, store;
+    ULONG c = 0;
+
+    InitGrow(&styleGrow, data->mypool, sizeof(struct LineStyle));
 
     // skip all styles before the the starting column
     while(line->line.Styles[c].column <= x)
+    {
+      AddToGrow(&styleGrow, &line->line.Styles[c]);
       c++;
+    }
 
     // if the style differs between the start and the end of the range
     // then we must add style changes accordingly
+    D(DBF_DUMP, "start style %04lx, end style %04lx", start_style, end_style);
     if(start_style != end_style)
     {
       UWORD turn_off = start_style & ~end_style;
@@ -1414,44 +1427,66 @@ BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG len
 
       if(isFlagSet(turn_off, BOLD))
       {
-        line->line.Styles[c].column = x+1;
-        line->line.Styles[c].style = ~BOLD;
+        struct LineStyle newStyle;
+
+        newStyle.column = x+1;
+        newStyle.style = ~BOLD;
+        AddToGrow(&styleGrow, &newStyle);
+
         c++;
       }
       if(isFlagSet(turn_off, ITALIC))
       {
-        line->line.Styles[c].column = x+1;
-        line->line.Styles[c].style = ~ITALIC;
+        struct LineStyle newStyle;
+
+        newStyle.column = x+1;
+        newStyle.style = ~ITALIC;
+        AddToGrow(&styleGrow, &newStyle);
+
         c++;
       }
       if(isFlagSet(turn_off, UNDERLINE))
       {
-        line->line.Styles[c].column = x+1;
-        line->line.Styles[c].style = ~UNDERLINE;
+        struct LineStyle newStyle;
+
+        newStyle.column = x+1;
+        newStyle.style = ~UNDERLINE;
+        AddToGrow(&styleGrow, &newStyle);
+
         c++;
       }
       if(isFlagSet(turn_on, BOLD))
       {
-        line->line.Styles[c].column = x+1;
-        line->line.Styles[c].style = BOLD;
+        struct LineStyle newStyle;
+
+        newStyle.column = x+1;
+        newStyle.style = BOLD;
+        AddToGrow(&styleGrow, &newStyle);
+
         c++;
       }
       if(isFlagSet(turn_on, ITALIC))
       {
-        line->line.Styles[c].column = x+1;
-        line->line.Styles[c].style = ITALIC;
+        struct LineStyle newStyle;
+
+        newStyle.column = x+1;
+        newStyle.style = ITALIC;
+        AddToGrow(&styleGrow, &newStyle);
+
         c++;
       }
       if(isFlagSet(turn_on, UNDERLINE))
       {
-        line->line.Styles[c].column = x+1;
-        line->line.Styles[c].style = UNDERLINE;
+        struct LineStyle newStyle;
+
+        newStyle.column = x+1;
+        newStyle.style = UNDERLINE;
+        AddToGrow(&styleGrow, &newStyle);
+
         c++;
       }
     }
 
-    // remember the current style change column
-    store = c;
     // skip all style changes until we reach the end of the range
     while(line->line.Styles[c].column <= x+length+1)
       c++;
@@ -1459,38 +1494,59 @@ BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG len
     // move all remaining style changes towards the beginning
     while(line->line.Styles[c].column != EOS)
     {
-      line->line.Styles[store].column = line->line.Styles[c].column-length;
-      line->line.Styles[store].style = line->line.Styles[c].style;
+      struct LineStyle newStyle;
+
+      newStyle.column = line->line.Styles[c].column-length;
+      newStyle.style = line->line.Styles[c].style;
+      AddToGrow(&styleGrow, &newStyle);
+
       c++;
-      store++;
     }
 
     // put a new style termination
-    line->line.Styles[store].column = EOS;
+    if(styleGrow.itemCount > 0)
+    {
+      struct LineStyle terminator;
+
+      terminator.column = EOS;
+      terminator.style = 0;
+      AddToGrow(&styleGrow, &terminator);
+    }
+
+    // free the old styles and remember the newly created styles (maybe NULL)
+    FreeVecPooled(data->mypool, line->line.Styles);
+    line->line.Styles = (struct LineStyle *)styleGrow.array;
   }
 
   // check if there are any color changes at all
   if(line->line.Colors != NULL && line->line.Colors[0].column != EOC)
   {
+    struct Grow colorGrow;
     UWORD start_color = GetColor(x-1, line);
     UWORD end_color = GetColor(x+length, line);
-    ULONG c = 0, store;
+    ULONG c = 0;
+
+    InitGrow(&colorGrow, data->mypool, sizeof(struct LineColor));
 
     // skip all colors before the the starting column
     while(line->line.Colors[c].column <= x)
+    {
+      AddToGrow(&colorGrow, &line->line.Colors[c]);
       c++;
+    }
 
     // if the colors differs between the start and the end of the range
     // then we must add color changes accordingly
     if(start_color != end_color)
     {
-      line->line.Colors[c].column = x+1;
-      line->line.Colors[c].color = end_color;
+      struct LineColor newColor;
+
+      newColor.column = x+1;
+      newColor.color = end_color;
+      AddToGrow(&colorGrow, &newColor);
       c++;
     }
 
-    // remember the current color change column
-    store = c;
     // skip all color changes until we reach the end of the range
     while(line->line.Colors[c].column <= x+length+1)
       c++;
@@ -1498,14 +1554,28 @@ BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG len
     // move all remaining color changes towards the beginning
     while(line->line.Colors[c].column != EOC)
     {
-      line->line.Colors[store].column = line->line.Colors[c].column-length;
-      line->line.Colors[store].color = line->line.Colors[c].color;
+      struct LineColor newColor;
+
+      newColor.column = line->line.Colors[c].column-length;
+      newColor.color = line->line.Colors[c].color;
+      AddToGrow(&colorGrow, &newColor);
+
       c++;
-      store++;
     }
 
     // put a new color termination
-    line->line.Colors[store].column = EOC;
+    if(colorGrow.itemCount > 0)
+    {
+      struct LineColor terminator;
+
+      terminator.column = EOC;
+      terminator.color = 0;
+      AddToGrow(&colorGrow, &terminator);
+    }
+
+    // free the old styles and remember the newly created colors (maybe NULL)
+    FreeVecPooled(data->mypool, line->line.Colors);
+    line->line.Colors = (struct LineColor *)colorGrow.array;
   }
 
   UpdateChange(data, x, line, length, NULL, NULL);
