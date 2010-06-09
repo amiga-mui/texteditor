@@ -9,6 +9,10 @@ $URL$
 
   * mcc/Get#?.c: added GetHead/Pred/Succ/Tail implementation for those systems
     which don't implement these natively.
+  * mcc/EditorStuff.c: use the growing tables as well when removing characters
+    and the style/color information needs to be updated. This should have been
+    the last place for possible buffer overruns if removing some styled text
+    resulted in more style changes than before.
 
 2010-06-07 Thore Böckelmann <tboeckel@gmx.de>
 
