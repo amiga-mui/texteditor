@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-06-09 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Get#?.c: added GetHead/Pred/Succ/Tail implementation for those systems
+    which don't implement these natively.
+
 2010-06-07 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: replaced all hand crafted style and color array allocations by
