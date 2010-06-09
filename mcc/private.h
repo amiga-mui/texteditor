@@ -604,8 +604,16 @@ APTR AllocVecPooled(APTR, ULONG);
 void FreeVecPooled(APTR, APTR);
 #endif
 
-APTR _AllocVecPooled(APTR, ULONG);
-void _FreeVecPooled(APTR, APTR);
+#if !defined(__amigaos4__) && !defined(__AROS__)
+// GetHead.c
+struct Node *GetHead(struct List *);
+// GetPred.c
+struct Node *GetPred(struct Node *);
+// GetSucc.c
+struct Node *GetSucc(struct Node *);
+// GetTail.c
+struct Node *GetTail(struct List *);
+#endif
 
 #if defined(DEBUG)
 void DumpLine(struct line_node *line);

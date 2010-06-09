@@ -510,9 +510,9 @@ static ULONG DbgUnsuitableFreeCount;
 static struct DbgMallocNode *findDbgMallocNode(const void *ptr)
 {
   struct DbgMallocNode *result = NULL;
-  struct MinNode *curNode;
+  struct Node *curNode;
 
-  for(curNode = DbgMallocList[ptr2hash(ptr)].mlh_Head; curNode->mln_Succ != NULL; curNode = curNode->mln_Succ)
+  for(curNode = GetHead((struct List *)&DbgMallocList[ptr2hash(ptr)]); curNode != NULL; curNode = GetSucc(curNode))
   {
     struct DbgMallocNode *dmn = (struct DbgMallocNode *)curNode;
 
@@ -717,9 +717,9 @@ void DumpDbgMalloc(void)
     D(DBF_ALWAYS, "%ld memory areas tracked", DbgMallocCount);
     for(i = 0; i < ARRAY_SIZE(DbgMallocList); i++)
     {
-      struct MinNode *curNode;
+      struct Node *curNode;
 
-      for(curNode = DbgMallocList[i].mlh_Head; curNode->mln_Succ != NULL; curNode = curNode->mln_Succ)
+      for(curNode = GetHead((struct List *)&DbgMallocList[i]; curNode != NULL; curNode = GetSucc(curNode))
       {
         struct DbgMallocNode *dmn = (struct DbgMallocNode *)curNode;
 
