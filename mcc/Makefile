@@ -254,7 +254,7 @@ ifeq ($(OS), os3)
   LDLIBS  += -ldebug -lmui
 
   # additional object files required
-  COBJS += vastubs.o AllocVecPooled.o FreeVecPooled.o
+  COBJS += vastubs.o AllocVecPooled.o FreeVecPooled.o GetHead.o GetPred.o GetSucc.o GetTail.o
 
 else
 ifeq ($(OS), mos)
@@ -274,6 +274,9 @@ ifeq ($(OS), mos)
   CFLAGS  += -noixemul -DNO_PPCINLINE_STDARG
   LDFLAGS += -noixemul
   LDLIBS  += -ldebug
+
+  # additional object files required
+  COBJS += GetHead.o GetPred.o GetSucc.o GetTail.o
 
 else
 ifeq ($(OS), aros-i386)
