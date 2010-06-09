@@ -32,6 +32,8 @@
 
 #include "SDI_compiler.h"
 
+#include "private.h"
+
 #define DEBUG_USE_MALLOC_REDEFINE 1
 #include "Debug.h"
 #include "version.h"
@@ -43,14 +45,6 @@
 #else
 #include <clib/debug_protos.h>
 #endif
-
-// special flagging macros
-#define isFlagSet(v,f)      (((v) & (f)) == (f))  // return TRUE if the flag is set
-#define hasFlag(v,f)        (((v) & (f)) != 0)    // return TRUE if one of the flags in f is set in v
-#define isFlagClear(v,f)    (((v) & (f)) == 0)    // return TRUE if flag f is not set in v
-#define SET_FLAG(v,f)       ((v) |= (f))          // set the flag f in v
-#define CLEAR_FLAG(v,f)     ((v) &= ~(f))         // clear the flag f in v
-#define MASK_FLAG(v,f)      ((v) &= (f))          // mask the variable v with flag f bitwise
 
 // our static variables with default values
 static int indent_level = 0;
@@ -155,7 +149,7 @@ void SetupDebug(void)
             if(strnicmp(&s[2], dbclasses[i].token, strlen(dbclasses[i].token)) == 0)
             {
               _DBPRINTF("clear '%s' debug class flag.\n", dbclasses[i].token);
-              CLEAR_FLAG(debug_classes, dbclasses[i].flag);
+              clearFlag(debug_classes, dbclasses[i].flag);
             }
           }
         }
@@ -167,7 +161,7 @@ void SetupDebug(void)
             if(strnicmp(&s[1], dbclasses[i].token, strlen(dbclasses[i].token)) == 0)
             {
               _DBPRINTF("set '%s' debug class flag\n", dbclasses[i].token);
-              SET_FLAG(debug_classes, dbclasses[i].flag);
+              setFlag(debug_classes, dbclasses[i].flag);
             }
           }
         }
@@ -182,7 +176,7 @@ void SetupDebug(void)
             if(strnicmp(&s[1], dbflags[i].token, strlen(dbflags[i].token)) == 0)
             {
               _DBPRINTF("clear '%s' debug flag\n", dbflags[i].token);
-              CLEAR_FLAG(debug_flags, dbflags[i].flag);
+              clearFlag(debug_flags, dbflags[i].flag);
             }
           }
         }
@@ -202,7 +196,7 @@ void SetupDebug(void)
               if(strnicmp(s, dbflags[i].token, strlen(dbflags[i].token)) == 0)
               {
                 _DBPRINTF("set '%s' debug flag\n", dbflags[i].token);
-                SET_FLAG(debug_flags, dbflags[i].flag);
+                setFlag(debug_flags, dbflags[i].flag);
               }
             }
           }
@@ -719,7 +713,7 @@ void DumpDbgMalloc(void)
     {
       struct Node *curNode;
 
-      for(curNode = GetHead((struct List *)&DbgMallocList[i]; curNode != NULL; curNode = GetSucc(curNode))
+      for(curNode = GetHead((struct List *)&DbgMallocList[i]); curNode != NULL; curNode = GetSucc(curNode))
       {
         struct DbgMallocNode *dmn = (struct DbgMallocNode *)curNode;
 
