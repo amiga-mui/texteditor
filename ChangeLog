@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-06-10 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/misc: moved all sources which implement stuff which is missing on some
+    systems to a separate "extrasrc" directory.
+
 2010-06-09 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Get#?.c: added GetHead/Pred/Succ/Tail implementation for those systems

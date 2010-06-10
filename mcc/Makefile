@@ -254,7 +254,13 @@ ifeq ($(OS), os3)
   LDLIBS  += -ldebug -lmui
 
   # additional object files required
-  COBJS += vastubs.o AllocVecPooled.o FreeVecPooled.o GetHead.o GetPred.o GetSucc.o GetTail.o
+  COBJS += vastubs.o \
+           extrasrc/AllocVecPooled.o \
+           extrasrc/FreeVecPooled.o \
+           extrasrc/GetHead.o \
+           extrasrc/GetPred.o \
+           extrasrc/GetSucc.o \
+           extrasrc/GetTail.o
 
 else
 ifeq ($(OS), mos)
@@ -276,7 +282,10 @@ ifeq ($(OS), mos)
   LDLIBS  += -ldebug
 
   # additional object files required
-  COBJS += GetHead.o GetPred.o GetSucc.o GetTail.o
+  COBJS += extrasrc/GetHead.o \
+           extrasrc/GetPred.o \
+           extrasrc/GetSucc.o \
+           extrasrc/GetTail.o
 
 else
 ifeq ($(OS), aros-i386)
@@ -369,6 +378,7 @@ release:
 $(OBJDIR):
 	@echo "  MK $@"
 	@$(MKDIR) $(OBJDIR)
+	@$(MKDIR) $(OBJDIR)/extrasrc
 
 # make the binary directories
 $(BINDIR):
