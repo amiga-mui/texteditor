@@ -1,19 +1,21 @@
 ;
-; $VER: Install-MCC 1.3 (27.05.2010)
+; $VER: Install-MCC 1.4 (11.6.2010)
 ;
 ; $Id$
 ;
 ; History:
 ;
-;   1.0   25.5.2010: initial release
-;   1.1   26.5.2010: easier definition of supported languages
-;   1.2   26.5.2010: added support for multiple catalog files per language
-;                    and added british english as supported language
-;   1.3   27.5.2010: the supported languages are now collected dynamically
-;                    instead of being defined statically. Furthermore the
-;                    .mcc name must be specified in the script's icon as
-;                    application name. This makes it possible to use the
-;                    script for arbitrary classes without modification.
+;   1.0   25.05.2010: initial release
+;   1.1   26.05.2010: easier definition of supported languages
+;   1.2   26.05.2010: added support for multiple catalog files per language
+;                     and added british english as supported language
+;   1.3   27.05.2010: the supported languages are now collected dynamically
+;                     instead of being defined statically. Furthermore the
+;                     .mcc name must be specified in the script's icon as
+;                     application name. This makes it possible to use the
+;                     script for arbitrary classes without modification.
+;   1.4   11.06.2010: extended the final message that a reboot might be
+;                     necessary to be able to use the just installed version.
 
 ;----------------------------------------------------------------------------
 ; /// language bit definition, do not change these!!
@@ -82,7 +84,10 @@
         (set #lang_catalog  (cat "Which catalog file do you want to install?\n"
                                  "(English language is built-in)"))
         (set #done          (cat "\n"
-                                 @app-name " has been successfully installed.\n"))
+                                 @app-name " has been successfully installed.\n"
+                                 "\n"
+                                 "A reboot might be necessary to\n"
+                                 "finish this installation!"))
     )
 )
 
@@ -95,7 +100,10 @@
         (set #lang_catalog  (cat "Welche catalog-Datei wollen Sie installieren?\n"
                                  "(Englisch ist eingebaut)"))
         (set #done          (cat "\n"
-                                 @app-name " wurde erfolgreich installiert.\n"))
+                                 @app-name " wurde erfolgreich installiert.\n"
+                                 "\n"
+                                 "Gegebenenfalls ist ein Neustart des Systems\n"
+                                 "nötig, um die Installation abzuschließen!"))
     )
 )
 ; ///
