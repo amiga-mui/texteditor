@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-06-27 Thore Böckelmann <tboeckel@gmx.de>
+
+  * doc/MCC_TextEditor.guide: fixed wrong version information. This fixes bug
+    #3021781.
+
 2010-06-11 Thore Böckelmann <tboeckel@gmx.de>
 
   * Install-MCC: extended the final message that a reboot might be necessary to
