@@ -604,7 +604,7 @@ APTR AllocVecPooled(APTR, ULONG);
 void FreeVecPooled(APTR, APTR);
 #endif
 
-#if !defined(__amigaos4__) && !defined(__AROS__)
+#if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
 // GetHead.c
 struct Node *GetHead(struct List *);
 // GetPred.c
