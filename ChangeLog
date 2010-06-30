@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-06-29 Ilkka Lehtoranta <ilkleht@yahoo.com>
+
+  * mcc/Makefile, mcc/private.h: Use standard AROS GetHead/Pred/Succ/Tail
+    macros in MorphOS.
+
 2010-06-29 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale/swedish.ct: added ##codeset line.
