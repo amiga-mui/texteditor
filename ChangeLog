@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-06-30 Jens Langner <Jens.Langner@light-speed.de>
+
+  * Makefile: fixed the top-level Makefile to only compile for the standard
+    platform found by the separate Makefiles in each subdirectories.
+  * tools/mkrelease.sh: minor fixes to the mkrelease script to generate a complete
+    new release archive.
+
 2010-06-29 Ilkka Lehtoranta <ilkleht@yahoo.com>
 
   * mcc/Makefile, mcc/private.h: Use standard AROS GetHead/Pred/Succ/Tail
