@@ -41,11 +41,11 @@ clean:
 	@$(MAKE) -C mcp clean
 	@$(MAKE) -C demo clean
 
-.PHONY: cleanall
-cleanall:
-	@$(MAKE) -C mcc cleanall
-	@$(MAKE) -C mcp cleanall
-	@$(MAKE) -C demo cleanall
+.PHONY: distclean
+distclean:
+	@$(MAKE) -C mcc distclean
+	@$(MAKE) -C mcp distclean
+	@$(MAKE) -C demo distclean
 
 .PHONY: install
 install:

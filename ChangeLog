@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.34 RELEASE ############################################################
+
+2010-07-01 Jens Langner <Jens.Langner@light-speed.de>
+
+  * misc: final v15.34 release preparations
+
 2010-06-30 Jens Langner <Jens.Langner@light-speed.de>
 
   * Makefile: fixed the top-level Makefile to only compile for the standard
