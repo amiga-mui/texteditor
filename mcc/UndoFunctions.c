@@ -32,9 +32,13 @@
 
 /// FreeUndoStep()
 // free the memory occupated by an undo step
-static void FreeUndoStep(struct InstData *data, struct UserAction *step)
+static void FreeUndoStep(struct InstData *data, ULONG index)
 {
+  struct UserAction *step = &data->undoSteps[index];
+
   ENTER();
+
+  D(DBF_UNDO, "free undo step %ld", index);
 
   if(step->type == ET_DELETEBLOCK || step->type == ET_DELETEBLOCK_NOMOVE || step->type == ET_PASTEBLOCK)
   {
@@ -364,17 +368,14 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
     // and if not we clean it up one entry
     if(data->nextUndoStep == data->maxUndoSteps)
     {
-      ULONG i;
-
       // free the oldest stored action and forget about it
       D(DBF_UNDO, "undo buffer is full, loose the oldest step");
-      FreeUndoStep(data, &data->undoSteps[0]);
+      FreeUndoStep(data, 0);
       data->nextUndoStep--;
       data->usedUndoSteps--;
 
       // shift all remaining actions one step to the front
-      for(i = 1; i < data->maxUndoSteps; i++)
-        memmove(&data->undoSteps[i-1], &data->undoSteps[i], sizeof(data->undoSteps[i]));
+      memmove(&data->undoSteps[0], &data->undoSteps[1], sizeof(data->undoSteps[0]) * data->maxUndoSteps);
 
       // signal the user that something in the undo buffer was lost
       setFlag(data->flags, FLG_UndoLost);
@@ -388,7 +389,7 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
       for(i = data->nextUndoStep; i < data->usedUndoSteps; i++)
       {
         D(DBF_UNDO, "free not yet redone step %ld", i);
-        FreeUndoStep(data, &data->undoSteps[i]);
+        FreeUndoStep(data, i);
       }
       data->usedUndoSteps = data->nextUndoStep;
     }
@@ -511,7 +512,7 @@ void ResetUndoBuffer(struct InstData *data)
     ULONG i;
 
     for(i = 0; i < data->usedUndoSteps; i++)
-      FreeUndoStep(data, &data->undoSteps[i]);
+      FreeUndoStep(data, i);
 
     data->usedUndoSteps = 0;
     data->nextUndoStep = 0;
@@ -546,11 +547,20 @@ void ResizeUndoBuffer(struct InstData *data, ULONG newMaxUndoSteps)
       oldSize = (data->maxUndoSteps * sizeof(struct UserAction));
       newSize = (newMaxUndoSteps * sizeof(struct UserAction));
 
-      // allocate a new undo buffer and copy over the old undo steps
+      // allocate a new undo buffer
       if((newUndoSteps = AllocVecPooled(data->mypool, newSize)) != NULL)
       {
         if(data->undoSteps != NULL)
+        {
+          ULONG i;
+
+          // copy over the old undo steps
           CopyMem(data->undoSteps, newUndoSteps, MIN(oldSize, newSize));
+
+          // free the steps which don't fit into the new buffer anymore
+          for(i = newMaxUndoSteps; i < data->maxUndoSteps; i++)
+            FreeUndoStep(data, i);
+        }
       }
     }
 
@@ -583,7 +593,11 @@ void FreeUndoBuffer(struct InstData *data)
 
   if(data->undoSteps != NULL)
   {
-    ResetUndoBuffer(data);
+    ULONG i;
+
+    for(i = 0; i < data->usedUndoSteps; i++)
+      FreeUndoStep(data, i);
+
     FreeVecPooled(data->mypool, data->undoSteps);
     data->undoSteps = NULL;
   }
