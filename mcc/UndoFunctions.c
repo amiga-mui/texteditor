@@ -496,7 +496,7 @@ void ResetUndoBuffer(struct InstData *data)
 {
   ENTER();
 
-  if(data->maxUndoSteps != 0)
+  if(data->maxUndoSteps != 0 && data->undoSteps != NULL)
   {
     ULONG i;
 
@@ -505,6 +505,11 @@ void ResetUndoBuffer(struct InstData *data)
 
     data->usedUndoSteps = 0;
     data->nextUndoStep = 0;
+
+    // trigger possible notifications
+    SetAttrs(data->object, MUIA_TextEditor_RedoAvailable, FALSE,
+                           MUIA_TextEditor_UndoAvailable, FALSE,
+                           TAG_DONE);
   }
 
   LEAVE();
@@ -550,6 +555,27 @@ void ResizeUndoBuffer(struct InstData *data, ULONG newMaxUndoSteps)
     data->maxUndoSteps = newMaxUndoSteps;
     data->usedUndoSteps = MIN(data->usedUndoSteps, newMaxUndoSteps);
     data->nextUndoStep = MIN(data->nextUndoStep, newMaxUndoSteps);
+
+    // trigger possible notifications
+    SetAttrs(data->object, MUIA_TextEditor_RedoAvailable, data->nextUndoStep < data->usedUndoSteps,
+                           MUIA_TextEditor_UndoAvailable, data->usedUndoSteps != 0,
+                           TAG_DONE);
+  }
+
+  LEAVE();
+}
+
+///
+/// FreeUndoBuffer()
+void FreeUndoBuffer(struct InstData *data)
+{
+  ENTER();
+
+  if(data->undoSteps != NULL)
+  {
+    ResetUndoBuffer(data);
+    FreeVecPooled(data->mypool, data->undoSteps);
+    data->undoSteps = NULL;
   }
 
   LEAVE();
