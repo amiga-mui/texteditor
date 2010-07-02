@@ -9,6 +9,9 @@ $URL$
 
   * mcc/UndoFunctions.c: the undo buffer will be preserved in case the number of
     undo steps is modified.
+  * mcc/UndoFunctions.c: a modified number of undo steps will now trigger the
+    notifications for MUIA_TextEditor_Undo/RedoAvailable.
+
 
 #### v15.34 RELEASE ############################################################
 
