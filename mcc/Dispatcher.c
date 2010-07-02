@@ -196,6 +196,7 @@ static IPTR mDispose(struct IClass *cl, Object *obj, Msg msg)
 
   ENTER();
 
+  ResetUndoBuffer(data);
   ResizeUndoBuffer(data, 0);
 
   data->blockinfo.startline = NULL;

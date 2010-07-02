@@ -512,37 +512,44 @@ void ResetUndoBuffer(struct InstData *data)
 
 ///
 /// ResizeUndoBuffer()
-void ResizeUndoBuffer(struct InstData *data, ULONG maxSteps)
+void ResizeUndoBuffer(struct InstData *data, ULONG newMaxUndoSteps)
 {
   ENTER();
 
-  if(data->maxUndoSteps != maxSteps)
+  if(data->maxUndoSteps != newMaxUndoSteps)
   {
-    D(DBF_UNDO, "resizing undo buffer for %ld undo steps", maxSteps);
+    struct UserAction *newUndoSteps = NULL;
 
-    if(data->undoSteps != NULL)
+    D(DBF_UNDO, "resizing undo buffer from %ld to %ld steps", data->maxUndoSteps, newMaxUndoSteps);
+
+    if(newMaxUndoSteps != 0)
     {
-      ResetUndoBuffer(data);
-      FreeVecPooled(data->mypool, data->undoSteps);
-    }
-
-    // reset everything to zero
-    data->undoSteps = NULL;
-    data->maxUndoSteps = 0;
-    data->usedUndoSteps = 0;
-    data->nextUndoStep = 0;
-
-    if(maxSteps > 0)
-    {
+      ULONG oldSize;
       ULONG newSize;
 
       // calculate number of bytes from number of undo levels
-      newSize = (maxSteps * sizeof(struct UserAction));
+      oldSize = (data->maxUndoSteps * sizeof(struct UserAction));
+      newSize = (newMaxUndoSteps * sizeof(struct UserAction));
 
-      // allocate a new undo buffer
-      if((data->undoSteps = AllocVecPooled(data->mypool, newSize)) != NULL)
-        data->maxUndoSteps = maxSteps;
+      // allocate a new undo buffer and copy over the old undo steps
+      if((newUndoSteps = AllocVecPooled(data->mypool, newSize)) != NULL)
+      {
+        if(data->undoSteps != NULL)
+          CopyMem(data->undoSteps, newUndoSteps, MIN(oldSize, newSize));
+      }
     }
+
+    if(data->undoSteps != NULL)
+    {
+      // free the old buffer
+      FreeVecPooled(data->mypool, data->undoSteps);
+    }
+
+    // reset everything to the new values
+    data->undoSteps = newUndoSteps;
+    data->maxUndoSteps = newMaxUndoSteps;
+    data->usedUndoSteps = MIN(data->usedUndoSteps, newMaxUndoSteps);
+    data->nextUndoStep = MIN(data->nextUndoStep, newMaxUndoSteps);
   }
 
   LEAVE();
