@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-07-02 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/UndoFunctions.c: the undo buffer will be preserved in case the number of
+    undo steps is modified.
+
 #### v15.34 RELEASE ############################################################
 
 2010-07-01 Jens Langner <Jens.Langner@light-speed.de>

@@ -150,6 +150,13 @@
 #define isFlagSet(mask, flag)           (((mask) & (flag)) == (flag))  // return TRUE if the flag is set
 #define isFlagClear(mask, flag)         (((mask) & (flag)) == 0)       // return TRUE if the flag is NOT set
 
+#ifndef MAX
+#define MAX(a,b)          (((a) > (b)) ? (a) : (b))
+#endif
+#ifndef MIN
+#define MIN(a,b)          (((a) < (b)) ? (a) : (b))
+#endif
+
 enum EventType
 {
   ET_PASTECHAR = 0,
