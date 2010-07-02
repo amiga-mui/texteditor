@@ -14,6 +14,8 @@ $URL$
   * mcc/UndoFunctions.c: in case there is not enough memory for a new undo step
     (i.e. a too big block) only this single step will be discarded instead of
     all remembered steps so far.
+  * mcc/UndoFunctions.c: in case the number of undo steps is decreased the steps
+    which don't fit into the new buffer are freed correctly now.
 
 #### v15.34 RELEASE ############################################################
 

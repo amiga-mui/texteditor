@@ -601,6 +601,7 @@ void AddStyleToLine(struct InstData *, LONG, struct line_node *, LONG, UWORD);
 BOOL AddToUndoBuffer(struct InstData *, enum EventType, void *);
 void ResetUndoBuffer(struct InstData *);
 void ResizeUndoBuffer(struct InstData *, ULONG);
+void FreeUndoBuffer(struct InstData *);
 BOOL Undo(struct InstData *);
 BOOL Redo(struct InstData *);
 
