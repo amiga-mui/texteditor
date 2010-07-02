@@ -358,6 +358,7 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
   if(isFlagClear(data->flags, FLG_ReadOnly) && data->maxUndoSteps > 0)
   {
     struct UserAction *action;
+    BOOL success = TRUE;
 
     // check if there is still enough space in our undo buffer
     // and if not we clean it up one entry
@@ -396,19 +397,6 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
 
     // clear any previous data
     memset(action, 0, sizeof(*action));
-
-    // advance the index for the next undo step
-    data->nextUndoStep++;
-    // and count this new step
-    data->usedUndoSteps++;
-
-    // as we are about to set something new for an undo
-    // operation we have to signal that redo operation
-    // is cleared now.
-    // and we definitely have something to undo now
-    SetAttrs(data->object, MUIA_TextEditor_RedoAvailable, FALSE,
-                           MUIA_TextEditor_UndoAvailable, TRUE,
-                           TAG_DONE);
 
     action->x = data->CPos_X;
     action->y = LineNr(data, data->actualline);
@@ -469,8 +457,7 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
         }
         else
         {
-          ResetUndoBuffer(data);
-          DoMethod(data->object, MUIM_TextEditor_HandleError, Error_NotEnoughUndoMem);
+          success = FALSE;
         }
       }
       break;
@@ -481,6 +468,29 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
         // nothing to do
       }
       break;
+    }
+
+    if(success == TRUE)
+    {
+      // adding the undo step was successful, update the variables
+
+      // advance the index for the next undo step
+      data->nextUndoStep++;
+      // and count this new step
+      data->usedUndoSteps++;
+
+      // as we are about to set something new for an undo
+      // operation we have to signal that redo operation
+      // is cleared now.
+      // and we definitely have something to undo now
+      SetAttrs(data->object, MUIA_TextEditor_RedoAvailable, FALSE,
+                             MUIA_TextEditor_UndoAvailable, TRUE,
+                             TAG_DONE);
+    }
+    else
+    {
+      // something went wrong, invoke the error method
+      DoMethod(data->object, MUIM_TextEditor_HandleError, Error_NotEnoughUndoMem);
     }
   }
 

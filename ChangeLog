@@ -11,7 +11,9 @@ $URL$
     undo steps is modified.
   * mcc/UndoFunctions.c: a modified number of undo steps will now trigger the
     notifications for MUIA_TextEditor_Undo/RedoAvailable.
-
+  * mcc/UndoFunctions.c: in case there is not enough memory for a new undo step
+    (i.e. a too big block) only this single step will be discarded instead of
+    all remembered steps so far.
 
 #### v15.34 RELEASE ############################################################
 
