@@ -5,6 +5,17 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-07-03 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/ObjectCreator.c: removed the "undo steps" slider from the real time
+    settings facility of MUI4 completely. First, adjusting the value will give
+    no visual feedback. Second (and even more important), adjusting the number
+    of steps in real time will effectively kill all undo steps so far in case
+    the slider is moved to zero. This is not what the user expects to happen.
+    MorphOS-devs, please check the other GUI elements if some of them can be
+    excluded from the real time settings as well. Furthermore, please check if
+    this change fixes bug #3024024.
+
 2010-07-02 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/UndoFunctions.c: the undo buffer will be preserved in case the number of
