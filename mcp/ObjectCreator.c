@@ -346,7 +346,6 @@ IPTR New(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct opSet 
         DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->typenspell, MUICFG_TextEditor_TypeNSpell, 1, tr(MSG_ConfigMenu_TypeNSpell));
         DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->CheckWord, MUICFG_TextEditor_CheckWord, 1, tr(MSG_ConfigMenu_CheckWord));
         DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->tabsize, MUICFG_TextEditor_TabSize, 1, tr(MSG_Label_TabSize));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->undosize, MUICFG_TextEditor_UndoSize, 1, tr(MSG_Label_UndoLevel));
         DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->textcolor, MUICFG_TextEditor_TextColor, 1, tr(MSG_Label_Text));
         DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->separatorshine, MUICFG_TextEditor_SeparatorShine, 1, tr(MSG_Label_SeparatorShine));
         DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->separatorshadow, MUICFG_TextEditor_SeparatorShadow, 1, tr(MSG_Label_SeparatorShadow));
