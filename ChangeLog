@@ -12,6 +12,9 @@ $URL$
     Having a flow blown editor is far too much overhead here.
   * mcc/UndoFunctions.c: defined a separate value for a "do nothing" undo step
     which can be used to erase any other undo step type.
+  * mcc/UndoFunctions.c: fixed a possible memory leak when resizing the undo
+    buffer. A resize from any number of steps to zero steps would not have freed
+    any undo steps done so far.
 
 2010-07-03 Thore Böckelmann <tboeckel@gmx.de>
 

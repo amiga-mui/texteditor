@@ -553,20 +553,20 @@ void ResizeUndoBuffer(struct InstData *data, ULONG newMaxUndoSteps)
       {
         if(data->undoSteps != NULL)
         {
-          ULONG i;
-
           // copy over the old undo steps
           CopyMem(data->undoSteps, newUndoSteps, MIN(oldSize, newSize));
-
-          // free the steps which don't fit into the new buffer anymore
-          for(i = newMaxUndoSteps; i < data->maxUndoSteps; i++)
-            FreeUndoStep(data, i);
         }
       }
     }
 
     if(data->undoSteps != NULL)
     {
+      ULONG i;
+
+      // free the steps which don't fit into the new buffer anymore
+      for(i = newMaxUndoSteps; i < data->maxUndoSteps; i++)
+        FreeUndoStep(data, i);
+
       // free the old buffer
       FreeVecPooled(data->mypool, data->undoSteps);
     }
