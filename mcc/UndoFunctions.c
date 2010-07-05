@@ -48,6 +48,8 @@ static void FreeUndoStep(struct InstData *data, ULONG index)
       // clear the pointer
       step->clip = NULL;
     }
+    // forget about the type of undo
+    step->type = ET_NONE;
   }
 
   LEAVE();
@@ -465,7 +467,6 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
 
       default:
       {
-        D(DBF_UNDO, "add undo PASTECHARS");
         // nothing to do
       }
       break;
