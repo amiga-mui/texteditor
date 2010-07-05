@@ -475,25 +475,22 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
     if(success == TRUE)
     {
       // adding the undo step was successful, update the variables
-
       // advance the index for the next undo step
       data->nextUndoStep++;
       // and count this new step
       data->usedUndoSteps++;
-
-      // as we are about to set something new for an undo
-      // operation we have to signal that redo operation
-      // is cleared now.
-      // and we definitely have something to undo now
-      SetAttrs(data->object, MUIA_TextEditor_RedoAvailable, FALSE,
-                             MUIA_TextEditor_UndoAvailable, TRUE,
-                             TAG_DONE);
     }
     else
     {
       // something went wrong, invoke the error method
       DoMethod(data->object, MUIM_TextEditor_HandleError, Error_NotEnoughUndoMem);
     }
+
+    // trigger possible notifications, no matter if the action succeeded or not,
+    // because the undo/redo situation might have changed
+    SetAttrs(data->object, MUIA_TextEditor_RedoAvailable, data->nextUndoStep < data->usedUndoSteps,
+                           MUIA_TextEditor_UndoAvailable, data->usedUndoSteps != 0,
+                           TAG_DONE);
   }
 
   D(DBF_UNDO, "after  maxUndoSteps=%ld nextUndoStep=%ld usedUndoSteps=%ld", data->maxUndoSteps, data->nextUndoStep, data->usedUndoSteps);
