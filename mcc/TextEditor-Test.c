@@ -220,7 +220,9 @@ int main(void)
                    *bold, *italic, *underline, *ischanged, *undo, *redo, *string,
                    *xslider, *yslider, *flow, *search, *replace, *wrapmode, *wrapborder,
                    *rgroup, *isdisabled, *isreadonly;
-                   Object *lower,*upper;
+            Object *lower,*upper;
+            Object *undoslider;
+
             const char *flow_text[] = { "Left", "Center", "Right", NULL };
             const char *wrap_modes[] = { "NoWrap", "SoftWrap", "HardWrap", NULL };
             const char *classes[] = { "TextEditor.mcc", NULL };
@@ -417,6 +419,7 @@ int main(void)
                         Child, xslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 1000),
                         Child, yslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 200),
                         End,
+                      Child, undoslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 1000),
                       Child, string = StringObject,
                         StringFrame,
                         MUIA_CycleChain, TRUE,
@@ -488,6 +491,8 @@ int main(void)
             DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_CursorY, MUIV_EveryTime, yslider, 3, MUIM_NoNotifySet, MUIA_Numeric_Value, MUIV_TriggerValue);
             DoMethod(yslider, MUIM_Notify, MUIA_Numeric_Value, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_CursorY, MUIV_TriggerValue);
 
+            DoMethod(undoslider, MUIM_Notify, MUIA_Numeric_Value, MUIV_EveryTime, editorgad, 3, MUIM_Set, MUIA_TextEditor_UndoLevels, MUIV_TriggerValue);
+
             DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_AreaMarked, MUIV_EveryTime, MUIV_Notify_Self, 7, MUIM_MultiSet, MUIA_Disabled, MUIV_NotTriggerValue, cut, copy, erase, NULL);
             DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_UndoAvailable, MUIV_EveryTime, undo, 3, MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
             DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_RedoAvailable, MUIV_EveryTime, redo, 3, MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
@@ -535,6 +540,7 @@ int main(void)
   //          set(wrapmode, MUIA_Cycle_Active, MUIV_TextEditor_WrapMode_HardWrap);
             set(wrapmode, MUIA_Cycle_Active, MUIV_TextEditor_WrapMode_SoftWrap);
             set(wrapborder, MUIA_Numeric_Value, wrap_border);
+            nnset(undoslider, MUIA_Numeric_Value, xget(editorgad, MUIA_TextEditor_UndoLevels));
 
 
   /*          {
