@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-07-05 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/CreatePrefsGroup.c: replaced the text editor object containing the
+    instructions about the spell checking facility by a plain float text object.
+    Having a flow blown editor is far too much overhead here.
+
 2010-07-03 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/ObjectCreator.c: removed the "undo steps" slider from the real time
