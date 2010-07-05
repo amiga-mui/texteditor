@@ -10,6 +10,8 @@ $URL$
   * mcp/CreatePrefsGroup.c: replaced the text editor object containing the
     instructions about the spell checking facility by a plain float text object.
     Having a flow blown editor is far too much overhead here.
+  * mcc/UndoFunctions.c: defined a separate value for a "do nothing" undo step
+    which can be used to erase any other undo step type.
 
 2010-07-03 Thore Böckelmann <tboeckel@gmx.de>
 
