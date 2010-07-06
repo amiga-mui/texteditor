@@ -170,7 +170,7 @@ IPTR mClearText(struct IClass *cl, Object *obj, UNUSED Msg msg)
 
         data->CPos_X = 0;
         data->actualline = data->firstline;
-        AddToUndoBuffer(data, ET_DELETEBLOCK, &newblock);
+        AddToUndoBuffer(data, ET_DELETEBLOCK_NOMOVE, &newblock);
       }
       FreeTextMem(data, data->firstline);
       data->firstline = newcontents;
