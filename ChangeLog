@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-07-06 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Methods.c: clearing the complete text is now remembered as an action
+    without cursor movement. Undoing this action will result in the cursor being
+    placed on the very first character of the text instead of behind the very
+    last character.
+
 2010-07-05 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/CreatePrefsGroup.c: replaced the text editor object containing the
