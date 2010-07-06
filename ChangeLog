@@ -11,6 +11,8 @@ $URL$
     without cursor movement. Undoing this action will result in the cursor being
     placed on the very first character of the text instead of behind the very
     last character.
+  * mcc/misc: use the SetAfPt() macro instead of poking directly into the
+    RastPort structure.
 
 2010-07-05 Thore Böckelmann <tboeckel@gmx.de>
 

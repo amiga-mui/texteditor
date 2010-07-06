@@ -22,6 +22,7 @@
 
 #include <string.h>
 
+#include <graphics/gfxmacros.h>
 #include <graphics/text.h>
 #include <libraries/mui.h>
 #include <clib/alib_protos.h>
@@ -614,7 +615,7 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
     line = pos.line;
     x = pos.x;
 
-    if(lines-line_nr < 3 || doublebuffer)
+    if(lines-line_nr < 3 || doublebuffer == TRUE)
     {
       doublebuffer = TRUE;
     }
@@ -635,10 +636,6 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
 
     if(drawbottom && (data->maxlines > (data->totallines-data->visual_y+1)))
     {
-      UWORD *oldPattern = (UWORD *)data->rport->AreaPtrn;
-      UBYTE oldSize = data->rport->AreaPtSz;
-      UWORD newPattern[] = {0x1111, 0x4444};
-
       DoMethod(data->object, MUIM_DrawBackground,
             data->xpos,
             data->ypos+((data->totallines-data->visual_y+1)*data->height),
@@ -649,30 +646,32 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
 
       if(isFlagSet(data->flags, FLG_Ghosted))
       {
+        UWORD newPattern[2];
+
         if(((data->visual_y-1)*data->height)%2 == 0)
         {
-            newPattern[0] = 0x4444;
-            newPattern[1] = 0x1111;
+          newPattern[0] = 0x4444;
+          newPattern[1] = 0x1111;
+        }
+        else
+        {
+          newPattern[0] = 0x1111;
+          newPattern[1] = 0x4444;
         }
         SetDrMd(data->rport, JAM1);
         SetAPen(data->rport, _pens(data->object)[MPEN_SHADOW]);
-        data->rport->AreaPtrn = newPattern;
-        data->rport->AreaPtSz = 1;
+        SetAfPt(data->rport, newPattern, 1);
         RectFill(data->rport,
               data->xpos,
               data->ypos+((data->totallines-data->visual_y+1)*data->height),
               data->xpos+data->innerwidth-1,
               data->ypos+((data->totallines-data->visual_y+1)*data->height)+(data->maxlines*data->height) - ((data->totallines-data->visual_y+1)*data->height)-1);
-        data->rport->AreaPtrn = oldPattern;
-        data->rport->AreaPtSz = oldSize;
+        SetAfPt(data->rport, NULL, (UBYTE)-1);
       }
     }
 
-    if(!doublebuffer)
-    {
+    if(doublebuffer == FALSE)
       RemoveClipping(data);
-    }
-
   }
 
   LEAVE();
