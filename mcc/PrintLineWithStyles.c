@@ -20,6 +20,7 @@
 
 ***************************************************************************/
 
+#include <graphics/gfxmacros.h>
 #include <graphics/text.h>
 #include <clib/alib_protos.h>
 #include <proto/graphics.h>
@@ -387,14 +388,12 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
     if(isFlagSet(data->flags, FLG_Ghosted))
     {
-      UWORD *oldPattern = (UWORD *)rp->AreaPtrn;
-      UBYTE oldSize = rp->AreaPtSz;
       UWORD newPattern[] = {0x1111, 0x4444};
 
       if(doublebuffer == TRUE)
       {
-        ULONG ptrn1 = 0x11111111;
-        ULONG ptrn2 = 0x44444444;
+        ULONG ptrn1 = 0x11111111UL;
+        ULONG ptrn2 = 0x44444444UL;
 
         ptrn1 = ptrn1>>((data->xpos-xoffset)%16);
         ptrn2 = ptrn2>>((data->xpos-xoffset)%16);
@@ -421,11 +420,9 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
       SetDrMd(rp, JAM1);
       SetAPen(rp, _pens(data->object)[MPEN_SHADOW]);
-      rp->AreaPtrn = newPattern;
-      rp->AreaPtSz = 1;
+      SetAfPt(rp, newPattern, 1);
       RectFill(rp, xoffset, starty, xoffset+data->innerwidth-1, starty+data->height-1);
-      rp->AreaPtrn = oldPattern;
-      rp->AreaPtSz = oldSize;
+      SetAfPt(rp, NULL, (UBYTE)-1);
     }
 
     if(doublebuffer == FALSE)

@@ -25,6 +25,7 @@
 #include <exec/memory.h>
 #include <intuition/classes.h>
 #include <clib/alib_protos.h>
+#include <graphics/gfxmacros.h>
 #include <proto/intuition.h>
 #include <proto/graphics.h>
 #include <proto/utility.h>
@@ -531,17 +532,13 @@ static IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
     // the gadget was flagged as being ghosted.
     if(isFlagSet(data->flags, FLG_Ghosted))
     {
-      UWORD *oldPattern = (UWORD *)data->rport->AreaPtrn;
-      UBYTE oldSize = data->rport->AreaPtSz;
       UWORD newPattern[] = {0x1111, 0x4444};
 
       SetDrMd(data->rport, JAM1);
       SetAPen(data->rport, _pens(obj)[MPEN_SHADOW]);
-      data->rport->AreaPtrn = newPattern;
-      data->rport->AreaPtSz = 1;
+      SetAfPt(data->rport, newPattern, 1);
       RectFill(data->rport, ad->mad_Box.Left, ad->mad_Box.Top, ad->mad_Box.Left + ad->mad_Box.Width  - 1, ad->mad_Box.Top  + ad->mad_Box.Height - 1);
-      data->rport->AreaPtrn = oldPattern;
-      data->rport->AreaPtSz = oldSize;
+      SetAfPt(data->rport, NULL, (UBYTE)-1);
     }
 
     // dump all text now
