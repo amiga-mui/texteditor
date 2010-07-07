@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-07-07 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/HandleInput.c: the text was no longer refreshed in case the user tried
+    to paste from an empty or non-text clipboard.
+
 2010-07-06 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Methods.c: clearing the complete text is now remembered as an action

@@ -1196,6 +1196,8 @@ void Key_Paste(struct InstData *data)
     AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
     data->pixel_x = 0;
   }
+  else
+    data->update = TRUE;
 
   LEAVE();
 }
