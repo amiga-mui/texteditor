@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-07-29 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcp: fixed MorphOS compile by applying debugging framework from mcc also
+    on the mcp.
+
 2010-07-07 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c: the text was no longer refreshed in case the user tried
