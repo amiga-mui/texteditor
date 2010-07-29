@@ -31,6 +31,14 @@
 
 #include "Debug.h"
 
+// special flagging macros
+#define setFlag(mask, flag)             (mask) |= (flag)               // set the flag "flag" in "mask"
+#define clearFlag(mask, flag)           (mask) &= ~(flag)              // clear the flag "flag" in "mask"
+#define maskFlag(mask, flag)            (mask) &= (flag)               // mask the variable "mask" with flags "flag" bitwise
+#define isAnyFlagSet(mask, flag)        (((mask) & (flag)) != 0)       // return TRUE if at least one of the flags is set
+#define isFlagSet(mask, flag)           (((mask) & (flag)) == (flag))  // return TRUE if the flag is set
+#define isFlagClear(mask, flag)         (((mask) & (flag)) == 0)       // return TRUE if the flag is NOT set
+
 // if something in our configuration setup (keybindings, etc)
 // has changed we can increase the config version so that TextEditor
 // will popup a warning about and obsolete configuration.
