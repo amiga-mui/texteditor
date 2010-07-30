@@ -61,16 +61,6 @@
 // debug flags
 #define DBF_ALWAYS    (1<<0)
 #define DBF_STARTUP   (1<<1)     // for startup/shutdown events
-#define DBF_INPUT     (1<<2)     // HandleInput.c
-#define DBF_REXX      (1<<3)     // HandleARexx.c
-#define DBF_CLIPBOARD (1<<4)     // EditorStuff.c, BlockOperators.c
-#define DBF_UNDO      (1<<5)     // UndoFunctions.c
-#define DBF_DUMP      (1<<6)
-#define DBF_STYLE     (1<<7)     // styles and colors
-#define DBF_SPELL     (1<<8)     // SpellChecker.c
-#define DBF_BLOCK     (1<<9)     // BlockOperators.c
-#define DBF_IMPORT    (1<<10)    // ImportHook.c
-#define DBF_EXPORT    (1<<10)    // ExportHook.c
 #define DBF_ALL       0xffffffff
 
 void SetupDebug(void);
