@@ -9,6 +9,7 @@ $URL$
 
   * mcc/Debug.c, mcp/Debug.c: removed unused debug flags from the .mcp and made
     @mtrack user definable for both classes.
+  * mcp/Makefile, misc: added missing functions for the OS3 debug build.
 
 2010-07-29 Jens Langner <Jens.Langner@light-speed.de>
 
