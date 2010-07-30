@@ -105,6 +105,7 @@ void SetupDebug(void)
       { "debug",   DBC_DEBUG    },
       { "error",   DBC_ERROR    },
       { "warning", DBC_WARNING  },
+      { "mtrack",  DBC_MTRACK   },
       { "all",     DBC_ALL      },
       { NULL,      0            }
     };
@@ -113,16 +114,6 @@ void SetupDebug(void)
     {
       { "always",    DBF_ALWAYS    },
       { "startup",   DBF_STARTUP   },
-      { "input",     DBF_INPUT     },
-      { "rexx",      DBF_REXX      },
-      { "clipboard", DBF_CLIPBOARD },
-      { "undo",      DBF_UNDO      },
-      { "dump",      DBF_DUMP      },
-      { "style",     DBF_STYLE     },
-      { "spell",     DBF_SPELL     },
-      { "block",     DBF_BLOCK     },
-      { "import",    DBF_IMPORT    },
-      { "export",    DBF_IMPORT    },
       { "all",       DBF_ALL       },
       { NULL,        0             }
     };

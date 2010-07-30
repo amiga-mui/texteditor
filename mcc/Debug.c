@@ -105,6 +105,7 @@ void SetupDebug(void)
       { "debug",   DBC_DEBUG    },
       { "error",   DBC_ERROR    },
       { "warning", DBC_WARNING  },
+      { "mtrack",  DBC_MTRACK   },
       { "all",     DBC_ALL      },
       { NULL,      0            }
     };

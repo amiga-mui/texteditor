@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-07-30 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Debug.c, mcp/Debug.c: removed unused debug flags from the .mcp and made
+    @mtrack user definable for both classes.
+
 2010-07-29 Jens Langner <Jens.Langner@light-speed.de>
 
   * mcp: fixed MorphOS compile by applying debugging framework from mcc also
