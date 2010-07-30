@@ -212,4 +212,15 @@ IPTR xget(Object *obj, const IPTR attr);
 #endif
 ///
 
+#if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
+// GetHead.c
+struct Node *GetHead(struct List *);
+// GetPred.c
+struct Node *GetPred(struct Node *);
+// GetSucc.c
+struct Node *GetSucc(struct Node *);
+// GetTail.c
+struct Node *GetTail(struct List *);
+#endif
+
 #endif /* MUI_NLISTVIEWS_priv_MCP_H */

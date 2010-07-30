@@ -243,7 +243,12 @@ ifeq ($(OS), os3)
   LDLIBS  += -ldebug -lmui
 
   # additional object files required
-  COBJS += vastubs.o
+  # additional object files required
+  COBJS += vastubs.o \
+           extrasrc/GetHead.o \
+           extrasrc/GetPred.o \
+           extrasrc/GetSucc.o \
+           extrasrc/GetTail.o
 
 else
 ifeq ($(OS), mos)
@@ -355,6 +360,7 @@ release:
 $(OBJDIR):
 	@echo "  MK $@"
 	@$(MKDIR) $(OBJDIR)
+	@$(MKDIR) $(OBJDIR)/extrasrc
 
 # make the binary directories
 $(BINDIR):
