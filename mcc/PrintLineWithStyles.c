@@ -303,6 +303,8 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     while(c_length > 0)
     {
       LONG p_length = c_length;
+      struct TextExtent te;
+      UWORD fitting;
 
       SetSoftStyle(rp, convert(GetStyle(x, line)), AskSoftStyle(rp));
       if(styles != NULL)
@@ -346,10 +348,14 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       }
 */
 
-      if(text[x+p_length-1] < ' ')
-        Text(rp, text+x,p_length-1);
+      // calculate how many characters will fit in the visible area
+      fitting = TextFit(rp, text+x, p_length, &te, NULL, 1, _mwidth(data->object), data->fontheight);
+      if(text[x+fitting-1] < ' ')
+        Text(rp, text+x,fitting-1);
       else
-        Text(rp, text+x, p_length);
+        Text(rp, text+x, fitting);
+
+      // add the length calculated before no matter how many character really fitted
 
       x += p_length;
       c_length -= p_length;
