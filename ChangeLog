@@ -10,6 +10,10 @@ $URL$
   * mcc/#?: replaced lots of direct references to MUI's area data and render
     info by the appropriate macro calls. This way we can rid of some private
     variables which are just copies of these values.
+  * mcc/PrintLineWithStyle.c: added a TextFit() call to calculate how many
+    characters can really be displayed. This works around the problem that very
+    long lines would either be drawn outside the editors area or were not
+    correctly displayed at all due to integer overflows in graphics.library.
 
 2010-07-30 Thore Böckelmann <tboeckel@gmx.de>
 
