@@ -1097,9 +1097,9 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
           struct Hook *oldhook;
 
           oldhook = InstallLayerHook(data->rport->Layer, LAYERS_NOBACKFILL);
-          ScrollRasterBF(data->rport, 0, data->height,
-                    data->xpos, data->ypos,
-                    data->xpos + data->innerwidth - 1, (data->ypos + ((data->maxlines-1) * data->height)) - 1);
+          ScrollRasterBF(data->rport, 0, data->fontheight,
+                    _mleft(data->object), data->ypos,
+                    _mleft(data->object) + _mwidth(data->object) - 1, (data->ypos + ((data->maxlines-1) * data->fontheight)) - 1);
           InstallLayerHook(data->rport->Layer, oldhook);
 
           PrintLine(data, 0, line, data->maxlines-1, FALSE);

@@ -299,7 +299,7 @@ int main(void)
                         Child, isreadonly = MUI_MakeObject(MUIO_Checkmark, "Is read-only?"),
                         Child, flow = MUI_MakeObject(MUIO_Cycle, NULL, flow_text),
                         Child, wrapmode = MUI_MakeObject(MUIO_Cycle, NULL, wrap_modes),
-                        Child, wrapborder = MUI_MakeObject(MUIO_Slider, NULL, 0, 1000),
+                        Child, wrapborder = MUI_MakeObject(MUIO_Slider, NULL, 0, 10000),
 
                       End,
 
@@ -342,13 +342,14 @@ int main(void)
   //                                MUIA_Background, MUII_GroupBack,
   //                                MUIA_TextEditor_FixedFont, TRUE,
                                     MUIA_TextEditor_AutoClip, FALSE,
-  //                                  MUIA_TextEditor_ReadOnly, TRUE,
+  //                        MUIA_TextEditor_ReadOnly, TRUE,
   //                                 MUIA_TextEditor_ActiveObjectOnClick, TRUE,
                                     MUIA_TextEditor_DoubleClickHook, &URLHook,
   //                                MUIA_TextEditor_HorizontalScroll, TRUE,
-  //                                MUIA_TextEditor_ImportWrap, 1023,
-                                    MUIA_TextEditor_WrapBorder, wrap_border,
+                                  MUIA_TextEditor_ImportWrap, 10023,
+  //                                  MUIA_TextEditor_WrapBorder, wrap_border,
   //                                MUIA_TextEditor_ExportWrap, 80,
+                                    MUIA_TextEditor_WrapMode, MUIV_TextEditor_WrapMode_NoWrap,
 
                                   MUIA_TextEditor_ExportHook, MUIV_TextEditor_ExportHook_NoStyle,
   //                                MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_EMail,
@@ -362,6 +363,8 @@ int main(void)
                                     MUIA_ControlChar, 'a',
                                     MUIA_TextEditor_Contents,
 
+                                      "\n"
+                                      "a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line a very long line\n"
                                       "\n"
                                       "\33r\33b" __DATE__ "\33n\n"
                                       "\n\33cTextEditor.mcc " LIB_REV_STRING " test program\n"
@@ -416,8 +419,8 @@ int main(void)
 
                             End,
   */                    Child, HGroup,
-                        Child, xslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 1000),
-                        Child, yslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 200),
+                        Child, xslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 10000),
+                        Child, yslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 1000),
                         End,
                       Child, undoslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 1000),
                       Child, string = StringObject,
@@ -537,8 +540,9 @@ int main(void)
 
             set(window, MUIA_Window_ActiveObject, editorgad);
             set(window, MUIA_Window_Open, TRUE);
+            set(wrapmode, MUIA_Cycle_Active, MUIV_TextEditor_WrapMode_NoWrap);
   //          set(wrapmode, MUIA_Cycle_Active, MUIV_TextEditor_WrapMode_HardWrap);
-            set(wrapmode, MUIA_Cycle_Active, MUIV_TextEditor_WrapMode_SoftWrap);
+  //          set(wrapmode, MUIA_Cycle_Active, MUIV_TextEditor_WrapMode_SoftWrap);
             set(wrapborder, MUIA_Numeric_Value, wrap_border);
             nnset(undoslider, MUIA_Numeric_Value, xget(editorgad, MUIA_TextEditor_UndoLevels));
 
