@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-08-04 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/#?: replaced lots of direct references to MUI's area data and render
+    info by the appropriate macro calls. This way we can rid of some private
+    variables which are just copies of these values.
+
 2010-07-30 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Debug.c, mcp/Debug.c: removed unused debug flags from the .mcp and made

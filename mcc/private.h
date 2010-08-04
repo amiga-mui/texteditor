@@ -306,11 +306,9 @@ struct Grow
 
 struct InstData
 {
-  WORD    xpos;             // xpos of gadget
   WORD    ypos;             // ypos of gadget
   WORD    realypos;
-  UWORD   height;           // font height
-  UWORD   innerwidth;         // inner gadget width in pixels (-cursor)
+  UWORD   fontheight;       // font height
 
   UWORD   CPos_X;           // Cursor x pos.
   struct  line_node *actualline;    // The actual line...

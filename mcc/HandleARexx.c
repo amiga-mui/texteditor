@@ -130,7 +130,7 @@ static IPTR CallFunction(struct InstData *data, UWORD function, IPTR *args, cons
       new_y = data->totallines-data->maxlines;
     if(new_y < 0)
       new_y = 0;
-    set(data->object, MUIA_TextEditor_Prop_First, new_y*data->height);
+    set(data->object, MUIA_TextEditor_Prop_First, new_y*data->fontheight);
   }
   else
   {

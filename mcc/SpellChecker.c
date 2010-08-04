@@ -462,8 +462,8 @@ void SuggestWord(struct InstData *data)
     OffsetToLines(data, data->CPos_X, line, &pos);
     left = xget(_win(data->object), MUIA_Window_LeftEdge);
     top = xget(_win(data->object), MUIA_Window_TopEdge);
-    left  += data->xpos + FlowSpace(data, line->line.Flow, line->line.Contents+(data->CPos_X-pos.x)) + TextLength(&data->tmprp, line->line.Contents+(data->CPos_X-pos.x), pos.x);
-    top += data->ypos + (data->height * (line_nr + pos.lines));
+    left  += _mleft(data->object) + FlowSpace(data, line->line.Flow, line->line.Contents+(data->CPos_X-pos.x)) + TextLength(&data->tmprp, line->line.Contents+(data->CPos_X-pos.x), pos.x);
+    top += data->ypos + (data->fontheight * (line_nr + pos.lines));
 
     while(data->CPos_X < line->line.Length && (IsAlpha(data->mylocale, line->line.Contents[data->CPos_X]) || line->line.Contents[data->CPos_X] == '-' || line->line.Contents[data->CPos_X] == '\''))
     {

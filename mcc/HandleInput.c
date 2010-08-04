@@ -275,7 +275,7 @@ static LONG FindKey(struct InstData *data, UBYTE key, ULONG qualifier)
             new_y = data->totallines-data->maxlines;
           if(new_y < 0)
             new_y = 0;
-          set(data->object, MUIA_TextEditor_Prop_First, new_y*data->height);
+          set(data->object, MUIA_TextEditor_Prop_First, new_y*data->fontheight);
 
           RETURN(4);
           return(4);
@@ -895,12 +895,10 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
             // user has pressed the left mousebutton
             if(imsg->Code == IECODE_LBUTTON)
             {
-              struct MUI_AreaData *ad = muiAreaData(obj);
-
-              if(imsg->MouseX >= ad->mad_Box.Left &&
-                 imsg->MouseX <  ad->mad_Box.Left + ad->mad_Box.Width &&
+              if(imsg->MouseX >= _left(data->object) &&
+                 imsg->MouseX <= _right(data->object) &&
                  imsg->MouseY >= data->ypos &&
-                 imsg->MouseY <  data->ypos+(data->maxlines * data->height))
+                 imsg->MouseY <  data->ypos+(data->maxlines * data->fontheight))
               {
                 if(isFlagClear(data->flags, FLG_Active) &&
                    isFlagClear(data->flags, FLG_Activated) &&
