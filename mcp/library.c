@@ -49,6 +49,7 @@
 
 #define CLASSINIT
 #define CLASSEXPUNGE
+
 #define MIN_STACKSIZE 8192
 
 #include "locale.h"
