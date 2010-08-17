@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-08-17 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mccinit.c, SDI_compiler.h: updated to latest versions.
+
 2010-08-04 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/#?: replaced lots of direct references to MUI's area data and render
