@@ -232,8 +232,8 @@ STATIC const char USED_VAR stack_size[] = "$STACK:" STR(MIN_STACKSIZE) "\n";
 
 /* The name of the class will also become the name of the library. */
 /* We need a pointer to this string in our ROMTag (see below). */
-STATIC const char RODATA UserLibName[] = CLASS;
-STATIC const char RODATA UserLibID[]   = "$VER: " USERLIBID;
+STATIC const char UserLibName[] = CLASS;
+STATIC const char UserLibID[]   = "$VER: " USERLIBID;
 
 #ifdef SUPERCLASS
 STATIC struct MUI_CustomClass *ThisClass = NULL;
