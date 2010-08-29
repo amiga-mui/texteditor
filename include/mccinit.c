@@ -369,7 +369,8 @@ STATIC IPTR                   LIBFUNC MCC_Query  (REG(d0, LONG which));
  *
  */
 
-#if defined(__amigaos4__) || !defined(__mc68000__)
+#if defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+#if !defined(__mc68000__)
 int32 _start(void)
 {
   return RETURN_FAIL;
@@ -381,6 +382,7 @@ asm(".text                    \n\
    _start:                    \n\
      moveq #0,d0              \n\
      rts");
+#endif
 #endif
 
 #if !defined(__amigaos4__)
