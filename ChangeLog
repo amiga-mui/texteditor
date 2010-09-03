@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2010-09-03 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mccinit.c, #?/ClipboardServer.c: updated to the latest version and clear all
+    embedded semaphore structures before calling InitSemaphore().
+
 #### v15.35 RELEASE ############################################################
 
 2010-09-01 Jens Langner <Jens.Langner@light-speed.de>

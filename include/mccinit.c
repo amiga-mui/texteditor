@@ -58,6 +58,8 @@
                      sure that the _start() function is really the first entry,
                      otherwise random data will be executed as code, which will
                      crash for sure.
+  1.22  03.09.2010 : the library semaphore is now correctly cleared ahead of the
+                     InitSemaphore() call.
 
  About:
 
@@ -969,6 +971,7 @@ STATIC struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
 
     // init our protecting semaphore and the
     // initialized flag variable
+    memset(&base->lh_Semaphore, 0, sizeof(base->lh_Semaphore));
     InitSemaphore(&base->lh_Semaphore);
 
     // protect mccLibInit()
