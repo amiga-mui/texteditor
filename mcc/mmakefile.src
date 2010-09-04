@@ -20,6 +20,7 @@ FILES := library \
         ExportBlock \
         ExportText \
         GetSetAttrs \
+        Grow \
         HandleARexx \
         HandleInput \
         InitConfig \
