@@ -1,7 +1,7 @@
 /*******************************************************************************
 
         Name:           mccinit.c
-        Versionstring:  $VER: mccinit.c 1.22 (03.09.2010)
+        Versionstring:  $VER: mccinit.c 1.23 (07.09.2010)
         Author:         Jens Langner <Jens.Langner@light-speed.de>
         Distribution:   PD (public domain)
         Description:    library init file for easy generation of a MUI
@@ -60,6 +60,7 @@
                      crash for sure.
   1.22  03.09.2010 : the library semaphore is now correctly cleared ahead of the
                      InitSemaphore() call.
+  1.23  07.09.2010 : added missing #include <string.h> for memset().
 
  About:
 
@@ -157,6 +158,8 @@
 /******************************************************************************/
 /* Includes                                                                   */
 /******************************************************************************/
+
+#include <string.h>
 
 #ifdef __MORPHOS__
 #include <emul/emulinterface.h>
