@@ -1032,6 +1032,9 @@ STATIC struct LibraryHeader * LIBFUNC LibInit(REG(d0, struct LibraryHeader *base
 
 STATIC BPTR LibDelete(struct LibraryHeader *base)
 {
+#if defined(__amigaos4__)
+  struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
+#endif
   BPTR rc;
 
   // remove the library base from exec's lib list in advance
@@ -1065,7 +1068,6 @@ STATIC BPTR LibDelete(struct LibraryHeader *base)
 #if defined(__amigaos4__)
 STATIC BPTR LibExpunge(struct LibraryManagerInterface *Self)
 {
-  struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
   struct LibraryHeader *base = (struct LibraryHeader *)Self->Data.LibBase;
 #elif defined(__MORPHOS__)
 STATIC BPTR LibExpunge(void)
