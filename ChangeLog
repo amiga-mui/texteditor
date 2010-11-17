@@ -8,6 +8,8 @@ $URL$
 2010-11-17 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c: slightly deobfuscated the double click handling.
+  * demo/TextEditor-Demo.c: obtain/release the pens in the MUIM_Setup/Cleanup
+    methods instead of MUIM_Show/Hide.
 
 2010-10-05 Thore Böckelmann <tboeckel@gmx.de>
 
