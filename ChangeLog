@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.37 RELEASE ############################################################
+
+2011-11-26 Jens Langner <Jens.Langner@light-speed.de>
+
+  * misc: final v15.37 release preparations
+
 2011-01-04 Thore Böckelmann <tboeckel@gmx.de>
 
   * all/Makefile: fixed the dependency generation to respect the system specific
