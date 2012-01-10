@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-01-10 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/HandleInput.c: mouse wheel events happening over the slider object are
+    now handled in the same way as over the editor object. This makes scrolling
+    speed to be the same no matter where the mouse pointer is located.
+
 #### v15.37 RELEASE ############################################################
 
 2011-11-26 Jens Langner <Jens.Langner@light-speed.de>
