@@ -16,7 +16,7 @@
 #
 # TextEditor class Support Site:  http://www.sf.net/projects/texteditor-mcc
 #
-# $Id: Makefile.os4 283 2007-01-02 12:21:51Z damato $
+# $Id$
 #
 #***************************************************************************/
 

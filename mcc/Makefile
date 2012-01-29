@@ -16,7 +16,7 @@
 #
 # TextEditor class Support Site:  http://www.sf.net/projects/texteditor-mcc
 #
-# $Id: Makefile.os4 283 2007-01-02 12:21:51Z damato $
+# $Id: Makefile 34327M 2012-01-29 14:48:46Z (lokal) $
 #
 #***************************************************************************/
 
@@ -313,7 +313,7 @@ ifeq ($(OS), aros-ppc)
 
   # Compiler/Linker flags
   OPTFLAGS = -O2 -fomit-frame-pointer -funroll-loops
-  CFLAGS += -Wno-pointer-sign -DNO_INLINE_STDARG
+  CFLAGS += -Wno-pointer-sign
   LDLIBS += -larossupport -lrom -lmui
 
 else
@@ -330,7 +330,7 @@ ifeq ($(OS), aros-x86_64)
 
   # Compiler/Linker flags
   OPTFLAGS = -O2 -fomit-frame-pointer -funroll-loops
-  CFLAGS += -Wno-pointer-sign -DNO_INLINE_STDARG
+  CFLAGS += -Wno-pointer-sign
   LDLIBS += -larossupport -lrom -lmui
 
 endif

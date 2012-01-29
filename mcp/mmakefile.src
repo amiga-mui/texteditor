@@ -10,8 +10,9 @@ include $(TOP)/config/make.cfg
 
 #MM- clean :  texteditor-mcp-clean
 
-USER_INCLUDES = -I$(SRCDIR)/$(CURDIR)/../include -I$(SRCDIR)/$(CURDIR)/../mcc
-USER_CFLAGS := -DNO_INLINE_STDARG
+# We need to use -idirafter, so that we
+# *don't* pick up the project's local MUI headers.
+USER_INCLUDES = -idirafter $(SRCDIR)/$(CURDIR)/../include -I$(TOP)/$(CURDIR)/ -I$(SRCDIR)/$(CURDIR)/../mcc
 
 FILES := library \
      locale \
@@ -27,21 +28,15 @@ FILES := library \
   modname=TextEditor modtype=mcp \
   files=$(FILES) uselibs="amiga mui rom m"
 
-
 #MM includes-copy
 
 INCLUDE_FILES := TextEditor_mcp.h
 %copy_includes path=mui
 
-
-
 TARGETDIR := $(AROS_CATALOGS)
 
-# FIXME: doesn't work outside source tree
-# LOCALE_H := $(TOP)/$(CURDIR)/locale.h
-# LOCALE_C := $(TOP)/$(CURDIR)/locale.c
-LOCALE_H := $(SRCDIR)/$(CURDIR)/locale.h
-LOCALE_C := $(SRCDIR)/$(CURDIR)/locale.c
+LOCALE_H := $(TOP)/$(CURDIR)/locale.h
+LOCALE_C := $(TOP)/$(CURDIR)/locale.c
 
 #MM
 workbench-classes-zune-texteditor-mcp-locale : $(LOCALE_C) $(LOCALE_H) \
@@ -81,7 +76,6 @@ $(TARGETDIR)/dansk/TextEditor_mcp.catalog: $(SRCDIR)/$(CURDIR)/locale/danish.ct
 $(TARGETDIR)/russian/TextEditor_mcp.catalog: $(SRCDIR)/$(CURDIR)/locale/russian.ct
 	@$(MKDIR) $(TARGETDIR)/russian
 	@$(FLEXCAT) $(SRCDIR)/$(CURDIR)/locale/TextEditor_mcp.cd $< CATALOG $@
-
 
 #MM
 texteditor-mcp-clean :

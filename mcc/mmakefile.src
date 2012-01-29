@@ -4,8 +4,9 @@ include $(TOP)/config/make.cfg
 #MM workbench-classes-zune-texteditor-class : includes linklibs \
 #MM     workbench-libs-rexxsyslib
 
-USER_INCLUDES := -I$(SRCDIR)/$(CURDIR)/../include -I$(SRCDIR)/$(CURDIR)/../mcp
-USER_CFLAGS := -DNO_INLINE_STDARG
+# We need to use -idirafter, so that we
+# *don't* pick up the project's local MUI headers.
+USER_INCLUDES := -idirafter $(SRCDIR)/$(CURDIR)/../include -I$(SRCDIR)/$(CURDIR)/../mcp
 
 FILES := library \
         AllocBitMap \
@@ -20,6 +21,7 @@ FILES := library \
         ExportBlock \
         ExportText \
         GetSetAttrs \
+        Grow \
         HandleARexx \
         HandleInput \
         InitConfig \
