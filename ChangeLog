@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-01-29 Matthias Rustler <mrustler@gmx.de>
+
+  * Backport of AROS fixes.
+    SDI headers updated.
+
 2012-01-10 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c: mouse wheel events happening over the slider object are

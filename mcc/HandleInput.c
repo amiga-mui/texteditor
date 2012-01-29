@@ -790,7 +790,7 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
           // we check wheter the mouse is currently within our object borders
           // and if so we check wheter the newmouse wheel stuff is used or not
           if(data->slider &&
-             (_isinwholeobject(obj, imsg->MouseX, imsg->MouseY) || _isinwholeobject(data->slider, imsg->MouseX, imsg->MouseY)))
+             _isinwholeobject(obj, imsg->MouseX, imsg->MouseY))
           {
             // MouseWheel events are only possible if the mouse is above the
             // object
@@ -841,7 +841,7 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
         case IDCMP_EXTENDEDMOUSE:
         {
           if(data->slider &&
-             (_isinwholeobject(obj, imsg->MouseX, imsg->MouseY) || _isinwholeobject(data->slider, imsg->MouseX, imsg->MouseY)))
+             _isinwholeobject(obj, imsg->MouseX, imsg->MouseY))
           {
             LONG visible = xget(obj, MUIA_TextEditor_Prop_Visible);
 

@@ -131,7 +131,7 @@ void InitConfig(struct InstData *data, Object *obj)
 
   if(isFlagClear(data->flags, FLG_OwnBackground))
   {
-    LONG background = MUII_BACKGROUND;
+    IPTR background = MUII_BACKGROUND;
 
     data->backgroundcolor = 0;
     data->fastbackground = TRUE;
@@ -150,7 +150,7 @@ void InitConfig(struct InstData *data, Object *obj)
       else if(bg_setting[0] != '\0')
         data->fastbackground = FALSE;
 
-      background = setting;
+      background = (IPTR)setting;
     }
     set(obj, MUIA_Background, background);
   }
@@ -218,14 +218,9 @@ void InitConfig(struct InstData *data, Object *obj)
 
   if(isFlagClear(data->flags, FLG_OwnFrame))
   {
-  #ifndef __AROS__
     if(MUIMasterBase->lib_Version >= 20)
         set(obj, MUIA_Frame, DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_Frame, &setting) ? (STRPTR)setting : (STRPTR)"302200");
     else  set(obj, MUIA_Frame, MUIV_Frame_String);
-  #else
-     set(obj, MUIA_Frame, MUIV_Frame_String);
-     #warning "FIXME AROS/Zune: does not support things like MUIA_Frame, "302200"!"
-  #endif
   }
 
   data->TypeAndSpell = FALSE;
