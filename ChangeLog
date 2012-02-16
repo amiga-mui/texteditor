@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-02-16 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/ColorOperators.c: fixed adding new colors in case there was no color
+    used at all yet on a line.
+
 2012-01-29 Matthias Rustler <mrustler@gmx.de>
 
   * Backport of AROS fixes.
