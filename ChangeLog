@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-04-02 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/InitConfig.c: string pointers obtained from the MUI configuration must
+    be copied instead of rembembered directly. With MUI4's realtime prefs the
+    pointer might become invalid at any time and hence the class would operate
+    on invalid data after that.
+
 2012-02-16 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ColorOperators.c: fixed adding new colors in case there was no color
