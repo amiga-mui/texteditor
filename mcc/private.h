@@ -398,8 +398,8 @@ struct InstData
   APTR            SuggestListview;
   UWORD           SuggestSpawn;
   UWORD           LookupSpawn;
-  const char *    SuggestCmd;
-  const char *    LookupCmd;
+  char            SuggestCmd[256];
+  char            LookupCmd[256];
   ULONG           clipcount;
   APTR            cliphandle;
 

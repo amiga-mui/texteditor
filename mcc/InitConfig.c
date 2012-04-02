@@ -310,19 +310,19 @@ void InitConfig(struct InstData *data, Object *obj)
   }
 
   data->LookupSpawn = 0;
-  data->LookupCmd = "";
+  data->LookupCmd[0] = '\0';
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_LookupCmd, &setting))
   {
     data->LookupSpawn = (short) *(ULONG *)setting;
-    data->LookupCmd = (char *)setting+4;
+    strlcpy(data->LookupCmd, (char *)setting+4, sizeof(data->LookupCmd));
   }
 
   data->SuggestSpawn = 1;
-  data->SuggestCmd  = "\"Open('f', 'T:Matches', 'W');WriteLn('f', '%s');Close('f')\"";
+  strlcpy(data->SuggestCmd, "\"Open('f', 'T:Matches', 'W');WriteLn('f', '%s');Close('f')\"", sizeof(data->SuggestCmd));
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_SuggestCmd, &setting))
   {
     data->SuggestSpawn = (short) *(ULONG *)setting;
-    data->SuggestCmd = (char *)setting+4;
+    strlcpy(data->SuggestCmd, (char *)setting+4, sizeof(data->SuggestCmd));
   }
 
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_ConfigVersion, &setting))
