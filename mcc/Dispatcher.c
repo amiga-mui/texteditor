@@ -160,6 +160,15 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             setFlag(data->flags, FLG_PasteStyles);
             setFlag(data->flags, FLG_PasteColors);
 
+            #if defined(__amigaos3__) || defined(__amigaos4__)
+            if(MUIMasterBase->lib_Version > 20 || (MUIMasterBase->lib_Version == 20 && MUIMasterBase->lib_Revision >= 5640))
+            {
+              // MUI 4.0 for AmigaOS4 does the disabled pattern drawing itself,
+              // no need to do this on our own
+              setFlag(data->flags, FLG_MUI4);
+            }
+            #endif
+
             if(FindTagItem(MUIA_Background, msg->ops_AttrList))
               setFlag(data->flags, FLG_OwnBackground);
             if(FindTagItem(MUIA_Frame, msg->ops_AttrList))
@@ -516,9 +525,12 @@ static IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
                                        _mwidth(data->object), (_mheight(data->object)-(data->fontheight * (data->maxlines))),
                                        _mleft(data->object), _mtop(data->object), 0);
 
+    // dump all text now
+    DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
+
     // make sure we ghost out the whole area in case
     // the gadget was flagged as being ghosted.
-    if(isFlagSet(data->flags, FLG_Ghosted))
+    if(isFlagSet(data->flags, FLG_Ghosted) && isFlagClear(data->flags, FLG_MUI4))
     {
       UWORD newPattern[] = {0x1111, 0x4444};
 
@@ -528,9 +540,6 @@ static IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
       RectFill(data->rport, _left(data->object), _top(data->object), _right(data->object), _bottom(data->object));
       SetAfPt(data->rport, NULL, (UBYTE)-1);
     }
-
-    // dump all text now
-    DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
   }
 
   RETURN(0);
