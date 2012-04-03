@@ -644,7 +644,7 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
             (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mleft(data->object)),
             (isFlagSet(data->flags, FLG_InVGrp) ? 0 : data->realypos) + data->totallines*data->fontheight);
 
-      if(isFlagSet(data->flags, FLG_Ghosted))
+      if(isFlagSet(data->flags, FLG_Ghosted) && isFlagClear(data->flags, FLG_MUI4))
       {
         UWORD newPattern[2];
 

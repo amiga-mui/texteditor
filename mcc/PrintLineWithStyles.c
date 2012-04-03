@@ -392,7 +392,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     }
 
 
-    if(isFlagSet(data->flags, FLG_Ghosted))
+    if(isFlagSet(data->flags, FLG_Ghosted) && isFlagClear(data->flags, FLG_MUI4))
     {
       UWORD newPattern[] = {0x1111, 0x4444};
 
