@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-04-04 Jens Langner <Jens.Langner@light-speed.de>
+
+  * Makefile: got rid of -funroll-loops option as this one is potentially 
+    dangerous under certain circumstances.
+
 2012-04-02 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/InitConfig.c: string pointers obtained from the MUI configuration must
