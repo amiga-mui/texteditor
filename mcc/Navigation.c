@@ -39,8 +39,8 @@ ULONG FlowSpace(struct InstData *data, UWORD flow, STRPTR text)
 
   if(flow != MUIV_TextEditor_Flow_Left)
   {
-    flowspace  = (_mwidth(data->object)-TextLength(&data->tmprp, text, LineCharsWidth(data, text)-1));
-    flowspace -= (data->CursorWidth == 6) ? TextLength(&data->tmprp, " ", 1) : data->CursorWidth;
+    flowspace  = (_mwidth(data->object)-TextLengthNew(&data->tmprp, text, LineCharsWidth(data, text)-1, 0));
+    flowspace -= (data->CursorWidth == 6) ? TextLengthNew(&data->tmprp, " ", 1, 0) : data->CursorWidth;
     if(flow == MUIV_TextEditor_Flow_Center)
     {
       flowspace /= 2;
@@ -62,7 +62,7 @@ static ULONG CursorOffset(struct InstData *data)
 
   ENTER();
 
-  // call TextFit() to find out how many chars would fit.
+  // call TextFitNew() to find out how many chars would fit.
   if((lineCharsWidth = LineCharsWidth(data, text)) > 0)
   {
     struct TextExtent tExtend;
@@ -71,7 +71,7 @@ static ULONG CursorOffset(struct InstData *data)
     if(offset < 1)
       offset = 1;
 
-    res = TextFit(&data->tmprp, text, lineCharsWidth, &tExtend, NULL, 1, offset, data->font->tf_YSize);
+    res = TextFitNew(&data->tmprp, text, lineCharsWidth, &tExtend, NULL, 1, offset, data->font->tf_YSize);
 
     // in case of a hard-wrapped line we have to deal with
     // the possibility that the user tries to
@@ -98,12 +98,12 @@ static LONG GetPosInPixels(struct InstData *data, LONG bytes, LONG x)
 
   ENTER();
 
-  pos = TextLength(&data->tmprp, &data->actualline->line.Contents[bytes], x);
+  pos = TextLengthNew(&data->tmprp, &data->actualline->line.Contents[bytes], x, 0);
 
   if(data->actualline->line.Contents[data->CPos_X] == '\n')
-    pos += TextLength(&data->tmprp, " ", 1)/2;
+    pos += TextLengthNew(&data->tmprp, " ", 1, 1)/2;
   else
-    pos += TextLength(&data->tmprp, &data->actualline->line.Contents[data->CPos_X], 1)/2;
+    pos += TextLengthNew(&data->tmprp, &data->actualline->line.Contents[data->CPos_X], 1, 0)/2;
 
   pos += FlowSpace(data, data->actualline->line.Flow, &data->actualline->line.Contents[bytes]);
 

@@ -345,7 +345,7 @@ IPTR mInputTrigger(struct IClass *cl, Object *obj, UNUSED Msg msg)
         OffsetToLines(data, data->CPos_X, data->actualline, &pos);
         flow = FlowSpace(data, data->actualline->line.Flow, &data->actualline->line.Contents[pos.bytes]);
 
-        if(MouseX <= (LONG)(_mleft(data->object)+flow+TextLength(&data->tmprp, &data->actualline->line.Contents[pos.bytes], pos.extra-pos.bytes-1)))
+        if(MouseX <= (LONG)(_mleft(data->object)+flow+TextLengthNew(&data->tmprp, &data->actualline->line.Contents[pos.bytes], pos.extra-pos.bytes-1, 0)))
         {
           if(data->selectmode == 1)
           {

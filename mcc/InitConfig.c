@@ -286,6 +286,24 @@ void InitConfig(struct InstData *data, Object *obj)
       data->inactiveCursor = FALSE;
   }
 
+  // If user would change tabs mode setting while text editor is running
+  // that won't update gadget (unlike it would be done using set()).
+  data->RealTabs = TRUE;
+  if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_RealTabs, &setting))
+  {
+    if(*(long *)setting == 0)
+      data->RealTabs = FALSE;
+  }
+
+  // If user would change wrap whole words mode setting while text editor is running
+  // that won't update gadget (unlike it would be done using set()).
+  data->WrapWords = TRUE;
+  if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_WrapWords, &setting))
+  {
+    if(*(long *)setting == 0)
+      data->WrapWords = FALSE;
+  }
+
   {
     ULONG undoSteps;
 

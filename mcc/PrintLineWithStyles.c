@@ -186,11 +186,11 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       if(startx < x+c_length && stopx > x)
       {
         if(startx > x)
-          blockstart = TextLength(&data->tmprp, text+x, startx-x);
+          blockstart = TextLengthNew(&data->tmprp, text+x, startx-x, 0);
         else
           startx = x;
 
-        blockwidth = ((stopx >= c_length+x) ? _mwidth(data->object)-(blockstart+flow) : TextLength(&data->tmprp, text+startx, stopx-startx));
+        blockwidth = ((stopx >= c_length+x) ? _mwidth(data->object)-(blockstart+flow) : TextLengthNew(&data->tmprp, text+startx, stopx-startx, 0));
       }
       else if(isFlagClear(data->flags, FLG_ReadOnly) &&
               isFlagClear(data->flags, FLG_Ghosted) &&
@@ -201,12 +201,12 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
               (isFlagSet(data->flags, FLG_Active) || data->inactiveCursor == TRUE))
       {
         cursor = TRUE;
-        blockstart = TextLength(&data->tmprp, text+x, data->CPos_X-x);
+        blockstart = TextLengthNew(&data->tmprp, text+x, data->CPos_X-x, 0);
 
         // calculate the cursor width
         // if it is set to 6 then we should find out how the width of the current char is
         if(data->CursorWidth == 6)
-          blockwidth = TextLength(&data->tmprp, (text[data->CPos_X] < ' ') ? (char *)" " : (char *)&text[data->CPos_X], 1);
+          blockwidth = TextLengthNew(&data->tmprp, (text[data->CPos_X] < ' ') ? (char *)" " : (char *)&text[data->CPos_X], 1, 0);
         else
           blockwidth = data->CursorWidth;
       }
@@ -349,11 +349,11 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 */
 
       // calculate how many characters will fit in the visible area
-      fitting = TextFit(rp, text+x, p_length, &te, NULL, 1, _mwidth(data->object), data->fontheight);
+      fitting = TextFitNew(rp, text+x, p_length, &te, NULL, 1, _mwidth(data->object), data->fontheight);
       if(text[x+fitting-1] < ' ')
-        Text(rp, text+x,fitting-1);
+        TextNew(rp, text+x, fitting-1, xoffset+flow);
       else
-        Text(rp, text+x, fitting);
+        TextNew(rp, text+x, fitting, xoffset+flow);
 
       // add the length calculated before no matter how many character really fitted
 
@@ -427,7 +427,8 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       SetDrMd(rp, JAM1);
       SetAPen(rp, _pens(data->object)[MPEN_SHADOW]);
       SetAfPt(rp, newPattern, 1);
-      RectFill(rp, xoffset, starty, xoffset+_mwidth(data->object)-1, starty+data->fontheight-1);
+      #warning "why has RectFill() been disabled here?"
+//      RectFill(rp, xoffset, starty, xoffset+_mwidth(data->object)-1, starty+data->fontheight-1);
       SetAfPt(rp, NULL, (UBYTE)-1);
     }
 

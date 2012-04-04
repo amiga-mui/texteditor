@@ -42,6 +42,8 @@ TextEditor.mcc/MUIA_TextEditor_UndoAvailable
 TextEditor.mcc/MUIA_TextEditor_UndoLevels
 TextEditor.mcc/MUIA_TextEditor_WrapBorder
 TextEditor.mcc/MUIA_TextEditor_WrapMode
+TextEditor.mcc/MUIA_TextEditor_RealTabs
+TextEditor.mcc/MUIA_TextEditor_WrapWords
 TextEditor.mcc/MUIM_TextEditor_ARexxCmd
 TextEditor.mcc/MUIM_TextEditor_BlockInfo
 TextEditor.mcc/MUIM_TextEditor_ClearText
@@ -1028,6 +1030,39 @@ TextEditor.mcc/MUIM_TextEditor_Search
         MUIA_TextEditro_WrapBorder
         MUIA_TextEditor_ExportWrap
         MUIA_TextEditor_ImportWrap
+
+
+TextEditor.mcc/MUIA_TextEditor_RealTabs
+
+    NAME
+        MUIA_TextEditor_RealTabs -- [ISG], BOOL
+
+    FUNCTION
+        When true, \t symbol will be writen on tab key input, else
+        constant number of space symbols will be written instead.
+
+    NOTE
+        Change of this attribute from TRUE to FALSE will cause update of
+        editor gadget (but cursor coordinates will be reset to zeroes).
+
+    SEE ALSO
+
+
+TextEditor.mcc/MUIA_TextEditor_WrapWords
+
+    NAME
+        MUIA_TextEditor_WrapMode -- [ISG], BOOL
+
+    FUNCTION
+        When true, wrapping won't part line at symbol between space and/
+        or tabulation.
+
+    NOTE
+        Change of this attribute will cause update of
+        editor gadget (but cursor coordinates will be reset to zeroes).
+
+    SEE ALSO
+        MUIA_TextEditor_WrapMode
 
 
 TextEditor.mcc/MUIM_TextEditor_ARexxCmd

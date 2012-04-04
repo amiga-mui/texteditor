@@ -154,6 +154,9 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             data->WrapBorder = 0;
             data->WrapMode = MUIV_TextEditor_WrapMode_HardWrap;
 
+            data->RealTabs = TRUE;
+            data->WrapWords = TRUE;
+
             data->ExportHook = &ExportHookPlain;
             setFlag(data->flags, FLG_AutoClip);
             setFlag(data->flags, FLG_ActiveOnClick);
@@ -263,6 +266,8 @@ static IPTR mSetup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
     // initialize our temporary rastport
     InitRastPort(&data->tmprp);
     SetFont(&data->tmprp, data->font);
+    #warning "why 'W' is used here?"
+    TabSizePixels = data->TabSize*TextLengthNew(&data->tmprp, "W", 1, 0);
 
     // make sure we have a proper font setup here and
     // that our spellchecker suggest window object is also

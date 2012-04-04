@@ -612,7 +612,9 @@ static BOOL ReactOnRawKey(struct InstData *data, struct IntuiMessage *imsg)
 
   dummy = FindKey(data, imsg->Code, imsg->Qualifier);
 
-  D(DBF_INPUT, "FindKey: %ld", dummy);
+  #warning "MorphOS/AmigaOS4 version doesn't receive 0x42 on tab key pressed (MUI eating it?), though gets 0xC2 when it's released"
+  D(DBF_INPUT, "FindKey: %ld (%lx)", dummy, imsg->Code);
+
   if(dummy == 1 || dummy == 0)
   {
     if(dummy == 1)
@@ -1224,20 +1226,37 @@ void Key_Tab(struct InstData *data)
   else
     ScrollIntoDisplay(data);
 
+  if(data->RealTabs)
   {
-    struct marking block =
-    {
-      TRUE,
-      data->actualline,
-      data->CPos_X,
-      data->actualline,
-      data->CPos_X+data->TabSize
-    };
+	  struct marking block =
+	  {
+	    TRUE,
+	    data->actualline,
+	    data->CPos_X,
+	    data->actualline,
+	    data->CPos_X+1
+	  };
 
-    CheckWord(data);
-    AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
-    data->CPos_X += data->TabSize;
-    PasteChars(data, data->CPos_X-data->TabSize, data->actualline, data->TabSize, "            ", NULL);
+	  CheckWord(data);
+	  AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
+	  data->CPos_X++;
+	  PasteChars(data, data->CPos_X-1, data->actualline, 1, "\t", NULL);
+  }
+  else
+  {
+	  struct marking block =
+	  {
+	    TRUE,
+	    data->actualline,
+	    data->CPos_X,
+	    data->actualline,
+	    data->CPos_X+data->TabSize
+	  };
+
+	  CheckWord(data);
+	  AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
+	  data->CPos_X += data->TabSize;
+	  PasteChars(data, data->CPos_X-data->TabSize, data->actualline, data->TabSize, "            ", NULL);
   }
 
   LEAVE();

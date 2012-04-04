@@ -204,6 +204,7 @@ COBJS = AllocBitMap.o \
         SpellChecker.o \
         StyleOperators.o \
         UndoFunctions.o \
+        NewGfx.o \
         Debug.o
 
 TOBJS = TextEditor-Test.o

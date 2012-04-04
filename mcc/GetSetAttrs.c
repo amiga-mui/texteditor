@@ -200,6 +200,15 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = isFlagSet(data->flags, FLG_PasteColors);
     break;
 
+    case MUIA_TextEditor_RealTabs:
+      ti_Data = data->RealTabs;
+    break;
+
+    case MUIA_TextEditor_WrapWords:
+      ti_Data = data->WrapWords;
+    break;
+
+
     default:
       LEAVE();
       return(DoSuperMethodA(cl, obj, (Msg)msg));
@@ -709,6 +718,48 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           setFlag(data->flags, FLG_PasteColors);
         else
           clearFlag(data->flags, FLG_PasteColors);
+      break;
+
+      case MUIA_TextEditor_RealTabs:
+      {
+        struct Hook *ExportHookCopy = data->ExportHook;
+
+        if(data->RealTabs != (BOOL)ti_Data)
+        {
+          data->RealTabs = ti_Data;
+          if(ti_Data==FALSE)
+          {
+            IPTR buff;
+            struct line_node *newcontents;
+            data->ExportHook = &ExportHookPlain;
+
+		        if(buff = mExportText(cl, obj, (APTR)msg))
+            {
+        		  if((newcontents = ImportText(data, (char *)buff, data->ImportHook, data->ImportWrap)) != NULL)
+	        		  FreeTextMem(data, data->firstline);
+
+		        	data->firstline = newcontents;
+			        ResetDisplay(data);
+        			ResetUndoBuffer(data);
+	        		result = TRUE;
+		        }
+
+            FreeVec((APTR)buff);
+          }
+
+          data->ExportHook = ExportHookCopy;
+        }
+      }
+      break;
+
+      case MUIA_TextEditor_WrapWords:
+      {
+        if(data->WrapWords != (BOOL)ti_Data)
+        {
+          data->WrapWords = ti_Data;
+          ResetDisplay(data);
+        }
+      }
       break;
     }
   }
