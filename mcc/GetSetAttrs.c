@@ -24,6 +24,7 @@
 #include <utility/tagitem.h>
 #include <clib/alib_protos.h>
 
+#include <proto/exec.h>
 #include <proto/graphics.h>
 #include <proto/utility.h>
 #include <proto/layers.h>
@@ -733,16 +734,16 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
             struct line_node *newcontents;
             data->ExportHook = &ExportHookPlain;
 
-		        if(buff = mExportText(cl, obj, (APTR)msg))
+            if((buff = mExportText(cl, obj, (APTR)msg)) != NULL)
             {
-        		  if((newcontents = ImportText(data, (char *)buff, data->ImportHook, data->ImportWrap)) != NULL)
-	        		  FreeTextMem(data, data->firstline);
+              if((newcontents = ImportText(data, (char *)buff, data->ImportHook, data->ImportWrap)) != NULL)
+                FreeTextMem(data, data->firstline);
 
-		        	data->firstline = newcontents;
-			        ResetDisplay(data);
-        			ResetUndoBuffer(data);
-	        		result = TRUE;
-		        }
+	          data->firstline = newcontents;
+	          ResetDisplay(data);
+	          ResetUndoBuffer(data);
+	          result = TRUE;
+	        }
 
             FreeVec((APTR)buff);
           }
