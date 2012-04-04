@@ -38,6 +38,7 @@ FILES := library \
         SpellChecker \
         StyleOperators \
         UndoFunctions \
+        NewGfx \
         Debug
 
 %build_module_simple mmake=workbench-classes-zune-texteditor-class \

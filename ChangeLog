@@ -7,6 +7,14 @@ $URL$
 
 2012-04-04 Jens Langner <Jens.Langner@light-speed.de>
 
+  * mcc/*: applied patch kindly provided by Nicolas Rybkin. Please note that
+    the functionality provided by this patch is not complete yet. But it should
+    provide basic functionality which will allow to put real tabs (\t) into a
+    texteditor (if the developer enabled this). Currently TE.mcc only supports
+    replacing tabs by a various number of spaces. With the patches provided
+    TE.mcc should be able to allow to press the TAB key and see \t to end up
+    in the buffer. However, as mentioned, the patches are not yet complete
+    and need some more work to end up in the final release.
   * Makefile: got rid of -funroll-loops option as this one is potentially 
     dangerous under certain circumstances.
 

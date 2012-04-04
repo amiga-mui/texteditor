@@ -226,13 +226,13 @@ LONG LineCharsWidth(struct InstData *data, CONST_STRPTR text)
 
     // see how many chars of our text fit to the current innerwidth of the
     // texteditor
-    c = TextFit(&data->tmprp, text, textlen, &tExtend, NULL, 1, w, fontheight);
+    c = TextFitNew(&data->tmprp, text, textlen, &tExtend, NULL, 1, w, fontheight);
     if(c >= textlen)
     {
       // if all text fits, then we have to do the calculations once more and
       // see if also the ending cursor might fit on the line
-      w -= (data->CursorWidth == 6) ? TextLength(&data->tmprp, " ", 1) : data->CursorWidth;
-      c = TextFit(&data->tmprp, text, textlen, &tExtend, NULL, 1, w, fontheight);
+      w -= (data->CursorWidth == 6) ? TextLengthNew(&data->tmprp, " ", 1,0) : data->CursorWidth;
+      c = TextFitNew(&data->tmprp, text, textlen, &tExtend, NULL, 1, w, fontheight);
     }
 
     // if the user selected soft wrapping with a defined wrapborder
@@ -248,9 +248,12 @@ LONG LineCharsWidth(struct InstData *data, CONST_STRPTR text)
     {
       LONG tc = c-1;
 
-      // search backwards for a LWSP
-      while(text[tc] != ' ' && tc != 0)
-        tc--;
+      if(data->WrapWords)
+      {
+	      // search backwards for a linear whitespace (LWSP)
+	      while(text[tc] != ' ' && text[tc] != '\t' && tc != 0)
+	        tc--;
+      }
 
       if(tc != 0)
         c = tc+1;
@@ -404,6 +407,8 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
   UWORD colors[3] = {0, 0, 0};
   WORD  start = 0, stop = 0;
   LONG  c;
+  LONG xoffset = _mleft(data->object);
+  UWORD flow;
 
   ENTER();
 
@@ -445,14 +450,15 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
     // calculate the cursor width
     // if it is set to 6 then we should find out how the width of the current char is
     if(data->CursorWidth == 6)
-      cursor_width = TextLength(&data->tmprp, (chars[1] < ' ') ? (char *)" " : (char *)&chars[1], 1);
+      cursor_width = TextLengthNew(&data->tmprp, (chars[1] < ' ') ? (char *)" " : (char *)&chars[1], 1, 0);
     else
       cursor_width = data->CursorWidth;
 
-    xplace  = _mleft(data->object) + TextLength(&data->tmprp, &line->line.Contents[x-pos.x], pos.x+start);
-    xplace += FlowSpace(data, line->line.Flow, &line->line.Contents[pos.bytes]);
+    xplace  = _mleft(data->object) + TextLengthNew(&data->tmprp, &line->line.Contents[x-pos.x], pos.x+start, 0);
+flow=FlowSpace(data, line->line.Flow, &line->line.Contents[pos.bytes]);
+    xplace += flow;
     yplace  = data->ypos + (data->fontheight * (line_nr + pos.lines - 1));
-    cursorxplace = xplace + TextLength(&data->tmprp, &line->line.Contents[x+start], 0-start);
+    cursorxplace = xplace + TextLengthNew(&data->tmprp, &line->line.Contents[x+start], 0-start, xplace-xoffset-flow);
 
     //D(DBF_STARTUP, "xplace: %ld, yplace: %ld cplace: %ld, innerwidth: %ld width: %ld %ld", xplace, yplace, cursorxplace, _mwidth(data->object), _width(data->object), _mleft(data->object));
 
@@ -462,7 +468,8 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
       if(IS_ANTIALIASED(data->font))
       {
         DoMethod(data->object, MUIM_DrawBackground, xplace, yplace,
-                                                    TextLength(&data->tmprp, start == 0 ? (STRPTR)chars+1 : (STRPTR)chars, stop-start+1), data->fontheight,
+                                                    TextLengthNew(&data->tmprp, start == 0 ? (STRPTR)chars+1 : (STRPTR)chars, stop-start+1, xplace-xoffset-flow), 
+                                                    data->fontheight,
                                                     cursorxplace - (isFlagSet(data->flags, FLG_InVGrp) ? _mleft(data->object) : 0),
                                                     (isFlagSet(data->flags, FLG_InVGrp) ? 0 : data->realypos) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
                                                     0);
@@ -480,7 +487,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
           ULONG cwidth = cursor_width;
 
           if(data->CursorWidth != 6)
-            cwidth = TextLength(&data->tmprp, chars[1] < ' ' ? (char *)" " : (char *)&chars[1], 1);
+            cwidth = TextLengthNew(&data->tmprp, chars[1] < ' ' ? (char *)" " : (char *)&chars[1], 1, 0);
 
           if(Set == FALSE && data->currentCursorState == CS_INACTIVE)
           {
@@ -513,6 +520,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
         else
         {
           RectFill(rp, cursorxplace, yplace, cursorxplace+cursor_width-1, yplace+data->fontheight-1);
+
           // remember the active state
           data->currentCursorState = CS_ACTIVE;
         }
@@ -525,7 +533,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
           ULONG cwidth = cursor_width;
 
           if(data->CursorWidth != 6 && Set == FALSE)
-            cwidth = TextLength(&data->tmprp, chars[1] < ' ' ? (char *)" " : (char *)&chars[1], 1);
+            cwidth = TextLengthNew(&data->tmprp, chars[1] < ' ' ? (char *)" " : (char *)&chars[1], 1,0);
 
           DoMethod(data->object, MUIM_DrawBackground, cursorxplace, yplace,
                                                       cwidth, data->fontheight,
@@ -552,7 +560,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
       {
         SetAPen(rp, ConvertPen(data, colors[1+c], line->line.Highlight));
         SetSoftStyle(rp, styles[1+c], AskSoftStyle(rp));
-        Text(rp, (STRPTR)&chars[1+c], 1);
+        TextNew(rp, (STRPTR)&chars[1+c], 1, xoffset+flow);
       }
       SetSoftStyle(rp, FS_NORMAL, AskSoftStyle(rp));
 
@@ -562,11 +570,12 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
         WORD LeftX, LeftWidth;
         WORD RightX, RightWidth;
         WORD Y, Height;
-        UWORD flow = FlowSpace(data, line->line.Flow, &line->line.Contents[pos.bytes]);
+        #warning "FlowSpace commented out?"
+//        UWORD flow = FlowSpace(data, line->line.Flow, &line->line.Contents[pos.bytes]);
 
         LeftX = _mleft(data->object);
         LeftWidth = flow-3;
-        RightX = _mleft(data->object) + flow + TextLength(&data->tmprp, &line->line.Contents[pos.bytes], pos.extra-pos.bytes-1) + 3;
+        RightX = _mleft(data->object) + flow + TextLengthNew(&data->tmprp, &line->line.Contents[pos.bytes], pos.extra-pos.bytes-1, 0) + 3;
         RightWidth = _mleft(data->object)+_mwidth(data->object) - RightX;
         Y = yplace;
         Height = isFlagSet(line->line.Separator, LNSF_Thick) ? 2 : 1;

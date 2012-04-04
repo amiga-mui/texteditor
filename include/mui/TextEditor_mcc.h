@@ -102,6 +102,8 @@ extern "C" {
 #define MUIA_TextEditor_ActiveObjectOnClick   (TextEditor_Dummy + 0x3a)
 #define MUIA_TextEditor_PasteStyles           (TextEditor_Dummy + 0x3b)
 #define MUIA_TextEditor_PasteColors           (TextEditor_Dummy + 0x3c)
+#define MUIA_TextEditor_RealTabs              (TextEditor_Dummy + 0x3d)
+#define MUIA_TextEditor_WrapWords             (TextEditor_Dummy + 0x3e)
 
 #define MUIM_TextEditor_AddKeyBindings        (TextEditor_Dummy + 0x22)
 #define MUIM_TextEditor_ARexxCmd              (TextEditor_Dummy + 0x23)

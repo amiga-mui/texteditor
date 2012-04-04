@@ -204,11 +204,11 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
   STRPTR result = NULL;
   char *eol;
   char *src = msg->Data;
-  int tabs;
+  int tabs=0;
 
   ENTER();
 
-  if((eol = FindEOL(src, &tabs)) != NULL)
+  if((eol = FindEOL(src, msg->RealTabs?NULL:&tabs)) != NULL)
   {
     int len;
     struct LineNode *line = msg->linenode;
@@ -247,7 +247,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
       {
         unsigned char c = *src++;
 
-        if(c == '\t')
+        if(c == '\t' && !msg->RealTabs)
         {
           int i;
 
@@ -545,11 +545,11 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
   STRPTR result = NULL;
   char *eol;
   char *src = msg->Data;
-  int tabs;
+  int tabs=0;
 
   ENTER();
 
-  if((eol = FindEOL(src, &tabs)) != NULL)
+  if((eol = FindEOL(src, msg->RealTabs?NULL:&tabs)) != NULL)
   {
     int len;
     struct LineNode *line = msg->linenode;
@@ -621,7 +621,7 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
         {
           lastWasSeparator = TRUE;
         }
-        else if(c == '\t')
+        else if(c == '\t' && !msg->RealTabs)
         {
           int i;
 
@@ -737,7 +737,7 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 
               src += i + 1;
 
-              if((eol = FindEOL(src, &tabs)) == NULL)
+              if((eol = FindEOL(src, msg->RealTabs?NULL:&tabs)) == NULL)
                 break;
 
               /* The size of the dest buffer has to be increased now */

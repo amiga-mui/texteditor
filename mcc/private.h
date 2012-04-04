@@ -291,6 +291,7 @@ struct ImportMessage
   struct  LineNode *linenode; /* Pointer to a linenode, which you should fill out */
   APTR    PoolHandle;         /* A poolhandle, all allocations done for styles or contents must be made from this pool, and the size of the allocation must be stored in the first LONG */
   ULONG   ImportWrap;         /* For your use only (reflects MUIA_TextEditor_ImportWrap) */
+  ULONG   RealTabs;           /* do not convert to spaces when importing tabs (\t) */
 };
 
 struct Grow
@@ -303,6 +304,12 @@ struct Grow
 
   APTR pool;
 };
+
+//#ifndef TABSIZEPIXELS
+//#define TABSIZEPIXELS
+#warning "global variable used here?!? bad!"
+UWORD TabSizePixels;
+//#endif
 
 struct InstData
 {
@@ -385,6 +392,8 @@ struct InstData
   UWORD           TabSize;
   ULONG           WrapBorder;
   ULONG           WrapMode;
+  BOOL            RealTabs;
+  BOOL            WrapWords;
   struct UserAction *undoSteps;   // pointer to memory for the undo actions
   ULONG           maxUndoSteps;   // how many steps can be put into the undoBuffer
   ULONG           usedUndoSteps;  // how many steps in the undoBuffer have been used so far
@@ -603,6 +612,11 @@ void ResizeUndoBuffer(struct InstData *, ULONG);
 void FreeUndoBuffer(struct InstData *);
 BOOL Undo(struct InstData *);
 BOOL Redo(struct InstData *);
+
+// NewGfx.c
+WORD TextLengthNew( struct RastPort *rp, CONST_STRPTR string, ULONG count,WORD result);
+ULONG TextFitNew( struct RastPort *rp, CONST_STRPTR string, ULONG strLen, CONST struct TextExtent *textExtent, CONST struct TextExtent *constrainingExtent, LONG strDirection, ULONG constrainingBitWidth, ULONG constrainingBitHeight);
+void TextNew( struct RastPort *rp, CONST_STRPTR string, ULONG count , LONG xoffset);
 
 #if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
 // AllocVecPooled.c
