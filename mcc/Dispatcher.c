@@ -153,9 +153,8 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             data->ImportWrap = 1023;
             data->WrapBorder = 0;
             data->WrapMode = MUIV_TextEditor_WrapMode_HardWrap;
-
-            data->RealTabs = TRUE;
-            data->WrapWords = TRUE;
+            data->WrapWords = TRUE; // wrap at word boundaries
+            data->ConvertTabs = TRUE; // convert tab to spaces per default
 
             data->ExportHook = &ExportHookPlain;
             setFlag(data->flags, FLG_AutoClip);

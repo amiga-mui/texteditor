@@ -1245,7 +1245,7 @@ void Key_Tab(struct InstData *data)
   else
     ScrollIntoDisplay(data);
 
-  if(data->RealTabs)
+  if(data->ConvertTabs == FALSE)
   {
 	  struct marking block =
 	  {

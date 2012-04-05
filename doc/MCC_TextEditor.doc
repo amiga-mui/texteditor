@@ -7,6 +7,7 @@ TextEditor.mcc/MUIA_TextEditor_AutoClip
 TextEditor.mcc/MUIA_TextEditor_ColorMap
 TextEditor.mcc/MUIA_TextEditor_Columns
 TextEditor.mcc/MUIA_TextEditor_Contents
+TextEditor.mcc/MUIA_TextEditor_ConvertTabs
 TextEditor.mcc/MUIA_TextEditor_CursorPosition
 TextEditor.mcc/MUIA_TextEditor_CursorX
 TextEditor.mcc/MUIA_TextEditor_CursorY
@@ -42,7 +43,6 @@ TextEditor.mcc/MUIA_TextEditor_UndoAvailable
 TextEditor.mcc/MUIA_TextEditor_UndoLevels
 TextEditor.mcc/MUIA_TextEditor_WrapBorder
 TextEditor.mcc/MUIA_TextEditor_WrapMode
-TextEditor.mcc/MUIA_TextEditor_RealTabs
 TextEditor.mcc/MUIA_TextEditor_WrapWords
 TextEditor.mcc/MUIM_TextEditor_ARexxCmd
 TextEditor.mcc/MUIM_TextEditor_BlockInfo
@@ -242,6 +242,24 @@ TextEditor.mcc/MUIM_TextEditor_Search
     SEE ALSO
         MUIA_TextEditor_ImportHook
         MUIM_TextEditor_InsertText
+
+TextEditor.mcc/MUIA_TextEditor_ConvertTabs
+
+    NAME
+        MUIA_TextEditor_ConvertTabs -- [ISG], BOOL
+
+    FUNCTION
+        When TRUE (default) TextEditor will convert tabs (\t) to the number
+        of spaces specified by the user configuration setting. If FALSE,
+        TextEditor will instead put pure \t characters and just display
+        spaces to the user.
+
+    NOTE
+        Change of this attribute from TRUE to FALSE will cause update of
+        editor gadget (but cursor coordinates will be reset to zeroes).
+
+    SEE ALSO
+
 
 TextEditor.mcc/MUIA_TextEditor_CursorPosition
 
@@ -965,7 +983,9 @@ TextEditor.mcc/MUIM_TextEditor_Search
         at which text should be wrapped to the next line (i.e. 'autowrap').
 
         However, the way wrapping is done depends on the actual 'WrapMode'
-        that was specified by MUIA_TextEditor_WrapMode.
+        that was specified by MUIA_TextEditor_WrapMode. In addition, 
+        MUIA_TextEditor_WrapWords will allow to set if TextEditor will wrap
+        at word boundaries or not.
 
         Per default the WrapBorder is set to 0 which in fact disables the
         wrapping and depending on the set WrapMode, wrapping will either be
@@ -973,7 +993,8 @@ TextEditor.mcc/MUIM_TextEditor_Search
         which is the default.
 
     SEE ALSO
-        MUIA_TextEditro_WrapMode
+        MUIA_TextEditor_WrapMode
+        MUIA_TextEditor_WrapWords
         MUIA_TextEditor_ExportWrap
         MUIA_TextEditor_ImportWrap
 
@@ -1032,30 +1053,15 @@ TextEditor.mcc/MUIM_TextEditor_Search
         MUIA_TextEditor_ImportWrap
 
 
-TextEditor.mcc/MUIA_TextEditor_RealTabs
+TextEditor.mcc/MUIA_TextEditor_WrapWords
 
     NAME
-        MUIA_TextEditor_RealTabs -- [ISG], BOOL
+        MUIA_TextEditor_WrapWords -- [ISG], BOOL
 
     FUNCTION
-        When true, \t symbol will be writen on tab key input, else
-        constant number of space symbols will be written instead.
-
-    NOTE
-        Change of this attribute from TRUE to FALSE will cause update of
-        editor gadget (but cursor coordinates will be reset to zeroes).
-
-    SEE ALSO
-
-
-TextEditor.mcc/MUIA_TextEditor_WrapWords
-
-    NAME
-        MUIA_TextEditor_WrapMode -- [ISG], BOOL
-
-    FUNCTION
-        When true, wrapping won't part line at symbol between space and/
-        or tabulation.
+        When set to TRUE (default), wrapping will occur at word boundaries
+        (e.g. space or tab). If FALSE TextEditor.mcc will wrap at any
+        character.
 
     NOTE
         Change of this attribute will cause update of

@@ -291,7 +291,7 @@ struct ImportMessage
   struct  LineNode *linenode; /* Pointer to a linenode, which you should fill out */
   APTR    PoolHandle;         /* A poolhandle, all allocations done for styles or contents must be made from this pool, and the size of the allocation must be stored in the first LONG */
   ULONG   ImportWrap;         /* For your use only (reflects MUIA_TextEditor_ImportWrap) */
-  ULONG   RealTabs;           /* do not convert to spaces when importing tabs (\t) */
+  ULONG   ConvertTabs;        /* do not convert to spaces when importing tabs (\t) */
 };
 
 struct Grow
@@ -383,12 +383,12 @@ struct InstData
   ULONG           ExportWrap;
   UWORD           ImportWrap;
   BOOL            HasChanged;
-  UWORD           TabSize;
-  UWORD           TabSizePixels; // number of pixels a Tab<>Spaces conversion will consume
+  UWORD           TabSize;        // number of spaces to use when Tab2Spaces is active
+  UWORD           TabSizePixels;  // number of pixels a Tab<>Spaces conversion will consume
+  BOOL            ConvertTabs;    // convert to spaces when TAB key is used. Otherwise insert \t
   ULONG           WrapBorder;
   ULONG           WrapMode;
-  BOOL            RealTabs;
-  BOOL            WrapWords;
+  BOOL            WrapWords;      // wrap at words boundaries rather than hard wrapping at each char
   struct UserAction *undoSteps;   // pointer to memory for the undo actions
   ULONG           maxUndoSteps;   // how many steps can be put into the undoBuffer
   ULONG           usedUndoSteps;  // how many steps in the undoBuffer have been used so far

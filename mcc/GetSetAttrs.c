@@ -185,6 +185,10 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = data->WrapMode;
     break;
 
+    case MUIA_TextEditor_WrapWords:
+      ti_Data = data->WrapWords;
+    break;
+
     case MUIA_Font:
       ti_Data = (IPTR)data->font;
       break;
@@ -201,19 +205,15 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = isFlagSet(data->flags, FLG_PasteColors);
     break;
 
-    case MUIA_TextEditor_RealTabs:
-      ti_Data = data->RealTabs;
+    case MUIA_TextEditor_ConvertTabs:
+      ti_Data = data->ConvertTabs;
     break;
-
-    case MUIA_TextEditor_WrapWords:
-      ti_Data = data->WrapWords;
-    break;
-
 
     default:
       LEAVE();
       return(DoSuperMethodA(cl, obj, (Msg)msg));
   }
+
   *msg->opg_Storage = ti_Data;
 
   RETURN(TRUE);
@@ -721,14 +721,15 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           clearFlag(data->flags, FLG_PasteColors);
       break;
 
-      case MUIA_TextEditor_RealTabs:
+      case MUIA_TextEditor_ConvertTabs:
       {
         struct Hook *ExportHookCopy = data->ExportHook;
 
-        if(data->RealTabs != (BOOL)ti_Data)
+        if(data->ConvertTabs != (BOOL)ti_Data)
         {
-          data->RealTabs = ti_Data;
-          if(ti_Data==FALSE)
+          data->ConvertTabs = ti_Data;
+
+          if(ti_Data == FALSE)
           {
             IPTR buff;
             struct line_node *newcontents;
