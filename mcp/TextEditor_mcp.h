@@ -72,8 +72,6 @@ extern "C" {
 #define MUICFG_TextEditor_InactiveCursor   0xad000069UL
 #define MUICFG_TextEditor_SelectPointer    0xad00006aUL
 #define MUICFG_TextEditor_InactiveColor    0xad00006bUL
-#define MUICFG_TextEditor_RealTabs         0xad00006cUL
-#define MUICFG_TextEditor_WrapWords        0xad00006dUL
 
 #if !defined(__AROS__) && defined(__PPC__)
   #if defined(__GNUC__)

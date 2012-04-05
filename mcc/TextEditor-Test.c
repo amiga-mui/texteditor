@@ -219,7 +219,7 @@ int main(void)
             Object *app, *window, *clear, *cut, *copy, *paste, *erase,
                    *bold, *italic, *underline, *ischanged, *undo, *redo, *string,
                    *xslider, *yslider, *flow, *search, *replace, *wrapmode, *wrapborder,
-                   *rgroup, *isdisabled, *isreadonly, *realtabs, *wrapwords;
+                   *rgroup, *isdisabled, *isreadonly, *converttabs, *wrapwords;
             Object *lower,*upper;
             Object *undoslider;
 
@@ -303,11 +303,11 @@ int main(void)
                         Child, flow = MUI_MakeObject(MUIO_Cycle, NULL, flow_text),
                         Child, wrapmode = MUI_MakeObject(MUIO_Cycle, NULL, wrap_modes),
                         Child, wrapborder = MUI_MakeObject(MUIO_Slider, NULL, 0, 10000),
-                        Child, realtabs = TextObject,
+                        Child, converttabs = TextObject,
                           MUIA_Background,    MUII_ButtonBack,
                           MUIA_Frame,         MUIV_Frame_Button,
                           MUIA_Text_PreParse, "\33c",
-                          MUIA_Text_Contents, "Real tabs",
+                          MUIA_Text_Contents, "Tabs2Spaces",
                           MUIA_FixHeight,     17,
                           MUIA_FixWidth,      24,
                           MUIA_InputMode,     MUIV_InputMode_Toggle,
@@ -316,7 +316,7 @@ int main(void)
                           MUIA_Background,    MUII_ButtonBack,
                           MUIA_Frame,         MUIV_Frame_Button,
                           MUIA_Text_PreParse, "\33c",
-                          MUIA_Text_Contents, "Wrap whole words",
+                          MUIA_Text_Contents, "Wrap words",
                           MUIA_FixHeight,     17,
                           MUIA_FixWidth,      24,
                           MUIA_InputMode,     MUIV_InputMode_Toggle,
@@ -370,8 +370,8 @@ int main(void)
   //                                  MUIA_TextEditor_WrapBorder, wrap_border,
   //                                MUIA_TextEditor_ExportWrap, 80,
                                     MUIA_TextEditor_WrapMode, MUIV_TextEditor_WrapMode_NoWrap,
-					MUIA_TextEditor_RealTabs, FALSE,
-					MUIA_TextEditor_WrapWords, FALSE,
+                                    MUIA_TextEditor_ConvertTabs, FALSE,
+                                    MUIA_TextEditor_WrapWords, FALSE,
 
                                   MUIA_TextEditor_ExportHook, MUIV_TextEditor_ExportHook_NoStyle,
   //                                MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_EMail,
@@ -562,9 +562,9 @@ int main(void)
             DoMethod(window, MUIM_Notify, MUIA_Window_InputEvent, "f1", rgroup, 3, MUIM_Set, MUIA_Group_ActivePage, 0);
             DoMethod(window, MUIM_Notify, MUIA_Window_InputEvent, "f2", rgroup, 3, MUIM_Set, MUIA_Group_ActivePage, 1);
 
-            DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_RealTabs, MUIV_EveryTime, realtabs, 3, MUIM_NoNotifySet, MUIA_Selected, MUIV_TriggerValue);
-            DoMethod(realtabs,  MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_RealTabs, MUIV_TriggerValue);
-            DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_WrapWords, MUIV_EveryTime, realtabs, 3, MUIM_NoNotifySet, MUIA_Selected, MUIV_TriggerValue);
+            DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_ConvertTabs, MUIV_EveryTime, converttabs, 3, MUIM_NoNotifySet, MUIA_Selected, MUIV_TriggerValue);
+            DoMethod(converttabs,  MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_ConvertTabs, MUIV_TriggerValue);
+            DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_WrapWords, MUIV_EveryTime, converttabs, 3, MUIM_NoNotifySet, MUIA_Selected, MUIV_TriggerValue);
             DoMethod(wrapwords,  MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_WrapWords, MUIV_TriggerValue);
 
             set(window, MUIA_Window_ActiveObject, editorgad);

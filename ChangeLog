@@ -6,7 +6,9 @@ $Id$
 $URL$
 
 2012-04-05 Jens Langner <Jens.Langner@light-speed.de>
- 
+
+  * mcc: renamed 'RealTabs' to 'ConvertTabs' and made it default to TRUE so that
+    the old behaviour is reserved where TE.mcc always converts \t to spaces.
   * mcc: removed the global TabSizePixels variable and moved it into the instance
     data including reworked Text*New() functions in NewGfx.c.
   * mcc/HandleInput.c: when a TE.mcc object has been active and the TAB has was
