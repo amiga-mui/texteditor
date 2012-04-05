@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-04-05 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/HandleInput.c: fixed handling of the TAB key as real input key.
+
 2012-04-04 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/GetSetAttrs.c: added missing #include.
