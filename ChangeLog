@@ -6,7 +6,9 @@ $Id$
 $URL$
 
 2012-04-05 Jens Langner <Jens.Langner@light-speed.de>
-
+ 
+  * mcc: removed the global TabSizePixels variable and moved it into the instance
+    data including reworked Text*New() functions in NewGfx.c.
   * mcc/HandleInput.c: when a TE.mcc object has been active and the TAB has was
     used the action always ended up in activating the next object in the
     CycleChain as the new active object. However, when using the TAB key in an

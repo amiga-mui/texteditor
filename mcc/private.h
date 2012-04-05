@@ -305,12 +305,6 @@ struct Grow
   APTR pool;
 };
 
-//#ifndef TABSIZEPIXELS
-//#define TABSIZEPIXELS
-#warning "global variable used here?!? bad!"
-UWORD TabSizePixels;
-//#endif
-
 struct InstData
 {
   WORD    ypos;             // ypos of gadget
@@ -390,6 +384,7 @@ struct InstData
   UWORD           ImportWrap;
   BOOL            HasChanged;
   UWORD           TabSize;
+  UWORD           TabSizePixels; // number of pixels a Tab<>Spaces conversion will consume
   ULONG           WrapBorder;
   ULONG           WrapMode;
   BOOL            RealTabs;
@@ -614,9 +609,9 @@ BOOL Undo(struct InstData *);
 BOOL Redo(struct InstData *);
 
 // NewGfx.c
-WORD TextLengthNew( struct RastPort *rp, CONST_STRPTR string, ULONG count,WORD result);
-ULONG TextFitNew( struct RastPort *rp, CONST_STRPTR string, ULONG strLen, CONST struct TextExtent *textExtent, CONST struct TextExtent *constrainingExtent, LONG strDirection, ULONG constrainingBitWidth, ULONG constrainingBitHeight);
-void TextNew( struct RastPort *rp, CONST_STRPTR string, ULONG count , LONG xoffset);
+WORD TextLengthNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, WORD result, UWORD tabSizePixels);
+ULONG TextFitNew(struct RastPort *rp, CONST_STRPTR string, ULONG strLen, CONST struct TextExtent *textExtent, CONST struct TextExtent *constrainingExtent, LONG strDirection, ULONG constrainingBitWidth, ULONG constrainingBitHeight, UWORD tabSizePixels);
+void TextNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, LONG xoffset, UWORD tabSizePixels);
 
 #if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
 // AllocVecPooled.c

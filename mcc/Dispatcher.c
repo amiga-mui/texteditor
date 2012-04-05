@@ -266,8 +266,10 @@ static IPTR mSetup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
     // initialize our temporary rastport
     InitRastPort(&data->tmprp);
     SetFont(&data->tmprp, data->font);
-    #warning "why 'W' is used here?"
-    TabSizePixels = data->TabSize*TextLengthNew(&data->tmprp, "W", 1, 0);
+
+    // calculate the amount of pixels a Tab<>Spaces conversion will take
+    data->TabSizePixels = data->TabSize*TextLength(&data->tmprp, " ", 1);
+    D(DBF_INPUT, "TabSizePixels: %d", data->TabSizePixels);
 
     // make sure we have a proper font setup here and
     // that our spellchecker suggest window object is also
