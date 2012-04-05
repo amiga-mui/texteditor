@@ -697,19 +697,33 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
   }
   else if(isFlagClear(data->flags, FLG_Ghosted) &&
           data->shown == TRUE &&
-          msg->imsg != NULL &&
-          ((msg->muikey != MUIKEY_GADGET_PREV &&  // user moves to previous obj with TAB key
-            msg->muikey != MUIKEY_GADGET_NEXT &&  // user moves to next obj with TAB key
-            msg->muikey != MUIKEY_GADGET_OFF) || // user deselected gadget with CTRL+TAB
-           (data->RealTabs == TRUE && msg->imsg->Code == 0x42))) // if editor should get \t then treat TAB different
+          msg->imsg != NULL)
   {
     Object *activeobj;
     Object *defaultobj;
     struct IntuiMessage *imsg = msg->imsg;
 
+    // here we check if the GADGET_NEXT muikey has been used (usually associated with the
+    // TAB key) but if it is not the TAB key we activate the next object in the cyclechain because
+    // we need to catch the TAB key to use it for storing either \t or a specific number of
+    // spaces. So TE.mcc has to be TAB key aware. (note: MUIA_Window_DisableKeys is used in
+    // Dispatcher.c to make this happen)
+    if(msg->muikey == MUIKEY_GADGET_NEXT && imsg->Code != 0x42)
+    {
+      set(_win(obj), MUIA_Window_ActiveObject, MUIV_Window_ActiveObject_Next);
+
+      RETURN(MUI_EventHandlerRC_Eat);
+      return MUI_EventHandlerRC_Eat;
+    }
+ 
+    // next we check if TE.mcc is the currently active object in the window and if not and if
+    // it is also not the default object assigned to the window it is embedded we check if the
+    // CtrlChar has been pressed which would signal that we need to activate the object accordingly
+    // if the developer used MUIA_ControlChar correctly.
     activeobj = (Object *)xget(_win(obj), MUIA_Window_ActiveObject);
     defaultobj = (Object *)xget(_win(obj), MUIA_Window_DefaultObject);
 
+    D(DBF_INPUT, "actobj: %08lx, defobj: %08lx, obj: %08lx", activeobj, defaultobj, obj);
     if(data->CtrlChar && activeobj != obj && defaultobj != obj && RAWToANSI(imsg) == data->CtrlChar)
     {
       set(_win(obj), MUIA_Window_ActiveObject, obj);
@@ -1075,6 +1089,8 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
       RETURN(MUI_EventHandlerRC_Eat);
       return(MUI_EventHandlerRC_Eat);
     }
+    else
+      D(DBF_INPUT, "ignore reached");
   }
 
   RETURN(0);
