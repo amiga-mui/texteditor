@@ -272,6 +272,7 @@ int main(void)
                           MUIA_FixHeight,     17,
                           MUIA_FixWidth,      24,
                           MUIA_InputMode,     MUIV_InputMode_Toggle,
+                          MUIA_CycleChain,    TRUE,
                           End,
 
                         Child, italic = TextObject,
@@ -282,6 +283,7 @@ int main(void)
                           MUIA_FixHeight,     17,
                           MUIA_FixWidth,      24,
                           MUIA_InputMode,     MUIV_InputMode_Toggle,
+                          MUIA_CycleChain,    TRUE,
                         End,
 
                         Child, underline = TextObject,
@@ -292,6 +294,7 @@ int main(void)
                           MUIA_FixHeight,     17,
                           MUIA_FixWidth,      24,
                           MUIA_InputMode,     MUIV_InputMode_Toggle,
+                          MUIA_CycleChain,    TRUE,
                         End,
 
                         Child, ischanged = MUI_MakeObject(MUIO_Checkmark, "Is changed?"),
@@ -438,8 +441,8 @@ int main(void)
 
                             End,
   */                    Child, HGroup,
-                        Child, xslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 10000),
-                        Child, yslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 1000),
+                          Child, xslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 10000),
+                          Child, yslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 1000),
                         End,
                       Child, undoslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 1000),
                       Child, string = StringObject,
@@ -460,6 +463,8 @@ int main(void)
               BPTR  fh;
 
             set(editorgad, MUIA_TextEditor_Slider, slider);
+            set(xslider, MUIA_CycleChain, TRUE);
+            set(yslider, MUIA_CycleChain, TRUE);
 
             if(argarray[4])
             {
