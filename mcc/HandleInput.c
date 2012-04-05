@@ -682,8 +682,11 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 
   // check if the gadget was activate recently (via TAB key?)
   wasActivated = isFlagSet(data->flags, FLG_Activated);
+
   // clear the activated flag immediately
   clearFlag(data->flags, FLG_Activated);
+
+  D(DBF_INPUT, "imsg->Code: %lx msg->muikey: %d", msg->imsg != NULL ? msg->imsg->Code : 0, msg->muikey);
 
   if(msg->muikey == MUIKEY_UP && data->KeyUpFocus && _win(obj) && data->firstline == data->actualline)
   {
@@ -695,9 +698,10 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
   else if(isFlagClear(data->flags, FLG_Ghosted) &&
           data->shown == TRUE &&
           msg->imsg != NULL &&
-          msg->muikey != MUIKEY_GADGET_PREV &&
-       // msg->muikey != MUIKEY_GADGET_NEXT && // if the user moves to another obj with TAB
-          msg->muikey != MUIKEY_GADGET_OFF) // user deselected gadget with CTRL+TAB
+          ((msg->muikey != MUIKEY_GADGET_PREV &&  // user moves to previous obj with TAB key
+            msg->muikey != MUIKEY_GADGET_NEXT &&  // user moves to next obj with TAB key
+            msg->muikey != MUIKEY_GADGET_OFF) || // user deselected gadget with CTRL+TAB
+           (data->RealTabs == TRUE && msg->imsg->Code == 0x42))) // if editor should get \t then treat TAB different
   {
     Object *activeobj;
     Object *defaultobj;
