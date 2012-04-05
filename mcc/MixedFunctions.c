@@ -455,7 +455,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
       cursor_width = data->CursorWidth;
 
     xplace  = _mleft(data->object) + TextLengthNew(&data->tmprp, &line->line.Contents[x-pos.x], pos.x+start, 0, data->TabSizePixels);
-flow=FlowSpace(data, line->line.Flow, &line->line.Contents[pos.bytes]);
+    flow = FlowSpace(data, line->line.Flow, &line->line.Contents[pos.bytes]);
     xplace += flow;
     yplace  = data->ypos + (data->fontheight * (line_nr + pos.lines - 1));
     cursorxplace = xplace + TextLengthNew(&data->tmprp, &line->line.Contents[x+start], 0-start, xplace-xoffset-flow, data->TabSizePixels);
@@ -570,8 +570,6 @@ flow=FlowSpace(data, line->line.Flow, &line->line.Contents[pos.bytes]);
         WORD LeftX, LeftWidth;
         WORD RightX, RightWidth;
         WORD Y, Height;
-        #warning "FlowSpace commented out?"
-//        UWORD flow = FlowSpace(data, line->line.Flow, &line->line.Contents[pos.bytes]);
 
         LeftX = _mleft(data->object);
         LeftWidth = flow-3;
