@@ -612,7 +612,6 @@ static BOOL ReactOnRawKey(struct InstData *data, struct IntuiMessage *imsg)
 
   dummy = FindKey(data, imsg->Code, imsg->Qualifier);
 
-  #warning "MorphOS/AmigaOS4 version doesn't receive 0x42 on tab key pressed (MUI eating it?), though gets 0xC2 when it's released"
   D(DBF_INPUT, "FindKey: %ld (%lx)", dummy, imsg->Code);
 
   if(dummy == 1 || dummy == 0)
@@ -697,7 +696,7 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
           data->shown == TRUE &&
           msg->imsg != NULL &&
           msg->muikey != MUIKEY_GADGET_PREV &&
-          msg->muikey != MUIKEY_GADGET_NEXT && // if the user moves to another obj with TAB
+       // msg->muikey != MUIKEY_GADGET_NEXT && // if the user moves to another obj with TAB
           msg->muikey != MUIKEY_GADGET_OFF) // user deselected gadget with CTRL+TAB
   {
     Object *activeobj;
@@ -782,7 +781,7 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
           D(DBF_INPUT, "HandleInput rawkey code=%02x qual=%04x", imsg->Code, imsg->Qualifier);
 
           if(data->ypos != data->realypos ||
-             (wasActivated && imsg->Code == 66)) // ignore TAB key if the gadget was activated recently
+             (wasActivated && (msg->muikey == MUIKEY_GADGET_NEXT || imsg->Code == 0x42))) // ignore TAB key if the gadget was activated recently
           {
             RETURN(MUI_EventHandlerRC_Eat);
             return(MUI_EventHandlerRC_Eat);
