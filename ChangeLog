@@ -5,6 +5,15 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-04-05 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcc/HandleInput.c: when a TE.mcc object has been active and the TAB has was
+    used the action always ended up in activating the next object in the
+    CycleChain as the new active object. However, when using the TAB key in an
+    editor the action should always end up in either storing real tabs (\t) or in
+    storing a number of spaces into the object according to the current settings.
+    However, this was not possible at all.
+
 2012-04-05 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c: fixed handling of the TAB key as real input key.
