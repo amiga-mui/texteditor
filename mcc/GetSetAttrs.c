@@ -734,7 +734,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
             struct line_node *newcontents;
             data->ExportHook = &ExportHookPlain;
 
-            if((buff = mExportText(cl, obj, (APTR)msg)) != NULL)
+            if((buff = mExportText(cl, obj, (APTR)msg)) != (IPTR)NULL)
             {
               if((newcontents = ImportText(data, (char *)buff, data->ImportHook, data->ImportWrap)) != NULL)
                 FreeTextMem(data, data->firstline);

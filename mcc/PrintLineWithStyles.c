@@ -427,8 +427,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       SetDrMd(rp, JAM1);
       SetAPen(rp, _pens(data->object)[MPEN_SHADOW]);
       SetAfPt(rp, newPattern, 1);
-      #warning "why has RectFill() been disabled here?"
-//      RectFill(rp, xoffset, starty, xoffset+_mwidth(data->object)-1, starty+data->fontheight-1);
+      RectFill(rp, xoffset, starty, xoffset+_mwidth(data->object)-1, starty+data->fontheight-1);
       SetAfPt(rp, NULL, (UBYTE)-1);
     }
 
