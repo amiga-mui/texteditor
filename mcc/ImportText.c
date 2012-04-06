@@ -47,6 +47,7 @@ struct line_node *ImportText(struct InstData *data, char *contents, struct Hook 
     im.ImportWrap = wraplength;
     im.PoolHandle = data->mypool;
     im.ConvertTabs = data->ConvertTabs;
+    im.TabSize = data->TabSize;
 
     memset(first_line, 0, sizeof(*first_line));
     line = first_line;
