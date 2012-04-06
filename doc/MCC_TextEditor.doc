@@ -787,7 +787,7 @@ TextEditor.mcc/MUIM_TextEditor_Search
 
         In read-only mode:
           - there will be no cursor (only a normal TAB frame),
-          - TAB will activate the next gadget (instead of alt-TAB),
+          - TAB will activate the next gadget (instead of RCOMMAND+TAB),
           - the frame will be set to a ReadListFrame (may change),
           - there is no ARexx support, except "Copy".
 
