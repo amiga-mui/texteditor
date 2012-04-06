@@ -130,6 +130,7 @@ static char *FindEOL(char *src, int *tabs_ptr)
       tabs++;
     else if(c == '\r' || c == '\n')
       break;
+
     eol++;
   }
 
@@ -197,7 +198,9 @@ static BOOL ContainsText(char *str, char stopchar)
                      8 = StrikeThru   - Draw separator ontop of text.
                      16 = Thick        - Make separator extra thick.
 
- Note: Tabs are converted to spaces with a tab size of 4.
+ Note: Tabs are converted to the number of spaces specified in the
+       TE.mcc object used
+
 *************************************************************************/
 HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 {
@@ -215,7 +218,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
     ULONG wrap = msg->ImportWrap;
     ULONG allocatedContents;
 
-    len = eol - src + 4 * tabs;
+    len = eol - src + (msg->TabSize * tabs);
 
     // allocate some more memory for the possible quote mark '>', note that if
     // a '=' is detected at the end of a line this memory is not sufficient!
@@ -249,9 +252,9 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 
         if(c == '\t' && msg->ConvertTabs == TRUE)
         {
-          int i;
+          unsigned int i;
 
-          for(i=(dest - dest_start)% 4; i < 4; i++)
+          for(i=(dest - dest_start) % msg->TabSize; i < msg->TabSize; i++)
             *dest++ = ' ';
 
           continue;
@@ -539,7 +542,9 @@ MakeHook(ImPlainHook, PlainImportHookFunc);
                      8 = StrikeThru   - Draw separator ontop of text.
                      16 = Thick        - Make separator extra thick.
 
- Note: Tabs are converted to spaces with a tab size of 4.
+ Note: Tabs are converted to the number of spaces specified in the
+       TE.mcc object used
+
 *************************************************************************/
 static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 {
@@ -557,7 +562,7 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
     ULONG wrap = msg->ImportWrap;
     ULONG allocatedContents;
 
-    len = eol - src + 4 * tabs;
+    len = eol - src + (msg->TabSize * tabs);
 
     // allocate some more memory for the possible quote mark '>', note that if
     // a '=' is detected at the end of a line this memory is not sufficient!
@@ -624,9 +629,9 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
         }
         else if(c == '\t' && msg->ConvertTabs == TRUE)
         {
-          int i;
+          unsigned int i;
 
-          for(i=(dest - dest_start)% 4; i < 4; i++)
+          for(i=(dest - dest_start) % msg->TabSize; i < msg->TabSize; i++)
             *dest++ = ' ';
 
           lastWasSeparator = TRUE;
@@ -742,7 +747,7 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
                 break;
 
               /* The size of the dest buffer has to be increased now */
-              len += eol - src + 4 * tabs;
+              len += eol - src + (msg->TabSize * tabs);
 
               if((new_dest_start = (unsigned char*)AllocVecPooled(msg->PoolHandle, len + 4)) == NULL)
                 break;
