@@ -231,7 +231,7 @@ LONG LineCharsWidth(struct InstData *data, CONST_STRPTR text)
     {
       // if all text fits, then we have to do the calculations once more and
       // see if also the ending cursor might fit on the line
-      w -= (data->CursorWidth == 6) ? TextLengthNew(&data->tmprp, " ", 1, 0, data->TabSizePixels) : data->CursorWidth;
+      w -= (data->CursorWidth == 6) ? TextLength(&data->tmprp, " ", 1) : data->CursorWidth;
       c = TextFitNew(&data->tmprp, text, textlen, &tExtend, NULL, 1, w, fontheight, data->TabSizePixels);
     }
 
@@ -407,7 +407,6 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
   UWORD colors[3] = {0, 0, 0};
   WORD  start = 0, stop = 0;
   LONG  c;
-  LONG xoffset = _mleft(data->object);
   UWORD flow;
 
   ENTER();
@@ -450,15 +449,15 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
     // calculate the cursor width
     // if it is set to 6 then we should find out how the width of the current char is
     if(data->CursorWidth == 6)
-      cursor_width = TextLengthNew(&data->tmprp, (chars[1] < ' ') ? (char *)" " : (char *)&chars[1], 1, 0, data->TabSizePixels);
+      cursor_width = TextLengthNew(&data->tmprp, (chars[1] < ' ') ? (char *)" " : (char *)&chars[1], 1, data->TabSizePixels);
     else
       cursor_width = data->CursorWidth;
 
-    xplace  = _mleft(data->object) + TextLengthNew(&data->tmprp, &line->line.Contents[x-pos.x], pos.x+start, 0, data->TabSizePixels);
+    xplace  = _mleft(data->object) + TextLengthNew(&data->tmprp, &line->line.Contents[x-pos.x], pos.x+start, data->TabSizePixels);
     flow = FlowSpace(data, line->line.Flow, &line->line.Contents[pos.bytes]);
     xplace += flow;
     yplace  = data->ypos + (data->fontheight * (line_nr + pos.lines - 1));
-    cursorxplace = xplace + TextLengthNew(&data->tmprp, &line->line.Contents[x+start], 0-start, xplace-xoffset-flow, data->TabSizePixels);
+    cursorxplace = xplace + TextLengthNew(&data->tmprp, &line->line.Contents[x+start], 0-start, data->TabSizePixels);
 
     //D(DBF_STARTUP, "xplace: %ld, yplace: %ld cplace: %ld, innerwidth: %ld width: %ld %ld", xplace, yplace, cursorxplace, _mwidth(data->object), _width(data->object), _mleft(data->object));
 
@@ -468,7 +467,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
       if(IS_ANTIALIASED(data->font))
       {
         DoMethod(data->object, MUIM_DrawBackground, xplace, yplace,
-                                                    TextLengthNew(&data->tmprp, start == 0 ? (STRPTR)chars+1 : (STRPTR)chars, stop-start+1, xplace-xoffset-flow, data->TabSizePixels), 
+                                                    TextLengthNew(&data->tmprp, start == 0 ? (STRPTR)chars+1 : (STRPTR)chars, stop-start+1, data->TabSizePixels), 
                                                     data->fontheight,
                                                     cursorxplace - (isFlagSet(data->flags, FLG_InVGrp) ? _mleft(data->object) : 0),
                                                     (isFlagSet(data->flags, FLG_InVGrp) ? 0 : data->realypos) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
@@ -487,7 +486,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
           ULONG cwidth = cursor_width;
 
           if(data->CursorWidth != 6)
-            cwidth = TextLengthNew(&data->tmprp, chars[1] < ' ' ? (char *)" " : (char *)&chars[1], 1, 0, data->TabSizePixels);
+            cwidth = TextLengthNew(&data->tmprp, chars[1] < ' ' ? (char *)" " : (char *)&chars[1], 1, data->TabSizePixels);
 
           if(Set == FALSE && data->currentCursorState == CS_INACTIVE)
           {
@@ -533,7 +532,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
           ULONG cwidth = cursor_width;
 
           if(data->CursorWidth != 6 && Set == FALSE)
-            cwidth = TextLengthNew(&data->tmprp, chars[1] < ' ' ? (char *)" " : (char *)&chars[1], 1, 0, data->TabSizePixels);
+            cwidth = TextLengthNew(&data->tmprp, chars[1] < ' ' ? (char *)" " : (char *)&chars[1], 1, data->TabSizePixels);
 
           DoMethod(data->object, MUIM_DrawBackground, cursorxplace, yplace,
                                                       cwidth, data->fontheight,
@@ -560,7 +559,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
       {
         SetAPen(rp, ConvertPen(data, colors[1+c], line->line.Highlight));
         SetSoftStyle(rp, styles[1+c], AskSoftStyle(rp));
-        TextNew(rp, (STRPTR)&chars[1+c], 1, xoffset+flow, data->TabSizePixels);
+        TextNew(rp, (STRPTR)&chars[1+c], 1, data->TabSizePixels);
       }
       SetSoftStyle(rp, FS_NORMAL, AskSoftStyle(rp));
 
@@ -573,7 +572,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
 
         LeftX = _mleft(data->object);
         LeftWidth = flow-3;
-        RightX = _mleft(data->object) + flow + TextLengthNew(&data->tmprp, &line->line.Contents[pos.bytes], pos.extra-pos.bytes-1, 0, data->TabSizePixels) + 3;
+        RightX = _mleft(data->object) + flow + TextLengthNew(&data->tmprp, &line->line.Contents[pos.bytes], pos.extra-pos.bytes-1, data->TabSizePixels) + 3;
         RightWidth = _mleft(data->object)+_mwidth(data->object) - RightX;
         Y = yplace;
         Height = isFlagSet(line->line.Separator, LNSF_Thick) ? 2 : 1;

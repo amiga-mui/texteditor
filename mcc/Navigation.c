@@ -39,8 +39,8 @@ ULONG FlowSpace(struct InstData *data, UWORD flow, STRPTR text)
 
   if(flow != MUIV_TextEditor_Flow_Left)
   {
-    flowspace  = (_mwidth(data->object)-TextLengthNew(&data->tmprp, text, LineCharsWidth(data, text)-1, 0, data->TabSizePixels));
-    flowspace -= (data->CursorWidth == 6) ? TextLengthNew(&data->tmprp, " ", 1, 0, data->TabSizePixels) : data->CursorWidth;
+    flowspace  = (_mwidth(data->object)-TextLengthNew(&data->tmprp, text, LineCharsWidth(data, text)-1, data->TabSizePixels));
+    flowspace -= (data->CursorWidth == 6) ? TextLength(&data->tmprp, " ", 1) : data->CursorWidth;
     if(flow == MUIV_TextEditor_Flow_Center)
     {
       flowspace /= 2;
@@ -98,12 +98,12 @@ static LONG GetPosInPixels(struct InstData *data, LONG bytes, LONG x)
 
   ENTER();
 
-  pos = TextLengthNew(&data->tmprp, &data->actualline->line.Contents[bytes], x, 0, data->TabSizePixels);
+  pos = TextLengthNew(&data->tmprp, &data->actualline->line.Contents[bytes], x, data->TabSizePixels);
 
   if(data->actualline->line.Contents[data->CPos_X] == '\n')
-    pos += TextLengthNew(&data->tmprp, " ", 1, 1, data->TabSizePixels)/2;
+    pos += TextLength(&data->tmprp, " ", 1)/2;
   else
-    pos += TextLengthNew(&data->tmprp, &data->actualline->line.Contents[data->CPos_X], 1, 0, data->TabSizePixels)/2;
+    pos += TextLengthNew(&data->tmprp, &data->actualline->line.Contents[data->CPos_X], 1, data->TabSizePixels)/2;
 
   pos += FlowSpace(data, data->actualline->line.Flow, &data->actualline->line.Contents[bytes]);
 

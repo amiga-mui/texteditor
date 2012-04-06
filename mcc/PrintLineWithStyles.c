@@ -186,11 +186,11 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       if(startx < x+c_length && stopx > x)
       {
         if(startx > x)
-          blockstart = TextLengthNew(&data->tmprp, text+x, startx-x, 0, data->TabSizePixels);
+          blockstart = TextLengthNew(&data->tmprp, text+x, startx-x, data->TabSizePixels);
         else
           startx = x;
 
-        blockwidth = ((stopx >= c_length+x) ? _mwidth(data->object)-(blockstart+flow) : TextLengthNew(&data->tmprp, text+startx, stopx-startx, 0, data->TabSizePixels));
+        blockwidth = ((stopx >= c_length+x) ? _mwidth(data->object)-(blockstart+flow) : TextLengthNew(&data->tmprp, text+startx, stopx-startx, data->TabSizePixels));
       }
       else if(isFlagClear(data->flags, FLG_ReadOnly) &&
               isFlagClear(data->flags, FLG_Ghosted) &&
@@ -201,12 +201,12 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
               (isFlagSet(data->flags, FLG_Active) || data->inactiveCursor == TRUE))
       {
         cursor = TRUE;
-        blockstart = TextLengthNew(&data->tmprp, text+x, data->CPos_X-x, 0, data->TabSizePixels);
+        blockstart = TextLengthNew(&data->tmprp, text+x, data->CPos_X-x, data->TabSizePixels);
 
         // calculate the cursor width
         // if it is set to 6 then we should find out how the width of the current char is
         if(data->CursorWidth == 6)
-          blockwidth = TextLengthNew(&data->tmprp, (text[data->CPos_X] < ' ') ? (char *)" " : (char *)&text[data->CPos_X], 1, 0, data->TabSizePixels);
+          blockwidth = TextLengthNew(&data->tmprp, (text[data->CPos_X] < ' ') ? (char *)" " : (char *)&text[data->CPos_X], 1, data->TabSizePixels);
         else
           blockwidth = data->CursorWidth;
       }
@@ -351,9 +351,9 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       // calculate how many characters will fit in the visible area
       fitting = TextFitNew(rp, text+x, p_length, &te, NULL, 1, _mwidth(data->object), data->fontheight, data->TabSizePixels);
       if(text[x+fitting-1] < ' ')
-        TextNew(rp, text+x, fitting-1, xoffset+flow, data->TabSizePixels);
+        TextNew(rp, text+x, fitting-1, data->TabSizePixels);
       else
-        TextNew(rp, text+x, fitting, xoffset+flow, data->TabSizePixels);
+        TextNew(rp, text+x, fitting, data->TabSizePixels);
 
       // add the length calculated before no matter how many character really fitted
 

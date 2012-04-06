@@ -5,8 +5,23 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-04-07 Jens Langner <Jens.Langner@light-speed.de>
+
+  * mcc: the graphics library TextLength() function is now used for situations where
+    only a fixed string is used, thus no \t can be in there.
+  * mcc/NewGfx.c: removed the xoffset dependance in TextLengthNew() and TextFitNew()
+    as I can't see any reason for that? In addition, this fixes the problem that
+    the number of pixels required in ConvertTabs mode and non-ConvertTabs mode
+    wasn't equal for an instered TAB.
+
 2012-04-05 Jens Langner <Jens.Langner@light-speed.de>
 
+  * ImportText.c, ImportHook.c, misc: changed ImportHook to also allow to specify
+    the number of spaces that should be used to convert tabs to spaces if this
+    operation is wanted.
+  * Keybindings.c, MCC_TextEditor.doc: changed default NextGadget keybinding to
+    use RCOMMAND+TAB instead of ALT+TAB because ALT+TAB is already taken by MUI
+    itself for switching windows.
   * mcc: renamed 'RealTabs' to 'ConvertTabs' and made it default to TRUE so that
     the old behaviour is reserved where TE.mcc always converts \t to spaces.
   * mcc: removed the global TabSizePixels variable and moved it into the instance

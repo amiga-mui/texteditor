@@ -610,9 +610,9 @@ BOOL Undo(struct InstData *);
 BOOL Redo(struct InstData *);
 
 // NewGfx.c
-WORD TextLengthNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, WORD result, UWORD tabSizePixels);
+WORD TextLengthNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, UWORD tabSizePixels);
 ULONG TextFitNew(struct RastPort *rp, CONST_STRPTR string, ULONG strLen, CONST struct TextExtent *textExtent, CONST struct TextExtent *constrainingExtent, LONG strDirection, ULONG constrainingBitWidth, ULONG constrainingBitHeight, UWORD tabSizePixels);
-void TextNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, LONG xoffset, UWORD tabSizePixels);
+void TextNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, UWORD tabSizePixels);
 
 #if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
 // AllocVecPooled.c
