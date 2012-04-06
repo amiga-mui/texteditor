@@ -63,7 +63,7 @@ const struct te_key default_keybindings[] =
   { 8+500, IEQUALIFIER_ALT, MUIV_TextEditor_KeyAction_DelBOW },
   { 0x7f+500, IEQUALIFIER_ALT, MUIV_TextEditor_KeyAction_DelEOW },
   { 'x'+500, IEQUALIFIER_CONTROL, MUIV_TextEditor_KeyAction_DelLine },
-  { 0x9+500, IEQUALIFIER_ALT, MUIV_TextEditor_KeyAction_NextGadget },
+  { 0x9+500, IEQUALIFIER_RCOMMAND, MUIV_TextEditor_KeyAction_NextGadget },
 
   { '1'+500, IEQUALIFIER_RCOMMAND | IEQUALIFIER_SHIFT, MUIV_TextEditor_KeyAction_SetBookmark1 },
   { '2'+500, IEQUALIFIER_RCOMMAND | IEQUALIFIER_SHIFT, MUIV_TextEditor_KeyAction_SetBookmark2 },
