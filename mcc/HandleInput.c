@@ -715,7 +715,7 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
       RETURN(MUI_EventHandlerRC_Eat);
       return MUI_EventHandlerRC_Eat;
     }
- 
+
     // next we check if TE.mcc is the currently active object in the window and if not and if
     // it is also not the default object assigned to the window it is embedded we check if the
     // CtrlChar has been pressed which would signal that we need to activate the object accordingly
@@ -961,20 +961,20 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 
                     if(last_x == data->CPos_X && lastline == data->actualline && DoubleClick(data->StartSecs, data->StartMicros, imsg->Seconds, imsg->Micros))
                     {
-                      BOOL handleDoubleClick;
+                      BOOL doubleClickHandled;
 
                       if(data->DoubleClickHook != NULL)
                       {
                         // we have a user defined hook, let this one decide
-                        handleDoubleClick = CallHook(data->DoubleClickHook, data->object, data->actualline->line.Contents, data->CPos_X, imsg->Qualifier);
+                        doubleClickHandled = CallHook(data->DoubleClickHook, data->object, data->actualline->line.Contents, data->CPos_X, imsg->Qualifier);
                       }
                       else
                       {
-                        // no hook function, handle this double click
-                        handleDoubleClick = TRUE;
+                        // no hook function, treat this double click as unhandled yet
+                        doubleClickHandled = FALSE;
                       }
 
-                      if(handleDoubleClick != FALSE)
+                      if(doubleClickHandled == FALSE)
                       {
                         if(CheckSep(data, data->actualline->line.Contents[data->CPos_X]) == FALSE)
                         {

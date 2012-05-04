@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-05-04 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/HandleInput.c: restored the correct return code interpretation of the
+    double click hook that was inverted in r756. Now everything is conformant to
+    the Autodocs again.
+
 2012-04-07 Jens Langner <Jens.Langner@light-speed.de>
 
   * mcc: the graphics library TextLength() function is now used for situations where
