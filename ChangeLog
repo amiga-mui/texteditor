@@ -5,6 +5,18 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.38 RELEASE ############################################################
+
+2012-05-12 Jens Langner <Jens.Langner@light-speed.de>
+
+  * misc: final v15.38 release preparations
+  * mcc/Makefile: restored the -DNO_INLINE_STDARG define in CFLAGS as otherwise
+    our AROS cross-compilers won't build for these targets and raise some
+    "untermated macro" errors when building our test applications.
+  * doc/TextEditor.guide: removed the whole "History" section as we solely
+    rely on the ChangeLog in future as it is too much work to update the .guide
+    for every new release.
+
 2012-05-04 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c: restored the correct return code interpretation of the

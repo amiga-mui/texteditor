@@ -314,7 +314,7 @@ ifeq ($(OS), aros-ppc)
 
   # Compiler/Linker flags
   OPTFLAGS = -O2 -fomit-frame-pointer
-  CFLAGS += -Wno-pointer-sign
+  CFLAGS += -Wno-pointer-sign -DNO_INLINE_STDARG
   LDLIBS += -larossupport -lrom -lmui
 
 else
@@ -331,7 +331,7 @@ ifeq ($(OS), aros-x86_64)
 
   # Compiler/Linker flags
   OPTFLAGS = -O2 -fomit-frame-pointer
-  CFLAGS += -Wno-pointer-sign
+  CFLAGS += -Wno-pointer-sign -DNO_INLINE_STDARG
   LDLIBS += -larossupport -lrom -lmui
 
 endif
