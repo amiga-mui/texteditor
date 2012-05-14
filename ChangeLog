@@ -8,6 +8,8 @@ $URL$
 2012-05-14 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/Makefile: removed .catalog files in clean target.
+  * mcp/locale/TextEditor_mcp.cd: replaced non-7bit-ASCII character by a
+    suitable sequence.
 
 #### v15.38 RELEASE ############################################################
 
