@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-05-14 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/Makefile: removed .catalog files in clean target.
+
 #### v15.38 RELEASE ############################################################
 
 2012-05-12 Jens Langner <Jens.Langner@light-speed.de>

@@ -422,6 +422,7 @@ clean:
 	-$(RM) $(TARGET) $(TARGET).debug $(TARGET).map
 	-$(RM) $(TESTTARGET) $(TESTTARGET).debug $(TESTTARGET).map
 	-$(RM) $(MCPOBJS) $(TESTOBJS) $(M68KSTUBS)
+	-$(RM) $(CATALOGS)
 
 .PHONY: distclean
 distclean: clean
