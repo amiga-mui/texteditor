@@ -135,6 +135,7 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
                                                     ASOPOOL_Puddle, 3*1024,
                                                     ASOPOOL_Threshold, 512,
                                                     ASOPOOL_Name, "TextEditor.mcc pool",
+                                                    ASOPOOL_LockMem, FALSE,
                                                     TAG_DONE);
     #else
     data->mypool = CreatePool(MEMF_ANY|MEMF_CLEAR, 3*1024, 512);

@@ -495,7 +495,7 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
             colors = NULL;
           }
           // allocate one word more than the chunk tell us, because we terminate the array with EOC
-          if(numColors > 0 && (colors = AllocVec((numColors+1) * sizeof(*colors), SHARED_MEMFLAG)) != NULL)
+          if(numColors > 0 && (colors = AllocVecShared((numColors+1) * sizeof(*colors), MEMF_ANY)) != NULL)
           {
             error = ReadChunkBytes(iff, colors, numColors * sizeof(struct LineColor));
             SHOWVALUE(DBF_CLIPBOARD, error);
@@ -517,7 +517,7 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
             styles = NULL;
           }
           // allocate one word more than the chunk tell us, because we terminate the array with EOS
-          if(numStyles > 0 && (styles = AllocVec((numStyles+1) * sizeof(struct LineStyle), SHARED_MEMFLAG)) != NULL)
+          if(numStyles > 0 && (styles = AllocVecShared((numStyles+1) * sizeof(struct LineStyle), MEMF_ANY)) != NULL)
           {
             error = ReadChunkBytes(iff, styles, numStyles * sizeof(struct LineStyle));
             SHOWVALUE(DBF_CLIPBOARD, error);
@@ -538,14 +538,14 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
             // allocate 2 additional bytes:
             // - one for the trailing LF
             // - another one for the terminating NUL
-            if((textline = AllocVec(length + 2, SHARED_MEMFLAG)) != NULL)
+            if((textline = AllocVecShared(length + 2, MEMF_ANY)) != NULL)
             {
               error = ReadChunkBytes(iff, textline, length);
               SHOWVALUE(DBF_CLIPBOARD, error);
               textline[length] = '\0';
             }
 
-            if(textline != NULL && (line = AllocVec(sizeof(*line), SHARED_MEMFLAG)) != NULL)
+            if(textline != NULL && (line = AllocVecShared(sizeof(*line), MEMF_ANY)) != NULL)
             {
               line->next = NULL;
               line->previous = NULL;

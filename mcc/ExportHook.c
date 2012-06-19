@@ -49,7 +49,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
   // create a temporary buffer if we don't have one yet
   if(buf == NULL)
   {
-    if((buf = AllocVec(sizeof(*buf), MEMF_SHARED|MEMF_CLEAR)) != NULL)
+    if((buf = AllocVecShared(sizeof(*buf), MEMF_CLEAR)) != NULL)
     {
       if(data != NULL)
       {
@@ -59,7 +59,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
       }
       else
       {
-        buf->buffer = AllocVec(1024, MEMF_SHARED|MEMF_CLEAR);
+        buf->buffer = AllocVecShared(1024, MEMF_CLEAR);
         buf->size = 1024;
       }
     }
@@ -91,7 +91,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
       }
       else
       {
-        buf->buffer = AllocVec(oldsize+expand+1024, MEMF_SHARED|MEMF_CLEAR);
+        buf->buffer = AllocVecShared(oldsize+expand+1024, MEMF_CLEAR);
         buf->size = oldsize+expand+1024;
       }
 

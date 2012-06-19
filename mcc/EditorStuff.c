@@ -83,7 +83,7 @@ static char *utf8_to_ansi(STRPTR src)
 
    // the new string must be AllocVec()'d instead of AllocVecPooled()'d, because
    // we handle data from the clipboard server which also uses AllocVec()
-   dst = AllocVec(strlength, SHARED_MEMFLAG);
+   dst = AllocVecShared(strlength, MEMF_ANY);
 
    if (dst)
    {
