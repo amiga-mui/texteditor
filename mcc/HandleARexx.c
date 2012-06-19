@@ -176,7 +176,7 @@ static IPTR CallFunction(struct InstData *data, UWORD function, IPTR *args, cons
         {
           STRPTR buffer;
 
-          if((buffer = AllocVec(16, MEMF_SHARED)) != NULL)
+          if((buffer = AllocVecShared(16, MEMF_ANY)) != NULL)
           {
             set(data->object, MUIA_TextEditor_CursorY, *(ULONG *)*args);
 
@@ -194,7 +194,7 @@ static IPTR CallFunction(struct InstData *data, UWORD function, IPTR *args, cons
         {
           STRPTR buffer;
 
-          if((buffer = AllocVec(16, MEMF_SHARED)) != NULL)
+          if((buffer = AllocVecShared(16, MEMF_ANY)) != NULL)
           {
             set(data->object, MUIA_TextEditor_CursorX, *(ULONG *)*args);
             // return the current column number, this may differ from the input value!
@@ -320,7 +320,7 @@ static IPTR CallFunction(struct InstData *data, UWORD function, IPTR *args, cons
       {
         STRPTR buffer;
 
-        if((buffer = AllocVec(data->actualline->line.Length+1, MEMF_SHARED)) != NULL)
+        if((buffer = AllocVecShared(data->actualline->line.Length+1, MEMF_ANY)) != NULL)
         {
           strlcpy(buffer, data->actualline->line.Contents, data->actualline->line.Length+1);
           result = (IPTR)buffer;
@@ -332,7 +332,7 @@ static IPTR CallFunction(struct InstData *data, UWORD function, IPTR *args, cons
       {
         STRPTR buffer;
 
-        if((buffer = AllocVec(16, MEMF_SHARED)) != NULL)
+        if((buffer = AllocVecShared(16, MEMF_ANY)) != NULL)
         {
           LONG pos = 0;
 

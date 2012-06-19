@@ -51,7 +51,7 @@ static struct TextFont *GetFont(UNUSED struct InstData *data, void *obj, long at
     int fontnameLen;
 
     fontnameLen = strlen(setting)+6;
-    if((fontname = AllocVec(fontnameLen, MEMF_SHARED|MEMF_CLEAR)) != NULL)
+    if((fontname = AllocVecShared(fontnameLen, MEMF_CLEAR)) != NULL)
     {
       char *sizePtr;
       struct TextAttr textAttr;

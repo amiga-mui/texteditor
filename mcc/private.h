@@ -47,13 +47,10 @@
 #define ITALIC    0x04
 #define COLOURED  0x08
 
-// define memory flags not existing on older platforms
-#ifndef MEMF_SHARED
-#if defined(__MORPHOS__)
-#define MEMF_SHARED MEMF_ANY
+#if defined(__amigaos4__)
+#define AllocVecShared(size, flags)  AllocVecTags((size), AVT_Type, (flags)|MEMF_SHARED, AVT_Lock, FALSE, ((flags)&MEMF_CLEAR) ? AVT_ClearWithValue : TAG_IGNORE, 0, TAG_DONE)
 #else
-#define MEMF_SHARED MEMF_PUBLIC
-#endif
+#define AllocVecShared(size, flags)  AllocVec((size), (flags))
 #endif
 
 #if defined(__MORPHOS__)
@@ -430,13 +427,6 @@ struct InstData
 // AllocBitMap.c
 struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG), REG(d1, LONG), REG(d2, LONG), REG(d3, LONG flags), REG(a0, struct BitMap *));
 void SAVEDS ASM MUIG_FreeBitMap(REG(a0, struct BitMap *));
-
-// AllocFunctions.c
-#if defined(__amigaos4__)
-#define SHARED_MEMFLAG          MEMF_SHARED
-#else
-#define SHARED_MEMFLAG          MEMF_ANY
-#endif
 
 // AllocFunctions.c
 struct line_node *AllocLine(struct InstData *);
