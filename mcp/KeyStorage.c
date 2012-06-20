@@ -140,7 +140,7 @@ void ConvertKeyString(STRPTR keystring, UWORD action, struct KeyAction *storage)
     ULONG length = strlen(keystring);
     char *buffer;
 
-    if((buffer = AllocVec(length + 2, MEMF_ANY)) != NULL)
+    if((buffer = AllocVecShared(length + 2, MEMF_ANY)) != NULL)
     {
       strlcpy(buffer, keystring, length + 1);
       buffer[length] = '\n';
@@ -472,7 +472,7 @@ void ExportKeys(struct InstData_MCP *data, void *config)
   c = xget(data->keybindings, MUIA_List_Entries);
   size = (c+1) * sizeof(struct te_key);
 
-  if((entries = (struct te_key *)AllocMem(size, MEMF_ANY)))
+  if((entries = (struct te_key *)AllocVecShared(size, MEMF_ANY)))
   {
       struct te_key *buffer = entries+c;
 
@@ -486,7 +486,7 @@ void ExportKeys(struct InstData_MCP *data, void *config)
       buffer->act  = entry->act;
     }
     DoMethod(config, MUIM_Dataspace_Add, entries, size, MUICFG_TextEditor_Keybindings);
-    FreeMem((APTR)entries, size);
+    FreeVec(entries);
   }
 }
 

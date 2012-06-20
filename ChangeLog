@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-06-20 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/KeyStorage.c: don't allocate locked memory here as well and replaced an
+    AllocMem() call by AllocVec().
+
 2012-06-19 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: don't allocate locked memory.
