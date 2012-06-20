@@ -39,6 +39,12 @@
 #define isFlagSet(mask, flag)           (((mask) & (flag)) == (flag))  // return TRUE if the flag is set
 #define isFlagClear(mask, flag)         (((mask) & (flag)) == 0)       // return TRUE if the flag is NOT set
 
+#if defined(__amigaos4__)
+#define AllocVecShared(size, flags)  AllocVecTags((size), AVT_Type, (flags)|MEMF_SHARED, AVT_Lock, FALSE, ((flags)&MEMF_CLEAR) ? AVT_ClearWithValue : TAG_IGNORE, 0, TAG_DONE)
+#else
+#define AllocVecShared(size, flags)  AllocVec((size), (flags))
+#endif
+
 // if something in our configuration setup (keybindings, etc)
 // has changed we can increase the config version so that TextEditor
 // will popup a warning about and obsolete configuration.
