@@ -337,8 +337,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 
             ScrollRasterBF(data->rport, 0, smooth,
                           _mleft(obj), data->realypos,
-                          _mleft(obj) + _mwidth(obj) - 1,
-                          data->realypos + (data->maxlines * data->fontheight) - 1);
+                          _mright(obj), data->realypos + (data->maxlines * data->fontheight) - 1);
 
             data->ypos = data->realypos - ti_Data%data->fontheight;
             line_nr = data->maxlines-(smooth/data->fontheight)-1;
