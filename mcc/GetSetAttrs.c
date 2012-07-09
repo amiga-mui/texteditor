@@ -65,7 +65,7 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       else
         cursor_width = data->CursorWidth;
 
-      xplace  = _mleft(data->object) + TextLength(&data->tmprp, &line->line.Contents[x-pos.x], pos.x);
+      xplace  = _mleft(obj) + TextLength(&data->tmprp, &line->line.Contents[x-pos.x], pos.x);
       xplace += FlowSpace(data, line->line.Flow, &line->line.Contents[pos.bytes]);
       yplace  = data->ypos + (data->fontheight * (line_nr + pos.lines - 1));
 
@@ -330,14 +330,14 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
             data->scr_direction = 0;
 
           oldhook = InstallLayerHook(data->rport->Layer, LAYERS_NOBACKFILL);
-          cliphandle = MUI_AddClipping(muiRenderInfo(data->object), _mleft(data->object), data->realypos, _mwidth(data->object), data->maxlines*data->fontheight);
+          cliphandle = MUI_AddClipping(muiRenderInfo(obj), _mleft(obj), data->realypos, _mwidth(obj), data->maxlines*data->fontheight);
           if(smooth > 0 && smooth < data->maxlines*data->fontheight)
           {
             LONG line_nr;
 
             ScrollRasterBF(data->rport, 0, smooth,
-                          _mleft(data->object), data->realypos,
-                          _mleft(data->object) + _mwidth(data->object) - 1,
+                          _mleft(obj), data->realypos,
+                          _mleft(obj) + _mwidth(obj) - 1,
                           data->realypos + (data->maxlines * data->fontheight) - 1);
 
             data->ypos = data->realypos - ti_Data%data->fontheight;
@@ -348,10 +348,10 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 
               if(layer->DamageList && layer->DamageList->RegionRectangle)
               {
-                if(MUI_BeginRefresh(muiRenderInfo(data->object),0))
+                if(MUI_BeginRefresh(muiRenderInfo(obj),0))
                 {
-                  MUI_Redraw(data->object, MADF_DRAWOBJECT);
-                  MUI_EndRefresh(muiRenderInfo(data->object), 0);
+                  MUI_Redraw(obj, MADF_DRAWOBJECT);
+                  MUI_EndRefresh(muiRenderInfo(obj), 0);
                 }
               }
             }
@@ -365,19 +365,18 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
               LONG lines;
 
               ScrollRasterBF(data->rport, 0, smooth,
-                            _mleft(data->object), data->realypos,
-                            _mleft(data->object) + _mwidth(data->object) - 1,
-                            data->realypos + (data->maxlines * data->fontheight) - 1);
+                            _mleft(obj), data->realypos,
+                            _mright(obj), data->realypos + (data->maxlines * data->fontheight) - 1);
               data->ypos = data->realypos - ti_Data%data->fontheight;
               lines = (-smooth/data->fontheight)+2;
               {
                 struct Layer *layer = data->rport->Layer;
 
                 if(layer->DamageList && layer->DamageList->RegionRectangle)
-                  if(MUI_BeginRefresh(muiRenderInfo(data->object),0))
+                  if(MUI_BeginRefresh(muiRenderInfo(obj),0))
                   {
-                    MUI_Redraw(data->object, MADF_DRAWOBJECT);
-                    MUI_EndRefresh(muiRenderInfo(data->object), 0);
+                    MUI_Redraw(obj, MADF_DRAWOBJECT);
+                    MUI_EndRefresh(muiRenderInfo(obj), 0);
                   }
               }
 
@@ -389,7 +388,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
                 DumpText(data, data->visual_y, 0, data->maxlines+1, FALSE);
             }
           }
-          MUI_RemoveClipping(muiRenderInfo(data->object), cliphandle);
+          MUI_RemoveClipping(muiRenderInfo(obj), cliphandle);
           InstallLayerHook(data->rport->Layer, oldhook);
 
           if(data->scrollaction == FALSE)
@@ -482,10 +481,10 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           clearFlag(data->flags, FLG_Quiet);
           MUI_Redraw(obj, MADF_DRAWOBJECT);
           if(data->maxlines > data->totallines)
-            set(data->object, MUIA_TextEditor_Prop_Entries, data->maxlines*data->fontheight);
+            set(obj, MUIA_TextEditor_Prop_Entries, data->maxlines*data->fontheight);
           else
-            set(data->object, MUIA_TextEditor_Prop_Entries, data->totallines*data->fontheight);
-          set(data->object, MUIA_TextEditor_Prop_First, (data->visual_y-1)*data->fontheight);
+            set(obj, MUIA_TextEditor_Prop_Entries, data->totallines*data->fontheight);
+          set(obj, MUIA_TextEditor_Prop_First, (data->visual_y-1)*data->fontheight);
         }
         break;
 

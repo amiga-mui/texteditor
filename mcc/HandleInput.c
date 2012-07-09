@@ -914,8 +914,8 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
             // user has pressed the left mousebutton
             if(imsg->Code == IECODE_LBUTTON)
             {
-              if(imsg->MouseX >= _left(data->object) &&
-                 imsg->MouseX <= _right(data->object) &&
+              if(imsg->MouseX >= _left(obj) &&
+                 imsg->MouseX <= _right(obj) &&
                  imsg->MouseY >= data->ypos &&
                  imsg->MouseY <  data->ypos+(data->maxlines * data->fontheight))
               {
@@ -966,7 +966,7 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                       if(data->DoubleClickHook != NULL)
                       {
                         // we have a user defined hook, let this one decide
-                        doubleClickHandled = CallHook(data->DoubleClickHook, data->object, data->actualline->line.Contents, data->CPos_X, imsg->Qualifier);
+                        doubleClickHandled = CallHook(data->DoubleClickHook, obj, data->actualline->line.Contents, data->CPos_X, imsg->Qualifier);
                       }
                       else
                       {
