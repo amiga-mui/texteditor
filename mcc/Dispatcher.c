@@ -76,14 +76,15 @@ void ResetDisplay(struct InstData *data)
     data->Flow = data->actualline->line.Flow;
     data->Separator = data->actualline->line.Separator;
     data->NoNotify = TRUE;
-    SetAttrs(data->object,  MUIA_TextEditor_Pen,            data->Pen,
-                    MUIA_TextEditor_Flow,         data->Flow,
-                    MUIA_TextEditor_Separator,        data->Separator,
-                    MUIA_TextEditor_Prop_Entries,     lines*data->fontheight,
-                    MUIA_TextEditor_Prop_Visible,     data->maxlines*data->fontheight,
-                    MUIA_TextEditor_Prop_First,     (data->visual_y-1)*data->fontheight,
-                    MUIA_TextEditor_Prop_DeltaFactor, data->fontheight,
-                    TAG_DONE);
+    SetAttrs(data->object,
+      MUIA_TextEditor_Pen,              data->Pen,
+      MUIA_TextEditor_Flow,             data->Flow,
+      MUIA_TextEditor_Separator,        data->Separator,
+      MUIA_TextEditor_Prop_Entries,     lines*data->fontheight,
+      MUIA_TextEditor_Prop_Visible,     data->maxlines*data->fontheight,
+      MUIA_TextEditor_Prop_First,       (data->visual_y-1)*data->fontheight,
+      MUIA_TextEditor_Prop_DeltaFactor, data->fontheight,
+      TAG_DONE);
     data->NoNotify = FALSE;
 
 
@@ -458,7 +459,7 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
 
   // initialize the doublebuffering rastport
   InitRastPort(&data->doublerp);
-  data->doublebuffer = MUIG_AllocBitMap(_mwidth(data->object)+((data->fontheight-data->font->tf_Baseline+1)>>1)+1, data->fontheight, GetBitMapAttr(data->rport->BitMap, BMA_DEPTH), (BMF_CLEAR | BMF_INTERLEAVED), data->rport->BitMap);
+  data->doublebuffer = MUIG_AllocBitMap(_mwidth(obj)+((data->fontheight-data->font->tf_Baseline+1)>>1)+1, data->fontheight, GetBitMapAttr(data->rport->BitMap, BMA_DEPTH), (BMF_CLEAR | BMF_INTERLEAVED), data->rport->BitMap);
   data->doublerp.BitMap = data->doublebuffer;
   SetFont(&data->doublerp, data->font);
 
@@ -530,9 +531,9 @@ static IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
     // we clear the very last part of the gadget
     // content at the very bottom because that one will not be
     // automatically cleared by PrintLine() later on
-    DoMethod(obj, MUIM_DrawBackground, _mleft(data->object), data->ypos+(data->fontheight * (data->maxlines)),
-                                       _mwidth(data->object), (_mheight(data->object)-(data->fontheight * (data->maxlines))),
-                                       _mleft(data->object), _mtop(data->object), 0);
+    DoMethod(obj, MUIM_DrawBackground, _mleft(obj), _mtop(obj)+(data->fontheight * (data->maxlines)),
+                                       _mwidth(obj), (_mheight(obj)-(data->fontheight * (data->maxlines))),
+                                       _mleft(obj), _mtop(obj), 0);
 
     // dump all text now
     DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
@@ -546,7 +547,7 @@ static IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
       SetDrMd(data->rport, JAM1);
       SetAPen(data->rport, _pens(obj)[MPEN_SHADOW]);
       SetAfPt(data->rport, newPattern, 1);
-      RectFill(data->rport, _left(data->object), _top(data->object), _right(data->object), _bottom(data->object));
+      RectFill(data->rport, _left(obj), _top(obj), _right(obj), _bottom(obj));
       SetAfPt(data->rport, NULL, (UBYTE)-1);
     }
   }

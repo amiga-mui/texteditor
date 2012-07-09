@@ -14,6 +14,7 @@ $URL$
     TAB. The "Wetter" application tries to import a text before the configuration
     has been parsed and this left the class with a TAB size of zero which then
     was used to replace TAB characters by spaces. This closes bug #3536338.
+  * mcc/misc: replaced several indirect object pointers by direct ones.
 
 2012-06-20 Thore Böckelmann <tboeckel@gmx.de>
 

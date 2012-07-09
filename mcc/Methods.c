@@ -238,7 +238,7 @@ IPTR mInputTrigger(struct IClass *cl, Object *obj, UNUSED Msg msg)
       if(move != 1 && move != -1)
         move  = (move*2)/3;
 
-      set(data->object, MUIA_TextEditor_Prop_First, (data->visual_y-1)*data->fontheight+(data->realypos-data->ypos)+move);
+      set(obj, MUIA_TextEditor_Prop_First, (data->visual_y-1)*data->fontheight+(data->realypos-data->ypos)+move);
     }
     else
     {
@@ -254,13 +254,13 @@ IPTR mInputTrigger(struct IClass *cl, Object *obj, UNUSED Msg msg)
 
   if(data->mousemove == TRUE)
   {
-    LONG MouseX = _window(data->object)->MouseX;
-    LONG MouseY = _window(data->object)->MouseY;
+    LONG MouseX = _window(obj)->MouseX;
+    LONG MouseY = _window(obj)->MouseY;
     LONG oldCPos_X = data->CPos_X;
     struct line_node *oldactualline = data->actualline;
     BOOL scroll = TRUE;
 
-    if(xget(_win(data->object), MUIA_Window_Activate) == FALSE)
+    if(xget(_win(obj), MUIA_Window_Activate) == FALSE)
     {
       data->mousemove = FALSE;
       RejectInput(data);
@@ -323,7 +323,7 @@ IPTR mInputTrigger(struct IClass *cl, Object *obj, UNUSED Msg msg)
       NiceBlock(&data->blockinfo, &tmpblock);
       if(data->blockinfo.startx == tmpblock.startx && data->blockinfo.startline == tmpblock.startline)
       {
-        if(MouseX > _mleft(data->object))
+        if(MouseX > _mleft(obj))
         {
           if(data->selectmode == 1)
           {
@@ -345,7 +345,7 @@ IPTR mInputTrigger(struct IClass *cl, Object *obj, UNUSED Msg msg)
         OffsetToLines(data, data->CPos_X, data->actualline, &pos);
         flow = FlowSpace(data, data->actualline->line.Flow, &data->actualline->line.Contents[pos.bytes]);
 
-        if(MouseX <= (LONG)(_mleft(data->object)+flow+TextLengthNew(&data->tmprp, &data->actualline->line.Contents[pos.bytes], pos.extra-pos.bytes-1, data->TabSizePixels)))
+        if(MouseX <= (LONG)(_mleft(obj)+flow+TextLengthNew(&data->tmprp, &data->actualline->line.Contents[pos.bytes], pos.extra-pos.bytes-1, data->TabSizePixels)))
         {
           if(data->selectmode == 1)
           {
