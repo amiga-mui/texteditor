@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-07-09 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/EditorStuff.c: added some more boundary checks when inserting or deleting
+    a range of characters. I hope this makes it possible to track down those
+    mysterious crashed during UpdateChange().
+
 2012-06-20 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/KeyStorage.c: don't allocate locked memory here as well and replaced an

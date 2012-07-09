@@ -1245,13 +1245,10 @@ static void UpdateChange(struct InstData *data, LONG x, struct line_node *line, 
 
   do
   {
-    width = LineCharsWidth(data, line->line.Contents + skip);
+    width = LineCharsWidth(data, &line->line.Contents[skip]);
 
     // don't exceed the line length!
-    if(skip > (LONG)line->line.Length)
-      break;
-
-    if(width <= 0 || skip + width >= x)
+    if(width <= 0 || skip + width >= x || skip + width >= (LONG)line->line.Length)
       break;
 
     lineabove_width = width;
@@ -1262,10 +1259,14 @@ static void UpdateChange(struct InstData *data, LONG x, struct line_node *line, 
 
   if(characters != NULL)
   {
+    // make some room for the additional characters
     memmove(&line->line.Contents[x+length], &line->line.Contents[x], strlen(&line->line.Contents[x])+1);
+    // insert them
     memcpy(&line->line.Contents[x], characters, length);
+    // adjust the length information
     width += length;
     line->line.Length += length;
+    // correct the styles
     if(buffer != NULL)
     {
       UWORD style = buffer->del.style;
@@ -1280,7 +1281,9 @@ static void UpdateChange(struct InstData *data, LONG x, struct line_node *line, 
   }
   else
   {
+    // remove the requested amount of characters
     strlcpy(&line->line.Contents[x], &line->line.Contents[x+length], line->line.Length-length+1);
+    // adjust the length information
     width -= length;
     line->line.Length -= length;
   }
@@ -1310,17 +1313,20 @@ static void UpdateChange(struct InstData *data, LONG x, struct line_node *line, 
 
   if(orgline_nr != line_nr)
   {
-    if(lineabove_width != LineCharsWidth(data, &line->line.Contents[skip-lineabove_width]))
+    if(skip-lineabove_width >= 0 && skip-lineabove_width < (LONG)line->line.Length)
     {
-      LONG newwidth;
-
-      newwidth = PrintLine(data, skip-lineabove_width, line, line_nr-1, TRUE) - lineabove_width;
-      skip  += newwidth;
-      width -= newwidth;
-      if(skip >= (LONG)line->line.Length)
+      if(lineabove_width != LineCharsWidth(data, &line->line.Contents[skip-lineabove_width]))
       {
-        LEAVE();
-        return;
+        LONG newwidth;
+
+        newwidth = PrintLine(data, skip-lineabove_width, line, line_nr-1, TRUE) - lineabove_width;
+        skip  += newwidth;
+        width -= newwidth;
+        if(skip < 0 || skip >= (LONG)line->line.Length)
+        {
+          LEAVE();
+          return;
+        }
       }
     }
   }
