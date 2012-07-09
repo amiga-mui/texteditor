@@ -155,6 +155,8 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             data->WrapBorder = 0;
             data->WrapMode = MUIV_TextEditor_WrapMode_HardWrap;
             data->WrapWords = TRUE; // wrap at word boundaries
+            data->TabSize = 4; // default to 4 spaces per TAB
+            data->TabSizePixels = 4*8; // assume a fixed space width of 8 pixels per default
             data->ConvertTabs = TRUE; // convert tab to spaces per default
 
             data->ExportHook = &ExportHookPlain;

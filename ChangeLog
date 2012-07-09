@@ -10,6 +10,10 @@ $URL$
   * mcc/EditorStuff.c: added some more boundary checks when inserting or deleting
     a range of characters. I hope this makes it possible to track down those
     mysterious crashed during UpdateChange().
+  * mcc/Dispatcher.c, mcc/ImportHook.c: assume a default TAB size of 4 spaces per
+    TAB. The "Wetter" application tries to import a text before the configuration
+    has been parsed and this left the class with a TAB size of zero which then
+    was used to replace TAB characters by spaces. This closes bug #3536338.
 
 2012-06-20 Thore Böckelmann <tboeckel@gmx.de>
 

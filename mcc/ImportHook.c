@@ -211,6 +211,14 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 
   ENTER();
 
+  // check for a valid TAB size
+  if(msg->TabSize <= 0)
+  {
+    E(DBF_IMPORT, "invalid TAB size %ld", msg->TabSize);
+    // assume the default TAB size to avoid a division by zero
+    msg->TabSize = 4;
+  }
+
   if((eol = FindEOL(src, msg->ConvertTabs == FALSE ? NULL : &tabs)) != NULL)
   {
     int len;
