@@ -57,7 +57,7 @@ void AddClipping(struct InstData *data)
 
   if(data->clipcount++ == 0)
   {
-    data->cliphandle = MUI_AddClipping(muiRenderInfo(data->object), _mleft(data->object), data->realypos, _mwidth(data->object), _mheight(data->object));
+    data->cliphandle = MUI_AddClipping(muiRenderInfo(data->object), _mleft(data->object), _mtop(data->object), _mwidth(data->object), _mheight(data->object));
   }
 
   LEAVE();
@@ -414,7 +414,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
   if(Enabled(data) ||
      data->update == FALSE ||
      (data->scrollaction == TRUE && Set == TRUE) ||
-     data->ypos != data->realypos ||
+     data->ypos != _mtop(data->object) ||
      data->shown == FALSE ||
      isFlagSet(data->flags, FLG_ReadOnly) ||
      isFlagSet(data->flags, FLG_Quiet) ||
@@ -461,16 +461,16 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
 
     //D(DBF_STARTUP, "xplace: %ld, yplace: %ld cplace: %ld, innerwidth: %ld width: %ld %ld", xplace, yplace, cursorxplace, _mwidth(data->object), _width(data->object), _mleft(data->object));
 
-    if(xplace < (ULONG)(_mleft(data->object)+_mwidth(data->object)))
+    if(xplace <= (ULONG)_mright(data->object))
     {
       // if font is anti aliased, clear area near the cursor first
       if(IS_ANTIALIASED(data->font))
       {
         DoMethod(data->object, MUIM_DrawBackground, xplace, yplace,
-                                                    TextLengthNew(&data->tmprp, start == 0 ? (STRPTR)chars+1 : (STRPTR)chars, stop-start+1, data->TabSizePixels), 
+                                                    TextLengthNew(&data->tmprp, start == 0 ? (STRPTR)chars+1 : (STRPTR)chars, stop-start+1, data->TabSizePixels),
                                                     data->fontheight,
                                                     cursorxplace - (isFlagSet(data->flags, FLG_InVGrp) ? _mleft(data->object) : 0),
-                                                    (isFlagSet(data->flags, FLG_InVGrp) ? 0 : data->realypos) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
+                                                    (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mtop(data->object)) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
                                                     0);
       }
 
@@ -498,7 +498,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
               DoMethod(data->object, MUIM_DrawBackground, cursorxplace, yplace,
                                                           cwidth, data->fontheight,
                                                           cursorxplace - (isFlagSet(data->flags, FLG_InVGrp) ? _mleft(data->object) : 0),
-                                                          (isFlagSet(data->flags, FLG_InVGrp) ? 0 : data->realypos) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
+                                                          (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mtop(data->object)) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
                                                           0);
             }
           }
@@ -509,7 +509,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
             DoMethod(data->object, MUIM_DrawBackground, cursorxplace+1, yplace+1,
                                                         cwidth-2, data->fontheight-2,
                                                         cursorxplace - (isFlagSet(data->flags, FLG_InVGrp) ? _mleft(data->object) : 0),
-                                                        (isFlagSet(data->flags, FLG_InVGrp) ? 0 : data->realypos) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
+                                                        (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mtop(data->object)) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
                                                         0);
           }
 
@@ -537,7 +537,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
           DoMethod(data->object, MUIM_DrawBackground, cursorxplace, yplace,
                                                       cwidth, data->fontheight,
                                                       cursorxplace - (isFlagSet(data->flags, FLG_InVGrp) ? _mleft(data->object) : 0),
-                                                      (isFlagSet(data->flags, FLG_InVGrp) ? 0 : data->realypos) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
+                                                      (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mtop(data->object)) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
                                                       0);
         }
 
@@ -648,7 +648,7 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
             _mwidth(data->object),
             (data->maxlines*data->fontheight) - ((data->totallines-data->visual_y+1)*data->fontheight),
             (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mleft(data->object)),
-            (isFlagSet(data->flags, FLG_InVGrp) ? 0 : data->realypos) + data->totallines*data->fontheight);
+            (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mtop(data->object)) + data->totallines*data->fontheight);
 
       if(isFlagSet(data->flags, FLG_Ghosted) && isFlagClear(data->flags, FLG_MUI4))
       {
@@ -670,7 +670,7 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
         RectFill(data->rport,
               _mleft(data->object),
               data->ypos+((data->totallines-data->visual_y+1)*data->fontheight),
-              _mleft(data->object)+_mwidth(data->object)-1,
+              _mright(data->object),
               data->ypos+((data->totallines-data->visual_y+1)*data->fontheight)+(data->maxlines*data->fontheight) - ((data->totallines-data->visual_y+1)*data->fontheight)-1);
         SetAfPt(data->rport, NULL, (UBYTE)-1);
       }
@@ -713,7 +713,7 @@ void ScrollUp(struct InstData *data, LONG line_nr, LONG lines)
       oldhook = InstallLayerHook(data->rport->Layer, LAYERS_NOBACKFILL);
       ScrollRasterBF(data->rport, 0, data->fontheight * lines,
                     _mleft(data->object), data->ypos + (data->fontheight * line_nr),
-                    _mleft(data->object) + _mwidth(data->object) - 1, (data->ypos + data->maxlines * data->fontheight) - 1);
+                    _mright(data->object), (data->ypos + data->maxlines * data->fontheight) - 1);
       InstallLayerHook(data->rport->Layer, oldhook);
 
       {
@@ -744,7 +744,7 @@ void ScrollUp(struct InstData *data, LONG line_nr, LONG lines)
               _mwidth(data->object),
               data->fontheight,
               _mleft(data->object),
-              (isFlagSet(data->flags, FLG_InVGrp) ? 0 : data->realypos) + (data->visual_y+data->maxlines-1)*data->fontheight);
+              (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mtop(data->object)) + (data->visual_y+data->maxlines-1)*data->fontheight);
         }
       }
       else
@@ -789,7 +789,7 @@ void ScrollDown(struct InstData *data, LONG line_nr, LONG lines)
       oldhook = InstallLayerHook(data->rport->Layer, LAYERS_NOBACKFILL);
       ScrollRasterBF(data->rport, 0, -data->fontheight * lines,
                     _mleft(data->object), data->ypos + (data->fontheight * line_nr),
-                    _mleft(data->object) + _mwidth(data->object) - 1, data->ypos + (data->maxlines * data->fontheight) - 1);
+                    _mright(data->object), data->ypos + (data->maxlines * data->fontheight) - 1);
       InstallLayerHook(data->rport->Layer, oldhook);
 
       {

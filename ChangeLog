@@ -15,6 +15,8 @@ $URL$
     has been parsed and this left the class with a TAB size of zero which then
     was used to replace TAB characters by spaces. This closes bug #3536338.
   * mcc/misc: replaced several indirect object pointers by direct ones.
+  * mcc/misc: removed a global variable to keep the object's top position. This
+    value is better obtained by using _mtop(obj).
 
 2012-06-20 Thore Böckelmann <tboeckel@gmx.de>
 

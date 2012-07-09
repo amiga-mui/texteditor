@@ -314,10 +314,10 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_TextEditor_Prop_First:
       {
-        if(((data->visual_y-1)*data->fontheight+(data->realypos - data->ypos) != (LONG)ti_Data) && data->shown == TRUE)
+        if(((data->visual_y-1)*data->fontheight+(_mtop(obj) - data->ypos) != (LONG)ti_Data) && data->shown == TRUE)
         {
           LONG     smooth;
-          LONG     lastpixel = ((data->visual_y-1)*data->fontheight) + (data->realypos - data->ypos);
+          LONG     lastpixel = ((data->visual_y-1)*data->fontheight) + (_mtop(obj) - data->ypos);
           struct   Hook  *oldhook;
           void    *cliphandle;
 
@@ -330,16 +330,16 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
             data->scr_direction = 0;
 
           oldhook = InstallLayerHook(data->rport->Layer, LAYERS_NOBACKFILL);
-          cliphandle = MUI_AddClipping(muiRenderInfo(obj), _mleft(obj), data->realypos, _mwidth(obj), data->maxlines*data->fontheight);
+          cliphandle = MUI_AddClipping(muiRenderInfo(obj), _mleft(obj), _mtop(obj), _mwidth(obj), data->maxlines*data->fontheight);
           if(smooth > 0 && smooth < data->maxlines*data->fontheight)
           {
             LONG line_nr;
 
             ScrollRasterBF(data->rport, 0, smooth,
-                          _mleft(obj), data->realypos,
-                          _mright(obj), data->realypos + (data->maxlines * data->fontheight) - 1);
+                          _mleft(obj), _mtop(obj),
+                          _mright(obj), _mtop(obj) + (data->maxlines * data->fontheight) - 1);
 
-            data->ypos = data->realypos - ti_Data%data->fontheight;
+            data->ypos = _mtop(obj) - ti_Data%data->fontheight;
             line_nr = data->maxlines-(smooth/data->fontheight)-1;
 
             {
@@ -364,9 +364,9 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
               LONG lines;
 
               ScrollRasterBF(data->rport, 0, smooth,
-                            _mleft(obj), data->realypos,
-                            _mright(obj), data->realypos + (data->maxlines * data->fontheight) - 1);
-              data->ypos = data->realypos - ti_Data%data->fontheight;
+                            _mleft(obj), _mtop(obj),
+                            _mright(obj), _mtop(obj) + (data->maxlines * data->fontheight) - 1);
+              data->ypos = _mtop(obj) - ti_Data%data->fontheight;
               lines = (-smooth/data->fontheight)+2;
               {
                 struct Layer *layer = data->rport->Layer;

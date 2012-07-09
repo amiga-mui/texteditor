@@ -226,19 +226,19 @@ IPTR mInputTrigger(struct IClass *cl, Object *obj, UNUSED Msg msg)
 
   if(data->smooth_wait == 1 && data->scrollaction == TRUE)
   {
-    if(data->ypos != data->realypos)
+    if(data->ypos != _mtop(obj))
     {
       LONG  move;
 
       if(data->scr_direction)
-        move = data->fontheight-(data->realypos-data->ypos);
+        move = data->fontheight-(_mtop(obj)-data->ypos);
       else
-        move = -(data->realypos-data->ypos);
+        move = -(_mtop(obj)-data->ypos);
 
       if(move != 1 && move != -1)
         move  = (move*2)/3;
 
-      set(obj, MUIA_TextEditor_Prop_First, (data->visual_y-1)*data->fontheight+(data->realypos-data->ypos)+move);
+      set(obj, MUIA_TextEditor_Prop_First, (data->visual_y-1)*data->fontheight+(_mtop(obj)-data->ypos)+move);
     }
     else
     {
