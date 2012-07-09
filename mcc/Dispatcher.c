@@ -425,7 +425,6 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
   data->fontheight  = data->font->tf_YSize;
   data->maxlines    = _mheight(obj) / data->fontheight;
   data->ypos        = _mtop(obj);
-  data->realypos    = _mtop(obj);
 
   line = data->firstline;
   while(line != NULL)

@@ -218,7 +218,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       DoMethod(data->object, MUIM_DrawBackground, xoffset, starty,
                                                   flow+blockstart, data->fontheight,
                                                   isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mleft(data->object),
-                                                  isFlagSet(data->flags, FLG_InVGrp) ? data->fontheight*(data->visual_y+line_nr-2) : data->realypos+data->fontheight * (data->visual_y+line_nr-2),
+                                                  isFlagSet(data->flags, FLG_InVGrp) ? data->fontheight*(data->visual_y+line_nr-2) : _mtop(data->object)+data->fontheight * (data->visual_y+line_nr-2),
                                                   0);
 
       if(blockwidth)
@@ -263,7 +263,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
             DoMethod(data->object, MUIM_DrawBackground, xoffset+flow+blockstart+1, starty+1,
                                                         blockwidth-2, data->fontheight-2,
                                                         isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mleft(data->object),
-                                                        isFlagSet(data->flags, FLG_InVGrp) ? data->fontheight*(data->visual_y+line_nr-2) : data->realypos+data->fontheight * (data->visual_y+line_nr-2),
+                                                        isFlagSet(data->flags, FLG_InVGrp) ? data->fontheight*(data->visual_y+line_nr-2) : _mtop(data->object)+data->fontheight * (data->visual_y+line_nr-2),
                                                         0);
           }
         }
@@ -287,7 +287,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         if(isFlagClear(data->flags, FLG_InVGrp))
         {
           x_ptrn += _mleft(data->object);
-          y_ptrn += data->realypos;
+          y_ptrn += _mtop(data->object);
         }
 
         DoMethod(data->object, MUIM_DrawBackground, x_start, y_start, x_width, y_width, x_ptrn, y_ptrn);
@@ -437,15 +437,15 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     {
       if(line_nr == 1)
       {
-        BltBitMapRastPort(rp->BitMap, xoffset, data->realypos-data->ypos, data->rport, _mleft(data->object), data->realypos+(data->fontheight * (line_nr-1)), _mwidth(data->object), data->fontheight-(data->realypos-data->ypos), (ABC|ABNC));
+        BltBitMapRastPort(rp->BitMap, xoffset, _mtop(data->object)-data->ypos, data->rport, _mleft(data->object), _mtop(data->object)+(data->fontheight * (line_nr-1)), _mwidth(data->object), data->fontheight-(_mtop(data->object)-data->ypos), (ABC|ABNC));
       }
       else
       {
         if(line_nr == data->maxlines+1)
         {
-          if(data->realypos != data->ypos)
+          if(_mtop(data->object) != data->ypos)
           {
-            BltBitMapRastPort(rp->BitMap, xoffset, 0, data->rport, _mleft(data->object), data->ypos+(data->fontheight * (line_nr-1)), _mwidth(data->object), data->realypos-data->ypos, (ABC|ABNC));
+            BltBitMapRastPort(rp->BitMap, xoffset, 0, data->rport, _mleft(data->object), data->ypos+(data->fontheight * (line_nr-1)), _mwidth(data->object), _mtop(data->object)-data->ypos, (ABC|ABNC));
           }
         }
         else

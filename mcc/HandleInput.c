@@ -798,7 +798,7 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
         {
           D(DBF_INPUT, "HandleInput rawkey code=%02x qual=%04x", imsg->Code, imsg->Qualifier);
 
-          if(data->ypos != data->realypos ||
+          if(data->ypos != _mtop(obj) ||
              (wasActivated && (msg->muikey == MUIKEY_GADGET_NEXT || imsg->Code == 0x42))) // ignore TAB key if the gadget was activated recently
           {
             RETURN(MUI_EventHandlerRC_Eat);
@@ -895,7 +895,7 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 
         case IDCMP_MOUSEBUTTONS:
         {
-          if(data->ypos != data->realypos)
+          if(data->ypos != _mtop(obj))
           {
             RETURN(0);
             return(0);

@@ -306,7 +306,6 @@ struct Grow
 struct InstData
 {
   WORD    ypos;             // ypos of gadget
-  WORD    realypos;
   UWORD   fontheight;       // font height
 
   UWORD   CPos_X;           // Cursor x pos.
