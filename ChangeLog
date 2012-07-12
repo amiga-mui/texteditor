@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-07-12 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/EditorStuff.c: use memmove() instead of strlcpy() when moving characters
+    backwards as the regions may overlap.
+
 2012-07-09 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: added some more boundary checks when inserting or deleting
