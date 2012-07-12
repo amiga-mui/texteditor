@@ -9,6 +9,8 @@ $URL$
 
   * mcc/EditorStuff.c: use memmove() instead of strlcpy() when moving characters
     backwards as the regions may overlap.
+  * mcc/EditorStuff.c: rely on the existing line length information instead of
+    calculating it from scratch when inserting or removing characters.
 
 2012-07-09 Thore Böckelmann <tboeckel@gmx.de>
 
