@@ -1260,7 +1260,7 @@ static void UpdateChange(struct InstData *data, LONG x, struct line_node *line, 
   if(characters != NULL)
   {
     // make some room for the additional characters
-    memmove(&line->line.Contents[x+length], &line->line.Contents[x], strlen(&line->line.Contents[x])+1);
+    memmove(&line->line.Contents[x+length], &line->line.Contents[x], line->line.Length-x+1);
     // insert them
     memcpy(&line->line.Contents[x], characters, length);
     // adjust the length information
@@ -1282,7 +1282,7 @@ static void UpdateChange(struct InstData *data, LONG x, struct line_node *line, 
   else
   {
     // remove the requested amount of characters
-    memmove(&line->line.Contents[x], &line->line.Contents[x+length], line->line.Length-length+1);
+    memmove(&line->line.Contents[x], &line->line.Contents[x+length], line->line.Length-x+1-length);
     // adjust the length information
     width -= length;
     line->line.Length -= length;
