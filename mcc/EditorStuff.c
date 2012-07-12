@@ -1282,7 +1282,7 @@ static void UpdateChange(struct InstData *data, LONG x, struct line_node *line, 
   else
   {
     // remove the requested amount of characters
-    strlcpy(&line->line.Contents[x], &line->line.Contents[x+length], line->line.Length-length+1);
+    memmove(&line->line.Contents[x], &line->line.Contents[x+length], line->line.Length-length+1);
     // adjust the length information
     width -= length;
     line->line.Length -= length;
