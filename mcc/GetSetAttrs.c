@@ -743,7 +743,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
                 ResetUndoBuffer(data);
                 result = TRUE;
               }
-	        }
+            }
 
             FreeVec((APTR)buff);
           }
