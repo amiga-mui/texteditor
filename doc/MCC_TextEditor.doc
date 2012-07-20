@@ -239,8 +239,17 @@ TextEditor.mcc/MUIM_TextEditor_Search
         a text buffer, but if you have supplied your own import hook, then you
         can set this to anything you like, e.g. a filehandle.
 
+    NOTE
+        Setting a text content BEFORE the class has executed the MUIM_Setup
+        method will use the global default settings! This means that with active
+        TAB conversion TAB characters within the text will be converted using the
+        default TAB size of 4 spaces, no matter what the user has configured!
+        The better solution is to wait until MUIM_Setup has successully returned
+        and set the editor's initial content after that to ensure that the user
+        gets what he/she is expecting.
+
     SEE ALSO
-        MUIA_TextEditor_ImportHook
+        MUIA_TextEditor_ConvertTabs, MUIA_TextEditor_ImportHook
         MUIM_TextEditor_InsertText
 
 TextEditor.mcc/MUIA_TextEditor_ConvertTabs
@@ -983,7 +992,7 @@ TextEditor.mcc/MUIM_TextEditor_Search
         at which text should be wrapped to the next line (i.e. 'autowrap').
 
         However, the way wrapping is done depends on the actual 'WrapMode'
-        that was specified by MUIA_TextEditor_WrapMode. In addition, 
+        that was specified by MUIA_TextEditor_WrapMode. In addition,
         MUIA_TextEditor_WrapWords will allow to set if TextEditor will wrap
         at word boundaries or not.
 

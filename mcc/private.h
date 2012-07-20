@@ -682,7 +682,6 @@ enum
   FLG_ActiveOnClick  = 1L << 20, // should the gadget activated on click
   FLG_PasteStyles    = 1L << 21, // respect styles when pasting text
   FLG_PasteColors    = 1L << 22, // respect colors when pasting text
-  FLG_SetupDone      = 1L << 23, // MUIM_Setup was finished successfully
   FLG_MUI4           = 1L << 31, // running under MUI4
 
   FLG_NumberOf
