@@ -309,9 +309,6 @@ static IPTR mSetup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
       data->smooth_wait = 0;
       data->scrollaction = FALSE;
 
-      // remember the successful MUIM_Setup
-      setFlag(data->flags, FLG_SetupDone);
-
       result = TRUE;
     }
   }
@@ -349,9 +346,6 @@ static IPTR mCleanup(struct IClass *cl, Object *obj, Msg msg)
   }
 
   FreeConfig(data, muiRenderInfo(obj));
-
-  // forget the successful MUIM_Setup
-  clearFlag(data->flags, FLG_SetupDone);
 
   result = DoSuperMethodA(cl, obj, msg);
 
