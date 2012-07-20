@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-07-20 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/GetSetAttrs.c: fixed a potential memory leak in case importing a text
+    failed. In this case the former text buffer was not freed.
+
 2012-07-12 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: use memmove() instead of strlcpy() when moving characters
@@ -14,13 +19,14 @@ $URL$
 
 2012-07-09 Thore Böckelmann <tboeckel@gmx.de>
 
-  * mcc/EditorStuff.c: added some more boundary checks when inserting or deleting
-    a range of characters. I hope this makes it possible to track down those
-    mysterious crashed during UpdateChange().
-  * mcc/Dispatcher.c, mcc/ImportHook.c: assume a default TAB size of 4 spaces per
-    TAB. The "Wetter" application tries to import a text before the configuration
-    has been parsed and this left the class with a TAB size of zero which then
-    was used to replace TAB characters by spaces. This closes bug #3536338.
+  * mcc/EditorStuff.c: added some more boundary checks when inserting or
+    deleting a range of characters. I hope this makes it possible to track down
+    those mysterious crashed during UpdateChange().
+  * mcc/Dispatcher.c, mcc/ImportHook.c: assume a default TAB size of 4 spaces
+    per TAB. The "Wetter" application tries to import a text before the
+    configuration has been parsed and this left the class with a TAB size of
+    zero which then was used to replace TAB characters by spaces. This closes
+    bug #3536338.
   * mcc/misc: replaced several indirect object pointers by direct ones.
   * mcc/misc: removed a global variable to keep the object's top position. This
     value is better obtained by using _mtop(obj).
