@@ -38,6 +38,7 @@ TextEditor.mcc/MUIA_TextEditor_Slider
 TextEditor.mcc/MUIA_TextEditor_StyleBold
 TextEditor.mcc/MUIA_TextEditor_StyleItalic
 TextEditor.mcc/MUIA_TextEditor_StyleUnderline
+TextEditor.mcc/MUIA_TextEditor_TabSize
 TextEditor.mcc/MUIA_TextEditor_TypeAndSpell
 TextEditor.mcc/MUIA_TextEditor_UndoAvailable
 TextEditor.mcc/MUIA_TextEditor_UndoLevels
@@ -935,6 +936,26 @@ TextEditor.mcc/MUIM_TextEditor_Search
 
     SEE ALSO
         MUIA_TextEditor_StyleBold, MUIA_TextEditor_StyleItalic
+
+TextEditor.mcc/MUIA_TextEditor_TabSize
+
+    NAME
+        MUIA_TextEditor_TabSize -- [ISG], ULONG
+
+    SPECIAL INPUTS
+        MUIV_TextEditor_TabSize_Default
+
+    FUNCTION
+        This tag overrides the global TAB size as configured by MUI prefs if
+        a specific number of spaces per TAB needs to be enforced.
+        Use MUIV_TextEditor_TabSize_Default to reset the value to the user
+        configured value. Valid values range from 2 to 12 spaces per TAB
+        character.
+        Use this attribute with care as it contradicts the MUI philosophy to
+        let the user choose the settings.
+
+    SEE ALSO
+        MUIA_TextEditor_ConvertTabs
 
 TextEditor.mcc/MUIA_TextEditor_TypeAndSpell
 

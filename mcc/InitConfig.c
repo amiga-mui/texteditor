@@ -107,7 +107,7 @@ void InitConfig(struct IClass *cl, Object *obj)
   struct InstData *data = INST_DATA(cl, obj);
   IPTR setting = 0;
   BOOL loadDefaultKeys = FALSE;
-  LONG oldTabSize = data->TabSize;
+  ULONG oldTabSize = data->TabSize;
 
   ENTER();
 
@@ -160,9 +160,22 @@ void InitConfig(struct IClass *cl, Object *obj)
     data->fastbackground = FALSE;
 
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_TabSize, &setting))
-    data->TabSize = MINMAX(2, *(long *)setting, 12);
+  {
+    ULONG size = MINMAX(2, *(ULONG *)setting, 12);
+
+    // use the configured value only if the TAB size is not yet overridden
+    if(flagIsClear(data->flags, FLG_ForcedTabSize))
+      data->TabSize = size;
+
+    // remember the configured value in case the TAB size is being reset to the default value
+    data->GlobalTabSize = size;
+  }
   else
+  {
+    // assume the default value for both
     data->TabSize = 4;
+    data->GlobalTabSize = 4;
+  }
 
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_CursorWidth, &setting))
     data->CursorWidth = MINMAX(1, *(long *)setting, 6);
