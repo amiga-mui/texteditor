@@ -158,31 +158,24 @@ void InitConfig(struct InstData *data, Object *obj)
     data->fastbackground = FALSE;
 
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_TabSize, &setting))
-  {
-    data->TabSize = *(long *)setting;
-    if(data->TabSize > 12)
-      data->TabSize = 4;
-  }
+    data->TabSize = MINMAX(2, *(long *)setting, 12);
   else
     data->TabSize = 4;
 
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_CursorWidth, &setting))
-  {
-    data->CursorWidth = *(long *)setting;
-    if(data->CursorWidth > 6)
-      data->CursorWidth = 6;
-  }
+    data->CursorWidth = MINMAX(1, *(long *)setting, 6);
   else
     data->CursorWidth = 6;
 
-  data->normalfont  = GetFont(data, obj, MUICFG_TextEditor_NormalFont);
-  data->fixedfont   = GetFont(data, obj, MUICFG_TextEditor_FixedFont);
+  data->normalfont = GetFont(data, obj, MUICFG_TextEditor_NormalFont);
+  data->fixedfont = GetFont(data, obj, MUICFG_TextEditor_FixedFont);
   data->font = (data->use_fixedfont == TRUE) ? data->fixedfont : data->normalfont;
 
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_BlockQual, &setting))
   {
     switch(*(LONG *)setting)
     {
+      default:
       case 0:
         data->blockqual = IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT;
         break;
@@ -197,15 +190,16 @@ void InitConfig(struct InstData *data, Object *obj)
         break;
     }
   }
-  else  data->blockqual = IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT;
+  else
+    data->blockqual = IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT;
 
   data->BlinkSpeed = FALSE;
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_BlinkSpeed, &setting))
   {
-    if(*(LONG *)setting)
+    if(*(LONG *)setting != 0)
     {
       data->blinkhandler.ihn_Object    = obj;
-      data->blinkhandler.ihn_Millis    = *(LONG *)setting*25;
+      data->blinkhandler.ihn_Millis    = MINMAX(1, *(LONG *)setting, 20)*25;
       data->blinkhandler.ihn_Method    = MUIM_TextEditor_ToggleCursor;
       data->blinkhandler.ihn_Flags     = MUIIHNF_TIMER;
       data->BlinkSpeed = 1;
@@ -215,8 +209,9 @@ void InitConfig(struct InstData *data, Object *obj)
   if(isFlagClear(data->flags, FLG_OwnFrame))
   {
     if(MUIMasterBase->lib_Version >= 20)
-        set(obj, MUIA_Frame, DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_Frame, &setting) ? (STRPTR)setting : (STRPTR)"302200");
-    else  set(obj, MUIA_Frame, MUIV_Frame_String);
+      set(obj, MUIA_Frame, DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_Frame, &setting) ? (STRPTR)setting : (STRPTR)"302200");
+    else
+      set(obj, MUIA_Frame, MUIV_Frame_String);
   }
 
   data->TypeAndSpell = FALSE;
@@ -243,15 +238,14 @@ void InitConfig(struct InstData *data, Object *obj)
     setFlag(data->flags, FLG_FirstInit);
     data->NoNotify = TRUE;
     SetAttrs(obj,
-            MUIA_FillArea,              FALSE,
-            MUIA_TextEditor_Flow,       data->Flow,
-            MUIA_TextEditor_Pen,          data->Pen,
-            MUIA_TextEditor_AreaMarked,   FALSE,
-            MUIA_TextEditor_UndoAvailable,  FALSE,
-            MUIA_TextEditor_RedoAvailable,  FALSE,
-            MUIA_TextEditor_HasChanged,   FALSE,
-
-            TAG_DONE);
+      MUIA_FillArea, FALSE,
+      MUIA_TextEditor_Flow, data->Flow,
+      MUIA_TextEditor_Pen, data->Pen,
+      MUIA_TextEditor_AreaMarked, FALSE,
+      MUIA_TextEditor_UndoAvailable, FALSE,
+      MUIA_TextEditor_RedoAvailable, FALSE,
+      MUIA_TextEditor_HasChanged, FALSE,
+      TAG_DONE);
     data->NoNotify = FALSE;
   }
 
@@ -263,9 +257,7 @@ void InitConfig(struct InstData *data, Object *obj)
     setting = (long)&lort;
     DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_Smooth, &setting);
     if(data->slider != NULL)
-    {
       set(data->slider, MUIA_Prop_DoSmooth, *(long *)setting);
-    }
   }
 
   data->selectPointer = TRUE;
@@ -295,8 +287,8 @@ void InitConfig(struct InstData *data, Object *obj)
         undoSteps = *(long *)setting;
 
         // constrain the number of undo levels only if undo is enabled
-        if(undoSteps != 0 && undoSteps < 20)
-          undoSteps = 20;
+        if(undoSteps != 0)
+          undoSteps = MAX(undoSteps, 20);
       }
     }
     else

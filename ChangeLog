@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-08-02 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/InitConfig.c: restrict certain configuration values to their configurable
+    limits.
+
 2012-07-20 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/GetSetAttrs.c: fixed a potential memory leak in case importing a text
