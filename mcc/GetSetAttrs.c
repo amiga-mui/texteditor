@@ -210,7 +210,7 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
     break;
 
     case MUIA_TextEditor_TabSize:
-      ti_Data = data->TabsSize;
+      ti_Data = data->TabSize;
     break;
 
     default:
