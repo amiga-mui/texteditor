@@ -164,7 +164,7 @@ void InitConfig(struct IClass *cl, Object *obj)
     ULONG size = MINMAX(2, *(ULONG *)setting, 12);
 
     // use the configured value only if the TAB size is not yet overridden
-    if(flagIsClear(data->flags, FLG_ForcedTabSize))
+    if(isFlagClear(data->flags, FLG_ForcedTabSize))
       data->TabSize = size;
 
     // remember the configured value in case the TAB size is being reset to the default value
