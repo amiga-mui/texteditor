@@ -102,10 +102,12 @@ static void SetCol(struct InstData *data, void *obj, long item, ULONG *storage, 
 
 ///
 /// InitConfig()
-void InitConfig(struct InstData *data, Object *obj)
+void InitConfig(struct IClass *cl, Object *obj)
 {
+  struct InstData *data = INST_DATA(cl, obj);
   IPTR setting = 0;
   BOOL loadDefaultKeys = FALSE;
+  LONG oldTabSize = data->TabSize;
 
   ENTER();
 
@@ -380,36 +382,44 @@ void InitConfig(struct InstData *data, Object *obj)
     }
   }
 
+  if(data->TabSize != oldTabSize)
+  {
+    // reimport the current text if the TAB size has changed
+    ReimportText(cl, obj);
+  }
+
   LEAVE();
 }
 
 ///
 /// FreeConfig()
-void FreeConfig(struct InstData *data, struct MUI_RenderInfo *mri)
+void FreeConfig(struct IClass *cl, Object *obj)
 {
+  struct InstData *data = INST_DATA(cl, obj);
+
   ENTER();
 
   if(data->RawkeyBindings != NULL)
     FreeVecPooled(data->mypool, data->RawkeyBindings);
 
   if(data->allocatedpens & (1<<0))
-    MUI_ReleasePen(mri, data->textcolor);
+    MUI_ReleasePen(muiRenderInfo(obj), data->textcolor);
   if(data->allocatedpens & (1<<1))
-    MUI_ReleasePen(mri, data->cursorcolor);
+    MUI_ReleasePen(muiRenderInfo(obj), data->cursorcolor);
   if(data->allocatedpens & (1<<2))
-    MUI_ReleasePen(mri, data->cursortextcolor);
+    MUI_ReleasePen(muiRenderInfo(obj), data->cursortextcolor);
   if(data->allocatedpens & (1<<3))
-    MUI_ReleasePen(mri, data->highlightcolor);
+    MUI_ReleasePen(muiRenderInfo(obj), data->highlightcolor);
   if(data->allocatedpens & (1<<4))
-    MUI_ReleasePen(mri, data->markedcolor);
+    MUI_ReleasePen(muiRenderInfo(obj), data->markedcolor);
   if(data->allocatedpens & (1<<5))
-    MUI_ReleasePen(mri, data->separatorshine);
+    MUI_ReleasePen(muiRenderInfo(obj), data->separatorshine);
   if(data->allocatedpens & (1<<6))
-    MUI_ReleasePen(mri, data->separatorshadow);
+    MUI_ReleasePen(muiRenderInfo(obj), data->separatorshadow);
   if(data->allocatedpens & (1<<7))
-    MUI_ReleasePen(mri, data->inactivecolor);
+    MUI_ReleasePen(muiRenderInfo(obj), data->inactivecolor);
   if(data->allocatedpens & (1<<8))
-    MUI_ReleasePen(mri, data->backgroundcolor);
+    MUI_ReleasePen(muiRenderInfo(obj), data->backgroundcolor);
 
   if(data->normalfont != NULL)
     CloseFont(data->normalfont);

@@ -546,49 +546,55 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       break;
 
       case MUIA_TextEditor_FixedFont:
+      {
+        if(data->shown == FALSE)
         {
-          if(data->shown == FALSE)
+          if(ti_Data)
           {
-            if(ti_Data)
-            {
-              data->font = data->fixedfont;
-              data->use_fixedfont = TRUE;
-            }
-            else
-            {
-              data->font = data->normalfont;
-              data->use_fixedfont = FALSE;
-            }
-
-            // now we check whether we have a valid font or not
-            // and if not we take the default one of our muiAreaData
-            if(data->font == NULL)
-              data->font = _font(obj);
+            data->font = data->fixedfont;
+            data->use_fixedfont = TRUE;
           }
-          break;
+          else
+          {
+            data->font = data->normalfont;
+            data->use_fixedfont = FALSE;
+          }
+
+          // now we check whether we have a valid font or not
+          // and if not we take the default one of our muiAreaData
+          if(data->font == NULL)
+            data->font = _font(obj);
         }
+      }
+      break;
+
       case MUIA_TextEditor_DoubleClickHook:
         data->DoubleClickHook = (struct Hook *)ti_Data;
-        break;
+      break;
 
       case MUIA_TextEditor_HasChanged:
+      {
         data->HasChanged = ti_Data;
         if(ti_Data == FALSE)
           clearFlag(data->flags, FLG_UndoLost);
-        break;
+      }
+      break;
 
       case MUIA_TextEditor_HorizontalScroll:
+      {
         if(ti_Data)
           setFlag(data->flags, FLG_HScroll);
         else
           clearFlag(data->flags, FLG_HScroll);
-        break;
+      }
+      break;
 
       case MUIA_TextEditor_Contents:
         contents = (char *)ti_Data;
-        break;
+      break;
 
       case MUIA_TextEditor_ImportHook:
+      {
         switch(ti_Data)
         {
           case MUIV_TextEditor_ImportHook_Plain:
@@ -606,11 +612,12 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           default:
             data->ImportHook = (struct Hook *)ti_Data;
         }
-        break;
+      }
+      break;
 
       case MUIA_TextEditor_ImportWrap:
         data->ImportWrap = ti_Data;
-        break;
+      break;
 
       case MUIA_TextEditor_ExportHook:
       {
@@ -636,12 +643,13 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_TextEditor_ExportWrap:
         data->ExportWrap = ti_Data;
-        break;
+      break;
 
       case MUIA_TextEditor_Flow:
+      {
         if(data->NoNotify == FALSE)
         {
-          LONG    start, lines = 0;
+          LONG start, lines = 0;
 
           data->Flow = ti_Data;
           if(Enabled(data))
@@ -674,7 +682,8 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           DumpText(data, data->visual_y+start-1, start-1, start-1+lines, TRUE);
           data->HasChanged = TRUE;
         }
-        break;
+      }
+      break;
 
       case MUIA_TextEditor_WrapBorder:
       {
@@ -698,57 +707,38 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_TextEditor_TypeAndSpell:
         data->TypeAndSpell = ti_Data;
-        break;
+      break;
 
       case MUIA_TextEditor_UndoLevels:
         data->userUndoBufferSize = TRUE;
         ResizeUndoBuffer(data, ti_Data);
-        break;
+      break;
 
       case MUIA_TextEditor_PasteStyles:
+      {
         if(ti_Data)
           setFlag(data->flags, FLG_PasteStyles);
         else
           clearFlag(data->flags, FLG_PasteStyles);
+      }
       break;
 
       case MUIA_TextEditor_PasteColors:
+      {
         if(ti_Data)
           setFlag(data->flags, FLG_PasteColors);
         else
           clearFlag(data->flags, FLG_PasteColors);
+      }
       break;
 
       case MUIA_TextEditor_ConvertTabs:
       {
-        struct Hook *ExportHookCopy = data->ExportHook;
-
         if(data->ConvertTabs != (BOOL)ti_Data)
         {
           data->ConvertTabs = ti_Data;
-
-          if(ti_Data == FALSE)
-          {
-            IPTR buff;
-            struct line_node *newcontents;
-            data->ExportHook = &ExportHookPlain;
-
-            if((buff = mExportText(cl, obj, (APTR)msg)) != (IPTR)NULL)
-            {
-              if((newcontents = ImportText(data, (char *)buff, data->ImportHook, data->ImportWrap)) != NULL)
-              {
-                FreeTextMem(data, data->firstline);
-                data->firstline = newcontents;
-                ResetDisplay(data);
-                ResetUndoBuffer(data);
-                result = TRUE;
-              }
-            }
-
-            FreeVec((APTR)buff);
-          }
-
-          data->ExportHook = ExportHookCopy;
+          // reimport the text to match the current TAB conversion mode
+          result = ReimportText(cl, obj);
         }
       }
       break;

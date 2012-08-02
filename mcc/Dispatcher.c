@@ -243,7 +243,7 @@ static IPTR mDispose(struct IClass *cl, Object *obj, Msg msg)
 
 ///
 /// mSetup()
-static IPTR mSetup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
+static IPTR mSetup(struct IClass *cl, Object *obj, Msg msg)
 {
   IPTR result = FALSE;
   struct InstData *data = INST_DATA(cl, obj);
@@ -252,9 +252,9 @@ static IPTR mSetup(struct IClass *cl, Object *obj, struct MUI_RenderInfo *rinfo)
 
   // initialize the configuration of our TextEditor
   // object from the configuration set by the user
-  InitConfig(data, obj);
+  InitConfig(cl, obj);
 
-  if(DoSuperMethodA(cl, obj, (Msg)rinfo))
+  if(DoSuperMethodA(cl, obj, msg))
   {
     // disable that the object will automatically get a border when
     // the ActiveObjectOnClick option is active
@@ -345,7 +345,7 @@ static IPTR mCleanup(struct IClass *cl, Object *obj, Msg msg)
     RejectInput(data);
   }
 
-  FreeConfig(data, muiRenderInfo(obj));
+  FreeConfig(cl, obj);
 
   result = DoSuperMethodA(cl, obj, msg);
 
@@ -793,7 +793,7 @@ DISPATCHER(_Dispatcher)
     case OM_DISPOSE:                     result = mDispose(cl, obj, msg);                  RETURN(result); return result; break;
     case OM_GET:                         result = mGet(cl, obj, (APTR)msg);                RETURN(result); return result; break;
     case OM_SET:                         result = mSet(cl, obj, (APTR)msg);                                               break;
-    case MUIM_Setup:                     result = mSetup(cl, obj, (APTR)msg);              RETURN(result); return result; break;
+    case MUIM_Setup:                     result = mSetup(cl, obj, msg);                    RETURN(result); return result; break;
     case MUIM_Show:                      result = mShow(cl, obj, msg);                     RETURN(result); return result; break;
     case MUIM_AskMinMax:                 result = mAskMinMax(cl, obj, (APTR)msg);          RETURN(result); return result; break;
     case MUIM_Draw:                      result = mDraw(cl, obj, (APTR)msg);               RETURN(result); return result; break;

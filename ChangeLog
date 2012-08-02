@@ -9,6 +9,13 @@ $URL$
 
   * mcc/InitConfig.c: restrict certain configuration values to their configurable
     limits.
+  * mcc/GetSet.c, mcc/InitConfig.c, mcc/ImportText.c: added a new function to
+    reimport the current text with modified TAB size or TAB conversion mode. This
+    fixes the issues that may arise when the user has configured a custom TAB
+    size and an application has set a text containing TAB characters before the
+    class was able to access its configuration, i.e. before opening the window.
+    This changes ensures that the text will always be correctly displayed with
+    the configured TAB size.
 
 2012-07-20 Thore Böckelmann <tboeckel@gmx.de>
 
