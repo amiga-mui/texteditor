@@ -153,6 +153,9 @@
 #ifndef MIN
 #define MIN(a,b)          (((a) < (b)) ? (a) : (b))
 #endif
+#ifndef MINMAX
+#define MINMAX(min,x,max) (MAX((min),MIN((x),(max))))
+#endif
 
 enum EventType
 {
