@@ -128,7 +128,7 @@ BOOL ReimportText(struct IClass *cl, Object *obj)
 
   ENTER();
 
-  if((buff = (char *)mExportText(cl, obj, NULL)) != (IPTR)NULL)
+  if((buff = (char *)mExportText(cl, obj, NULL)) != NULL)
   {
     struct line_node *newcontents;
     struct Hook *ExportHookCopy = data->ExportHook;
