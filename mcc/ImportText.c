@@ -118,3 +118,41 @@ struct line_node *ImportText(struct InstData *data, char *contents, struct Hook 
 }
 
 ///
+/// ReimportText
+// export and reimport the current text with modified TAB size or TAB conversion
+BOOL ReimportText(struct IClass *cl, Object *obj)
+{
+  struct InstData *data = INST_DATA(cl, obj);
+  BOOL result = FALSE;
+  char *buff;
+
+  ENTER();
+
+  if((buff = (char *)mExportText(cl, obj, NULL)) != (IPTR)NULL)
+  {
+    struct line_node *newcontents;
+    struct Hook *ExportHookCopy = data->ExportHook;
+
+    // use the plain export hook
+    data->ExportHook = &ExportHookPlain;
+
+    if((newcontents = ImportText(data, buff, data->ImportHook, data->ImportWrap)) != NULL)
+    {
+	  FreeTextMem(data, data->firstline);
+      data->firstline = newcontents;
+	  ResetDisplay(data);
+      ResetUndoBuffer(data);
+      result = TRUE;
+    }
+
+    FreeVec(buff);
+
+    // restore the former export hook
+    data->ExportHook = ExportHookCopy;
+  }
+
+  RETURN(result);
+  return result;
+}
+
+///

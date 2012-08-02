@@ -505,10 +505,11 @@ void MarkText(struct InstData *, LONG, struct line_node *, LONG, struct line_nod
 
 // ImportText.c
 struct line_node *ImportText(struct InstData *, char *, struct Hook *, LONG);
+BOOL ReimportText(struct IClass *, Object *j);
 
 // InitConfig.c
-void InitConfig(struct InstData *, Object *);
-void FreeConfig(struct InstData *, struct MUI_RenderInfo *);
+void InitConfig(struct IClass *, Object *);
+void FreeConfig(struct IClass *, Object *);
 
 // Methods.c
 IPTR mMarkText(struct InstData *, struct MUIP_TextEditor_MarkText *);
