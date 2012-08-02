@@ -209,7 +209,7 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = data->ConvertTabs;
     break;
 
-    case MUIA_TextEditor_TabsSize:
+    case MUIA_TextEditor_TabSize:
       ti_Data = data->TabsSize;
     break;
 
