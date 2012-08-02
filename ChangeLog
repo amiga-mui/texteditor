@@ -16,6 +16,9 @@ $URL$
     class was able to access its configuration, i.e. before opening the window.
     This changes ensures that the text will always be correctly displayed with
     the configured TAB size.
+  * mcc/GetSet.c, mcc/InitConfig.c: added a new attribute MUIA_TextEditor_TabSize
+    to let an application enforce a specific number of spaces per TAB character
+    no matter what the user has configured.
 
 2012-07-20 Thore Böckelmann <tboeckel@gmx.de>
 

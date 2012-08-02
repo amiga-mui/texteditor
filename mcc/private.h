@@ -384,7 +384,8 @@ struct InstData
   UWORD           ImportWrap;
   BOOL            HasChanged;
   UWORD           TabSize;        // number of spaces to use when Tab2Spaces is active
-  UWORD           TabSizePixels;  // number of pixels a Tab<>Spaces conversion will consume
+  UWORD           GlobalTabSize;  // number of spaces as configured in MUI prefs
+  UWORD           TabSizePixels;  // number of pixels a Tab2Spaces conversion will consume
   BOOL            ConvertTabs;    // convert to spaces when TAB key is used. Otherwise insert \t
   ULONG           WrapBorder;
   ULONG           WrapMode;
@@ -686,6 +687,7 @@ enum
   FLG_ActiveOnClick  = 1L << 20, // should the gadget activated on click
   FLG_PasteStyles    = 1L << 21, // respect styles when pasting text
   FLG_PasteColors    = 1L << 22, // respect colors when pasting text
+  FLG_ForcedTabSize  = 1L << 23, // override the user defined TAB size
   FLG_MUI4           = 1L << 31, // running under MUI4
 
   FLG_NumberOf

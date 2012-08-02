@@ -209,6 +209,10 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = data->ConvertTabs;
     break;
 
+    case MUIA_TextEditor_TabsSize:
+      ti_Data = data->TabsSize;
+    break;
+
     default:
       LEAVE();
       return(DoSuperMethodA(cl, obj, (Msg)msg));
@@ -229,6 +233,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
   char  *contents = NULL;
   IPTR  result = FALSE;
   ULONG crsr_x = 0xffff, crsr_y = 0xffff;
+  BOOL reimport = FALSE;
 
   ENTER();
 
@@ -737,8 +742,33 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
         if(data->ConvertTabs != (BOOL)ti_Data)
         {
           data->ConvertTabs = ti_Data;
-          // reimport the text to match the current TAB conversion mode
-          result = ReimportText(cl, obj);
+          reimport = TRUE;
+        }
+      }
+      break;
+
+      case MUIA_TextEditor_TabSize:
+      {
+        if(data->TabSize != ti_Data)
+        {
+          if(data->TabSize == MUIV_TextEditor_TabSize_Default)
+          {
+            // reset the TAB size to the configured value
+            if(data->TabSize != data->GlobalTabSize)
+            {
+              // reimport the text only if the TAB size really changes
+              data->TabSize = data->GlobalTabSize;
+              reimport = TRUE;
+            }
+            clearFlag(data->flags, FLG_ForcedTabSize);
+		  }
+          else
+          {
+            data->TabSize = MINMAX(2, ti_Data, 12);
+            setFlag(data->flags, FLG_ForcedTabSize);
+            // a reimport is definitely necessary
+            reimport = TRUE;
+          }
         }
       }
       break;
@@ -753,6 +783,12 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       }
       break;
     }
+  }
+
+  if(reimport == TRUE)
+  {
+    // reimport the text to match the current TAB size and TAB conversion mode
+    result = ReimportText(cl, obj);
   }
 
   if(contents != NULL)

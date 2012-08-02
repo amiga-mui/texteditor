@@ -104,6 +104,7 @@ extern "C" {
 #define MUIA_TextEditor_PasteColors           (TextEditor_Dummy + 0x3c)
 #define MUIA_TextEditor_ConvertTabs           (TextEditor_Dummy + 0x3d)
 #define MUIA_TextEditor_WrapWords             (TextEditor_Dummy + 0x3e)
+#define MUIA_TextEditor_TabSize               (TextEditor_Dummy + 0x3f)
 
 #define MUIM_TextEditor_HandleError           (TextEditor_Dummy + 0x1f)
 #define MUIM_TextEditor_AddKeyBindings        (TextEditor_Dummy + 0x22)
@@ -157,6 +158,9 @@ struct MUIP_TextEditor_SetBlock          { STACKED ULONG MethodID; STACKED ULONG
 #define MUIV_TextEditor_WrapMode_NoWrap        0x00000000UL
 #define MUIV_TextEditor_WrapMode_SoftWrap      0x00000001UL
 #define MUIV_TextEditor_WrapMode_HardWrap      0x00000002UL
+
+/* Values for MUIA_TextEditor_TabSize */
+#define MUIV_TextEditor_TabSize_Default        0
 
 /* Values for MUIM_TextEditor_MarkText */
 #define MUIV_TextEditor_MarkText_All           (-1)
