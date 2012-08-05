@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.39 RELEASE ############################################################
+
+2012-08-05 Jens Langner <Jens.Langner@light-speed.de>
+
+  * misc: final v15.39 release preparations
+
 2012-08-02 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/InitConfig.c: restrict certain configuration values to their configurable
