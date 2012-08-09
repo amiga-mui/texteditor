@@ -367,9 +367,9 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
       // NUL terminate our buffer string
       *buf->pointer = '\0';
 
-      while(emsg->ExportWrap != 0 && buf->pointer-startx > (LONG)emsg->ExportWrap)
+      while(emsg->ExportWrap != 0 && buf->pointer-startx > emsg->ExportWrap)
       {
-        ULONG max = emsg->ExportWrap+1;
+        LONG max = emsg->ExportWrap+1;
 
         if(startx[emsg->ExportWrap] != '\n')
         {

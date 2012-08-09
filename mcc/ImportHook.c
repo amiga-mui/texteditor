@@ -223,7 +223,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
   {
     int len;
     struct LineNode *line = msg->linenode;
-    ULONG wrap = msg->ImportWrap;
+    LONG wrap = msg->ImportWrap;
     ULONG allocatedContents;
 
     len = eol - src + (msg->TabSize * tabs);
@@ -431,7 +431,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
           dest_word_start = dest;
         }
 
-        if(wrap != 0 && ((ULONG)(dest - dest_start)) >= wrap)
+        if(wrap != 0 && dest - dest_start >= wrap)
         {
           /* Only leave the loop, if we really have added some characters
            * (at least one word) to the line */
@@ -567,7 +567,7 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
   {
     int len;
     struct LineNode *line = msg->linenode;
-    ULONG wrap = msg->ImportWrap;
+    LONG wrap = msg->ImportWrap;
     ULONG allocatedContents;
 
     len = eol - src + (msg->TabSize * tabs);
@@ -932,7 +932,7 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
           lastWasSeparator = FALSE;
         }
 
-        if(wrap != 0 && ((ULONG)(dest - dest_start)) >= wrap)
+        if(wrap != 0 && dest - dest_start >= wrap)
         {
           /* Only leave the loop, if we really have added some characters
            * (at least one word) to the line */
