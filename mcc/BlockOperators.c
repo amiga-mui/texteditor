@@ -35,7 +35,8 @@
 /// RedrawArea()
 void RedrawArea(struct InstData *data, UWORD startx, struct line_node *startline, UWORD stopx, struct line_node *stopline)
 {
-  struct pos_info pos1, pos2;
+  struct pos_info pos1;
+  struct pos_info pos2;
   LONG line_nr1;
   LONG line_nr2;
 
