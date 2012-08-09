@@ -71,7 +71,9 @@ void RedrawArea(struct InstData *data, UWORD startx, struct line_node *startline
 STRPTR GetBlock(struct InstData *data, struct marking *block)
 {
   LONG startx, stopx;
-  struct line_node *startline, *stopline, *act;
+  struct line_node *startline;
+  struct line_node *stopline;
+  struct line_node *act;
   STRPTR text = NULL;
   struct ExportMessage emsg;
 
@@ -624,7 +626,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
 /// NiceBlock()
 void NiceBlock(struct marking *realblock, struct marking *newblock)
 {
-  LONG  startx = realblock->startx, stopx = realblock->stopx;
+  LONG startx = realblock->startx, stopx = realblock->stopx;
   struct line_node *startline = realblock->startline;
   struct line_node *stopline = realblock->stopline;
 
@@ -698,10 +700,12 @@ LONG CutBlock(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update)
 /// CutBlock2()
 LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, struct marking *newblock)
 {
-  LONG  tvisual_y;
-  LONG  startx, stopx;
-  LONG  res = 0;
-  struct  line_node *startline, *stopline;
+  LONG tvisual_y;
+  LONG startx;
+  LONG stopx;
+  LONG res = 0;
+  struct line_node *startline;
+  struct line_node *stopline;
   IPTR clipSession = (IPTR)NULL;
 
   ENTER();

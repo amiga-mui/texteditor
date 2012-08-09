@@ -209,8 +209,10 @@ void AddStyleToLine(struct InstData *data, LONG x, struct line_node *line, LONG 
 void AddStyle(struct InstData *data, struct marking *realblock, UWORD style, BOOL set)
 {
   struct marking newblock;
-  LONG startx, stopx;
-  struct line_node *startline, *stopline;
+  LONG startx;
+  LONG stopx;
+  struct line_node *startline;
+  struct line_node *stopline;
 
   ENTER();
 

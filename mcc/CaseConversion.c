@@ -28,8 +28,12 @@
 /// MangleCharacters()
 static void MangleCharacters(struct InstData *data, char (*change)(char c))
 {
-  LONG startx, stopx, _startx;
-  struct line_node *startline, *stopline, *_startline;
+  LONG startx;
+  LONG stopx;
+  LONG _startx;
+  struct line_node *startline;
+  struct line_node *stopline;
+  struct line_node *_startline;
   struct marking newblock;
 
   ENTER();
