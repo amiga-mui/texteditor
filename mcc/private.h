@@ -404,10 +404,10 @@ struct InstData
   BOOL            inactiveCursor;
   BOOL            selectPointer;
   BOOL            activeSelectPointer;
-  APTR            SuggestWindow;
-  APTR            SuggestListview;
-  UWORD           SuggestSpawn;
-  UWORD           LookupSpawn;
+  Object *        SuggestWindow;
+  Object *        SuggestListview;
+  BOOL            SuggestSpawn;
+  BOOL            LookupSpawn;
   char            SuggestCmd[256];
   char            LookupCmd[256];
   ULONG           clipcount;

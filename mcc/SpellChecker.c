@@ -394,10 +394,10 @@ static BOOL LookupWord(struct InstData *data, CONST_STRPTR word)
   SHOWSTRING(DBF_SPELL, word);
   SHOWVALUE(DBF_SPELL, data->LookupSpawn);
 
-  if(data->LookupSpawn != 0)
-    res = SendRexx(word, data->LookupCmd);
-  else
+  if(data->LookupSpawn == FALSE)
     res = SendCLI(word, data->LookupCmd);
+  else
+    res = SendRexx(word, data->LookupCmd);
 
   if(res == TRUE)
   {
@@ -504,10 +504,10 @@ void SuggestWord(struct InstData *data)
       {
         BOOL res;
 
-        if(data->SuggestSpawn != 0)
-          res = SendRexx(word, data->SuggestCmd);
-        else
+        if(data->SuggestSpawn == FALSE)
           res = SendCLI(word, data->SuggestCmd);
+        else
+          res = SendRexx(word, data->SuggestCmd);
 
         if(res == TRUE)
         {
