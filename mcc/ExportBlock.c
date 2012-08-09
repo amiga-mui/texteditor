@@ -33,7 +33,7 @@ IPTR mExportBlock(struct IClass *cl, Object *obj, struct MUIP_TextEditor_ExportB
   struct InstData *data = INST_DATA(cl, obj);
   struct line_node *node;
   struct Hook *exportHook = data->ExportHook;
-  ULONG wraplen = data->ExportWrap;
+  LONG wraplen = data->ExportWrap;
   struct ExportMessage emsg;
   struct marking newblock;
   ULONG flags = msg->flags;

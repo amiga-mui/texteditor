@@ -218,7 +218,7 @@ struct line_node
 
   struct LineNode line;
 
-  UWORD visual;               // How many lines are this line wrapped over
+  LONG visual;                // How many lines are this line wrapped over
   UWORD flags;                // Different flags...
 };
 
@@ -283,7 +283,7 @@ struct ExportMessage
   BOOL   Highlight;    // is the current line highlighted?
   UWORD  Flow;         // Current lines textflow
   UWORD  Separator;    // Current line contains a separator bar? see below
-  ULONG  ExportWrap;   // For your use only (reflects MUIA_TextEditor_ExportWrap)
+  LONG  ExportWrap;    // For your use only (reflects MUIA_TextEditor_ExportWrap)
   BOOL   Last;         // Set to TRUE if this is the last line
   APTR   data;         // pointer to the instance data of TextEditor.mcc (PRIVATE)
   BOOL   failure;      // something went wrong during the export
@@ -294,7 +294,7 @@ struct ImportMessage
   STRPTR  Data;               // The first time the hook is called, then this will be either the value of MUIA_TextEditor_Contents, or the argument given to MUIM_TextEditor_Insert.
   struct  LineNode *linenode; // Pointer to a linenode, which you should fill out
   APTR    PoolHandle;         // A poolhandle, all allocations done for styles or contents must be made from this pool, and the size of the allocation must be stored in the first LONG
-  ULONG   ImportWrap;         // For your use only (reflects MUIA_TextEditor_ImportWrap)
+  LONG    ImportWrap;         // For your use only (reflects MUIA_TextEditor_ImportWrap)
   ULONG   ConvertTabs;        // do not convert to spaces when importing tabs (\t)
   LONG    TabSize;            // if convert tabs to spaces we specify here how many spaces to use
 };
@@ -384,8 +384,8 @@ struct InstData
   struct  Hook    *DoubleClickHook;
   struct  Hook    *ExportHook;
   struct  Hook    *ImportHook;
-  ULONG           ExportWrap;
-  UWORD           ImportWrap;
+  LONG            ExportWrap;
+  LONG            ImportWrap;
   BOOL            HasChanged;
   LONG            TabSize;        // number of spaces to use when Tab2Spaces is active
   LONG            GlobalTabSize;  // number of spaces as configured in MUI prefs
