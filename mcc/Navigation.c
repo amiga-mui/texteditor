@@ -113,11 +113,11 @@ static LONG GetPosInPixels(struct InstData *data, LONG bytes, LONG x)
 
 ///
 /// SetBookmark()
-void SetBookmark(struct InstData *data, UWORD nr)
+void SetBookmark(struct InstData *data, ULONG nr)
 {
   ENTER();
 
-  if(nr < 4)
+  if(nr < ARRAY_SIZE(data->bookmarks))
   {
     data->bookmarks[nr].line = data->actualline;
     data->bookmarks[nr].x    = data->CPos_X;
@@ -128,11 +128,11 @@ void SetBookmark(struct InstData *data, UWORD nr)
 
 ///
 /// GotoBookmark()
-void GotoBookmark(struct InstData *data, UWORD nr)
+void GotoBookmark(struct InstData *data, ULONG nr)
 {
   ENTER();
 
-  if(nr < 4)
+  if(nr < ARRAY_SIZE(data->bookmarks))
   {
     if(data->bookmarks[nr].line)
     {

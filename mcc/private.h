@@ -223,7 +223,7 @@ struct line_node
 struct bookmark
 {
   struct  line_node *line;
-  UWORD   x;
+  ULONG   x;
 };
 
 struct marking
@@ -541,8 +541,8 @@ void GetLine(struct InstData *, LONG, struct pos_info *);
 LONG LineToVisual(struct InstData *, struct line_node *);
 
 // Navigation.c
-void SetBookmark(struct InstData *, UWORD);
-void GotoBookmark(struct InstData *, UWORD);
+void SetBookmark(struct InstData *, ULONG);
+void GotoBookmark(struct InstData *, ULONG);
 void GoTop(struct InstData *);
 void GoPreviousPage (struct InstData *);
 void GoPreviousLine(struct InstData *);
@@ -728,5 +728,7 @@ ULONG xget(Object *obj, const IPTR attr);
   #define xget(OBJ, ATTR) ({IPTR b=0; GetAttr(ATTR, OBJ, &b); b;})
 #endif
 ///
+
+#define ARRAY_SIZE(x)         (sizeof(x[0]) ? sizeof(x)/sizeof(x[0]) : 0)
 
 #endif /* TEXTEDITOR_MCC_PRIV_H */
