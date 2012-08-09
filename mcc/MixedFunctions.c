@@ -396,11 +396,13 @@ struct line_node *LineNode(struct InstData *data, LONG linenr)
 void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
 {
   unsigned char chars[4] = "   \0";
-  LONG   line_nr;
+  LONG line_nr;
   struct pos_info pos;
-  ULONG  xplace, yplace, cursorxplace;
-  UWORD  cursor_width;
-  BOOL   clipping = FALSE;
+  LONG xplace;
+  LONG yplace;
+  LONG cursorxplace;
+  LONG cursor_width;
+  BOOL clipping = FALSE;
   struct RastPort *rp = data->rport;
 
   UWORD styles[3] = {0, 0, 0};
@@ -461,7 +463,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
 
     //D(DBF_STARTUP, "xplace: %ld, yplace: %ld cplace: %ld, innerwidth: %ld width: %ld %ld", xplace, yplace, cursorxplace, _mwidth(data->object), _width(data->object), _mleft(data->object));
 
-    if(xplace <= (ULONG)_mright(data->object))
+    if(xplace <= _mright(data->object))
     {
       // if font is anti aliased, clear area near the cursor first
       if(IS_ANTIALIASED(data->font))
@@ -483,7 +485,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
         // if the gadget is in inactive state we just draw a skeleton cursor instead
         if(data->inactiveCursor == TRUE && isFlagClear(data->flags, FLG_Active) && isFlagClear(data->flags, FLG_Activated))
         {
-          ULONG cwidth = cursor_width;
+          LONG cwidth = cursor_width;
 
           if(data->CursorWidth != 6)
             cwidth = TextLengthNew(&data->tmprp, chars[1] < ' ' ? (char *)" " : (char *)&chars[1], 1, data->TabSizePixels);
@@ -529,7 +531,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
         // Clear the place of the cursor in case we are using NO anti-aliased font
         if(IS_ANTIALIASED(data->font) == FALSE)
         {
-          ULONG cwidth = cursor_width;
+          LONG cwidth = cursor_width;
 
           if(data->CursorWidth != 6 && Set == FALSE)
             cwidth = TextLengthNew(&data->tmprp, chars[1] < ' ' ? (char *)" " : (char *)&chars[1], 1, data->TabSizePixels);
@@ -566,9 +568,9 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
       /* This is really bad code!!! */
       if(line->line.Separator != LNSF_None)
       {
-        WORD LeftX, LeftWidth;
-        WORD RightX, RightWidth;
-        WORD Y, Height;
+        LONG LeftX, LeftWidth;
+        LONG RightX, RightWidth;
+        LONG Y, Height;
 
         LeftX = _mleft(data->object);
         LeftWidth = flow-3;

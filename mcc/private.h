@@ -296,7 +296,7 @@ struct ImportMessage
   APTR    PoolHandle;         // A poolhandle, all allocations done for styles or contents must be made from this pool, and the size of the allocation must be stored in the first LONG
   ULONG   ImportWrap;         // For your use only (reflects MUIA_TextEditor_ImportWrap)
   ULONG   ConvertTabs;        // do not convert to spaces when importing tabs (\t)
-  ULONG   TabSize;            // if convert tabs to spaces we specify here how many spaces to use
+  LONG    TabSize;            // if convert tabs to spaces we specify here how many spaces to use
 };
 
 struct Grow
@@ -387,9 +387,9 @@ struct InstData
   ULONG           ExportWrap;
   UWORD           ImportWrap;
   BOOL            HasChanged;
-  UWORD           TabSize;        // number of spaces to use when Tab2Spaces is active
-  UWORD           GlobalTabSize;  // number of spaces as configured in MUI prefs
-  UWORD           TabSizePixels;  // number of pixels a Tab2Spaces conversion will consume
+  LONG            TabSize;        // number of spaces to use when Tab2Spaces is active
+  LONG            GlobalTabSize;  // number of spaces as configured in MUI prefs
+  LONG            TabSizePixels;  // number of pixels a Tab2Spaces conversion will consume
   BOOL            ConvertTabs;    // convert to spaces when TAB key is used. Otherwise insert \t
   LONG            WrapBorder;
   ULONG           WrapMode;
@@ -566,7 +566,7 @@ void GoLeft(struct InstData *);
 BOOL CheckSep(struct InstData *, char);
 BOOL CheckSent(struct InstData *, char);
 void NextLine(struct InstData *);
-ULONG FlowSpace(struct InstData *, UWORD, STRPTR);
+LONG FlowSpace(struct InstData *, UWORD, STRPTR);
 void PosFromCursor(struct InstData *, WORD, WORD);
 
 // Pointer.c
@@ -608,7 +608,7 @@ BOOL Undo(struct InstData *);
 BOOL Redo(struct InstData *);
 
 // NewGfx.c
-WORD TextLengthNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, LONG tabSizePixels);
+LONG TextLengthNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, LONG tabSizePixels);
 ULONG TextFitNew(struct RastPort *rp, CONST_STRPTR string, ULONG strLen, CONST struct TextExtent *textExtent, CONST struct TextExtent *constrainingExtent, LONG strDirection, ULONG constrainingBitWidth, LONG constrainingBitHeight, LONG tabSizePixels);
 void TextNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, LONG tabSizePixels);
 

@@ -31,9 +31,9 @@
 struct pos_info pos;
 
 /// FlowSpace()
-ULONG FlowSpace(struct InstData *data, UWORD flow, STRPTR text)
+LONG FlowSpace(struct InstData *data, UWORD flow, STRPTR text)
 {
-  ULONG flowspace = 0;
+  LONG flowspace = 0;
 
   ENTER();
 
