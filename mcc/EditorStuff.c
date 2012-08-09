@@ -578,13 +578,8 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
           }
           else
           {
-            struct LineStyle newStyle;
-
             D(DBF_STYLE, "prepending style 0x%04lx at column %ld", line1Styles->style, line1Styles->column);
-            newStyle.column = line1Styles->column;
-            newStyle.style = line1Styles->style;
-            AddToGrow(&styleGrow, &newStyle);
-
+            AddToGrow(&styleGrow, line1Styles);
             line1Styles++;
           }
         }
@@ -632,14 +627,9 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
       {
         while(line1Colors->column != EOC && line1Colors->column < line->line.Length)
         {
-          struct LineColor newColor;
-
           D(DBF_STYLE, "applying color change from %ld to %ld in column %ld (1)", end_color, line1Colors->color, line1Colors->column);
-          newColor.column = line1Colors->column;
-          newColor.color = line1Colors->color;
-          AddToGrow(&colorGrow, &newColor);
-
           end_color = line1Colors->color;
+          AddToGrow(&colorGrow, line1Colors);
           line1Colors++;
         }
 
@@ -651,11 +641,10 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
         struct LineColor newColor;
 
         D(DBF_STYLE, "resetting color in column %ld (1)", line->line.Length - 1);
+        end_color = 0;
         newColor.column = line->line.Length;
         newColor.color = 0;
         AddToGrow(&colorGrow, &newColor);
-
-        end_color = 0;
       }
 
       if((line2Colors = line->next->line.Colors) != NULL)

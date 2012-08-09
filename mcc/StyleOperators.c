@@ -119,11 +119,7 @@ void AddStyleToLine(struct InstData *data, LONG x, struct line_node *line, LONG 
   {
     while(styles->column != EOS && styles->column < x)
     {
-      struct LineStyle newStyle;
-
-      newStyle.column = styles->column;
-      newStyle.style = styles->style;
-      AddToGrow(&styleGrow, &newStyle);
+      AddToGrow(&styleGrow, styles);
 
       if(styles->style > 0xff)
         cur_style &= styles->style;
@@ -164,11 +160,7 @@ void AddStyleToLine(struct InstData *data, LONG x, struct line_node *line, LONG 
 
       if(styles->style != style && styles->style != invstyle)
       {
-        struct LineStyle newStyle;
-
-        newStyle.column = styles->column;
-        newStyle.style = styles->style;
-        AddToGrow(&styleGrow, &newStyle);
+        AddToGrow(&styleGrow, styles);
       }
 
       styles++;
@@ -188,11 +180,7 @@ void AddStyleToLine(struct InstData *data, LONG x, struct line_node *line, LONG 
   {
     while(styles->column != EOS)
     {
-      struct LineStyle newStyle;
-
-      newStyle.column = styles->column;
-      newStyle.style = styles->style;
-      AddToGrow(&styleGrow, &newStyle);
+      AddToGrow(&styleGrow, styles);
 
       styles++;
     }
