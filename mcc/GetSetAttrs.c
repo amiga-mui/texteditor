@@ -753,7 +753,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_TextEditor_TabSize:
       {
-        if(data->TabSize != ti_Data)
+        if(data->TabSize != (LONG)ti_Data)
         {
           if(data->TabSize == MUIV_TextEditor_TabSize_Default)
           {

@@ -107,7 +107,7 @@ void InitConfig(struct IClass *cl, Object *obj)
   struct InstData *data = INST_DATA(cl, obj);
   IPTR setting = 0;
   BOOL loadDefaultKeys = FALSE;
-  ULONG oldTabSize = data->TabSize;
+  LONG oldTabSize = data->TabSize;
 
   ENTER();
 

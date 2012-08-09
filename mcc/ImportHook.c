@@ -260,7 +260,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 
         if(c == '\t' && msg->ConvertTabs == TRUE)
         {
-          unsigned int i;
+          LONG i;
 
           for(i=(dest - dest_start) % msg->TabSize; i < msg->TabSize; i++)
             *dest++ = ' ';
@@ -637,7 +637,7 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
         }
         else if(c == '\t' && msg->ConvertTabs == TRUE)
         {
-          unsigned int i;
+          LONG i;
 
           for(i=(dest - dest_start) % msg->TabSize; i < msg->TabSize; i++)
             *dest++ = ' ';
