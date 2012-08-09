@@ -422,7 +422,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
      isFlagSet(data->flags, FLG_Quiet) ||
      isFlagSet(data->flags, FLG_Ghosted))
   {
-    data->cursor_shown = 0;
+    data->cursor_shown = FALSE;
 
     LEAVE();
     return;
