@@ -200,7 +200,7 @@ IPTR mToggleCursor(struct IClass *cl, Object *obj, UNUSED Msg msg)
 
   if(isFlagSet(data->flags, FLG_Active))
   {
-    if(data->cursor_shown)
+    if(data->cursor_shown == TRUE)
     {
       SetCursor(data, data->CPos_X, data->actualline, FALSE);
       data->cursor_shown = FALSE;

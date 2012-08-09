@@ -327,7 +327,7 @@ struct InstData
   LONG    maxlines;         // max visual lines in gadget
   ULONG   flags;
 
-  UWORD   cursor_shown;       // Width of stored cursor
+  BOOL    cursor_shown;       // visibility of the cursor
   Object  *object;            // Pointer to the object itself
   struct  BitMap *doublebuffer; // Doublebuffer for line-printing
   BOOL    mousemove;
