@@ -78,7 +78,7 @@ ULONG ConvertPen(struct InstData *data, UWORD color, BOOL highlight)
 
 ///
 /// DrawSeparator()
-void DrawSeparator(struct InstData *data, struct RastPort *rp, WORD X, WORD Y, WORD Width, WORD Height)
+void DrawSeparator(struct InstData *data, struct RastPort *rp, LONG X, LONG Y, LONG Width, LONG Height)
 {
   ENTER();
 
@@ -364,9 +364,9 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
     if(line->line.Separator != LNSF_None)
     {
-      WORD LeftX, LeftWidth;
-      WORD RightX, RightWidth;
-      WORD Y, Height;
+      LONG LeftX, LeftWidth;
+      LONG RightX, RightWidth;
+      LONG Y, Height;
 
       LeftX = xoffset;
       LeftWidth = flow-3;

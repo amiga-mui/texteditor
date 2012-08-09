@@ -646,7 +646,7 @@ void NextLine(struct InstData *data)
 /*-----------------------------------------*
  * Place the cursor, based on an X Y coord *
  *-----------------------------------------*/
-void PosFromCursor(struct InstData *data, WORD MouseX, WORD MouseY)
+void PosFromCursor(struct InstData *data, LONG MouseX, LONG MouseY)
 {
   struct pos_info pos;
   LONG limit = data->ypos;

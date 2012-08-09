@@ -567,7 +567,7 @@ BOOL CheckSep(struct InstData *, char);
 BOOL CheckSent(struct InstData *, char);
 void NextLine(struct InstData *);
 LONG FlowSpace(struct InstData *, UWORD, STRPTR);
-void PosFromCursor(struct InstData *, WORD, WORD);
+void PosFromCursor(struct InstData *, LONG, LONG);
 
 // Pointer.c
 void SetupSelectPointer(struct InstData *data);
@@ -579,7 +579,7 @@ void HideSelectPointer(struct InstData *data, Object *obj);
 ULONG convert(UWORD);
 LONG PrintLine(struct InstData *, LONG, struct line_node *, LONG, BOOL);
 ULONG ConvertPen(struct InstData *, UWORD, BOOL);
-void DrawSeparator(struct InstData *, struct RastPort *, WORD, WORD, WORD, WORD);
+void DrawSeparator(struct InstData *, struct RastPort *, LONG, LONG, LONG, LONG);
 
 // Search.c
 IPTR mSearch(struct IClass *, Object *, struct MUIP_TextEditor_Search *);
