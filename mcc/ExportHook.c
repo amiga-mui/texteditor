@@ -172,12 +172,12 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
       if((styles != NULL || colors != NULL) &&
          (hookType == MUIV_TextEditor_ExportHook_EMail || hookType == MUIV_TextEditor_ExportHook_Plain))
       {
-        UWORD pos;
+        LONG pos;
         WORD style;
         BOOL coloured = FALSE;
         UWORD colour_state = 7;
-        UWORD nextStyleColumn;
-        UWORD nextColorColumn;
+        LONG nextStyleColumn;
+        LONG nextColorColumn;
 
         if(styles == NULL)
           nextStyleColumn = EOS;

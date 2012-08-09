@@ -54,8 +54,7 @@ IPTR mExportBlock(struct IClass *cl, Object *obj, struct MUIP_TextEditor_ExportB
 
   if(isFlagSet(flags, MUIF_TextEditor_ExportBlock_TakeBlock))
   {
-
-    if(msg->starty <= (ULONG)data->totallines)
+    if(msg->starty <= data->totallines)
       newblock.startline = LineNode(data, msg->starty+1);
 
     if(msg->startx <= (newblock.startline)->line.Length)
@@ -64,7 +63,7 @@ IPTR mExportBlock(struct IClass *cl, Object *obj, struct MUIP_TextEditor_ExportB
     if(msg->stopx <= (newblock.startline)->line.Length)
       newblock.stopx = msg->stopx;
 
-    if(msg->starty <= (ULONG)data->totallines)
+    if(msg->stopy <= data->totallines)
       newblock.stopline = LineNode(data, msg->stopy+1);
   }
 

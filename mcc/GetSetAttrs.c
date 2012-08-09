@@ -231,8 +231,9 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
   struct InstData *data = INST_DATA(cl, obj);
   struct TagItem *tags, *tag;
   char  *contents = NULL;
-  IPTR  result = FALSE;
-  ULONG crsr_x = 0xffff, crsr_y = 0xffff;
+  IPTR result = FALSE;
+  LONG crsr_x = INT_MAX;
+  LONG crsr_y = INT_MAX;
   BOOL reimport = FALSE;
 
   ENTER();
@@ -806,19 +807,19 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
     }
   }
 
-  if(crsr_x != 0xffff || crsr_y != 0xffff)
+  if(crsr_x != INT_MAX || crsr_y != INT_MAX)
   {
     SetCursor(data, data->CPos_X, data->actualline, FALSE);
 
-    if(crsr_y != 0xffff)
+    if(crsr_y != INT_MAX)
     {
       data->actualline = LineNode(data, crsr_y+1);
       if(data->actualline->line.Length < data->CPos_X)
         data->CPos_X = data->actualline->line.Length-1;
     }
-    if(crsr_x != 0xffff)
+    if(crsr_x != INT_MAX)
     {
-      data->CPos_X = (data->actualline->line.Length > (ULONG)crsr_x) ? (UWORD)crsr_x : (UWORD)data->actualline->line.Length-1;
+      data->CPos_X = (data->actualline->line.Length > crsr_x) ? crsr_x : data->actualline->line.Length-1;
     }
 
     ScrollIntoDisplay(data);

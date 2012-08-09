@@ -124,17 +124,17 @@ extern "C" {
 #define MUIM_TextEditor_ExportBlock           (TextEditor_Dummy + 0x37)
 
 struct MUIP_TextEditor_ARexxCmd          { STACKED ULONG MethodID; STACKED STRPTR command; };
-struct MUIP_TextEditor_BlockInfo         { STACKED ULONG MethodID; STACKED ULONG *startx; STACKED ULONG *starty; STACKED ULONG *stopx; STACKED ULONG *stopy; };
+struct MUIP_TextEditor_BlockInfo         { STACKED ULONG MethodID; STACKED LONG *startx; STACKED LONG *starty; STACKED LONG *stopx; STACKED LONG *stopy; };
 struct MUIP_TextEditor_ClearText         { STACKED ULONG MethodID; };
-struct MUIP_TextEditor_ExportBlock       { STACKED ULONG MethodID; STACKED ULONG flags; STACKED ULONG startx; STACKED ULONG starty; STACKED ULONG stopx; STACKED ULONG stopy; };
+struct MUIP_TextEditor_ExportBlock       { STACKED ULONG MethodID; STACKED ULONG flags; STACKED LONG startx; STACKED LONG starty; STACKED LONG stopx; STACKED LONG stopy; };
 struct MUIP_TextEditor_ExportText        { STACKED ULONG MethodID; };
 struct MUIP_TextEditor_HandleError       { STACKED ULONG MethodID; STACKED ULONG errorcode; }; /* See below for error codes */
 struct MUIP_TextEditor_InsertText        { STACKED ULONG MethodID; STACKED STRPTR text; STACKED LONG pos; }; /* See below for positions */
 struct MUIP_TextEditor_Replace           { STACKED ULONG MethodID; STACKED STRPTR NewString; STACKED ULONG Flags; };
 struct MUIP_TextEditor_Search            { STACKED ULONG MethodID; STACKED STRPTR SearchString; STACKED ULONG Flags; };
-struct MUIP_TextEditor_MarkText          { STACKED ULONG MethodID; STACKED ULONG start_crsr_x; STACKED ULONG start_crsr_y; STACKED ULONG stop_crsr_x; STACKED ULONG stop_crsr_y; };
+struct MUIP_TextEditor_MarkText          { STACKED ULONG MethodID; STACKED LONG start_crsr_x; STACKED LONG start_crsr_y; STACKED LONG stop_crsr_x; STACKED LONG stop_crsr_y; };
 struct MUIP_TextEditor_QueryKeyAction    { STACKED ULONG MethodID; STACKED ULONG keyAction; };
-struct MUIP_TextEditor_SetBlock          { STACKED ULONG MethodID; STACKED ULONG startx; STACKED ULONG starty; STACKED ULONG stopx; STACKED ULONG stopy; STACKED ULONG operation; STACKED ULONG value; };
+struct MUIP_TextEditor_SetBlock          { STACKED ULONG MethodID; STACKED LONG startx; STACKED LONG starty; STACKED LONG stopx; STACKED LONG stopy; STACKED ULONG operation; STACKED ULONG value; };
 
 #define MUIV_TextEditor_ExportHook_Plain       0x00000000UL
 #define MUIV_TextEditor_ExportHook_EMail       0x00000001UL
