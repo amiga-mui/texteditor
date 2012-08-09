@@ -34,13 +34,15 @@
 
 #include <mui/TextEditor_mcc.h>
 
+#include <limits.h>
+
 // if something in our configuration setup (keybindings, etc)
 // has changed we can increase the config version so that TextEditor
 // will popup a warning about and obsolete configuration.
 #define CONFIG_VERSION 4
 
-#define EOS        (unsigned short)-1
-#define EOC        (unsigned short)0xffff
+#define EOS       INT_MAX
+#define EOC       INT_MAX
 
 #define UNDERLINE 0x01
 #define BOLD      0x02
@@ -186,21 +188,21 @@ enum CursorState
 
 struct LineStyle
 {
-  UWORD column;
+  LONG column;
   UWORD style;
 };
 
 struct LineColor
 {
-  UWORD column;
+  LONG column;
   UWORD color;
 };
 
 struct LineNode
 {
   STRPTR   Contents;      // Set this to the linecontents (allocated via the poolhandle)
-  ULONG    Length;        // The length of the line (including the '\n')
-  ULONG allocatedContents;
+  LONG     Length;        // The length of the line (including the '\n')
+  LONG allocatedContents;
   struct LineStyle *Styles; // Set this to the styles used for this line (allocated via the poolhandle). The array is terminated by an (EOS,0) marker
   struct LineColor *Colors; // The colors to use (allocated via the poolhandle). The array is terminated by an (EOC,0) marker
   BOOL     Highlight;     // Set this to TRUE if you want the line to be highlighted
@@ -321,12 +323,12 @@ struct InstData
   UWORD   Separator;
 
   LONG    visual_y;         // The line nr of the top line
-  LONG    totallines;         // Total number of lines
+  LONG    totallines;       // Total number of lines
   LONG    maxlines;         // max visual lines in gadget
   ULONG   flags;
 
   UWORD   cursor_shown;       // Width of stored cursor
-  Object  *object;          // Pointer to the object itself
+  Object  *object;            // Pointer to the object itself
   struct  BitMap *doublebuffer; // Doublebuffer for line-printing
   BOOL    mousemove;
   UWORD   smooth_wait;        // Counter to see if smooth scroll is happening

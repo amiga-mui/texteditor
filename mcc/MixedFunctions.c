@@ -156,7 +156,7 @@ BOOL ExpandLine(struct InstData *data, struct line_node *line, LONG length)
 
   ENTER();
 
-  if(line->line.allocatedContents >=2 && line->line.Length >= line->line.allocatedContents)
+  if(line->line.allocatedContents >= 2 && line->line.Length >= line->line.allocatedContents)
   {
     E(DBF_STYLE, "line length (%ld) > allocated size (%ld)", line->line.Length, line->line.allocatedContents-1);
   }
@@ -610,7 +610,7 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
 {
   struct pos_info pos;
   struct line_node *line;
-  ULONG x;
+  LONG x;
   BOOL drawbottom = (visual_y + (lines-line_nr) - 1) > data->totallines;
 
   ENTER();
@@ -631,9 +631,9 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
       doublebuffer = FALSE;
     }
 
-    while((line != NULL) && (line_nr != lines))
+    while(line != NULL && line_nr != lines)
     {
-      while((x < line->line.Length) && (line_nr != lines))
+      while(x < line->line.Length && line_nr != lines)
         x = x + PrintLine(data, x, line, ++line_nr, doublebuffer);
 
       line = line->next;

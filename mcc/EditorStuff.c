@@ -753,7 +753,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
     {
       LONG t_oldvisual = oldvisual;
       LONG t_line_nr   = line_nr;
-      ULONG c = 0;
+      LONG c = 0;
 
       while((--t_oldvisual) && t_line_nr <= data->maxlines)
       {
@@ -798,7 +798,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
   struct line_node *next;
   struct pos_info pos;
   LONG line_nr, lines;
-  ULONG c;
+  LONG c;
   UWORD crsr_x = data->CPos_X;
   struct line_node *crsr_l = data->actualline;
 
@@ -1141,14 +1141,14 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
       x = line->line.Length;
 
       OffsetToLines(data, x-1, line, &pos);
-      if((ULONG)(line->visual + line->next->visual) >= c && line->visual == lines)
+      if(line->visual + line->next->visual >= c && line->visual == lines)
       {
-        if((ULONG)(line->visual + line->next->visual) > c)
+        if(line->visual + line->next->visual > c)
           data->totallines += 1;
 
         PrintLine(data, pos.bytes, line, line_nr, TRUE);
 
-        if(line_nr+line->next->visual-1 < data->maxlines && (ULONG)(line->visual + line->next->visual) > c)
+        if(line_nr+line->next->visual-1 < data->maxlines && line->visual + line->next->visual > c)
         {
           ScrollDown(data, line_nr+line->next->visual-1, 1);
         }
@@ -1157,7 +1157,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
       {
         PrintLine(data, (x-1)-pos.x, line, line_nr, TRUE);
 
-        if(line_nr < data->maxlines && (ULONG)(line->visual + line->next->visual) < c)
+        if(line_nr < data->maxlines && line->visual + line->next->visual < c)
         {
           data->totallines -= 1;
           ScrollUp(data, line_nr, 1);
