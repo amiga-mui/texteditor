@@ -471,7 +471,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
       // terminate the style array, but only if there are any styles at all
       if(style_grow.itemCount > 0)
       {
-        UWORD lastColumn = strlen(line->Contents)+1;
+        LONG lastColumn = strlen(line->Contents)+1;
 
         // ensure that we terminate the clip with plain style
         if(isFlagSet(state, BOLD))

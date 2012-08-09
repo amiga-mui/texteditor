@@ -28,7 +28,7 @@
 #include "Debug.h"
 
 /// SimpleMarkText()
-static void SimpleMarkText(struct InstData *data, UWORD startx, struct line_node *startline, UWORD stopx, struct line_node *stopline)
+static void SimpleMarkText(struct InstData *data, LONG startx, struct line_node *startline, LONG stopx, struct line_node *stopline)
 {
   ENTER();
 
@@ -72,7 +72,7 @@ IPTR mSearch(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Searc
   {
     BYTE map[256];
     LONG (*StrCmp)(STRPTR, STRPTR, LONG);
-    UWORD cursor;
+    LONG cursor;
     struct line_node *line;
 
     // if the FromTop flag is set we start the search right from the top
@@ -125,7 +125,7 @@ IPTR mSearch(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Searc
 //D(DBF_STARTUP, "MUIF_TextEditor_Search_Backwards  previous=%ld, contents=%s\n",line, contents);
           if(!StrCmp(contents, msg->SearchString, len))
           {
-            UWORD startx = contents - line->line.Contents;
+            LONG startx = contents - line->line.Contents;
 
 //D(DBF_STARTUP, "MUIF_TextEditor_Search_Backwards found\n");
 
@@ -161,7 +161,7 @@ IPTR mSearch(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Searc
           {
             if(!StrCmp(contents, msg->SearchString, len))
             {
-              UWORD startx = contents - line->line.Contents;
+              LONG startx = contents - line->line.Contents;
 
               SimpleMarkText(data, startx, line, startx+len, line);
 

@@ -64,7 +64,7 @@ HOOKPROTONH(SelectCode, void, void *lvobj, long **parms)
   if(entry != NULL)
   {
     int length = strlen(entry);
-    UWORD oldpos;
+    LONG oldpos;
 
     if(Enabled(data))
       Key_Clear(data);
@@ -429,7 +429,8 @@ static BOOL LookupWord(struct InstData *data, CONST_STRPTR word)
 /// SuggestWord()
 void SuggestWord(struct InstData *data)
 {
-  ULONG top, left;
+  LONG top;
+  LONG left;
   LONG line_nr;
   struct pos_info pos;
   struct line_node *line = data->actualline;

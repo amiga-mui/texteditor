@@ -315,9 +315,9 @@ struct InstData
   WORD    ypos;             // ypos of gadget
   UWORD   fontheight;       // font height
 
-  UWORD   CPos_X;           // Cursor x pos.
+  LONG    CPos_X;           // Cursor x pos.
   struct  line_node *actualline;    // The actual line...
-  WORD    pixel_x;          // Pixel x-pos of cursor. (for up/down movement)
+  LONG    pixel_x;          // Pixel x-pos of cursor. (for up/down movement)
   UWORD   style;            // Current style (bold-italic-underline)
   UWORD   Flow;
   UWORD   Separator;
@@ -391,7 +391,7 @@ struct InstData
   UWORD           GlobalTabSize;  // number of spaces as configured in MUI prefs
   UWORD           TabSizePixels;  // number of pixels a Tab2Spaces conversion will consume
   BOOL            ConvertTabs;    // convert to spaces when TAB key is used. Otherwise insert \t
-  ULONG           WrapBorder;
+  LONG            WrapBorder;
   ULONG           WrapMode;
   BOOL            WrapWords;      // wrap at words boundaries rather than hard wrapping at each char
   struct UserAction *undoSteps;   // pointer to memory for the undo actions
@@ -441,7 +441,7 @@ void FreeLine(struct InstData *, struct line_node *);
 
 // BlockOperators.c
 STRPTR GetBlock(struct InstData *, struct marking *);
-void RedrawArea(struct InstData *, UWORD, struct line_node *, UWORD, struct line_node *);
+void RedrawArea(struct InstData *, LONG, struct line_node *, LONG, struct line_node *);
 void NiceBlock(struct marking *, struct marking *);
 LONG CutBlock(struct InstData *, BOOL, BOOL, BOOL);
 LONG CutBlock2(struct InstData *, BOOL, BOOL, BOOL, struct marking *);
@@ -608,9 +608,9 @@ BOOL Undo(struct InstData *);
 BOOL Redo(struct InstData *);
 
 // NewGfx.c
-WORD TextLengthNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, UWORD tabSizePixels);
-ULONG TextFitNew(struct RastPort *rp, CONST_STRPTR string, ULONG strLen, CONST struct TextExtent *textExtent, CONST struct TextExtent *constrainingExtent, LONG strDirection, ULONG constrainingBitWidth, ULONG constrainingBitHeight, UWORD tabSizePixels);
-void TextNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, UWORD tabSizePixels);
+WORD TextLengthNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, LONG tabSizePixels);
+ULONG TextFitNew(struct RastPort *rp, CONST_STRPTR string, ULONG strLen, CONST struct TextExtent *textExtent, CONST struct TextExtent *constrainingExtent, LONG strDirection, ULONG constrainingBitWidth, LONG constrainingBitHeight, LONG tabSizePixels);
+void TextNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, LONG tabSizePixels);
 
 #if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
 // AllocVecPooled.c
@@ -648,9 +648,9 @@ extern struct Hook ExportHookNoStyle;
 struct UpdateData
 {
   UWORD type;
-  UWORD x;
+  LONG x;
   struct line_node *line;
-  UWORD length;
+  LONG length;
   STRPTR characters;
 };
 

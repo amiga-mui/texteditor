@@ -799,7 +799,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
   struct pos_info pos;
   LONG line_nr, lines;
   LONG c;
-  UWORD crsr_x = data->CPos_X;
+  LONG crsr_x = data->CPos_X;
   struct line_node *crsr_l = data->actualline;
 
   ENTER();

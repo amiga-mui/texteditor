@@ -33,7 +33,7 @@
 #include "Debug.h"
 
 /// RedrawArea()
-void RedrawArea(struct InstData *data, UWORD startx, struct line_node *startline, UWORD stopx, struct line_node *stopline)
+void RedrawArea(struct InstData *data, LONG startx, struct line_node *startline, LONG stopx, struct line_node *stopline)
 {
   struct pos_info pos1;
   struct pos_info pos2;
@@ -71,7 +71,8 @@ void RedrawArea(struct InstData *data, UWORD startx, struct line_node *startline
 /// GetBlock()
 STRPTR GetBlock(struct InstData *data, struct marking *block)
 {
-  LONG startx, stopx;
+  LONG startx;
+  LONG stopx;
   struct line_node *startline;
   struct line_node *stopline;
   struct line_node *act;

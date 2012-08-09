@@ -279,4 +279,3 @@ void AddStyle(struct InstData *data, struct marking *realblock, UWORD style, BOO
 }
 
 ///
-

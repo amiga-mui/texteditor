@@ -422,8 +422,8 @@ IPTR mInputTrigger(struct IClass *cl, Object *obj, UNUSED Msg msg)
 ULONG InsertText(struct InstData *data, STRPTR text, BOOL moveCursor)
 {
   struct line_node *line, *actline = data->actualline;
-  UWORD x = data->CPos_X;
-  UWORD realx = 0;
+  LONG x = data->CPos_X;
+  LONG realx = 0;
 
   ENTER();
 

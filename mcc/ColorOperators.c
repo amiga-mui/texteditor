@@ -48,7 +48,7 @@ UWORD GetColor(LONG x, struct line_node *line)
 
 ///
 /// AddColorToLine()
-static void AddColorToLine(struct InstData *data, UWORD x, struct line_node *line, UWORD length, UWORD color)
+static void AddColorToLine(struct InstData *data, LONG x, struct line_node *line, LONG length, UWORD color)
 {
   struct Grow colorGrow;
   struct LineColor *colors;
@@ -132,8 +132,8 @@ void AddColor(struct InstData *data, struct marking *realblock, UWORD color)
   struct marking newblock;
   struct line_node *startline;
   struct line_node *stopline;
-  UWORD startx;
-  UWORD stopx;
+  LONG startx;
+  LONG stopx;
 
   ENTER();
 
@@ -177,4 +177,3 @@ void AddColor(struct InstData *data, struct marking *realblock, UWORD color)
 }
 
 ///
-

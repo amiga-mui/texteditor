@@ -179,8 +179,8 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     }
 
     {
-      UWORD blockstart = 0;
-      UWORD blockwidth = 0;
+      LONG blockstart = 0;
+      LONG blockwidth = 0;
       struct RastPort *old = _rp(data->object);
 
       if(startx < x+c_length && stopx > x)
@@ -304,7 +304,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     {
       LONG p_length = c_length;
       struct TextExtent te;
-      UWORD fitting;
+      LONG fitting;
 
       SetSoftStyle(rp, convert(GetStyle(x, line)), AskSoftStyle(rp));
       if(styles != NULL)

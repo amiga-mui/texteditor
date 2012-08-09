@@ -87,7 +87,7 @@ enum
 static IPTR CallFunction(struct InstData *data, UWORD function, IPTR *args, const char *txtargs)
 {
   struct line_node *oldactualline = data->actualline;
-  UWORD oldCPos_X = data->CPos_X;
+  LONG oldCPos_X = data->CPos_X;
   IPTR result = TRUE;
   LONG new_y = data->visual_y-1;
 
