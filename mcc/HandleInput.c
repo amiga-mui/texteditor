@@ -1247,35 +1247,35 @@ void Key_Tab(struct InstData *data)
 
   if(data->ConvertTabs == FALSE)
   {
-	  struct marking block =
-	  {
-	    TRUE,
-	    data->actualline,
-	    data->CPos_X,
-	    data->actualline,
-	    data->CPos_X+1
-	  };
+	struct marking block =
+	{
+	  TRUE,
+	  data->actualline,
+	  data->CPos_X,
+	  data->actualline,
+	  data->CPos_X+1
+	};
 
-	  CheckWord(data);
-	  AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
-	  data->CPos_X++;
-	  PasteChars(data, data->CPos_X-1, data->actualline, 1, "\t", NULL);
+	CheckWord(data);
+	AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
+	data->CPos_X++;
+	PasteChars(data, data->CPos_X-1, data->actualline, 1, "\t", NULL);
   }
   else
   {
-	  struct marking block =
-	  {
-	    TRUE,
-	    data->actualline,
-	    data->CPos_X,
-	    data->actualline,
-	    data->CPos_X+data->TabSize
-	  };
+	struct marking block =
+	{
+	  TRUE,
+	  data->actualline,
+	  data->CPos_X,
+	  data->actualline,
+	  data->CPos_X+data->TabSize
+	};
 
-	  CheckWord(data);
-	  AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
-	  data->CPos_X += data->TabSize;
-	  PasteChars(data, data->CPos_X-data->TabSize, data->actualline, data->TabSize, "            ", NULL);
+	CheckWord(data);
+	AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
+	data->CPos_X += data->TabSize;
+	PasteChars(data, data->CPos_X-data->TabSize, data->actualline, data->TabSize, "            ", NULL);
   }
 
   LEAVE();

@@ -130,8 +130,10 @@ static void AddColorToLine(struct InstData *data, UWORD x, struct line_node *lin
 void AddColor(struct InstData *data, struct marking *realblock, UWORD color)
 {
   struct marking newblock;
-  struct line_node *startline, *stopline;
-  UWORD startx, stopx;
+  struct line_node *startline;
+  struct line_node *stopline;
+  UWORD startx;
+  UWORD stopx;
 
   ENTER();
 

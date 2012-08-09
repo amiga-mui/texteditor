@@ -666,7 +666,8 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
             startline = newblock.startline;
             start = LineToVisual(data, startline);
 
-            do {
+            do
+            {
               lines += startline->visual;
               startline->line.Flow = ti_Data;
               startline = startline->next;

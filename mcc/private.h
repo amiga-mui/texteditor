@@ -222,17 +222,17 @@ struct line_node
 
 struct bookmark
 {
-  struct  line_node *line;
-  ULONG   x;
+  struct line_node *line;
+  LONG x;
 };
 
 struct marking
 {
-  BOOL    enabled;              // Boolean that indicates wether block is on/off
-  struct  line_node *startline; // Line where blockings starts
-  UWORD   startx;               // X place of start
-  struct  line_node *stopline;  // Line where marking ends
-  UWORD   stopx;                // X place of stop
+  BOOL enabled;                // Boolean that indicates wether block is on/off
+  struct line_node *startline; // Line where blockings starts
+  LONG startx;                 // X place of start
+  struct line_node *stopline;  // Line where marking ends
+  LONG stopx;                  // X place of stop
 };
 
 struct pos_info
