@@ -407,8 +407,9 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
 
   UWORD styles[3] = {0, 0, 0};
   UWORD colors[3] = {0, 0, 0};
-  WORD  start = 0, stop = 0;
-  LONG  c;
+  LONG start = 0;
+  LONG stop = 0;
+  LONG c;
   UWORD flow;
 
   ENTER();
