@@ -261,10 +261,12 @@ struct UserAction
 
   struct
   {
-    UWORD x, y;        // pasteblock
+    LONG x;            // pasteblock
+    LONG y;            // pasteblock
   } blk;
 
-  UWORD x, y;
+  LONG x;
+  LONG y;
 };
 
 struct ExportMessage
