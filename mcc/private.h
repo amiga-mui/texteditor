@@ -312,8 +312,8 @@ struct Grow
 
 struct InstData
 {
-  WORD    ypos;             // ypos of gadget
-  UWORD   fontheight;       // font height
+  LONG    ypos;             // ypos of gadget
+  LONG    fontheight;       // font height
 
   LONG    CPos_X;           // Cursor x pos.
   struct  line_node *actualline;    // The actual line...
@@ -356,7 +356,8 @@ struct InstData
   Object  *KeyUpFocus;
   Object  *PointerObj;
 
-  ULONG   Rows, Columns;  // The value of the rows/columns tags
+  LONG    Rows;     // The value of the rows tag
+  LONG    Columns;  // The value of the columns tag
 
   struct te_key *RawkeyBindings;
   ULONG   blockqual;
@@ -380,7 +381,7 @@ struct InstData
   struct  TextFont  *fixedfont;
 
   UWORD           BlinkSpeed;
-  UWORD           CursorWidth;
+  LONG            CursorWidth;
   struct  Hook    *DoubleClickHook;
   struct  Hook    *ExportHook;
   struct  Hook    *ImportHook;

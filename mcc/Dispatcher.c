@@ -359,7 +359,7 @@ static IPTR mAskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *ms
 {
   struct InstData *data = INST_DATA(cl, obj);
   struct MUI_MinMax *mi;
-  ULONG fontheight;
+  LONG fontheight;
 
   ENTER();
 
@@ -368,10 +368,10 @@ static IPTR mAskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *ms
 
   mi = ((struct MUIP_AskMinMax *)msg)->MinMaxInfo;
 
-  if(data->Columns)
+  if(data->Columns != 0)
   {
     // for the font width we take the nominal font width provided by the tf_XSize attribute
-    ULONG width = data->Columns * (data->font ? data->font->tf_XSize : _font(obj)->tf_XSize);
+    LONG width = data->Columns * (data->font ? data->font->tf_XSize : _font(obj)->tf_XSize);
 
     mi->MinWidth += width;
     mi->DefWidth += width;
@@ -385,9 +385,9 @@ static IPTR mAskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *ms
   }
 
   fontheight = data->font ? data->font->tf_YSize : _font(obj)->tf_YSize;
-  if(data->Rows)
+  if(data->Rows != 0)
   {
-    ULONG height = data->Rows * fontheight;
+    LONG height = data->Rows * fontheight;
 
     mi->MinHeight += height;
     mi->DefHeight += height;
