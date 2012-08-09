@@ -58,7 +58,7 @@ void ResetDisplay(struct InstData *data)
   data->pixel_x = 0;
   data->actualline = line;
 
-  data->cursor_shown = 0;
+  data->cursor_shown = FALSE;
   if(data->shown == TRUE)
   {
     while(line != NULL)
