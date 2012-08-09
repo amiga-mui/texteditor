@@ -53,12 +53,12 @@ ULONG FlowSpace(struct InstData *data, UWORD flow, STRPTR text)
 
 ///
 /// CursorOffset()
-static ULONG CursorOffset(struct InstData *data)
+static LONG CursorOffset(struct InstData *data)
 {
   struct line_node *line = data->actualline;
   STRPTR text = &line->line.Contents[data->CPos_X];
-  ULONG res=0;
-  ULONG lineCharsWidth;
+  LONG res=0;
+  LONG lineCharsWidth;
 
   ENTER();
 
@@ -479,7 +479,7 @@ void GoRight(struct InstData *data)
 {
   ENTER();
 
-  if((LONG)data->actualline->line.Length > data->CPos_X+1)
+  if(data->actualline->line.Length > data->CPos_X+1)
     data->CPos_X++;
   else
     NextLine(data);

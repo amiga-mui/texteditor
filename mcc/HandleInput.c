@@ -519,9 +519,11 @@ void Key_Normal(struct InstData *data, char key)
   // wrapping during writing text and if so we go and perform the hard word
   // wrapping at the correct border.
   if(data->WrapMode == MUIV_TextEditor_WrapMode_HardWrap &&
-     data->WrapBorder > 0 && (data->CPos_X > data->WrapBorder) && (key != ' '))
+     data->WrapBorder > 0 &&
+     data->CPos_X > data->WrapBorder &&
+     key != ' ')
   {
-    ULONG xpos = data->WrapBorder+1;
+    LONG xpos = data->WrapBorder+1;
     D(DBF_INPUT, "must wrap");
 
     // now we make sure to wrap *exactly* at the WrapBorder the user
@@ -542,7 +544,7 @@ void Key_Normal(struct InstData *data, char key)
     // now we do the line split operation at the xpos we found
     if(xpos != 0 && xpos < data->CPos_X)
     {
-      ULONG length = data->CPos_X-xpos;
+      LONG length = data->CPos_X-xpos;
 
       data->CPos_X = xpos;
       AddToUndoBuffer(data, ET_SPLITLINE, NULL);
@@ -604,7 +606,7 @@ static BOOL ConvertKey(struct InstData *data, struct IntuiMessage *imsg)
 static BOOL ReactOnRawKey(struct InstData *data, struct IntuiMessage *imsg)
 {
   struct line_node *oldactualline = data->actualline;
-  UWORD oldCPos_X = data->CPos_X;
+  LONG oldCPos_X = data->CPos_X;
   BOOL result = TRUE;
   LONG dummy;
 
@@ -932,7 +934,7 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                 }
                 else
                 {
-                  UWORD last_x = data->CPos_X;
+                  LONG last_x = data->CPos_X;
                   struct line_node *lastline = data->actualline;
 
                   RequestInput(data);
@@ -994,7 +996,7 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                           }
                           else
                           {
-                            int x = data->CPos_X;
+                            LONG x = data->CPos_X;
 
                             while(x > 0 && CheckSep(data, data->actualline->line.Contents[x-1]) == FALSE)
                               x--;

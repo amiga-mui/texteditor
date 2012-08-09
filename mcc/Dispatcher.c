@@ -87,7 +87,6 @@ void ResetDisplay(struct InstData *data)
       TAG_DONE);
     data->NoNotify = FALSE;
 
-
     UpdateStyles(data);
 
     DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
@@ -806,7 +805,7 @@ DISPATCHER(_Dispatcher)
     case MUIM_GoInactive:                result = mGoInactive(cl, obj, msg);               RETURN(result); return result; break;
     case MUIM_HandleEvent:
     {
-      ULONG oldx = data->CPos_X;
+      LONG oldx = data->CPos_X;
       struct line_node *oldy = data->actualline;
 
       // process all input events

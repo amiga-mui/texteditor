@@ -31,13 +31,13 @@
 
 #include "Debug.h"
 
-WORD TextLengthNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, UWORD tabSizePixels)
+LONG TextLengthNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, LONG tabSizePixels)
 {
-  WORD result = 0;
+  LONG result = 0;
   char c;
   char *tptr;
   char *tptr0;
-  ULONG count0 = 0;
+  LONG count0 = 0;
   tptr = (char *)string;
   tptr0 = tptr;
 
@@ -48,9 +48,9 @@ WORD TextLengthNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, UWORD 
     c=*tptr;
     tptr++;
 
-    if(!count)
+    if(count == 0)
     {
-      if(count0)
+      if(count0 != 0)
         result += TextLength(rp, tptr0, count0);
 
       RETURN(result);
@@ -59,7 +59,7 @@ WORD TextLengthNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, UWORD 
 
     if(c == '\t')
     {
-      if(count0)
+      if(count0 != 0)
         result += TextLength(rp, tptr0, count0);
 
       tptr0=tptr;
@@ -75,7 +75,7 @@ WORD TextLengthNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, UWORD 
   while(1);
 }
 
-ULONG TextFitNew(struct RastPort *rp, CONST_STRPTR string, ULONG strLen, struct TextExtent *textExtent, CONST struct TextExtent *constrainingExtent, LONG strDirection, LONG/*ULONG*/ constrainingBitWidth, ULONG constrainingBitHeight, UWORD tabSizePixels)
+ULONG TextFitNew(struct RastPort *rp, CONST_STRPTR string, ULONG strLen, struct TextExtent *textExtent, CONST struct TextExtent *constrainingExtent, LONG strDirection, LONG constrainingBitWidth, LONG constrainingBitHeight, LONG tabSizePixels)
 {
   ULONG result=0;
   ULONG strLen0=0;
@@ -94,7 +94,7 @@ ULONG TextFitNew(struct RastPort *rp, CONST_STRPTR string, ULONG strLen, struct 
 
     if(!strLen)
     {
-      result += TextFit(rp, tptr0, strLen0, textExtent, constrainingExtent, strDirection, (ULONG)constrainingBitWidth, constrainingBitHeight);
+      result += TextFit(rp, tptr0, strLen0, textExtent, constrainingExtent, strDirection, constrainingBitWidth, constrainingBitHeight);
 
       RETURN(result);
       return(result);
@@ -106,7 +106,7 @@ ULONG TextFitNew(struct RastPort *rp, CONST_STRPTR string, ULONG strLen, struct 
       {
         result += TextFit(rp, tptr0, strLen0, textExtent, constrainingExtent, strDirection, constrainingBitWidth, constrainingBitHeight);
       }
-      
+
       if((constrainingBitWidth -= TextLengthNew(rp, tptr0, strLen0+1, tabSizePixels)) <= 0)
       {
         RETURN(result);
@@ -119,18 +119,18 @@ ULONG TextFitNew(struct RastPort *rp, CONST_STRPTR string, ULONG strLen, struct 
     }
     else
       strLen0++;
-    
+
     strLen--;
   }
   while(1);
 }
 
-void TextNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, UWORD tabSizePixels)
+void TextNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, LONG tabSizePixels)
 {
   char c;
   char *tptr;
   char *tptr0;
-  ULONG count0=0;
+  LONG count0=0;
 
   ENTER();
 
@@ -142,7 +142,7 @@ void TextNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, UWORD tabSiz
     c=*tptr;
     tptr++;
 
-    if(!count)
+    if(count == 0)
     {
       Text(rp, tptr0, count0);
 
@@ -152,7 +152,7 @@ void TextNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, UWORD tabSiz
 
     if(c == '\t')
     {
-      if(count0)
+      if(count0 != 0)
         Text(rp, tptr0, count0);
 
       tptr0=tptr;
@@ -160,7 +160,7 @@ void TextNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, UWORD tabSiz
 
       rp->cp_x += tabSizePixels;
     }
-    else 
+    else
       count0++;
 
     count--;

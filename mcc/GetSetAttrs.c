@@ -50,8 +50,10 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
   {
     case MUIA_TextEditor_CursorPosition:
     {
-      UWORD xplace, yplace, cursor_width;
-      UWORD x = data->CPos_X;
+      LONG xplace;
+      LONG yplace;
+      LONG cursor_width;
+      LONG x = data->CPos_X;
       struct line_node *line = data->actualline;
       LONG line_nr = LineToVisual(data, line) - 1;
       struct pos_info pos;
@@ -694,7 +696,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_TextEditor_WrapBorder:
       {
-        if(data->WrapBorder != ti_Data)
+        if(data->WrapBorder != (LONG)ti_Data)
         {
           data->WrapBorder = ti_Data;
           ResetDisplay(data);

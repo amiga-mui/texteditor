@@ -238,7 +238,7 @@ LONG LineCharsWidth(struct InstData *data, CONST_STRPTR text)
     // if the user selected soft wrapping with a defined wrapborder
     // we have to check if we take that border or do the soft wrapping
     // at the innerwidth of the texteditor
-    if(data->WrapBorder > 0 && (ULONG)c > data->WrapBorder && data->WrapMode == MUIV_TextEditor_WrapMode_SoftWrap)
+    if(data->WrapBorder > 0 && c > data->WrapBorder && data->WrapMode == MUIV_TextEditor_WrapMode_SoftWrap)
       c = data->WrapBorder;
 
     // now we check wheter all chars fit on the current innerwidth
