@@ -317,11 +317,11 @@ void OffsetToLines(struct InstData *data, LONG x, struct line_node *line, struct
 
   if(data->shown == TRUE)
   {
-    ULONG c=0;
-    ULONG d=0;
-    ULONG lines=0;
+    LONG c = 0;
+    LONG d = 0;
+    LONG lines = 0;
 
-    while(c <= (ULONG)x)
+    while(c <= x)
     {
       LONG e = LineCharsWidth(data, &line->line.Contents[c]);
 
@@ -336,17 +336,17 @@ void OffsetToLines(struct InstData *data, LONG x, struct line_node *line, struct
         break;
     }
 
-    pos->lines  = lines;
-    pos->x      = x - d;
-    pos->bytes  = d;
-    pos->extra  = c;
+    pos->lines = lines;
+    pos->x     = x - d;
+    pos->bytes = d;
+    pos->extra = c;
   }
   else
   {
-    pos->lines  = 1;
-    pos->x      = x;
-    pos->bytes  = 0;
-    pos->extra  = line->line.Length-1;
+    pos->lines = 1;
+    pos->x     = x;
+    pos->bytes = 0;
+    pos->extra = line->line.Length-1;
   }
 
   LEAVE();

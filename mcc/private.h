@@ -237,11 +237,11 @@ struct marking
 
 struct pos_info
 {
-  struct  line_node *line;      // Pointer to actual line
-  UWORD   lines;                // Lines down
-  UWORD   x;                    // Chars in
-  UWORD   bytes;                // Lines in bytes
-  UWORD   extra;                // Lines+1 in bytes
+  struct line_node *line; // Pointer to actual line
+  LONG lines;             // Lines down
+  LONG x;                 // Chars in
+  LONG bytes;             // Lines in bytes
+  LONG extra;             // Lines+1 in bytes
 };
 
 struct UserAction
