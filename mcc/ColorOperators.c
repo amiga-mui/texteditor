@@ -65,13 +65,9 @@ static void AddColorToLine(struct InstData *data, UWORD x, struct line_node *lin
     // keep all color changes ahead of the new color
     while(colors->column != EOC && colors->column < x)
     {
-      struct LineColor newColor;
-
-      newColor.column = colors->column;
-      newColor.color = colors->color;
       oldcol = colors->color;
+      AddToGrow(&colorGrow, colors);
       colors++;
-      AddToGrow(&colorGrow, &newColor);
     }
   }
   // add the new color if it is different from the last one
@@ -106,11 +102,7 @@ static void AddColorToLine(struct InstData *data, UWORD x, struct line_node *lin
   {
     while(colors->column != EOC)
     {
-      struct LineColor newColor;
-
-      newColor.column = colors->column;
-      newColor.color = colors->color;
-      AddToGrow(&colorGrow, &newColor);
+      AddToGrow(&colorGrow, colors);
       colors++;
     }
   }

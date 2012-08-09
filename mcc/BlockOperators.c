@@ -289,12 +289,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
         // copy all styles until the end of the block
         while(oldstyles->column <= stopx)
         {
-          struct LineStyle newStyle;
-
-          newStyle.column = oldstyles->column;
-          newStyle.style = oldstyles->style;
-          AddToGrow(&styleGrow, &newStyle);
-
+          AddToGrow(&styleGrow, oldstyles);
           oldstyles++;
         }
 
@@ -355,12 +350,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
           // apply real color changes only
           if(oldcolors->color != lastcolor)
           {
-            struct LineColor newColor;
-
-            newColor.column = oldcolors->column;
-            newColor.color = oldcolors->color;
-            AddToGrow(&colorGrow, &newColor);
-
+            AddToGrow(&colorGrow, oldcolors);
             // remember this color change
             lastcolor = oldcolors->color;
           }
