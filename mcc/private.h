@@ -645,15 +645,6 @@ extern struct Hook ExportHookPlain;
 extern struct Hook ExportHookEMail;
 extern struct Hook ExportHookNoStyle;
 
-struct UpdateData
-{
-  UWORD type;
-  LONG x;
-  struct line_node *line;
-  LONG length;
-  STRPTR characters;
-};
-
 #define IEQUALIFIER_SHIFT   0x0200
 #define IEQUALIFIER_ALT     0x0400
 #define IEQUALIFIER_COMMAND 0x0800
