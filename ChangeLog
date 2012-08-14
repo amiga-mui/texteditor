@@ -9,6 +9,8 @@ $URL$
 
   * mcc/GetSetAttrs.c: treat a NULL content pointer as an empty text. Otherwise
     setting a NULL content will have no effect.
+  * mcc/GetSetAttrs.c: enabling/disabling the object will cause a redraw event
+    only if the state really changes and MUI4 is not available.
 
 2012-08-09 Thore Böckelmann <tboeckel@gmx.de>
 

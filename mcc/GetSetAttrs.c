@@ -242,7 +242,8 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 
   if(data->shown == TRUE && isFlagClear(data->flags, FLG_Draw))
   {
-    if((tag = FindTagItem(MUIA_Disabled, msg->ops_AttrList)) != NULL)
+    // handle the disabled flag only if we are not under control of MUI4
+    if(isFlagClear(data->flags, FLG_MUI4) && (tag = FindTagItem(MUIA_Disabled, msg->ops_AttrList)) != NULL)
     {
       if(tag->ti_Data)
         setFlag(data->flags, FLG_Ghosted);
@@ -268,17 +269,33 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       break;
 
       case MUIA_Disabled:
-        if(ti_Data)
-          setFlag(data->flags, FLG_Ghosted);
-        else
-          clearFlag(data->flags, FLG_Ghosted);
+      {
+        BOOL modified = FALSE;
 
-        // make sure an eventually existing slider is disabled as well
+        if(ti_Data && isFlagClear(data->flags, FLG_Ghosted))
+        {
+          setFlag(data->flags, FLG_Ghosted);
+          modified = TRUE;
+        }
+        else if(!ti_Data && isFlagSet(data->flags, FLG_Ghosted))
+        {
+          clearFlag(data->flags, FLG_Ghosted);
+          modified = TRUE;
+        }
+
+        // perform a redraw only if the disabled state has really changed
+        // and we are NOT under the control of MUI4 which does the ghost
+        // effect itself
+        if(modified == TRUE && isFlagClear(data->flags, FLG_MUI4))
+        {
+          MUI_Redraw(obj, MADF_DRAWOBJECT);
+        }
+
+        // make sure a possibly existing slider is disabled as well
         if(data->slider != NULL)
           set(data->slider, MUIA_Disabled, ti_Data);
-
-        MUI_Redraw(obj, MADF_DRAWOBJECT);
-        break;
+      }
+      break;
 
       case MUIA_TextEditor_Rows:
         data->Rows = ti_Data;
@@ -297,24 +314,24 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_TextEditor_ColorMap:
         data->colormap = (ULONG *)ti_Data;
-        break;
+      break;
 
       case MUIA_TextEditor_InVirtualGroup:
         if(ti_Data)
           setFlag(data->flags, FLG_InVGrp);
         else
           clearFlag(data->flags, FLG_InVGrp);
-        break;
+      break;
 
       case MUIA_TextEditor_CursorX:
         if(data->NoNotify == FALSE)
           crsr_x = ti_Data;
-        break;
+      break;
 
       case MUIA_TextEditor_CursorY:
         if(data->NoNotify == FALSE)
           crsr_y = ti_Data;
-        break;
+      break;
 
       case MUIA_TextEditor_Prop_Release:
         data->smooth_wait = ti_Data;
@@ -479,6 +496,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       break;
 
       case MUIA_TextEditor_Quiet:
+      {
         if(ti_Data)
         {
           setFlag(data->flags, FLG_Quiet);
@@ -493,28 +511,31 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
             set(obj, MUIA_TextEditor_Prop_Entries, data->totallines*data->fontheight);
           set(obj, MUIA_TextEditor_Prop_First, (data->visual_y-1)*data->fontheight);
         }
-        break;
+      }
+      break;
 
       case MUIA_TextEditor_StyleBold:
         AddStyle(data, &data->blockinfo, BOLD, ti_Data != 0);
-        break;
+      break;
 
       case MUIA_TextEditor_StyleItalic:
         AddStyle(data, &data->blockinfo, ITALIC, ti_Data != 0);
-        break;
+      break;
 
       case MUIA_TextEditor_StyleUnderline:
         AddStyle(data, &data->blockinfo, UNDERLINE, ti_Data != 0);
-        break;
+      break;
 
       case MUIA_TextEditor_Pen:
+      {
         if(data->NoNotify == FALSE)
         {
           data->Pen = ti_Data;
           AddColor(data, &data->blockinfo, (UWORD)ti_Data);
           data->HasChanged = TRUE;
         }
-        break;
+      }
+      break;
 
       case MUIA_TextEditor_KeyUpFocus:
         data->KeyUpFocus = (Object *)ti_Data;
