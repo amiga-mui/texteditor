@@ -29,8 +29,8 @@
 #include "private.h"
 #include "Debug.h"
 
-/// convert()
-ULONG convert(UWORD style)
+/// ConvertStyle()
+ULONG ConvertStyle(UWORD style)
 {
   ULONG result = FS_NORMAL;
 
@@ -306,7 +306,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       struct TextExtent te;
       LONG fitting;
 
-      SetSoftStyle(rp, convert(GetStyle(x, line)), AskSoftStyle(rp));
+      SetSoftStyle(rp, ConvertStyle(GetStyle(x, line)), AskSoftStyle(rp));
       if(styles != NULL)
       {
         while(styles->column-1 <= x)

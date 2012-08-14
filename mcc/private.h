@@ -577,7 +577,7 @@ void ShowSelectPointer(struct InstData *data, Object *obj);
 void HideSelectPointer(struct InstData *data, Object *obj);
 
 // PrintLineWithStyles.c
-ULONG convert(UWORD);
+ULONG ConvertStyle(UWORD);
 LONG PrintLine(struct InstData *, LONG, struct line_node *, LONG, BOOL);
 ULONG ConvertPen(struct InstData *, UWORD, BOOL);
 void DrawSeparator(struct InstData *, struct RastPort *, LONG, LONG, LONG, LONG);
