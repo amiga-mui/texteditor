@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-08-14 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/GetSetAttrs.c: treat a NULL content pointer as an empty text. Otherwise
+    setting a NULL content will have no effect.
+
 2012-08-09 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: avoid copying styles and colors too often.

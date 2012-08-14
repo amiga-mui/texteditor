@@ -32,7 +32,7 @@
  Import the given 0 terminated text by invoking the given import Hook
  for every line
 ***********************************************************************/
-struct line_node *ImportText(struct InstData *data, char *contents, struct Hook *importHook, LONG wraplength)
+struct line_node *ImportText(struct InstData *data, const char *contents, struct Hook *importHook, LONG wraplength)
 {
   struct line_node *first_line;
 

@@ -34,7 +34,7 @@
 
 /*************************************************************************/
 /// GetHex()
-static LONG GetHex(char *src)
+static LONG GetHex(const char *src)
 {
   LONG result = -1;
 
@@ -57,10 +57,10 @@ static LONG GetHex(char *src)
  Convert a =XX string to it's value (into *val). Returns TRUE if
  conversion was successfull in that case *src_ptr will advanved as well.
 *************************************************************************/
-static BOOL GetQP(char **src_ptr, unsigned char *val)
+static BOOL GetQP(const char **src_ptr, unsigned char *val)
 {
   unsigned char v;
-  char *src = *src_ptr;
+  const char *src = *src_ptr;
   int rc;
   BOOL result = FALSE;
 
@@ -90,7 +90,7 @@ static BOOL GetQP(char **src_ptr, unsigned char *val)
  Reads out the next value at *src_ptr and advances src_ptr.
  Returns TRUE if succedded else FALSE
 *************************************************************************/
-static BOOL GetLong(char **src_ptr, LONG *val)
+static BOOL GetLong(const char **src_ptr, LONG *val)
 {
   LONG chars;
   BOOL result = FALSE;
@@ -116,11 +116,11 @@ static BOOL GetLong(char **src_ptr, LONG *val)
 
  This function also counts the number of tabs within this line.
 *************************************************************************/
-static char *FindEOL(char *src, int *tabs_ptr)
+static const char *FindEOL(const char *src, int *tabs_ptr)
 {
   int tabs = 0;
   char c;
-  char *eol = src;
+  const char *eol = src;
 
   ENTER();
 
@@ -147,7 +147,7 @@ static char *FindEOL(char *src, int *tabs_ptr)
  searches through a string and returns TRUE if the string contains
  any text (except newlines) until the stopchar is found
 *************************************************************************/
-static BOOL ContainsText(char *str, char stopchar)
+static BOOL ContainsText(const char *str, const char stopchar)
 {
   BOOL contains = FALSE;
 
@@ -205,9 +205,9 @@ static BOOL ContainsText(char *str, char stopchar)
 HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 {
   STRPTR result = NULL;
-  char *eol;
-  char *src = msg->Data;
-  int tabs=0;
+  const char *eol;
+  const char *src = msg->Data;
+  int tabs = 0;
 
   ENTER();
 
@@ -513,7 +513,7 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
     if(eol != NULL && eol[0] != '\0')
     {
       eol++;
-      result = eol;
+      result = (STRPTR)eol;
     }
   }
 
@@ -557,8 +557,8 @@ MakeHook(ImPlainHook, PlainImportHookFunc);
 static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 {
   STRPTR result = NULL;
-  char *eol;
-  char *src = msg->Data;
+  const char *eol;
+  const char *src = msg->Data;
   int tabs=0;
 
   ENTER();
@@ -977,7 +977,7 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
     if(eol != NULL && eol[0] != '\0')
     {
       eol++;
-      result = eol;
+      result = (STRPTR)eol;
     }
   }
 
