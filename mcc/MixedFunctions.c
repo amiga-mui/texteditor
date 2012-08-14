@@ -443,7 +443,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
         if(c > stop)
           stop = c;
 
-        styles[c+1] = convert(GetStyle(x+c, line));
+        styles[c+1] = GetStyle(x+c, line);
         colors[c+1] = GetColor(x+c, line);
         chars[c+1] = (line->line.Contents[x+c] != '\n') ? line->line.Contents[x+c] : ' ';
       }
@@ -561,7 +561,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
       for(c = start; c <= stop; c++)
       {
         SetAPen(rp, ConvertPen(data, colors[1+c], line->line.Highlight));
-        SetSoftStyle(rp, styles[1+c], AskSoftStyle(rp));
+        SetSoftStyle(rp, ConvertStyle(styles[1+c]), AskSoftStyle(rp));
         TextNew(rp, (STRPTR)&chars[1+c], 1, data->TabSizePixels);
       }
       SetSoftStyle(rp, FS_NORMAL, AskSoftStyle(rp));
