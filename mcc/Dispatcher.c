@@ -173,6 +173,13 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
               // no need to do this on our own
               setFlag(data->flags, FLG_MUI4);
             }
+            #elif defined(__MORPHOS__)
+            if(MUIMasterBase->lib_Version > 20 || (MUIMasterBase->lib_Version == 20 && MUIMasterBase->lib_Revision >= 6906))
+            {
+              // MUI 4.0 for MorphOS does the disabled pattern drawing itself,
+              // no need to do this on our own
+              setFlag(data->flags, FLG_MUI4);
+            }
             #endif
 
             if(FindTagItem(MUIA_Background, msg->ops_AttrList))
