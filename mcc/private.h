@@ -291,12 +291,12 @@ struct ExportMessage
 
 struct ImportMessage
 {
-  STRPTR  Data;               // The first time the hook is called, then this will be either the value of MUIA_TextEditor_Contents, or the argument given to MUIM_TextEditor_Insert.
-  struct  LineNode *linenode; // Pointer to a linenode, which you should fill out
-  APTR    PoolHandle;         // A poolhandle, all allocations done for styles or contents must be made from this pool, and the size of the allocation must be stored in the first LONG
-  LONG    ImportWrap;         // For your use only (reflects MUIA_TextEditor_ImportWrap)
-  ULONG   ConvertTabs;        // do not convert to spaces when importing tabs (\t)
-  LONG    TabSize;            // if convert tabs to spaces we specify here how many spaces to use
+  const char *Data;          // The first time the hook is called, then this will be either the value of MUIA_TextEditor_Contents, or the argument given to MUIM_TextEditor_Insert.
+  struct LineNode *linenode; // Pointer to a linenode, which you should fill out
+  APTR PoolHandle;           // A poolhandle, all allocations done for styles or contents must be made from this pool, and the size of the allocation must be stored in the first LONG
+  LONG ImportWrap;           // For your use only (reflects MUIA_TextEditor_ImportWrap)
+  ULONG ConvertTabs;         // do not convert to spaces when importing tabs (\t)
+  LONG TabSize;              // if convert tabs to spaces we specify here how many spaces to use
 };
 
 struct Grow
@@ -510,7 +510,7 @@ void ScrollIntoDisplay(struct InstData *);
 void MarkText(struct InstData *, LONG, struct line_node *, LONG, struct line_node *);
 
 // ImportText.c
-struct line_node *ImportText(struct InstData *, char *, struct Hook *, LONG);
+struct line_node *ImportText(struct InstData *, const char *, struct Hook *, LONG);
 BOOL ReimportText(struct IClass *, Object *j);
 
 // InitConfig.c

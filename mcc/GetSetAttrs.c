@@ -232,7 +232,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
   struct TagItem *tags, *tag;
-  char  *contents = NULL;
+  const char *contents = NULL;
   IPTR result = FALSE;
   LONG crsr_x = INT_MAX;
   LONG crsr_y = INT_MAX;
@@ -598,7 +598,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       break;
 
       case MUIA_TextEditor_Contents:
-        contents = (char *)ti_Data;
+        contents = ti_Data ? (const char *)ti_Data : "";
       break;
 
       case MUIA_TextEditor_ImportHook:

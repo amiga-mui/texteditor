@@ -238,7 +238,8 @@ TextEditor.mcc/MUIM_TextEditor_Search
     FUNCTION
         Set the contents of this gadget.  This should normally be a pointer to
         a text buffer, but if you have supplied your own import hook, then you
-        can set this to anything you like, e.g. a filehandle.
+        can set this to anything you like, e.g. a filehandle. Passing NULL as
+        pointer will be treated as an empty text.
 
     NOTE
         Setting a text content BEFORE the class has executed the MUIM_Setup
