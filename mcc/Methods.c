@@ -122,17 +122,7 @@ IPTR mMarkText(struct InstData *data, struct MUIP_TextEditor_MarkText *msg)
     else
     {
       // the user selected to mark all available text
-      struct line_node *actual = data->firstline;
-
-      data->blockinfo.startline = actual;
-      data->blockinfo.startx = 0;
-
-      while(actual->next)
-        actual = actual->next;
-
-      data->blockinfo.stopline = actual;
-      data->blockinfo.stopx = data->blockinfo.stopline->line.Length-1;
-      data->blockinfo.enabled = TRUE;
+      MarkAllBlock(data, &data->blockinfo);
     }
 
     MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);

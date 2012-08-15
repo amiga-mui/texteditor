@@ -412,17 +412,7 @@ static IPTR CallFunction(struct InstData *data, UWORD function, IPTR *args, cons
 
       case SELECTALL:
       {
-        struct line_node *actual = data->firstline;
-
-        data->blockinfo.startline = actual;
-        data->blockinfo.startx = 0;
-
-        while(actual->next != NULL)
-          actual = actual->next;
-
-        data->blockinfo.stopline = actual;
-        data->blockinfo.stopx = data->blockinfo.stopline->line.Length-1;
-        data->blockinfo.enabled = TRUE;
+        MarkAllBlock(data, &data->blockinfo);
         MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
       }
       break;

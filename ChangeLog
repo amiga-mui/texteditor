@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-08-15 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/BlockOperators.c: implemented a new function to mark the complete text.
+
 2012-08-14 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/GetSetAttrs.c: treat a NULL content pointer as an empty text. Otherwise
