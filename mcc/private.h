@@ -441,6 +441,7 @@ struct line_node *AllocLine(struct InstData *);
 void FreeLine(struct InstData *, struct line_node *);
 
 // BlockOperators.c
+void MarkAllBlock(struct InstData *, struct marking *);
 STRPTR GetBlock(struct InstData *, struct marking *);
 void RedrawArea(struct InstData *, LONG, struct line_node *, LONG, struct line_node *);
 void NiceBlock(struct marking *, struct marking *);

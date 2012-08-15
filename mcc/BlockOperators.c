@@ -68,6 +68,27 @@ void RedrawArea(struct InstData *data, LONG startx, struct line_node *startline,
 }
 
 ///
+/// MarkAllBlock()
+void MarkAllBlock(struct InstData *data, struct marking *block)
+{
+  struct line_node *actual = data->firstline;
+
+  ENTER();
+
+  block->startline = actual;
+  block->startx = 0;
+
+  while(actual->next != NULL)
+    actual = actual->next;
+
+  block->stopline = actual;
+  block->stopx = block->stopline->line.Length-1;
+  block->enabled = TRUE;
+
+  LEAVE();
+}
+
+///
 /// GetBlock()
 STRPTR GetBlock(struct InstData *data, struct marking *block)
 {
