@@ -284,6 +284,9 @@ ifeq ($(OS), mos)
   LDFLAGS += -noixemul
   LDLIBS  += -ldebug
 
+  # additional object files required
+  COBJS += extrasrc/MoveList.o
+
 else
 ifeq ($(OS), aros-i386)
 
@@ -300,6 +303,9 @@ ifeq ($(OS), aros-i386)
   OPTFLAGS = -O2 -fomit-frame-pointer
   CFLAGS += -Wno-pointer-sign -DNO_INLINE_STDARG
   LDLIBS += -larossupport -lrom -lmui
+
+  # additional object files required
+  COBJS += extrasrc/MoveList.o
 
 else
 ifeq ($(OS), aros-ppc)
@@ -318,6 +324,9 @@ ifeq ($(OS), aros-ppc)
   CFLAGS += -Wno-pointer-sign -DNO_INLINE_STDARG
   LDLIBS += -larossupport -lrom -lmui
 
+  # additional object files required
+  COBJS += extrasrc/MoveList.o
+
 else
 ifeq ($(OS), aros-x86_64)
 
@@ -334,6 +343,9 @@ ifeq ($(OS), aros-x86_64)
   OPTFLAGS = -O2 -fomit-frame-pointer
   CFLAGS += -Wno-pointer-sign -DNO_INLINE_STDARG
   LDLIBS += -larossupport -lrom -lmui
+
+  # additional object files required
+  COBJS += extrasrc/MoveList.o
 
 endif
 endif
