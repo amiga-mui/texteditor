@@ -622,19 +622,29 @@ APTR AllocVecPooled(APTR, ULONG);
 void FreeVecPooled(APTR, APTR);
 #endif
 
-#if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
+#if !defined(GetHead)
 // GetHead.c
 struct Node *GetHead(struct List *);
+#endif
+#if !defined(GetPred)
 // GetPred.c
 struct Node *GetPred(struct Node *);
+#endif
+#if !defined(GetSucc)
 // GetSucc.c
 struct Node *GetSucc(struct Node *);
+#endif
+#if !defined(GetTail)
 // GetTail.c
 struct Node *GetTail(struct List *);
+#endif
+#if !defined(MoveList)
 // MoveList.c
 void MoveList(struct List *to, struct List *from);
 #endif
 
+// define some convenience functions for accessing the list of lines
+// to avoid constant type casting within the normal source
 #define GetFirstLine(lines)     (struct line_node *)(GetHead((struct List *)(lines)))
 #define GetLastLine(lines)      (struct line_node *)(GetTail((struct List *)(lines)))
 #define GetNextLine(line)       (struct line_node *)(GetSucc((struct Node *)(line)))
