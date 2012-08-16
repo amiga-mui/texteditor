@@ -115,7 +115,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
   {
     LONG c_length = length;
     LONG startx = 0, stopx = 0;
-    LONG starty = 0, xoffset = ((data->fontheight-rp->TxBaseline+1)>>1)+1;
+    LONG starty = 0, xoffset = 0;
     LONG flow = 0;
     struct LineStyle *styles = line->line.Styles;
     struct LineColor *colors = line->line.Colors;
