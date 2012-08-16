@@ -611,7 +611,7 @@ BOOL Redo(struct InstData *);
 
 // NewGfx.c
 LONG TextLengthNew(struct RastPort *rp, const char *string, ULONG count, LONG tabSizePixels);
-ULONG TextFitNew(struct RastPort *rp, const char *string, ULONG strLen, struct TextExtent *textExtent, const struct TextExtent *constrainingExtent, LONG strDirection, ULONG constrainingBitWidth, LONG constrainingBitHeight, LONG tabSizePixels);
+ULONG TextFitNew(struct RastPort *rp, const char *string, ULONG strLen, struct TextExtent *textExtent, const struct TextExtent *constrainingExtent, LONG strDirection, LONG constrainingBitWidth, LONG constrainingBitHeight, LONG tabSizePixels);
 void TextNew(struct RastPort *rp, const char *string, ULONG count, LONG tabSizePixels);
 
 #if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
