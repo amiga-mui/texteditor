@@ -262,7 +262,8 @@ ifeq ($(OS), os3)
            extrasrc/GetHead.o \
            extrasrc/GetPred.o \
            extrasrc/GetSucc.o \
-           extrasrc/GetTail.o
+           extrasrc/GetTail.o \
+           extrasrc/MoveList.o
 
 else
 ifeq ($(OS), mos)

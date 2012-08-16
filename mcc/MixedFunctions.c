@@ -77,14 +77,14 @@ void RemoveClipping(struct InstData *data)
 
 ///
 /// FreeTextMem
-void FreeTextMem(struct InstData *data, struct line_node *line)
+void FreeTextMem(struct InstData *data, struct MinList *lines)
 {
+  struct line_node *line;
+
   ENTER();
 
-  while(line != NULL)
+  while((line = RemFirstLine(lines)) != NULL)
   {
-    struct line_node *next = line->next;
-
     FreeVecPooled(data->mypool, line->line.Contents);
     if(line->line.Styles != NULL)
       FreeVecPooled(data->mypool, line->line.Styles);
@@ -92,9 +92,9 @@ void FreeTextMem(struct InstData *data, struct line_node *line)
       FreeVecPooled(data->mypool, line->line.Colors);
 
     FreeLine(data, line);
-
-    line = next;
   }
+
+  InitLines(lines);
 
   LEAVE();
 }
@@ -104,7 +104,7 @@ void FreeTextMem(struct InstData *data, struct line_node *line)
 /*-----------------------------------*
  * Initializes a line_node structure *
  *-----------------------------------*/
-BOOL Init_LineNode(struct InstData *data, struct line_node *line, struct line_node *previous, CONST_STRPTR text)
+BOOL Init_LineNode(struct InstData *data, struct line_node *line, CONST_STRPTR text)
 {
   BOOL success = FALSE;
   LONG textlength = 0;
@@ -112,7 +112,7 @@ BOOL Init_LineNode(struct InstData *data, struct line_node *line, struct line_no
 
   ENTER();
 
-  while(text[textlength] != '\n' && text[textlength] != '\0')
+  while(text[0] != '\n' && text[0] != '\0')
     textlength++;
 
   // count one byte more for the trailing LF byte
@@ -123,8 +123,6 @@ BOOL Init_LineNode(struct InstData *data, struct line_node *line, struct line_no
   {
     strlcpy(ctext, text, textlength+1);
 
-    line->next = NULL;
-    line->previous = previous;
     line->line.Contents = ctext;
     line->line.Length = textlength;
     line->line.allocatedContents = textlength+1;
@@ -135,9 +133,6 @@ BOOL Init_LineNode(struct InstData *data, struct line_node *line, struct line_no
     line->line.Colors = NULL;
     line->line.Flow = MUIV_TextEditor_Flow_Left;
     line->line.Separator = LNSF_None;
-
-    if(previous != NULL)
-      previous->next = line;
 
     success = TRUE;
   }
@@ -200,6 +195,24 @@ BOOL CompressLine(struct InstData *data, struct line_node *line)
 
   RETURN(result);
   return result;
+}
+
+///
+/// InsertLines
+void InsertLines(struct MinList *lines, struct line_node *after)
+{
+  struct line_node *line;
+
+  ENTER();
+
+  // insert all lines backwards after the given line
+  // this will effectively add all lines in exactly the same order
+  while((line = RemLastLine(lines)) != NULL)
+  {
+    InsertLine(line, after);
+  }
+
+  LEAVE();
 }
 
 ///
@@ -357,14 +370,14 @@ void OffsetToLines(struct InstData *data, LONG x, struct line_node *line, struct
 LONG LineNr(struct InstData *data, struct line_node *line)
 {
   LONG result = 1;
-  struct line_node *actual = data->firstline;
+  struct line_node *actual = GetFirstLine(&data->linelist);
 
   ENTER();
 
   while(line != actual)
   {
     result++;
-    actual = actual->next;
+    actual = GetNextLine(actual);
   }
 
   RETURN(result);
@@ -375,13 +388,14 @@ LONG LineNr(struct InstData *data, struct line_node *line)
 /// LineNode()
 struct line_node *LineNode(struct InstData *data, LONG linenr)
 {
-  struct line_node *actual = data->firstline;
+  struct line_node *actual = GetFirstLine(&data->linelist);
+  struct line_node *next;
 
   ENTER();
 
-  while(--linenr && actual->next != NULL)
+  while(--linenr && (next = GetNextLine(actual)) != NULL)
   {
-    actual = actual->next;
+    actual = next;
   }
 
   RETURN(actual);
@@ -639,7 +653,7 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
       while(x < line->line.Length && line_nr != lines)
         x = x + PrintLine(data, x, line, ++line_nr, doublebuffer);
 
-      line = line->next;
+      line = GetNextLine(line);
       x = 0;
     }
 
@@ -829,21 +843,22 @@ void ScrollDown(struct InstData *data, LONG line_nr, LONG lines)
  *----------------------------------------------*/
 void GetLine(struct InstData *data, LONG realline, struct pos_info *pos)
 {
-  struct line_node *line = data->firstline;
+  struct line_node *line = GetFirstLine(&data->linelist);
+  struct line_node *next;
   LONG x = 0;
 
   ENTER();
 
-  while(realline > line->visual && line->next != NULL)
+  while(realline > line->visual && (next = GetNextLine(line)) != NULL)
   {
     realline = realline - line->visual;
-    line = line->next;
+    line = next;
   }
 
   pos->line = line;
   pos->lines = realline;
 
-  if(line->next == NULL && realline > line->visual)
+  if(HasNextLine(line) == FALSE && realline > line->visual)
   {
     x = line->line.Length-1;
   }
@@ -868,14 +883,14 @@ void GetLine(struct InstData *data, LONG realline, struct pos_info *pos)
 LONG LineToVisual(struct InstData *data, struct line_node *line)
 {
   LONG  line_nr = 2 - data->visual_y;   // Top line!
-  struct line_node *tline = data->firstline;
+  struct line_node *tline = GetFirstLine(&data->linelist);
 
   ENTER();
 
   while(tline != line && tline != NULL)
   {
     line_nr = line_nr + tline->visual;
-    tline = tline->next;
+    tline = GetNextLine(tline);
   }
 
   RETURN(line_nr);

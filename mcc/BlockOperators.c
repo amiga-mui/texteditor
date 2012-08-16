@@ -71,17 +71,11 @@ void RedrawArea(struct InstData *data, LONG startx, struct line_node *startline,
 /// MarkAllBlock()
 void MarkAllBlock(struct InstData *data, struct marking *block)
 {
-  struct line_node *actual = data->firstline;
-
   ENTER();
 
-  block->startline = actual;
+  block->startline = GetFirstLine(&data->linelist);
   block->startx = 0;
-
-  while(actual->next != NULL)
-    actual = actual->next;
-
-  block->stopline = actual;
+  block->stopline = GetLastLine(&data->linelist);
   block->stopx = block->stopline->line.Length-1;
   block->enabled = TRUE;
 
@@ -282,7 +276,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
     }
 
     // Start iterating...
-    act = startline->next;
+    act = GetNextLine(startline);
     while(emsg.failure == FALSE && act != stopline)
     {
       D(DBF_BLOCK, "exporting line with length %ld", act->line.Length);
@@ -294,7 +288,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
       emsg.Separator = act->line.Separator;
       emsg.Highlight = act->line.Highlight;
       emsg.UserData = (APTR)CallHookA(&ExportHookPlain, NULL, &emsg);
-      act = act->next;
+      act = GetNextLine(act);
     }
 
     // Create a Lastline look-a-like if it contains any text
@@ -667,15 +661,15 @@ void NiceBlock(struct marking *realblock, struct marking *newblock)
   }
   else
   {
-    struct  line_node *c_startline = startline,
-                      *c_stopline = stopline;
+    struct line_node *c_startline = startline;
+    struct line_node *c_stopline = stopline;
 
-    while((c_startline != stopline) && (c_stopline != startline))
+    while(c_startline != stopline && c_stopline != startline)
     {
-      if(c_startline->next)
-        c_startline = c_startline->next;
-      if(c_stopline->next)
-        c_stopline = c_stopline->next;
+      if(HasNextLine(c_startline) == TRUE)
+        c_startline = GetNextLine(c_startline);
+      if(HasNextLine(c_stopline) == TRUE)
+        c_stopline = GetNextLine(c_stopline);
     }
 
     if(c_stopline == startline)
@@ -742,7 +736,7 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, s
 
   if(startline != stopline)
   {
-    struct line_node *c_startline = startline->next;
+    struct line_node *c_startline = GetNextLine(startline);
 
     data->update = FALSE;
 
@@ -767,7 +761,7 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, s
 
       if(NoCut == FALSE)
       {
-        struct line_node *cc_startline = c_startline->next;
+        struct line_node *cc_startline = GetNextLine(c_startline);
 
         FreeVecPooled(data->mypool, c_startline->line.Contents);
         if(c_startline->line.Styles != NULL)
@@ -778,12 +772,13 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, s
 
         //D(DBF_STARTUP, "FreeLine %08lx", cc_startline);
 
+        RemLine(c_startline);
         FreeLine(data, c_startline);
 
         c_startline = cc_startline;
       }
       else
-        c_startline = c_startline->next;
+        c_startline = GetNextLine(c_startline);
     }
 
     if(Clipboard == TRUE)
@@ -796,9 +791,6 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, s
 
     if(NoCut == FALSE)
     {
-      startline->next = stopline;
-      stopline->previous = startline;
-
       //D(DBF_STARTUP, "RemoveChars: %ld %ld %08lx %ld", startx, stopx, startline, startline->line.Length);
 
       if(startline->line.Length-startx-1 > 0)

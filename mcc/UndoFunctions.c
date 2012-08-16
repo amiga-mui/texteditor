@@ -410,10 +410,12 @@ BOOL AddToUndoBuffer(struct InstData *data, enum EventType eventtype, void *even
       case ET_BACKSPACEMERGE:
       case ET_MERGELINES:
       {
+        struct line_node *next = GetNextLine(data->actualline);
+
         D(DBF_UNDO, "add undo MERGELINES/BACKSPACEMERGE");
-        action->del.highlight = data->actualline->next->line.Highlight;
-        action->del.flow = data->actualline->next->line.Flow;
-        action->del.separator = data->actualline->next->line.Separator;
+        action->del.highlight = next->line.Highlight;
+        action->del.flow = next->line.Flow;
+        action->del.separator = next->line.Separator;
       }
       break;
 

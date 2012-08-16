@@ -213,8 +213,7 @@ struct LineNode
 
 struct line_node
 {
-  struct line_node *next;     // Pointer to next line
-  struct line_node *previous; // Pointer to previous line
+  struct MinNode node;        // standard Exec MinNode
 
   struct LineNode line;
 
@@ -343,7 +342,7 @@ struct InstData
   struct  TextFont  *font;
   APTR    mypool;
   struct  Locale    *mylocale;
-  struct  line_node *firstline;
+  struct  MinList    linelist;
   BOOL    shown;
   BOOL    update;
 
@@ -511,8 +510,8 @@ void ScrollIntoDisplay(struct InstData *);
 void MarkText(struct InstData *, LONG, struct line_node *, LONG, struct line_node *);
 
 // ImportText.c
-struct line_node *ImportText(struct InstData *, const char *, struct Hook *, LONG);
-BOOL ReimportText(struct IClass *, Object *j);
+BOOL ImportText(struct InstData *, const char *, struct Hook *, LONG, struct MinList *);
+BOOL ReimportText(struct IClass *, Object *);
 
 // InitConfig.c
 void InitConfig(struct IClass *, Object *);
@@ -530,10 +529,11 @@ ULONG InsertText(struct InstData *, STRPTR, BOOL);
 // MixedFunctions.c
 void AddClipping(struct InstData *);
 void RemoveClipping(struct InstData *);
-void FreeTextMem(struct InstData *, struct line_node *);
-BOOL Init_LineNode(struct InstData *, struct line_node *, struct line_node *, CONST_STRPTR);
+void FreeTextMem(struct InstData *, struct MinList *);
+BOOL Init_LineNode(struct InstData *, struct line_node *, CONST_STRPTR);
 BOOL ExpandLine(struct InstData *, struct line_node *, LONG);
 BOOL CompressLine(struct InstData *, struct line_node *);
+void InsertLines(struct MinList *lines, struct line_node *after);
 LONG LineCharsWidth(struct InstData *, CONST_STRPTR);
 ULONG VisualHeight(struct InstData *, struct line_node *);
 void OffsetToLines(struct InstData *, LONG, struct line_node *, struct pos_info *);
@@ -630,7 +630,24 @@ struct Node *GetPred(struct Node *);
 struct Node *GetSucc(struct Node *);
 // GetTail.c
 struct Node *GetTail(struct List *);
+// MoveList.c
+void MoveList(struct List *to, struct List *from);
 #endif
+
+#define GetFirstLine(lines)     (struct line_node *)(GetHead((struct List *)(lines)))
+#define GetLastLine(lines)      (struct line_node *)(GetTail((struct List *)(lines)))
+#define GetNextLine(line)       (struct line_node *)(GetSucc((struct Node *)(line)))
+#define GetPrevLine(line)       (struct line_node *)(GetPred((struct Node *)(line)))
+#define HasNextLine(line)       (GetSucc((struct Node *)(line)) != NULL)
+#define HasPrevLine(line)       (GetPred((struct Node *)(line)) != NULL)
+#define AddLine(lines, line)    AddTail((struct List *)(lines), (struct Node *)(line))
+#define InsertLine(line, after) Insert(NULL, (struct Node *)(line), (struct Node *)(after))
+#define RemLine(line)           Remove((struct Node *)(line))
+#define RemFirstLine(lines)     (struct line_node *)RemHead((struct List *)(lines))
+#define RemLastLine(lines)      (struct line_node *)RemTail((struct List *)(lines))
+#define MoveLines(to, from)     MoveList((struct List *)(to), (struct List *)(from))
+#define InitLines(lines)        NewList((struct List *)(lines))
+#define ContainsLines(lines)    (IsListEmpty((struct List *)(lines)) == FALSE)
 
 #if defined(DEBUG)
 void DumpLine(struct line_node *line);

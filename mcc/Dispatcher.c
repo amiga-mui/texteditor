@@ -47,20 +47,21 @@ DISPATCHERPROTO(_Dispatcher);
 /// ResetDisplay()
 void ResetDisplay(struct InstData *data)
 {
-  struct  line_node *line = data->firstline;
-  LONG    lines = 0;
-
   ENTER();
 
   data->blockinfo.enabled = FALSE;
   data->visual_y = 1;
   data->CPos_X = 0;
   data->pixel_x = 0;
-  data->actualline = line;
+  data->actualline = GetFirstLine(&data->linelist);
 
   data->cursor_shown = FALSE;
   if(data->shown == TRUE)
   {
+    struct line_node *line;
+    LONG lines = 0;
+
+    line = GetFirstLine(&data->linelist);
     while(line != NULL)
     {
       LONG c;
@@ -68,7 +69,7 @@ void ResetDisplay(struct InstData *data)
       c = VisualHeight(data, line);
       lines += c;
       line->visual = c;
-      line = line->next;
+      line = GetNextLine(line);
     }
     data->totallines = lines;
 
@@ -130,6 +131,8 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
     struct InstData *data = INST_DATA(cl, obj);
     data->object = obj;
 
+    InitLines(&data->linelist);
+
     #if defined(__amigaos4__)
     data->mypool = AllocSysObjectTags(ASOT_MEMPOOL, ASOPOOL_MFlags, MEMF_SHARED|MEMF_CLEAR,
                                                     ASOPOOL_Puddle, 3*1024,
@@ -144,11 +147,15 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
     {
       if((data->mylocale = OpenLocale(NULL)) != NULL)
       {
-        if((data->firstline = AllocLine(data)) != NULL)
+        struct line_node *firstLine;
+
+        if((firstLine = AllocLine(data)) != NULL)
         {
-          if(Init_LineNode(data, data->firstline, NULL, "\n") == TRUE)
+          if(Init_LineNode(data, firstLine, "\n") == TRUE)
           {
-            data->actualline = data->firstline;
+            AddLine(&data->linelist, firstLine);
+
+            data->actualline = firstLine;
             data->update = TRUE;
             data->ImportHook = &ImPlainHook;
             data->ImportWrap = 1023;
@@ -225,8 +232,7 @@ static IPTR mDispose(struct IClass *cl, Object *obj, Msg msg)
   data->blockinfo.stopline = NULL;
 
   // free all lines with their contents
-  FreeTextMem(data, data->firstline);
-  data->firstline = NULL;
+  FreeTextMem(data, &data->linelist);
 
   if(data->mylocale != NULL)
   {
@@ -433,7 +439,7 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
   data->maxlines    = _mheight(obj) / data->fontheight;
   data->ypos        = _mtop(obj);
 
-  line = data->firstline;
+  line = GetFirstLine(&data->linelist);
   while(line != NULL)
   {
     LONG c;
@@ -441,7 +447,7 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
     c = VisualHeight(data, line);
     lines += c;
     line->visual = c;
-    line = line->next;
+    line = GetNextLine(line);
   }
   data->totallines = lines;
 

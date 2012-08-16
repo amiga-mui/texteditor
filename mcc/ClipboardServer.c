@@ -547,8 +547,6 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
 
             if(textline != NULL && (line = AllocVecShared(sizeof(*line), MEMF_ANY)) != NULL)
             {
-              line->next = NULL;
-              line->previous = NULL;
               line->line.Contents = textline;
               line->line.Length = length;
               line->line.allocatedContents = length+2;
@@ -981,4 +979,3 @@ void ShutdownClipboardServer(void)
 }
 
 ///
-
