@@ -20,51 +20,47 @@
 
 ***************************************************************************/
 
-#include <string.h>
-
-#include <graphics/gfxmacros.h>
-#include <graphics/text.h>
-#include <clib/alib_protos.h>
 #include <proto/graphics.h>
-#include <proto/layers.h>
-#include <proto/intuition.h>
+
+#include "private.h"
 
 #include "Debug.h"
 
+/// TextLengthNew
 LONG TextLengthNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, LONG tabSizePixels)
 {
   LONG result = 0;
-  char c;
-  char *tptr;
-  char *tptr0;
+  const char *tptr = string;
+  const char *tptr0 = string;
   LONG count0 = 0;
-  tptr = (char *)string;
-  tptr0 = tptr;
 
   ENTER();
 
   do
   {
-    c=*tptr;
-    tptr++;
+    char c;
 
     if(count == 0)
     {
+      // we parsed the string until the end
+      // add the remaining characters' width
       if(count0 != 0)
         result += TextLength(rp, tptr0, count0);
-
-      RETURN(result);
-      return(result);
+      break;
     }
 
+    // check the next character
+    c = *tptr++;
     if(c == '\t')
     {
+      // we found a TAB, calculate the characters' width so far
       if(count0 != 0)
         result += TextLength(rp, tptr0, count0);
 
-      tptr0=tptr;
-      count0=0;
+      tptr0 = tptr;
+      count0 = 0;
 
+      // add the size of a TAB
       result += tabSizePixels;
     }
     else
@@ -72,46 +68,48 @@ LONG TextLengthNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, LONG t
 
     count--;
   }
-  while(1);
+  while(TRUE);
+
+  RETURN(result);
+  return(result);
 }
 
+///
+/// TextFitNew
 ULONG TextFitNew(struct RastPort *rp, CONST_STRPTR string, ULONG strLen, struct TextExtent *textExtent, CONST struct TextExtent *constrainingExtent, LONG strDirection, LONG constrainingBitWidth, LONG constrainingBitHeight, LONG tabSizePixels)
 {
-  ULONG result=0;
-  ULONG strLen0=0;
-  char c;
-  char *tptr = (char *)string;
-  char *tptr0;
+  ULONG result = 0;
+  ULONG strLen0 = 0;
+  const char *tptr = string;
+  const char *tptr0 = string;
 
   ENTER();
 
-  tptr0 = tptr;
-
   do
   {
-    c = *tptr;
-    tptr++;
+    char c;
 
-    if(!strLen)
+    if(strLen == 0)
     {
+      // we parsed the string until the end
+      // add the number of fitting remaining characters
       result += TextFit(rp, tptr0, strLen0, textExtent, constrainingExtent, strDirection, constrainingBitWidth, constrainingBitHeight);
-
-      RETURN(result);
-      return(result);
+      break;
     }
 
+    // check the next character
+    c = *tptr++;
     if(c == '\t')
     {
-      if(strLen0)
-      {
+      // we found a TAB, calculate the number of fitting characters so far
+      if(strLen0 != 0)
         result += TextFit(rp, tptr0, strLen0, textExtent, constrainingExtent, strDirection, constrainingBitWidth, constrainingBitHeight);
-      }
 
-      if((constrainingBitWidth -= TextLengthNew(rp, tptr0, strLen0+1, tabSizePixels)) <= 0)
-      {
-        RETURN(result);
-        return(result);
-      }
+      // substract the width of the maximum width
+      constrainingBitWidth -= TextLengthNew(rp, tptr0, strLen0+1, tabSizePixels);
+      // bail out if no space is left
+      if(constrainingBitWidth <= 0)
+        break;
 
       result++;
       tptr0 = tptr;
@@ -122,42 +120,46 @@ ULONG TextFitNew(struct RastPort *rp, CONST_STRPTR string, ULONG strLen, struct 
 
     strLen--;
   }
-  while(1);
+  while(TRUE);
+
+  RETURN(result);
+  return(result);
 }
 
+///
+/// TextNew
 void TextNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, LONG tabSizePixels)
 {
-  char c;
-  char *tptr;
-  char *tptr0;
-  LONG count0=0;
+  const char *tptr = string;
+  const char *tptr0 = string;
+  LONG count0 = 0;
 
   ENTER();
 
-  tptr=(char *)string;
-  tptr0=tptr;
-
   do
   {
-    c=*tptr;
-    tptr++;
+    char c;
 
     if(count == 0)
     {
+      // we parsed the string until the end
+      // print out the remaining characters
       Text(rp, tptr0, count0);
-
-      LEAVE();
-      return;
+      break;
     }
 
+    // check the next character
+    c = *tptr++;
     if(c == '\t')
     {
+      // we found a TAB, print out the characters so far
       if(count0 != 0)
         Text(rp, tptr0, count0);
 
-      tptr0=tptr;
-      count0=0;
+      tptr0 = tptr;
+      count0 = 0;
 
+      // advance the rastport's cursor position
       rp->cp_x += tabSizePixels;
     }
     else
@@ -165,5 +167,9 @@ void TextNew(struct RastPort *rp, CONST_STRPTR string, ULONG count, LONG tabSize
 
     count--;
   }
-  while(1);
+  while(TRUE);
+
+  LEAVE();
 }
+
+///
