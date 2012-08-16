@@ -10,6 +10,8 @@ $URL$
   * mcc/BlockOperators.c: implemented a new function to mark the complete text.
   * mcc/PrintLineWithStyles.c: correctly respect the maximum visibile width of
     the object when drawing the text. This fixes bug #3558290.
+  * mcc/PrintLineWithStyles.c: don't print any text if there is no space left
+    for at least one character.
 
 2012-08-14 Thore Böckelmann <tboeckel@gmx.de>
 
