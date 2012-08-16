@@ -411,26 +411,21 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL moveCursor)
 
   ENTER();
 
-  ImportText(data, text, data->ImportHook, data->ImportWrap, &newlines);
-  if(ContainsLines(&newlines) == TRUE)
+  if(ImportText(data, text, data->ImportHook, data->ImportWrap, &newlines) == TRUE)
   {
     BOOL oneline = FALSE;
     BOOL newline = FALSE;
     struct line_node *line = GetFirstLine(&newlines);
-    struct line_node *startline = line;
-    struct line_node *next;
     LONG tvisual_y;
 
     line->visual = VisualHeight(data, line);
     data->totallines += line->visual;
-    next = GetNextLine(line);
 
-    while(next != NULL)
+    while(HasNextLine(line) == TRUE)
     {
-      line = next;
+      line = GetNextLine(line);
       line->visual = VisualHeight(data, line);
       data->totallines += line->visual;
-      next = GetNextLine(line);
     }
 
     if(line->line.Contents[line->line.Length] == '\n')
@@ -438,9 +433,9 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL moveCursor)
 
     data->update = FALSE;
     SplitLine(data, x, actline, FALSE, NULL);
-    InsertLine(startline, actline);
+    InsertLines(&newlines, actline);
     data->CPos_X = line->line.Length-1;
-    if(line == GetNextLine(actline))
+    if(GetNextLine(actline) == line)
     {
       data->CPos_X += actline->line.Length-1;
       oneline = TRUE;
