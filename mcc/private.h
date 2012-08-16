@@ -25,6 +25,7 @@
 
 #include <graphics/rastport.h>
 #include <libraries/iffparse.h>
+#include <proto/exec.h>
 #include <proto/intuition.h>
 
 #include <libraries/mui.h>
