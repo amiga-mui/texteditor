@@ -306,7 +306,6 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     {
       LONG p_length = c_length;
       struct TextExtent te;
-      LONG fitting;
 
       SetSoftStyle(rp, ConvertStyle(GetStyle(x, line)), AskSoftStyle(rp));
       if(styles != NULL)
@@ -350,14 +349,19 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       }
 */
 
-      // calculate how many characters will fit in the visible area
+      // check if there is space left to print some text
       if(maxwidth > 0)
       {
-        fitting = TextFitNew(rp, text+x, p_length, &te, NULL, 1, maxwidth, data->fontheight, data->TabSizePixels);
-        if(text[x+fitting-1] < ' ')
-          TextNew(rp, text+x, fitting-1, data->TabSizePixels);
-        else
-          TextNew(rp, text+x, fitting, data->TabSizePixels);
+        // calculate how many character really fit in the remaining space
+        ULONG fitting = TextFitNew(rp, text+x, p_length, &te, NULL, 1, maxwidth, data->fontheight, data->TabSizePixels);
+
+        if(fitting > 0)
+        {
+          if(text[x+fitting-1] < ' ')
+            TextNew(rp, text+x, fitting-1, data->TabSizePixels);
+          else
+            TextNew(rp, text+x, fitting, data->TabSizePixels);
+        }
 
         // adjust the available horizontal pixel space
         maxwidth -= te.te_Width;
