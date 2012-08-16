@@ -197,7 +197,6 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
     LONG error;
     BOOL newline = TRUE;
     struct MinList importedLines;
-    struct line_node *importedLine = NULL;
 
     InitLines(&importedLines);
 
@@ -325,6 +324,8 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
           }
           else
           {
+            struct line_node *importedLine;
+
             // this is one of our own clips
             D(DBF_CLIPBOARD, "importing TextEditor.mcc clip");
 
@@ -389,6 +390,7 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
     {
       BOOL oneline = FALSE;
       struct line_node *line;
+      struct line_node *lastLine;
       LONG updatefrom;
 
       // sum up the visual heights of all imported lines
@@ -400,9 +402,11 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
       }
 
       SplitLine(data, x, actline, FALSE, NULL);
+      // get the last imported line, this is needed for further actions
+      lastLine = GetLastLine(&importedLines);
       InsertLines(&importedLines, actline);
-      data->CPos_X = importedLine->line.Length-1;
-      if(GetNextLine(actline) == importedLine)
+      data->CPos_X = lastLine->line.Length-1;
+      if(GetNextLine(actline) == lastLine)
       {
         data->CPos_X += actline->line.Length-1;
         oneline = TRUE;
@@ -410,19 +414,19 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
       if(newline == FALSE)
       {
         D(DBF_CLIPBOARD, "merging line");
-        MergeLines(data, importedLine);
+        MergeLines(data, lastLine);
       }
       D(DBF_CLIPBOARD, "merging actline");
       MergeLines(data, actline);
 
       if(oneline == TRUE)
-        importedLine = actline;
+        lastLine = actline;
       if(newline == TRUE)
       {
-        importedLine = GetNextLine(importedLine);
+        lastLine = GetNextLine(lastLine);
         data->CPos_X = 0;
       }
-      data->actualline = importedLine;
+      data->actualline = lastLine;
 
       data->update = TRUE;
 
