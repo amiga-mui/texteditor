@@ -117,6 +117,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     LONG startx = 0, stopx = 0;
     LONG starty = 0, xoffset = 0;
     LONG flow = 0;
+    LONG maxwidth;
     struct LineStyle *styles = line->line.Styles;
     struct LineColor *colors = line->line.Colors;
     struct marking block;
@@ -300,6 +301,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
     SetAPen(rp, (line->line.Highlight ? data->highlightcolor : data->textcolor));
 
+    maxwidth = _mwidth(data->object) - flow;
     while(c_length > 0)
     {
       LONG p_length = c_length;
@@ -349,14 +351,19 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 */
 
       // calculate how many characters will fit in the visible area
-      fitting = TextFitNew(rp, text+x, p_length, &te, NULL, 1, _mwidth(data->object), data->fontheight, data->TabSizePixels);
-      if(text[x+fitting-1] < ' ')
-        TextNew(rp, text+x, fitting-1, data->TabSizePixels);
-      else
-        TextNew(rp, text+x, fitting, data->TabSizePixels);
+      if(maxwidth > 0)
+      {
+        fitting = TextFitNew(rp, text+x, p_length, &te, NULL, 1, maxwidth, data->fontheight, data->TabSizePixels);
+        if(text[x+fitting-1] < ' ')
+          TextNew(rp, text+x, fitting-1, data->TabSizePixels);
+        else
+          TextNew(rp, text+x, fitting, data->TabSizePixels);
+
+        // adjust the available horizontal pixel space
+        maxwidth -= te.te_Width;
+      }
 
       // add the length calculated before no matter how many character really fitted
-
       x += p_length;
       c_length -= p_length;
     }
