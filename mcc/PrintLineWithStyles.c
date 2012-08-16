@@ -140,7 +140,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
       NiceBlock(&data->blockinfo, &block);
 
-      blkline = block.startline->next;
+      blkline = GetNextLine(block.startline);
 
       if(block.startline == block.stopline)
       {
@@ -171,7 +171,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
               {
                 stopx = line->line.Length;
               }
-              blkline = blkline->next;
+              blkline = GetNextLine(blkline);
             }
           }
         }

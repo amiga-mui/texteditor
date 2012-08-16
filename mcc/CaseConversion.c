@@ -66,7 +66,7 @@ static void MangleCharacters(struct InstData *data, char (*change)(char c))
   _startx = startx;
   _startline = startline;
 
-  while(startline != stopline->next)
+  while(startline != GetNextLine(stopline))
   {
     while(startline->line.Contents[startx] != '\n')
     {
@@ -78,7 +78,7 @@ static void MangleCharacters(struct InstData *data, char (*change)(char c))
       startx++;
     }
     startx = 0;
-    startline = startline->next;
+    startline = GetNextLine(startline);
   }
 
   data->HasChanged = TRUE;

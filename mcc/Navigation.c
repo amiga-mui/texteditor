@@ -136,7 +136,7 @@ void GotoBookmark(struct InstData *data, ULONG nr)
   {
     if(data->bookmarks[nr].line)
     {
-      struct line_node *actual = data->firstline;
+      struct line_node *actual = GetFirstLine(&data->linelist);
 
       while(actual != NULL)
       {
@@ -148,7 +148,7 @@ void GotoBookmark(struct InstData *data, ULONG nr)
             data->CPos_X = actual->line.Length-1;
           break;
         }
-        actual = actual->next;
+        actual = GetNextLine(actual);
       }
       if(actual == NULL)
       {
@@ -171,7 +171,7 @@ void GoTop(struct InstData *data)
 {
   ENTER();
 
-  data->actualline = data->firstline;
+  data->actualline = GetFirstLine(&data->linelist);
   data->CPos_X = 0;
 
   LEAVE();
@@ -183,8 +183,8 @@ void GoPreviousLine(struct InstData *data)
 {
   ENTER();
 
-  if(data->CPos_X == 0 && data->actualline->previous != NULL)
-    data->actualline = data->actualline->previous;
+  if(data->CPos_X == 0 && HasPrevLine(data->actualline) == TRUE)
+    data->actualline = GetPrevLine(data->actualline);
   data->CPos_X = 0;
 
   LEAVE();
@@ -201,27 +201,28 @@ void GoPreviousPage(struct InstData *data)
     OffsetToLines(data, data->CPos_X, data->actualline, &pos);
     if(data->pixel_x == 0)
       data->pixel_x = GetPosInPixels(data, pos.bytes, pos.x);
-    if(!(data->actualline->previous == NULL && pos.lines == 1))
+    if(!(HasPrevLine(data->actualline) == FALSE && pos.lines == 1))
     {
       LONG lineplacement;
       LONG linemove = data->maxlines;
+      struct line_node *prev;
 
       lineplacement = LineToVisual(data, data->actualline)+pos.lines-1;
       if(lineplacement != 1)
         linemove = lineplacement-1;
       linemove -= pos.lines-1;
 
-      while(linemove != 0 && data->actualline->previous != NULL && data->actualline->previous->visual <= linemove)
+      while(linemove != 0 && (prev = GetPrevLine(data->actualline)) != NULL && prev->visual <= linemove)
       {
-        data->actualline = data->actualline->previous;
+        data->actualline = prev;
         linemove -= data->actualline->visual;
       }
       data->CPos_X = 0;
-      if(linemove != 0 && data->actualline->previous != NULL)
+      if(linemove != 0 && HasPrevLine(data->actualline) == TRUE)
       {
         if(linemove > 0)
         {
-          data->actualline = data->actualline->previous;
+          data->actualline = GetPrevLine(data->actualline);
           linemove = data->actualline->visual-linemove;
         }
         else
@@ -259,9 +260,9 @@ void GoUp(struct InstData *data)
     }
     if(pos.lines == 1)
     {
-      if(data->actualline->previous != NULL)
+      if(HasPrevLine(data->actualline) == TRUE)
       {
-        data->actualline = data->actualline->previous;
+        data->actualline = GetPrevLine(data->actualline);
         pos.lines = data->actualline->visual+1;
       }
       else
@@ -294,8 +295,7 @@ void GoBottom(struct InstData *data)
 {
   ENTER();
 
-  while(data->actualline->next != NULL)
-    data->actualline = data->actualline->next;
+  data->actualline = GetLastLine(&data->linelist);
   data->CPos_X = data->actualline->line.Length-1;
 
   LEAVE();
@@ -308,8 +308,8 @@ void GoNextLine(struct InstData *data)
   ENTER();
 
   data->CPos_X = 0;
-  if(data->actualline->next != NULL)
-    data->actualline = data->actualline->next;
+  if(HasNextLine(data->actualline) == TRUE)
+    data->actualline = GetNextLine(data->actualline);
   else
     data->CPos_X = data->actualline->line.Length-1;
 
@@ -327,7 +327,7 @@ void GoNextPage(struct InstData *data)
     OffsetToLines(data, data->CPos_X, data->actualline, &pos);
     if(data->pixel_x == 0)
       data->pixel_x = GetPosInPixels(data, pos.bytes, pos.x);
-    if(!(data->actualline->next == NULL && pos.lines == data->actualline->visual))
+    if(!(HasNextLine(data->actualline) == FALSE&& pos.lines == data->actualline->visual))
     {
       LONG lineplacement;
       LONG linemove = data->maxlines;
@@ -337,7 +337,7 @@ void GoNextPage(struct InstData *data)
         linemove = data->maxlines - lineplacement;
 
       linemove += pos.lines-1;
-      while(linemove != 0 && data->actualline->next != NULL && data->actualline->visual <= linemove)
+      while(linemove != 0 && HasNextLine(data->actualline) == TRUE && data->actualline->visual <= linemove)
       {
         linemove -= data->actualline->visual;
         NextLine(data);
@@ -377,10 +377,12 @@ void GoDown (struct InstData *data)
 
     if(pos.lines == data->actualline->visual)
     {
-      if(data->actualline->next != NULL)
+      struct line_node *next = GetNextLine(data->actualline);
+
+      if(next != NULL)
       {
         pos.lines = 0;
-        data->actualline = data->actualline->next;
+        data->actualline = next;
         data->CPos_X  = 0;
         data->CPos_X += CursorOffset(data);
       }
@@ -437,9 +439,11 @@ FindNextWord:
 
   if(data->CPos_X == data->actualline->line.Length)
   {
-    if(data->actualline->next != NULL)
+    struct line_node *next = GetNextLine(data->actualline);
+
+    if(next != NULL)
     {
-      data->actualline = data->actualline->next;
+      data->actualline = next;
       data->CPos_X = 0;
       goto FindNextWord;
     }
@@ -507,6 +511,7 @@ void GoStartOfLine(struct InstData *data)
 void GoPreviousWord(struct InstData *data)
 {
   BOOL moved = FALSE;
+  struct line_node *prev;
 
   ENTER();
 
@@ -522,9 +527,10 @@ FindWord:
     data->CPos_X--;
     moved = TRUE;
   }
-  if(data->CPos_X == 0 && data->actualline->previous != NULL && (moved == FALSE || CheckSep(data, data->actualline->line.Contents[0]) == TRUE))
+  prev = GetPrevLine(data->actualline);
+  if(data->CPos_X == 0 && prev != NULL && (moved == FALSE || CheckSep(data, data->actualline->line.Contents[0]) == TRUE))
   {
-    data->actualline = data->actualline->previous;
+    data->actualline = prev;
     data->CPos_X = data->actualline->line.Length-1;
     goto FindWord;
   }
@@ -539,12 +545,16 @@ FindWord:
 /// GoPreviousSentence()
 void GoPreviousSentence(struct InstData *data)
 {
+  struct line_node *prev;
+
   ENTER();
 
-  while(data->CPos_X == 0 && data->actualline->previous != NULL)
+  prev = GetPrevLine(data->actualline);
+  while(data->CPos_X == 0 && prev != NULL)
   {
-    data->actualline = data->actualline->previous;
+    data->actualline = prev;
     data->CPos_X = data->actualline->line.Length-1;
+    prev = GetPrevLine(prev);
   }
   if(data->CPos_X != 0)
   {
@@ -574,10 +584,15 @@ void GoLeft(struct InstData *data)
 
   if(data->CPos_X > 0)
     data->CPos_X--;
-  else if(data->actualline->previous != NULL)
+  else
   {
-    data->actualline = data->actualline->previous;
-    data->CPos_X = data->actualline->line.Length-1;
+    struct line_node *prev = GetPrevLine(data->actualline);
+
+    if(prev != NULL)
+    {
+      data->actualline = prev;
+      data->CPos_X = data->actualline->line.Length-1;
+    }
   }
 
   LEAVE();
@@ -626,11 +641,14 @@ BOOL CheckSent(UNUSED struct InstData *data, char character)
  *-----------------------------------*/
 void NextLine(struct InstData *data)
 {
+  struct line_node *prev;
+
   ENTER();
 
-  if(data->actualline->next != NULL)
+  prev = GetPrevLine(data->actualline);
+  if(prev != NULL)
   {
-    data->actualline = data->actualline->next;
+    data->actualline = prev;
     data->CPos_X = 0;
   }
   else

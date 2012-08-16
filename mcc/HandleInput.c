@@ -670,7 +670,7 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 
   D(DBF_INPUT, "imsg->Code: %lx msg->muikey: %d", msg->imsg != NULL ? msg->imsg->Code : 0, msg->muikey);
 
-  if(msg->muikey == MUIKEY_UP && data->KeyUpFocus && _win(obj) && data->firstline == data->actualline)
+  if(msg->muikey == MUIKEY_UP && data->KeyUpFocus && _win(obj) && data->actualline == GetFirstLine(&data->linelist))
   {
     set(_win(obj), MUIA_Window_ActiveObject, data->KeyUpFocus);
 
@@ -1133,7 +1133,7 @@ void Key_DelLine(struct InstData *data)
     MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
   }
 
-  if(data->actualline->next == NULL && data->actualline->line.Contents[0] == '\n')
+  if(HasNextLine(data->actualline) == FALSE && data->actualline->line.Contents[0] == '\n')
     GoLeft(data);
 
   GoStartOfLine(data);
@@ -1314,11 +1314,11 @@ void Key_Backspace(struct InstData *data)
       // erase the character
       RemoveChars(data, data->CPos_X, data->actualline, 1);
     }
-    else if(data->actualline->previous != NULL)
+    else if(HasPrevLine(data->actualline) == TRUE)
     {
       // merge two lines to a single line by appending
       // the current line to the previous
-      data->actualline = data->actualline->previous;
+      data->actualline = GetPrevLine(data->actualline);
       data->CPos_X = data->actualline->line.Length-1;
       AddToUndoBuffer(data, ET_BACKSPACEMERGE, NULL);
       ScrollIntoDisplay(data);
@@ -1360,7 +1360,7 @@ void Key_Delete(struct InstData *data)
       // erase the character
       RemoveChars(data, data->CPos_X, data->actualline, 1);
     }
-    else if(data->actualline->next != NULL)
+    else if(HasNextLine(data->actualline) == TRUE)
     {
       AddToUndoBuffer(data, ET_MERGELINES, NULL);
       MergeLines(data, data->actualline);
