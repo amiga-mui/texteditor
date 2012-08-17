@@ -276,6 +276,12 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
           ownclip = TRUE;
         }
 
+        if(line->line.Highlight == TRUE || line->line.Flow != MUIV_TextEditor_Flow_Left || line->line.Separator != LNSF_None)
+        {
+          // we found some of our own stuff, this mean the clip was created by ourselves
+          ownclip = TRUE;
+        }
+
         SHOWVALUE(DBF_CLIPBOARD, line->line.Highlight);
         SHOWVALUE(DBF_CLIPBOARD, line->line.Flow);
         SHOWVALUE(DBF_CLIPBOARD, line->line.clearFlow);
