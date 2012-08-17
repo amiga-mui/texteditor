@@ -151,7 +151,7 @@ BOOL Undo(struct InstData *data)
         STRPTR clip = GetBlock(data, &block);
 
         D(DBF_UNDO, "undo PASTEBLOCK");
-        CutBlock2(data, FALSE, FALSE, TRUE, &block);
+        CutBlock2(data, CUTF_CUT|CUTF_UPDATE, &block);
         action->clip = clip;
       }
       break;
@@ -320,7 +320,7 @@ BOOL Redo(struct InstData *data)
         STRPTR clip = GetBlock(data, &block);
 
         D(DBF_UNDO, "redo DELETEBLOCK/DELETEBLOCK_NOMOVE");
-        CutBlock2(data, FALSE, FALSE, TRUE, &block);
+        CutBlock2(data, CUTF_CUT|CUTF_UPDATE, &block);
         action->clip = clip;
       }
       break;
