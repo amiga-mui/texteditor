@@ -278,6 +278,7 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
 
         SHOWVALUE(DBF_CLIPBOARD, line->line.Highlight);
         SHOWVALUE(DBF_CLIPBOARD, line->line.Flow);
+        SHOWVALUE(DBF_CLIPBOARD, line->line.clearFlow);
         SHOWVALUE(DBF_CLIPBOARD, line->line.Separator);
         SHOWVALUE(DBF_CLIPBOARD, line->line.Contents);
         if(line->line.Contents != NULL)
@@ -350,6 +351,7 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
                 importedLine->visual = VisualHeight(data, line);
                 importedLine->line.Highlight = line->line.Highlight;
                 importedLine->line.Flow = line->line.Flow;
+                importedLine->line.clearFlow = line->line.clearFlow;
                 importedLine->line.Separator = line->line.Separator;
                 importedLine->line.Styles = styles;
                 importedLine->line.Colors = colors;

@@ -148,12 +148,16 @@ static void ServerWriteInfo(IPTR session, struct line_node *line)
 
   ENTER();
 
-  if(line->line.Flow != MUIV_TextEditor_Flow_Left)
+  if(line->line.Flow != MUIV_TextEditor_Flow_Left || line->line.clearFlow == TRUE)
   {
+    UWORD uwordBool = line->line.clearFlow;
+
     D(DBF_CLIPBOARD, "writing FLOW");
     error = PushChunk(iff, 0, ID_FLOW, IFFSIZE_UNKNOWN);
     SHOWVALUE(DBF_CLIPBOARD, error);
     error = WriteChunkBytes(iff, &line->line.Flow, 2);
+    SHOWVALUE(DBF_CLIPBOARD, error);
+    error = WriteChunkBytes(iff, &uwordBool, 2);
     SHOWVALUE(DBF_CLIPBOARD, error);
     error = PopChunk(iff);
     SHOWVALUE(DBF_CLIPBOARD, error);
@@ -400,6 +404,7 @@ static LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *cset
   STRPTR textline;
   LONG codeset = 0;
   UWORD flow = MUIV_TextEditor_Flow_Left;
+  BOOL clearFlow = FALSE;
   BOOL highlight = FALSE;
   UWORD separator = LNSF_None;
   LONG error;
@@ -441,14 +446,23 @@ static LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *cset
 
         case ID_FLOW:
         {
+          UWORD uwordBool;
+
           D(DBF_CLIPBOARD, "reading FLOW");
           SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
-          if(cn->cn_Size >= (LONG)sizeof(flow))
+          if(cn->cn_Size >= (LONG)(sizeof(flow)+sizeof(uwordBool)))
           {
-            if(ReadChunkBytes(iff, &flow, sizeof(flow)) == 2)
+            if((error = ReadChunkBytes(iff, &flow, sizeof(flow))) == 2)
+            {
               if(flow > MUIV_TextEditor_Flow_Right)
                 flow = MUIV_TextEditor_Flow_Left;
+            }
             SHOWVALUE(DBF_CLIPBOARD, flow);
+            SHOWVALUE(DBF_CLIPBOARD, error);
+            error = ReadChunkBytes(iff, &uwordBool, 2);
+            clearFlow = (uwordBool != 0) ? TRUE : FALSE;
+            SHOWVALUE(DBF_CLIPBOARD, clearFlow);
+            SHOWVALUE(DBF_CLIPBOARD, error);
           }
         }
         break;
@@ -545,13 +559,14 @@ static LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *cset
               textline[length] = '\0';
             }
 
-            if(textline != NULL && (line = AllocVecShared(sizeof(*line), MEMF_ANY)) != NULL)
+            if(textline != NULL && (line = AllocVecShared(sizeof(*line), MEMF_ANY|MEMF_CLEAR)) != NULL)
             {
               line->line.Contents = textline;
               line->line.Length = length;
               line->line.allocatedContents = length+2;
               line->line.Highlight = highlight;
               line->line.Flow = flow;
+              line->line.clearFlow = clearFlow;
               line->line.Separator = separator;
               line->line.Styles = styles;
               line->line.Colors = colors;
@@ -572,6 +587,7 @@ static LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *cset
             styles = NULL;
             colors = NULL;
             flow = MUIV_TextEditor_Flow_Left;
+            clearFlow = FALSE;
             highlight = FALSE;
             separator = LNSF_None;
           }
