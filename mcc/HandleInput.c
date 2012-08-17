@@ -1081,25 +1081,25 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 
 ///
 /// DoBlock()
-static void DoBlock(struct InstData *data, BOOL clipboard, BOOL erase)
+static void DoBlock(struct InstData *data, ULONG flags)
 {
   ENTER();
 
   data->blockinfo.enabled = FALSE;
-  CutBlock(data, clipboard, !erase, TRUE);
+  CutBlock(data, flags|CUTF_UPDATE);
 
   LEAVE();
 }
 
 ///
 /// EraseBlock()
-static void EraseBlock(struct InstData *data, BOOL clipboard)
+static void EraseBlock(struct InstData *data, ULONG flags)
 {
   ENTER();
 
   if(Enabled(data))
   {
-    DoBlock(data, clipboard, TRUE);
+    DoBlock(data, flags|CUTF_CUT);
     data->HasChanged = TRUE;
   }
   else
@@ -1116,7 +1116,7 @@ void Key_Clear(struct InstData *data)
 {
   ENTER();
 
-  EraseBlock(data, FALSE);
+  EraseBlock(data, 0);
 
   LEAVE();
 }
@@ -1164,7 +1164,7 @@ void Key_Cut(struct InstData *data)
   ENTER();
 
   ScrollIntoDisplay(data);
-  EraseBlock(data, TRUE);
+  EraseBlock(data, CUTF_CLIPBOARD);
 
   LEAVE();
 }
@@ -1178,7 +1178,7 @@ void Key_Copy(struct InstData *data)
   if(Enabled(data))
   {
     ScrollIntoDisplay(data);
-    DoBlock(data, TRUE, FALSE);
+    DoBlock(data, CUTF_CLIPBOARD);
   }
   else
     DoMethod(data->object, MUIM_TextEditor_HandleError, Error_NoAreaMarked);

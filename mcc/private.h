@@ -445,8 +445,13 @@ void MarkAllBlock(struct InstData *, struct marking *);
 STRPTR GetBlock(struct InstData *, struct marking *);
 void RedrawArea(struct InstData *, LONG, struct line_node *, LONG, struct line_node *);
 void NiceBlock(struct marking *, struct marking *);
-LONG CutBlock(struct InstData *, BOOL, BOOL, BOOL);
-LONG CutBlock2(struct InstData *, BOOL, BOOL, BOOL, struct marking *);
+LONG CutBlock(struct InstData *, ULONG);
+LONG CutBlock2(struct InstData *, ULONG, struct marking *);
+
+// flags for CutBlock() and CutBlock2()
+#define CUTF_CLIPBOARD (1<<0)
+#define CUTF_CUT       (1<<1)
+#define CUTF_UPDATE    (1<<2)
 
 // CaseConversion.c
 void Key_ToUpper(struct InstData *);
