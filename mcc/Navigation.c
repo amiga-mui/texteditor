@@ -641,14 +641,14 @@ BOOL CheckSent(UNUSED struct InstData *data, char character)
  *-----------------------------------*/
 void NextLine(struct InstData *data)
 {
-  struct line_node *prev;
+  struct line_node *next;
 
   ENTER();
 
-  prev = GetPrevLine(data->actualline);
-  if(prev != NULL)
+  next = GetNextLine(data->actualline);
+  if(next != NULL)
   {
-    data->actualline = prev;
+    data->actualline = next;
     data->CPos_X = 0;
   }
   else
