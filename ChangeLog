@@ -9,6 +9,8 @@ $URL$
 
   * mcc/BlockOperators.c: simplified the cutting block function prototypes to
     carry less parameters and avoid double negation.
+  * mcc/EditorStuff.c: fixed a memory leak when pasting clipboards without using
+    styles or colors.
 
 2012-08-15 Thore Böckelmann <tboeckel@gmx.de>
 
