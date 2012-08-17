@@ -72,7 +72,7 @@ struct ServerData
 #define ID_CSET    MAKE_ID('C','S','E','T')
 
 /// ServerStartSession
-IPTR ServerStartSession(ULONG mode)
+static IPTR ServerStartSession(ULONG mode)
 {
   IPTR result = (IPTR)NULL;
   struct IFFHandle *iff;
@@ -120,7 +120,7 @@ IPTR ServerStartSession(ULONG mode)
 
 ///
 /// ServerEndSession
-void ServerEndSession(IPTR session)
+static void ServerEndSession(IPTR session)
 {
   struct IFFHandle *iff = (struct IFFHandle *)session;
 
@@ -141,7 +141,7 @@ void ServerEndSession(IPTR session)
 
 ///
 /// ServerWriteInfo
-void ServerWriteInfo(IPTR session, struct line_node *line)
+static void ServerWriteInfo(IPTR session, struct line_node *line)
 {
   struct IFFHandle *iff = (struct IFFHandle *)session;
   LONG error;
@@ -188,7 +188,7 @@ void ServerWriteInfo(IPTR session, struct line_node *line)
 
 ///
 /// ServerWriteChars
-void ServerWriteChars(IPTR session, struct line_node *line, LONG start, LONG length)
+static void ServerWriteChars(IPTR session, struct line_node *line, LONG start, LONG length)
 {
   struct IFFHandle *iff = (struct IFFHandle *)session;
   LONG error;
@@ -325,7 +325,7 @@ void ServerWriteChars(IPTR session, struct line_node *line, LONG start, LONG len
 
 ///
 /// ServerWriteLine
-void ServerWriteLine(IPTR session, struct line_node *line)
+static void ServerWriteLine(IPTR session, struct line_node *line)
 {
   struct IFFHandle *iff = (struct IFFHandle *)session;
   LONG error;
@@ -391,7 +391,7 @@ void ServerWriteLine(IPTR session, struct line_node *line)
 
 ///
 /// ServerReadLine
-LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
+static LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
 {
   struct IFFHandle *iff = (struct IFFHandle *)session;
   struct line_node *line = NULL;
