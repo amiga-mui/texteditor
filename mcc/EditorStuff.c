@@ -236,11 +236,11 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
             AddToGrow(&styleGrow, style);
 
             styles = (struct LineStyle *)styleGrow.array;
-
-            // the clipboard server used AllocVec() before
-            FreeVec(line->line.Styles);
-            line->line.Styles = NULL;
           }
+
+          // the clipboard server used AllocVec() before
+          FreeVec(line->line.Styles);
+          line->line.Styles = NULL;
 
           // we found styles, this mean the clip was created by ourselves
           ownclip = TRUE;
@@ -266,11 +266,11 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
             AddToGrow(&colorGrow, color);
 
             colors = (struct LineColor *)colorGrow.array;
-
-            // the clipboard server used AllocVec() before
-            FreeVec(line->line.Colors);
-            line->line.Colors = NULL;
           }
+
+          // the clipboard server used AllocVec() before
+          FreeVec(line->line.Colors);
+          line->line.Colors = NULL;
 
           // we found colors, this mean the clip was created by ourselves
           ownclip = TRUE;
