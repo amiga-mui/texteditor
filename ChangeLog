@@ -11,6 +11,9 @@ $URL$
     carry less parameters and avoid double negation.
   * mcc/EditorStuff.c: fixed a memory leak when pasting clipboards without using
     styles or colors.
+  * mcc/EditorStuff.c: if things like right alignment or highlighting are found
+    in the clipboard these will be treated as clipboard entries created by TE.mcc
+    itself and everything will be restored correctly now.
 
 2012-08-15 Thore Böckelmann <tboeckel@gmx.de>
 
