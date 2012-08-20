@@ -254,8 +254,8 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
           RectFill(rp, xoffset, starty, right, starty+data->fontheight-1);
         }
         else
-
-          LONG right = MIN(_mright(data->object), xoffset+flow+blockstart+blockwidth-1));
+        {
+          LONG right = MIN(_mright(data->object), xoffset+flow+blockstart+blockwidth-1);
 
           SetAPen(rp, cursor ? data->cursorcolor : color);
           RectFill(rp, xoffset+flow+blockstart, starty, right, starty+data->fontheight-1);
