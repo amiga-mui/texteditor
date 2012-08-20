@@ -72,7 +72,7 @@ struct ServerData
 #define ID_CSET    MAKE_ID('C','S','E','T')
 
 /// ServerStartSession
-IPTR ServerStartSession(ULONG mode)
+static IPTR ServerStartSession(ULONG mode)
 {
   IPTR result = (IPTR)NULL;
   struct IFFHandle *iff;
@@ -120,7 +120,7 @@ IPTR ServerStartSession(ULONG mode)
 
 ///
 /// ServerEndSession
-void ServerEndSession(IPTR session)
+static void ServerEndSession(IPTR session)
 {
   struct IFFHandle *iff = (struct IFFHandle *)session;
 
@@ -141,19 +141,23 @@ void ServerEndSession(IPTR session)
 
 ///
 /// ServerWriteInfo
-void ServerWriteInfo(IPTR session, struct line_node *line)
+static void ServerWriteInfo(IPTR session, struct line_node *line)
 {
   struct IFFHandle *iff = (struct IFFHandle *)session;
   LONG error;
 
   ENTER();
 
-  if(line->line.Flow != MUIV_TextEditor_Flow_Left)
+  if(line->line.Flow != MUIV_TextEditor_Flow_Left || line->line.clearFlow == TRUE)
   {
+    UWORD uwordBool = line->line.clearFlow;
+
     D(DBF_CLIPBOARD, "writing FLOW");
     error = PushChunk(iff, 0, ID_FLOW, IFFSIZE_UNKNOWN);
     SHOWVALUE(DBF_CLIPBOARD, error);
     error = WriteChunkBytes(iff, &line->line.Flow, 2);
+    SHOWVALUE(DBF_CLIPBOARD, error);
+    error = WriteChunkBytes(iff, &uwordBool, 2);
     SHOWVALUE(DBF_CLIPBOARD, error);
     error = PopChunk(iff);
     SHOWVALUE(DBF_CLIPBOARD, error);
@@ -188,7 +192,7 @@ void ServerWriteInfo(IPTR session, struct line_node *line)
 
 ///
 /// ServerWriteChars
-void ServerWriteChars(IPTR session, struct line_node *line, LONG start, LONG length)
+static void ServerWriteChars(IPTR session, struct line_node *line, LONG start, LONG length)
 {
   struct IFFHandle *iff = (struct IFFHandle *)session;
   LONG error;
@@ -325,7 +329,7 @@ void ServerWriteChars(IPTR session, struct line_node *line, LONG start, LONG len
 
 ///
 /// ServerWriteLine
-void ServerWriteLine(IPTR session, struct line_node *line)
+static void ServerWriteLine(IPTR session, struct line_node *line)
 {
   struct IFFHandle *iff = (struct IFFHandle *)session;
   LONG error;
@@ -391,7 +395,7 @@ void ServerWriteLine(IPTR session, struct line_node *line)
 
 ///
 /// ServerReadLine
-LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
+static LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
 {
   struct IFFHandle *iff = (struct IFFHandle *)session;
   struct line_node *line = NULL;
@@ -400,6 +404,7 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
   STRPTR textline;
   LONG codeset = 0;
   UWORD flow = MUIV_TextEditor_Flow_Left;
+  BOOL clearFlow = FALSE;
   BOOL highlight = FALSE;
   UWORD separator = LNSF_None;
   LONG error;
@@ -441,14 +446,23 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
 
         case ID_FLOW:
         {
+          UWORD uwordBool;
+
           D(DBF_CLIPBOARD, "reading FLOW");
           SHOWVALUE(DBF_CLIPBOARD, cn->cn_Size);
-          if(cn->cn_Size >= (LONG)sizeof(flow))
+          if(cn->cn_Size >= (LONG)(sizeof(flow)+sizeof(uwordBool)))
           {
-            if(ReadChunkBytes(iff, &flow, sizeof(flow)) == 2)
+            if((error = ReadChunkBytes(iff, &flow, sizeof(flow))) == 2)
+            {
               if(flow > MUIV_TextEditor_Flow_Right)
                 flow = MUIV_TextEditor_Flow_Left;
+            }
             SHOWVALUE(DBF_CLIPBOARD, flow);
+            SHOWVALUE(DBF_CLIPBOARD, error);
+            error = ReadChunkBytes(iff, &uwordBool, 2);
+            clearFlow = (uwordBool != 0) ? TRUE : FALSE;
+            SHOWVALUE(DBF_CLIPBOARD, clearFlow);
+            SHOWVALUE(DBF_CLIPBOARD, error);
           }
         }
         break;
@@ -545,15 +559,14 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
               textline[length] = '\0';
             }
 
-            if(textline != NULL && (line = AllocVecShared(sizeof(*line), MEMF_ANY)) != NULL)
+            if(textline != NULL && (line = AllocVecShared(sizeof(*line), MEMF_ANY|MEMF_CLEAR)) != NULL)
             {
-              line->next = NULL;
-              line->previous = NULL;
               line->line.Contents = textline;
               line->line.Length = length;
               line->line.allocatedContents = length+2;
               line->line.Highlight = highlight;
               line->line.Flow = flow;
+              line->line.clearFlow = clearFlow;
               line->line.Separator = separator;
               line->line.Styles = styles;
               line->line.Colors = colors;
@@ -574,6 +587,7 @@ LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
             styles = NULL;
             colors = NULL;
             flow = MUIV_TextEditor_Flow_Left;
+            clearFlow = FALSE;
             highlight = FALSE;
             separator = LNSF_None;
           }
@@ -981,4 +995,3 @@ void ShutdownClipboardServer(void)
 }
 
 ///
-

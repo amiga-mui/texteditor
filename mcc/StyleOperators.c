@@ -258,13 +258,13 @@ void AddStyle(struct InstData *data, struct marking *realblock, UWORD style, BOO
   }
   else
   {
-    struct line_node *line = startline->next;
+    struct line_node *line = GetNextLine(startline);
 
     AddStyleToLine(data, startx, startline, startline->line.Length-startx-1, style);
     while(line != stopline)
     {
       AddStyleToLine(data, 0, line, line->line.Length-1, style);
-      line = line->next;
+      line = GetNextLine(line);
     }
     AddStyleToLine(data, 0, line, stopx, style);
   }

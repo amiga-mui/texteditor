@@ -49,22 +49,18 @@ void FreeLine(struct InstData *data, struct line_node *line)
   // structures as well such as the global blockinfo structure.
   if(data->blockinfo.startline == line)
   {
-    if(line->next != NULL)
-      data->blockinfo.startline = line->next;
-    else
+    data->blockinfo.startline = GetNextLine(line);
+    if(data->blockinfo.startline == NULL)
     {
-      data->blockinfo.startline = NULL;
       data->blockinfo.enabled = FALSE;
     }
   }
 
   if(data->blockinfo.stopline == line)
   {
-    if(line->previous != NULL)
-      data->blockinfo.stopline = line->previous;
-    else
+    data->blockinfo.stopline = GetPrevLine(line);
+    if(data->blockinfo.stopline == NULL)
     {
-      data->blockinfo.stopline = NULL;
       data->blockinfo.enabled = FALSE;
     }
   }

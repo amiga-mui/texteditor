@@ -161,13 +161,13 @@ void AddColor(struct InstData *data, struct marking *realblock, UWORD color)
   }
   else
   {
-    struct line_node *line = startline->next;
+    struct line_node *line = GetNextLine(startline);
 
     AddColorToLine(data, startx, startline, startline->line.Length-startx-1, color);
     while(line != stopline)
     {
       AddColorToLine(data, 0, line, line->line.Length-1, color);
-      line = line->next;
+      line = GetNextLine(line);
     }
     AddColorToLine(data, 0, line, stopx, color);
   }

@@ -47,31 +47,18 @@ DISPATCHERPROTO(_Dispatcher);
 /// ResetDisplay()
 void ResetDisplay(struct InstData *data)
 {
-  struct  line_node *line = data->firstline;
-  LONG    lines = 0;
-
   ENTER();
 
   data->blockinfo.enabled = FALSE;
   data->visual_y = 1;
   data->CPos_X = 0;
   data->pixel_x = 0;
-  data->actualline = line;
+  data->actualline = GetFirstLine(&data->linelist);
 
   data->cursor_shown = FALSE;
   if(data->shown == TRUE)
   {
-    while(line != NULL)
-    {
-      LONG c;
-
-      c = VisualHeight(data, line);
-      lines += c;
-      line->visual = c;
-      line = line->next;
-    }
-    data->totallines = lines;
-
+    data->totallines = CountLines(data, &data->linelist);
     data->Pen = GetColor(data->CPos_X, data->actualline);
     data->Flow = data->actualline->line.Flow;
     data->Separator = data->actualline->line.Separator;
@@ -80,7 +67,7 @@ void ResetDisplay(struct InstData *data)
       MUIA_TextEditor_Pen,              data->Pen,
       MUIA_TextEditor_Flow,             data->Flow,
       MUIA_TextEditor_Separator,        data->Separator,
-      MUIA_TextEditor_Prop_Entries,     lines*data->fontheight,
+      MUIA_TextEditor_Prop_Entries,     data->totallines*data->fontheight,
       MUIA_TextEditor_Prop_Visible,     data->maxlines*data->fontheight,
       MUIA_TextEditor_Prop_First,       (data->visual_y-1)*data->fontheight,
       MUIA_TextEditor_Prop_DeltaFactor, data->fontheight,
@@ -130,6 +117,8 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
     struct InstData *data = INST_DATA(cl, obj);
     data->object = obj;
 
+    InitLines(&data->linelist);
+
     #if defined(__amigaos4__)
     data->mypool = AllocSysObjectTags(ASOT_MEMPOOL, ASOPOOL_MFlags, MEMF_SHARED|MEMF_CLEAR,
                                                     ASOPOOL_Puddle, 3*1024,
@@ -144,11 +133,15 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
     {
       if((data->mylocale = OpenLocale(NULL)) != NULL)
       {
-        if((data->firstline = AllocLine(data)) != NULL)
+        struct line_node *firstLine;
+
+        if((firstLine = AllocLine(data)) != NULL)
         {
-          if(Init_LineNode(data, data->firstline, NULL, "\n") == TRUE)
+          if(Init_LineNode(data, firstLine, "\n") == TRUE)
           {
-            data->actualline = data->firstline;
+            AddLine(&data->linelist, firstLine);
+
+            data->actualline = firstLine;
             data->update = TRUE;
             data->ImportHook = &ImPlainHook;
             data->ImportWrap = 1023;
@@ -225,8 +218,7 @@ static IPTR mDispose(struct IClass *cl, Object *obj, Msg msg)
   data->blockinfo.stopline = NULL;
 
   // free all lines with their contents
-  FreeTextMem(data, data->firstline);
-  data->firstline = NULL;
+  FreeTextMem(data, &data->linelist);
 
   if(data->mylocale != NULL)
   {
@@ -416,8 +408,6 @@ static IPTR mAskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *ms
 static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
-  struct line_node  *line;
-  LONG  lines = 0;
 
   ENTER();
 
@@ -433,17 +423,7 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
   data->maxlines    = _mheight(obj) / data->fontheight;
   data->ypos        = _mtop(obj);
 
-  line = data->firstline;
-  while(line != NULL)
-  {
-    LONG c;
-
-    c = VisualHeight(data, line);
-    lines += c;
-    line->visual = c;
-    line = line->next;
-  }
-  data->totallines = lines;
+  data->totallines = CountLines(data, &data->linelist);
 
   data->shown = TRUE;
   data->update = FALSE;
@@ -451,17 +431,18 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
   data->update = TRUE;
   data->shown = FALSE;
 
-  SetAttrs(obj, MUIA_TextEditor_Prop_DeltaFactor, data->fontheight,
-            MUIA_TextEditor_Prop_Entries,
-              ((lines-(data->visual_y-1) < data->maxlines) ?
+  SetAttrs(obj,
+    MUIA_TextEditor_Prop_DeltaFactor, data->fontheight,
+    MUIA_TextEditor_Prop_Entries,
+              ((data->totallines-(data->visual_y-1) < data->maxlines) ?
                 ((data->visual_y-1)+data->maxlines) :
-                ((data->maxlines > lines) ?
+                ((data->maxlines > data->totallines) ?
                   data->maxlines :
-                  lines))
+                  data->totallines))
                 * data->fontheight,
-            MUIA_TextEditor_Prop_First,     (data->visual_y-1)*data->fontheight,
-            MUIA_TextEditor_Prop_Visible,     data->maxlines*data->fontheight,
-            TAG_DONE);
+    MUIA_TextEditor_Prop_First,     (data->visual_y-1)*data->fontheight,
+    MUIA_TextEditor_Prop_Visible,     data->maxlines*data->fontheight,
+    TAG_DONE);
 
   // initialize the doublebuffering rastport
   InitRastPort(&data->doublerp);

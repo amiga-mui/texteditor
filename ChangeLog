@@ -5,6 +5,23 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-08-20 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/MixedFunctions.c: put the line counting code into a separate function to
+    reduce code replication.
+  * mcc/PrintLineWithStyles.c: limit the drawing of the background of unwrapped
+    lines to the visual area.
+
+2012-08-16 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/BlockOperators.c: simplified the cutting block function prototypes to
+    carry less parameters and avoid double negation.
+  * mcc/EditorStuff.c: fixed a memory leak when pasting clipboards without using
+    styles or colors.
+  * mcc/EditorStuff.c: if things like right alignment or highlighting are found
+    in the clipboard these will be treated as clipboard entries created by TE.mcc
+    itself and everything will be restored correctly now.
+
 2012-08-15 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/BlockOperators.c: implemented a new function to mark the complete text.

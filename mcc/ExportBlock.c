@@ -76,7 +76,7 @@ IPTR mExportBlock(struct IClass *cl, Object *obj, struct MUIP_TextEditor_ExportB
   // the currently active export hook
   while(node != NULL)
   {
-    struct line_node *next_node = node->next;
+    struct line_node *next = GetNextLine(node);
 
     emsg.UserData = user_data;
     emsg.Contents = node->line.Contents;
@@ -87,11 +87,11 @@ IPTR mExportBlock(struct IClass *cl, Object *obj, struct MUIP_TextEditor_ExportB
     emsg.Flow = node->line.Flow;
     emsg.Separator = node->line.Separator;
     emsg.ExportWrap = wraplen;
-    emsg.Last = next_node == NULL || node == newblock.stopline;
+    emsg.Last = next == NULL || node == newblock.stopline;
 
     // to make sure that for the last line we don't export the additional,
     // artificial newline '\n' we reduce the passed length value by one.
-    if(next_node == NULL && emsg.Contents[node->line.Length-1] == '\n')
+    if(next == NULL && emsg.Contents[node->line.Length-1] == '\n')
       emsg.Length--;
 
     // see if we have to skip some chars at the front or
@@ -118,7 +118,7 @@ IPTR mExportBlock(struct IClass *cl, Object *obj, struct MUIP_TextEditor_ExportB
     if(node == newblock.stopline)
       break;
 
-    node = next_node;
+    node = next;
   }
 
   RETURN((IPTR)user_data);

@@ -694,9 +694,9 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
             {
               lines += startline->visual;
               startline->line.Flow = ti_Data;
-              startline = startline->next;
+              startline = GetNextLine(startline);
             }
-            while(startline != newblock.stopline->next);
+            while(startline != GetNextLine(newblock.stopline));
           }
           else
           {
@@ -818,12 +818,12 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 
   if(contents != NULL)
   {
-    struct line_node *newcontents;
+    struct MinList newlines;
 
-    if((newcontents = ImportText(data, contents, data->ImportHook, data->ImportWrap)) != NULL)
+    if(ImportText(data, contents, data->ImportHook, data->ImportWrap, &newlines) == TRUE)
     {
-      FreeTextMem(data, data->firstline);
-      data->firstline = newcontents;
+      FreeTextMem(data, &data->linelist);
+      MoveLines(&data->linelist, &newlines);
       ResetDisplay(data);
       ResetUndoBuffer(data);
       result = TRUE;
