@@ -319,14 +319,8 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
 
             if(ImportText(data, contents, &ImPlainHook, data->ImportWrap, &importedBlock) == TRUE)
             {
-              struct line_node *line;
-
-              while((line = RemFirstLine(&importedBlock)) != NULL)
-              {
-                DumpLine(line);
-                line->visual = VisualHeight(data, line);
-                AddLine(&importedLines, line);
-			  }
+              // append the imported lines
+              MoveLines(&importedLines, &importedBlock);
             }
           }
           else
@@ -354,7 +348,6 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
                 importedLine->line.Contents = contents;
                 importedLine->line.Length = length;
                 importedLine->line.allocatedContents = length+1;
-                importedLine->visual = VisualHeight(data, line);
                 importedLine->line.Highlight = line->line.Highlight;
                 importedLine->line.Flow = line->line.Flow;
                 importedLine->line.clearFlow = line->line.clearFlow;
@@ -397,18 +390,11 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
     if(error == IFFERR_EOF && ContainsLines(&importedLines) == TRUE)
     {
       BOOL oneline = FALSE;
-      struct line_node *line;
       struct line_node *lastLine;
       LONG updatefrom;
 
       // sum up the visual heights of all imported lines
-      line = GetFirstLine(&importedLines);
-      while(line != NULL)
-      {
-        data->totallines += line->visual;
-        line = GetNextLine(line);
-      }
-
+      data->totallines += CountLines(data, &importedLines);
       SplitLine(data, x, actline, FALSE, NULL);
       // get the last imported line, this is needed for further actions
       lastLine = GetLastLine(&importedLines);

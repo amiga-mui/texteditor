@@ -415,19 +415,12 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL moveCursor)
   {
     BOOL oneline = FALSE;
     BOOL newline = FALSE;
-    struct line_node *line = GetFirstLine(&newlines);
+    struct line_node *line;
     LONG tvisual_y;
 
-    line->visual = VisualHeight(data, line);
-    data->totallines += line->visual;
+    data->totallines += CountLines(data, &newlines);
 
-    while(HasNextLine(line) == TRUE)
-    {
-      line = GetNextLine(line);
-      line->visual = VisualHeight(data, line);
-      data->totallines += line->visual;
-    }
-
+    line = GetLastLine(&newlines);
     if(line->line.Contents[line->line.Length] == '\n')
       newline = TRUE;
 
