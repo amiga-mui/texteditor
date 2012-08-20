@@ -898,3 +898,28 @@ LONG LineToVisual(struct InstData *data, struct line_node *line)
 }
 
 ///
+/// CountLines
+// count all lines in the list and return the number of visual lines
+LONG CountLines(struct InstData *data, struct MinList *lines)
+{
+  LONG lineCount = 0;
+  struct line_node *line;
+
+  ENTER();
+
+  line = GetFirstLine(lines);
+  while(line != NULL)
+  {
+    LONG vh;
+
+    vh = VisualHeight(data, line);
+    lineCount += vh;
+    line->visual = vh;
+    line = GetNextLine(line);
+  }
+
+  RETURN(lineCount);
+  return lineCount;
+}
+
+///

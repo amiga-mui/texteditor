@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-08-20 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/MixedFunctions.c: put the line counting code into a separate function to
+    reduce code replication.
+
 2012-08-16 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/BlockOperators.c: simplified the cutting block function prototypes to
