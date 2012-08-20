@@ -71,17 +71,11 @@ void RedrawArea(struct InstData *data, LONG startx, struct line_node *startline,
 /// MarkAllBlock()
 void MarkAllBlock(struct InstData *data, struct marking *block)
 {
-  struct line_node *actual = data->firstline;
-
   ENTER();
 
-  block->startline = actual;
+  block->startline = GetFirstLine(&data->linelist);
   block->startx = 0;
-
-  while(actual->next != NULL)
-    actual = actual->next;
-
-  block->stopline = actual;
+  block->stopline = GetLastLine(&data->linelist);
   block->stopx = block->stopline->line.Length-1;
   block->enabled = TRUE;
 
@@ -282,7 +276,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
     }
 
     // Start iterating...
-    act = startline->next;
+    act = GetNextLine(startline);
     while(emsg.failure == FALSE && act != stopline)
     {
       D(DBF_BLOCK, "exporting line with length %ld", act->line.Length);
@@ -294,7 +288,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
       emsg.Separator = act->line.Separator;
       emsg.Highlight = act->line.Highlight;
       emsg.UserData = (APTR)CallHookA(&ExportHookPlain, NULL, &emsg);
-      act = act->next;
+      act = GetNextLine(act);
     }
 
     // Create a Lastline look-a-like if it contains any text
@@ -667,15 +661,15 @@ void NiceBlock(struct marking *realblock, struct marking *newblock)
   }
   else
   {
-    struct  line_node *c_startline = startline,
-                      *c_stopline = stopline;
+    struct line_node *c_startline = startline;
+    struct line_node *c_stopline = stopline;
 
-    while((c_startline != stopline) && (c_stopline != startline))
+    while(c_startline != stopline && c_stopline != startline)
     {
-      if(c_startline->next)
-        c_startline = c_startline->next;
-      if(c_stopline->next)
-        c_stopline = c_stopline->next;
+      if(HasNextLine(c_startline) == TRUE)
+        c_startline = GetNextLine(c_startline);
+      if(HasNextLine(c_stopline) == TRUE)
+        c_stopline = GetNextLine(c_stopline);
     }
 
     if(c_stopline == startline)
@@ -700,20 +694,20 @@ void NiceBlock(struct marking *realblock, struct marking *newblock)
 
 ///
 /// CutBlock()
-LONG CutBlock(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update)
+LONG CutBlock(struct InstData *data, ULONG flags)
 {
-  struct  marking newblock;
+  struct marking newblock;
   LONG result;
 
   ENTER();
 
-  //D(DBF_STARTUP, "CutBlock: %ld %ld %ld", Clipboard, NoCut, update);
+  //D(DBF_STARTUP, "CutBlock: %08lx", flags);
 
   NiceBlock(&data->blockinfo, &newblock);
-  if(NoCut == FALSE)
+  if(isFlagSet(flags, CUTF_CUT))
     AddToUndoBuffer(data, ET_DELETEBLOCK, &newblock);
 
-  result = CutBlock2(data, Clipboard, NoCut, update, &newblock);
+  result = CutBlock2(data, flags, &newblock);
 
   RETURN(result);
   return(result);
@@ -721,7 +715,7 @@ LONG CutBlock(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update)
 
 ///
 /// CutBlock2()
-LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, struct marking *newblock)
+LONG CutBlock2(struct InstData *data, ULONG flags, struct marking *newblock)
 {
   LONG tvisual_y;
   LONG startx;
@@ -738,36 +732,38 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, s
   startline = newblock->startline;
   stopline  = newblock->stopline;
 
-  //D(DBF_STARTUP, "CutBlock2: %ld-%ld %lx-%lx %ld %ld", startx, stopx, startline, stopline, Clipboard, NoCut);
+  //D(DBF_STARTUP, "CutBlock2: %ld-%ld %lx-%lx %08lx", startx, stopx, startline, stopline, flags);
 
   if(startline != stopline)
   {
-    struct line_node *c_startline = startline->next;
+    struct line_node *c_startline = GetNextLine(startline);
 
     data->update = FALSE;
 
-    if(Clipboard == TRUE)
+    if(isFlagSet(flags, CUTF_CLIPBOARD))
     {
+      // write the block to the clipboard
       if((clipSession = ClientStartSession(IFFF_WRITE)) != (IPTR)NULL)
       {
         ClientWriteChars(clipSession, startline, startx, startline->line.Length-startx);
       }
       else
       {
-        Clipboard = FALSE;
+        // clipboard access failed, don't do further clipboard accesses
+        clearFlag(flags, CUTF_CLIPBOARD);
       }
     }
 
     while(c_startline != stopline)
     {
-      if(Clipboard == TRUE)
+      if(isFlagSet(flags, CUTF_CLIPBOARD))
       {
         ClientWriteLine(clipSession, c_startline);
       }
 
-      if(NoCut == FALSE)
+      if(isFlagSet(flags, CUTF_CUT))
       {
-        struct line_node *cc_startline = c_startline->next;
+        struct line_node *cc_startline = GetNextLine(c_startline);
 
         FreeVecPooled(data->mypool, c_startline->line.Contents);
         if(c_startline->line.Styles != NULL)
@@ -778,15 +774,16 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, s
 
         //D(DBF_STARTUP, "FreeLine %08lx", cc_startline);
 
+        RemLine(c_startline);
         FreeLine(data, c_startline);
 
         c_startline = cc_startline;
       }
       else
-        c_startline = c_startline->next;
+        c_startline = GetNextLine(c_startline);
     }
 
-    if(Clipboard == TRUE)
+    if(isFlagSet(flags, CUTF_CLIPBOARD))
     {
       if(stopx != 0)
         ClientWriteChars(clipSession, stopline, 0, stopx);
@@ -794,11 +791,8 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, s
       ClientEndSession(clipSession);
     }
 
-    if(NoCut == FALSE)
+    if(isFlagSet(flags, CUTF_CUT))
     {
-      startline->next = stopline;
-      stopline->previous = startline;
-
       //D(DBF_STARTUP, "RemoveChars: %ld %ld %08lx %ld", startx, stopx, startline, startline->line.Length);
 
       if(startline->line.Length-startx-1 > 0)
@@ -814,7 +808,7 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, s
   }
   else
   {
-    if(Clipboard == TRUE)
+    if(isFlagSet(flags, CUTF_CLIPBOARD))
     {
       if((clipSession = ClientStartSession(IFFF_WRITE)) != (IPTR)NULL)
       {
@@ -822,18 +816,18 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, s
         ClientEndSession(clipSession);
       }
 
-      if(update == TRUE && NoCut == TRUE)
+      if(isFlagSet(flags, CUTF_UPDATE) && isFlagClear(flags, CUTF_CUT))
       {
         MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
           goto end;
       }
     }
 
-    if(NoCut == FALSE)
+    if(isFlagSet(flags, CUTF_CUT))
     {
       data->CPos_X = startx;
       RemoveChars(data, startx, startline, stopx-startx);
-      if(update == TRUE)
+      if(isFlagSet(flags, CUTF_UPDATE))
         goto end;
     }
   }
@@ -846,7 +840,7 @@ LONG CutBlock2(struct InstData *data, BOOL Clipboard, BOOL NoCut, BOOL update, s
     tvisual_y = 0;
   }
 
-  if(update == TRUE)
+  if(isFlagSet(flags, CUTF_UPDATE))
   {
     //D(DBF_STARTUP, "DumpText! %ld %ld %ld", data->visual_y, tvisual_y, data->maxlines);
     data->update = TRUE;

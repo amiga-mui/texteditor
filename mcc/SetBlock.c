@@ -129,9 +129,9 @@ IPTR mSetBlock(struct InstData *data, struct MUIP_TextEditor_SetBlock *msg)
       {
         lines += startline->visual;
         startline->line.Flow = msg->value;
-        startline = startline->next;
+        startline = GetNextLine(startline);
       }
-      while(startline != newblock2.stopline->next);
+      while(startline != GetNextLine(newblock2.stopline));
 
       if(start < 1)
         start = 1;

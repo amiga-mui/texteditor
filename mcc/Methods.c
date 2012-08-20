@@ -143,31 +143,24 @@ IPTR mClearText(struct IClass *cl, Object *obj, UNUSED Msg msg)
 
   if((newcontents = AllocLine(data)) != NULL)
   {
-    if(Init_LineNode(data, newcontents, NULL, "\n") == TRUE)
+    if(Init_LineNode(data, newcontents, "\n") == TRUE)
     {
       if(isFlagClear(data->flags, FLG_ReadOnly) && data->maxUndoSteps != 0)
       {
         struct marking newblock;
 
-        newblock.startx = 0;
-        newblock.startline = data->firstline;
-        newblock.stopline = data->firstline;
-        while(newblock.stopline->next != NULL)
-        {
-          newblock.stopline = newblock.stopline->next;
-        }
-        newblock.stopx = newblock.stopline->line.Length-1;
+        MarkAllBlock(data, &newblock);
 
         data->CPos_X = 0;
-        data->actualline = data->firstline;
+        data->actualline = GetFirstLine(&data->linelist);
 
         // add the text to the undo buffer only if we really have some text
         // i.e. the block contains at least some characters or some lines
         if(newblock.startline != newblock.stopline || newblock.startx < newblock.stopx)
           AddToUndoBuffer(data, ET_DELETEBLOCK_NOMOVE, &newblock);
       }
-      FreeTextMem(data, data->firstline);
-      data->firstline = newcontents;
+      FreeTextMem(data, &data->linelist);
+      AddLine(&data->linelist, newcontents);
       ResetDisplay(data);
     }
     else
@@ -411,39 +404,31 @@ IPTR mInputTrigger(struct IClass *cl, Object *obj, UNUSED Msg msg)
 /// InsertText()
 ULONG InsertText(struct InstData *data, STRPTR text, BOOL moveCursor)
 {
-  struct line_node *line, *actline = data->actualline;
+  struct MinList newlines;
+  struct line_node *actline = data->actualline;
   LONG x = data->CPos_X;
   LONG realx = 0;
 
   ENTER();
 
-  if((line = ImportText(data, text, data->ImportHook, data->ImportWrap)) != NULL)
+  if(ImportText(data, text, data->ImportHook, data->ImportWrap, &newlines) == TRUE)
   {
     BOOL oneline = FALSE;
     BOOL newline = FALSE;
-    struct line_node *startline = line;
+    struct line_node *line;
+    LONG tvisual_y;
 
-    line->visual = VisualHeight(data, line);
-    data->totallines += line->visual;
+    data->totallines += CountLines(data, &newlines);
 
-    while(line->next != NULL)
-    {
-      line = line->next;
-      line->visual = VisualHeight(data, line);
-      data->totallines += line->visual;
-    }
-
+    line = GetLastLine(&newlines);
     if(line->line.Contents[line->line.Length] == '\n')
       newline = TRUE;
 
     data->update = FALSE;
     SplitLine(data, x, actline, FALSE, NULL);
-    line->next = actline->next;
-    actline->next->previous = line;
-    actline->next = startline;
-    startline->previous = actline;
+    InsertLines(&newlines, actline);
     data->CPos_X = line->line.Length-1;
-    if(actline->next == line)
+    if(GetNextLine(actline) == line)
     {
       data->CPos_X += actline->line.Length-1;
       oneline = TRUE;
@@ -455,7 +440,7 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL moveCursor)
       line = actline;
     if(newline == TRUE)
     {
-      line = line->next;
+      line = GetNextLine(line);
       data->CPos_X = 0;
     }
     if(moveCursor == TRUE)
@@ -468,10 +453,6 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL moveCursor)
       data->CPos_X = x;
     }
     data->update = TRUE;
-  }
-
-  {
-    LONG tvisual_y;
 
     ScrollIntoDisplay(data);
 

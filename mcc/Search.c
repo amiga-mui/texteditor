@@ -79,7 +79,7 @@ IPTR mSearch(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Searc
     if(isFlagSet(msg->Flags, MUIF_TextEditor_Search_FromTop))
     {
       cursor = 0;
-      line = data->firstline;
+      line = GetFirstLine(&data->linelist);
     }
     else
     {
@@ -138,7 +138,7 @@ IPTR mSearch(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Searc
           lenTmp += 1;
         }
 
-        line = line->previous;
+        line = GetPrevLine(line);
 
         if(line != NULL)
           cursor = line->line.Length;
@@ -174,7 +174,7 @@ IPTR mSearch(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Searc
 
         cursor = 0;
 
-        line = line->next;
+        line = GetNextLine(line);
       }
     }
 

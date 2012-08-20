@@ -141,7 +141,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
       NiceBlock(&data->blockinfo, &block);
 
-      blkline = block.startline->next;
+      blkline = GetNextLine(block.startline);
 
       if(block.startline == block.stopline)
       {
@@ -172,7 +172,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
               {
                 stopx = line->line.Length;
               }
-              blkline = blkline->next;
+              blkline = GetNextLine(blkline);
             }
           }
         }
@@ -248,13 +248,17 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
            (flow && data->selectmode != 1 && startx-x == 0 && cursor == FALSE &&
             ((data->blockinfo.startline != data->blockinfo.stopline) || x > 0)))
         {
+          LONG right = MIN(_mright(data->object), xoffset+flow+blockwidth-1);
+
           SetAPen(rp, color);
-          RectFill(rp, xoffset, starty, xoffset+flow+blockwidth-1, starty+data->fontheight-1);
+          RectFill(rp, xoffset, starty, right, starty+data->fontheight-1);
         }
         else
         {
+          LONG right = MIN(_mright(data->object), xoffset+flow+blockstart+blockwidth-1);
+
           SetAPen(rp, cursor ? data->cursorcolor : color);
-          RectFill(rp, xoffset+flow+blockstart, starty, xoffset+flow+blockstart+blockwidth-1, starty+data->fontheight-1);
+          RectFill(rp, xoffset+flow+blockstart, starty, right, starty+data->fontheight-1);
 
           // if the gadget is in inactive state we just draw a skeleton cursor instead
           if(cursor == TRUE &&
