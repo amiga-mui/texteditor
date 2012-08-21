@@ -112,8 +112,12 @@ BOOL Init_LineNode(struct InstData *data, struct line_node *line, CONST_STRPTR t
 
   ENTER();
 
-  while(text[0] != '\n' && text[0] != '\0')
+  ctext = text;
+  while(*ctext != '\n' && *ctext != '\0')
+  {
+    ctext++;
     textlength++;
+  }
 
   // count one byte more for the trailing LF byte
   textlength++;
