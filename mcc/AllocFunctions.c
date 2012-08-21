@@ -28,15 +28,15 @@
 /// AllocLine()
 struct line_node *AllocLine(struct InstData *data)
 {
-  struct line_node *newline;
+  struct line_node *line;
 
   ENTER();
 
-  newline = AllocVecPooled(data->mypool, sizeof(struct line_node));
-  MEMTRACK("AllocLine", newline, sizeof(struct line_node));
+  line = AllocVecPooled(data->mypool, sizeof(*line));
+  MEMTRACK("AllocLine", newline, sizeof(*line));
 
-  RETURN(newline);
-  return newline;
+  RETURN(line);
+  return line;
 }
 
 ///
