@@ -107,18 +107,19 @@ void FreeTextMem(struct InstData *data, struct MinList *lines)
 BOOL Init_LineNode(struct InstData *data, struct line_node *line, CONST_STRPTR text)
 {
   BOOL success = FALSE;
-  LONG textlength = 0;
+  LONG textlength;
+  const char *p;
   char *ctext;
 
   ENTER();
 
-  ctext = text;
-  while(*ctext != '\n' && *ctext != '\0')
+  textlength = 0;
+  p = text;
+  while(*p != '\n' && *p != '\0')
   {
-    ctext++;
+    p++;
     textlength++;
   }
-
   // count one byte more for the trailing LF byte
   textlength++;
 
