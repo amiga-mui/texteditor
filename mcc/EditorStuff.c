@@ -1319,53 +1319,57 @@ static void UpdateChange(struct InstData *data, LONG x, struct line_node *line, 
  *------------------------------*/
 BOOL PasteChars(struct InstData *data, LONG x, struct line_node *line, LONG length, const char *characters, struct UserAction *buffer)
 {
+  BOOL success = TRUE;
+
   ENTER();
 
-  if(line->line.Styles != NULL && line->line.Styles[0].column != EOS)
+  // check if we need more space for the contents first
+  // include 2 extra bytes for LF and NUL
+  if(line->line.Length + 1 + length + 1 > line->line.allocatedContents)
   {
-    ULONG c = 0;
-
-    // skip all styles up to the given position
-    while(line->line.Styles[c].column <= x+1)
-      c++;
-
-    // move all style positions by the given length
-    while(line->line.Styles[c].column != EOS)
-    {
-      line->line.Styles[c].column += length;
-      c++;
-    }
+    success = ExpandLine(data, line, length);
   }
 
-  if(line->line.Colors != NULL && line->line.Colors[0].column != EOC)
+  // continue only if the possible expansion succeeded
+  if(success == TRUE)
   {
-    ULONG c = 0;
-
-    // skip all colors up to the given position
-    while(line->line.Colors[c].column <= x+1)
-      c++;
-
-    // move all color positions by the given length
-    while(line->line.Colors[c].column != EOC)
+    if(line->line.Styles != NULL)
     {
-      line->line.Colors[c].column += length;
-      c++;
+      struct LineStyle *stylePtr = line->line.Styles;
+
+      // skip all styles up to the given position
+      while(stylePtr->column <= x+1)
+        stylePtr++;
+
+      // move all style positions by the given length
+      while(stylePtr->column != EOS)
+      {
+        stylePtr->column += length;
+        stylePtr++;
+      }
     }
+
+    if(line->line.Colors != NULL && line->line.Colors[0].column != EOC)
+    {
+      struct LineColor *colorPtr = line->line.Colors;
+
+      // skip all colors up to the given position
+      while(colorPtr->column <= x+1)
+        colorPtr++;
+
+      // move all color positions by the given length
+      while(colorPtr->column != EOC)
+      {
+        colorPtr->column += length;
+        colorPtr++;
+      }
+    }
+
+    UpdateChange(data, x, line, length, characters, buffer);
   }
 
-  if(line->line.allocatedContents < line->line.Length + length + 1)
-  {
-    if(ExpandLine(data, line, length) == FALSE)
-    {
-      RETURN(FALSE);
-      return(FALSE);
-    }
-  }
-
-  UpdateChange(data, x, line, length, characters, buffer);
-
-  RETURN(TRUE);
-  return(TRUE);
+  RETURN(success);
+  return(success);
 }
 
 ///
