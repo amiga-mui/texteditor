@@ -194,7 +194,7 @@ BOOL CompressLine(struct InstData *data, struct line_node *line)
 
   if((newbuffer = AllocVecPooled(data->mypool, compressedSize)) != NULL)
   {
-    strlcpy(newbuffer, line->line.Contents, line->line.Length+1);
+    strlcpy(newbuffer, line->line.Contents, compressedSize);
     FreeVecPooled(data->mypool, line->line.Contents);
     line->line.Contents = newbuffer;
     line->line.Length = strlen(newbuffer);
