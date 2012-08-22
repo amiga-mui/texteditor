@@ -228,7 +228,6 @@ void InsertLines(struct MinList *lines, struct line_node *after)
 LONG LineCharsWidth(struct InstData *data, CONST_STRPTR text)
 {
   LONG c;
-  LONG w = _mwidth(data->object);
   LONG textlen;
 
   ENTER();
@@ -237,20 +236,20 @@ LONG LineCharsWidth(struct InstData *data, CONST_STRPTR text)
 
   // check the innerwidth as well. But we also check if we need to
   // take care of any of the word wrapping techniques we provide
-  if(w > 0 && textlen > 0 && data->WrapMode != MUIV_TextEditor_WrapMode_NoWrap)
+  if(textlen > 0 && data->WrapMode != MUIV_TextEditor_WrapMode_NoWrap)
   {
     struct TextExtent tExtend;
     ULONG fontheight = data->font ? data->font->tf_YSize : 0;
 
     // see how many chars of our text fit to the current innerwidth of the
     // texteditor
-    c = TextFitNew(&data->tmprp, text, textlen, &tExtend, NULL, 1, w, fontheight, data->TabSizePixels);
+    c = TextFitNew(&data->tmprp, text, textlen, &tExtend, NULL, 1, _mwidth(data->object), fontheight, data->TabSizePixels);
     if(c >= textlen)
     {
       // if all text fits, then we have to do the calculations once more and
       // see if also the ending cursor might fit on the line
       w -= (data->CursorWidth == 6) ? TextLength(&data->tmprp, " ", 1) : data->CursorWidth;
-      c = TextFitNew(&data->tmprp, text, textlen, &tExtend, NULL, 1, w, fontheight, data->TabSizePixels);
+      c = TextFitNew(&data->tmprp, text, textlen, &tExtend, NULL, 1, _mwidth(data->object), fontheight, data->TabSizePixels);
     }
 
     // if the user selected soft wrapping with a defined wrapborder
