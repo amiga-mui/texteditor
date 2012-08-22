@@ -169,7 +169,7 @@ BOOL ExpandLine(struct InstData *data, struct line_node *line, LONG length)
 
   if((newbuffer = AllocVecPooled(data->mypool, expandedSize)) != NULL)
   {
-    strlcpy(newbuffer, line->line.Contents, line->line.Length+1);
+    strlcpy(newbuffer, line->line.Contents, expandedSize);
     FreeVecPooled(data->mypool, line->line.Contents);
     line->line.Contents = newbuffer;
     line->line.allocatedContents = expandedSize;
