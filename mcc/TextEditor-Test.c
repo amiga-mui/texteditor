@@ -311,6 +311,7 @@ int main(void)
                           MUIA_FixHeight,     17,
                           MUIA_FixWidth,      24,
                           MUIA_InputMode,     MUIV_InputMode_Toggle,
+                          MUIA_CycleChain,    TRUE,
                           End,
                         Child, wrapwords = TextObject,
                           MUIA_Background,    MUII_ButtonBack,
@@ -320,6 +321,7 @@ int main(void)
                           MUIA_FixHeight,     17,
                           MUIA_FixWidth,      24,
                           MUIA_InputMode,     MUIV_InputMode_Toggle,
+                          MUIA_CycleChain,    TRUE,
                           End,
                       End,
 
@@ -462,6 +464,23 @@ int main(void)
               unsigned long running = 1;
               BPTR  fh;
 
+            set(clear, MUIA_CycleChain, TRUE);
+            set(cut, MUIA_CycleChain, TRUE);
+            set(copy, MUIA_CycleChain, TRUE);
+            set(paste, MUIA_CycleChain, TRUE);
+            set(erase, MUIA_CycleChain, TRUE);
+            set(undo, MUIA_CycleChain, TRUE);
+            set(redo, MUIA_CycleChain, TRUE);
+            set(search, MUIA_CycleChain, TRUE);
+            set(replace, MUIA_CycleChain, TRUE);
+            set(lower, MUIA_CycleChain, TRUE);
+            set(upper, MUIA_CycleChain, TRUE);
+            set(ischanged, MUIA_CycleChain, TRUE);
+            set(isdisabled, MUIA_CycleChain, TRUE);
+            set(isreadonly, MUIA_CycleChain, TRUE);
+            set(flow, MUIA_CycleChain, TRUE);
+            set(wrapmode, MUIA_CycleChain, TRUE);
+            set(wrapborder, MUIA_CycleChain, TRUE);
             set(editorgad, MUIA_TextEditor_Slider, slider);
             set(xslider, MUIA_CycleChain, TRUE);
             set(yslider, MUIA_CycleChain, TRUE);
