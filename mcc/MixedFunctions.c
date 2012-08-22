@@ -35,18 +35,6 @@
 
 /*************************************************************************/
 
-#ifndef FSF_ANTIALIASED
-#define FSF_ANTIALIASED 0x10
-#endif
-
-#if defined(__MORPHOS__) || defined(__AROS__)
-#define IS_ANTIALIASED(x) (((x)->tf_Style & FSF_COLORFONT) == FSF_COLORFONT && (((struct ColorTextFont *)(x))->ctf_Flags & CT_ANTIALIAS) == CT_ANTIALIAS)
-#else
-#define IS_ANTIALIASED(x) (((x)->tf_Style & FSF_ANTIALIASED) == FSF_ANTIALIASED)
-#endif
-
-/*************************************************************************/
-
 #include "private.h"
 #include "Debug.h"
 
@@ -497,16 +485,13 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
 
     if(xplace <= _mright(data->object))
     {
-      // if font is anti aliased, clear area near the cursor first
-      if(IS_ANTIALIASED(data->font))
-      {
-        DoMethod(data->object, MUIM_DrawBackground, xplace, yplace,
-                                                    TextLengthNew(&data->tmprp, start == 0 ? (STRPTR)chars+1 : (STRPTR)chars, stop-start+1, data->TabSizePixels),
-                                                    data->fontheight,
-                                                    cursorxplace - (isFlagSet(data->flags, FLG_InVGrp) ? _mleft(data->object) : 0),
-                                                    (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mtop(data->object)) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
-                                                    0);
-      }
+      // clear area near the cursor first
+      DoMethod(data->object, MUIM_DrawBackground, xplace, yplace,
+                                                  TextLengthNew(&data->tmprp, start == 0 ? (STRPTR)chars+1 : (STRPTR)chars, stop-start+1, data->TabSizePixels),
+                                                  data->fontheight,
+                                                  cursorxplace - (isFlagSet(data->flags, FLG_InVGrp) ? _mleft(data->object) : 0),
+                                                  (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mtop(data->object)) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
+                                                  0);
 
       if(Set == TRUE ||
          (data->inactiveCursor == TRUE && isFlagClear(data->flags, FLG_Active) && isFlagClear(data->flags, FLG_Activated)))
@@ -522,29 +507,14 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
           if(data->CursorWidth != 6)
             cwidth = TextLengthNew(&data->tmprp, chars[1] < ' ' ? (char *)" " : (char *)&chars[1], 1, data->TabSizePixels);
 
-          if(Set == FALSE && data->currentCursorState == CS_INACTIVE)
-          {
-            // the cursor should be switched off, but the skeleton cursor has already been
-            // drawn before, hence we must erase this old one, but only for non-antialiased
-            // fonts. For antialiased fonts this has been done already
-            if(IS_ANTIALIASED(data->font) == FALSE)
-            {
-              DoMethod(data->object, MUIM_DrawBackground, cursorxplace, yplace,
-                                                          cwidth, data->fontheight,
-                                                          cursorxplace - (isFlagSet(data->flags, FLG_InVGrp) ? _mleft(data->object) : 0),
-                                                          (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mtop(data->object)) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
-                                                          0);
-            }
-          }
-          else
+          if(Set == TRUE || data->currentCursorState != CS_INACTIVE)
           {
             // draw a "new" skeleton cursor
-            RectFill(rp, cursorxplace, yplace, cursorxplace+cwidth-1, yplace+data->fontheight-1);
-            DoMethod(data->object, MUIM_DrawBackground, cursorxplace+1, yplace+1,
-                                                        cwidth-2, data->fontheight-2,
-                                                        cursorxplace - (isFlagSet(data->flags, FLG_InVGrp) ? _mleft(data->object) : 0),
-                                                        (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mtop(data->object)) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
-                                                        0);
+            Move(rp, cursorxplace, yplace);
+            Draw(rp, cursorxplace+cwidth-1, yplace);
+            Draw(rp, cursorxplace+cwidth-1, yplace+data->fontheight-1);
+            Draw(rp, cursorxplace, yplace+data->fontheight-1);
+            Draw(rp, cursorxplace, yplace);
           }
 
           // remember the inactive state
@@ -552,6 +522,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
         }
         else
         {
+          // draw a normal cursor
           RectFill(rp, cursorxplace, yplace, cursorxplace+cursor_width-1, yplace+data->fontheight-1);
 
           // remember the active state
@@ -560,21 +531,6 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
       }
       else
       {
-        // Clear the place of the cursor in case we are using NO anti-aliased font
-        if(IS_ANTIALIASED(data->font) == FALSE)
-        {
-          LONG cwidth = cursor_width;
-
-          if(data->CursorWidth != 6 && Set == FALSE)
-            cwidth = TextLengthNew(&data->tmprp, chars[1] < ' ' ? (char *)" " : (char *)&chars[1], 1, data->TabSizePixels);
-
-          DoMethod(data->object, MUIM_DrawBackground, cursorxplace, yplace,
-                                                      cwidth, data->fontheight,
-                                                      cursorxplace - (isFlagSet(data->flags, FLG_InVGrp) ? _mleft(data->object) : 0),
-                                                      (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mtop(data->object)) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
-                                                      0);
-        }
-
         // remember the off state
         data->currentCursorState = CS_OFF;
       }
