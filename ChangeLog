@@ -15,6 +15,9 @@ $URL$
     accessing the array.
   * mcc/EditorStuff.c: apply all further changes to a line only if a possible
     expansion has succeeded before.
+  * mcc/MixedFunctions.c: removed all the handling of anti-aliased fonts. The
+    background area affected by redraw operations will always be cleared now no
+    matter what type of font is used.
 
 2012-08-21 Thore Böckelmann <tboeckel@gmx.de>
 
