@@ -13,6 +13,8 @@ $URL$
     be printed.
   * mcc/MixedFunctions.c: check the index to inside the array bounds before
     accessing the array.
+  * mcc/EditorStuff.c: apply all further changes to a line only if a possible
+    expansion has succeeded before.
 
 2012-08-21 Thore Böckelmann <tboeckel@gmx.de>
 
