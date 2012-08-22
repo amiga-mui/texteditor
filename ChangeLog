@@ -9,6 +9,8 @@ $URL$
 
   * mcc/EditorStuff.c: moved a check to a more appropriate location to avoid
     leaving a function somewhere in the middle.
+  * mcc/EditorStuff.c: fixed a potential out of bounds access of the text line to
+    be printed.
 
 2012-08-21 Thore Böckelmann <tboeckel@gmx.de>
 
