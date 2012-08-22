@@ -1298,18 +1298,16 @@ static void UpdateChange(struct InstData *data, LONG x, struct line_node *line, 
         newwidth = PrintLine(data, skip-lineabove_width, line, line_nr-1, TRUE) - lineabove_width;
         skip  += newwidth;
         width -= newwidth;
-        if(skip < 0 || skip >= (LONG)line->line.Length)
-        {
-          LEAVE();
-          return;
-        }
       }
     }
   }
 
-  OptimizedPrint(data, skip, line, line_nr, width);
-  ScrollIntoDisplay(data);
-  data->HasChanged = TRUE;
+  if(skip >= 0 && skip < line->line.Length)
+  {
+    OptimizedPrint(data, skip, line, line_nr, width);
+    ScrollIntoDisplay(data);
+    data->HasChanged = TRUE;
+  }
 
   LEAVE();
 }

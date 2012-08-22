@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-08-22 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/EditorStuff.c: moved a check to a more appropriate location to avoid
+    leaving a function somewhere in the middle.
+
 2012-08-21 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/MixedFunctions.c: fixed an endless loop when splitting a non-empty line
