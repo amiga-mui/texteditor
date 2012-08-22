@@ -55,10 +55,11 @@ void AddClipping(struct InstData *data)
 {
   ENTER();
 
-  if(data->clipcount++ == 0)
+  if(data->clipcount == 0)
   {
     data->cliphandle = MUI_AddClipping(muiRenderInfo(data->object), _mleft(data->object), _mtop(data->object), _mwidth(data->object), _mheight(data->object));
   }
+  data->clipcount++;
 
   LEAVE();
 }
@@ -69,8 +70,11 @@ void RemoveClipping(struct InstData *data)
 {
   ENTER();
 
-  if(--data->clipcount == 0)
+  data->clipcount--;
+  if(data->clipcount == 0)
+  {
     MUI_RemoveClipping(muiRenderInfo(data->object), data->cliphandle);
+  }
 
   LEAVE();
 }
