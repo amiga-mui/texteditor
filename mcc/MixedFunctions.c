@@ -156,7 +156,7 @@ BOOL ExpandLine(struct InstData *data, struct line_node *line, LONG length)
 {
   BOOL result = FALSE;
   char *newbuffer;
-  ULONG expandedSize;
+  LONG expandedSize;
 
   ENTER();
 
@@ -185,7 +185,7 @@ BOOL ExpandLine(struct InstData *data, struct line_node *line, LONG length)
 BOOL CompressLine(struct InstData *data, struct line_node *line)
 {
   BOOL result = FALSE;
-  ULONG compressedSize;
+  LONG compressedSize;
 
   ENTER();
 
