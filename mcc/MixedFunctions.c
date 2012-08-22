@@ -229,6 +229,7 @@ LONG LineCharsWidth(struct InstData *data, CONST_STRPTR text)
 {
   LONG c;
   LONG textlen;
+  LONG width = _mwidth(data->object);
 
   ENTER();
 
@@ -236,20 +237,20 @@ LONG LineCharsWidth(struct InstData *data, CONST_STRPTR text)
 
   // check the innerwidth as well. But we also check if we need to
   // take care of any of the word wrapping techniques we provide
-  if(textlen > 0 && data->WrapMode != MUIV_TextEditor_WrapMode_NoWrap)
+  if(width > 0 && textlen > 0 && data->WrapMode != MUIV_TextEditor_WrapMode_NoWrap)
   {
     struct TextExtent tExtend;
     ULONG fontheight = data->font ? data->font->tf_YSize : 0;
 
     // see how many chars of our text fit to the current innerwidth of the
     // texteditor
-    c = TextFitNew(&data->tmprp, text, textlen, &tExtend, NULL, 1, _mwidth(data->object), fontheight, data->TabSizePixels);
+    c = TextFitNew(&data->tmprp, text, textlen, &tExtend, NULL, 1, width, fontheight, data->TabSizePixels);
     if(c >= textlen)
     {
       // if all text fits, then we have to do the calculations once more and
       // see if also the ending cursor might fit on the line
-      w -= (data->CursorWidth == 6) ? TextLength(&data->tmprp, " ", 1) : data->CursorWidth;
-      c = TextFitNew(&data->tmprp, text, textlen, &tExtend, NULL, 1, _mwidth(data->object), fontheight, data->TabSizePixels);
+      width -= (data->CursorWidth == 6) ? TextLength(&data->tmprp, " ", 1) : data->CursorWidth;
+      c = TextFitNew(&data->tmprp, text, textlen, &tExtend, NULL, 1, width, fontheight, data->TabSizePixels);
     }
 
     // if the user selected soft wrapping with a defined wrapborder
@@ -258,22 +259,22 @@ LONG LineCharsWidth(struct InstData *data, CONST_STRPTR text)
     if(data->WrapBorder > 0 && c > data->WrapBorder && data->WrapMode == MUIV_TextEditor_WrapMode_SoftWrap)
       c = data->WrapBorder;
 
-    // now we check wheter all chars fit on the current innerwidth
+    // now we check whether all chars fit on the current innerwidth
     // or if we have to do soft word wrapping by searching for the last
     // occurance of a linear white space character
     if(c < textlen)
     {
-      LONG tc = c-1;
-
       if(data->WrapWords)
       {
+        LONG tc = c-1;
+
 	    // search backwards for a linear whitespace (LWSP)
 	    while(tc >= 0 && text[tc] != ' ' && text[tc] != '\t')
 	      tc--;
-      }
 
-      if(tc >= 0)
-        c = tc+1;
+        if(tc >= 0)
+          c = tc+1;
+      }
     }
     else
     {
