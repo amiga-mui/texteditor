@@ -643,7 +643,8 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
 /// NiceBlock()
 void NiceBlock(struct marking *realblock, struct marking *newblock)
 {
-  LONG startx = realblock->startx, stopx = realblock->stopx;
+  LONG startx = realblock->startx;
+  LONG stopx = realblock->stopx;
   struct line_node *startline = realblock->startline;
   struct line_node *stopline = realblock->stopline;
 
@@ -651,12 +652,13 @@ void NiceBlock(struct marking *realblock, struct marking *newblock)
 
   if(startline == stopline)
   {
+    // swap start end position if the block is marked backwards
     if(startx > stopx)
     {
-      LONG c_x = startx;
+      LONG tmp = startx;
 
       startx = stopx;
-      stopx = c_x;
+      stopx = tmp;
     }
   }
   else
@@ -664,6 +666,8 @@ void NiceBlock(struct marking *realblock, struct marking *newblock)
     struct line_node *c_startline = startline;
     struct line_node *c_stopline = stopline;
 
+    // ensure that the start and and stop line pointers really point to
+    // the first and last line respectively
     while(c_startline != stopline && c_stopline != startline)
     {
       if(HasNextLine(c_startline) == TRUE)
@@ -672,18 +676,24 @@ void NiceBlock(struct marking *realblock, struct marking *newblock)
         c_stopline = GetNextLine(c_stopline);
     }
 
+    // swap start end position if the block is marked backwards
     if(c_stopline == startline)
     {
-      LONG  c_x = startx;
+      LONG tmp = startx;
 
       startx = stopx;
-      stopx = c_x;
+      stopx = tmp;
 
       c_startline = startline;
       startline = stopline;
       stopline = c_startline;
     }
   }
+
+  // reuse the original block if this is requested
+  if(newblock == NULL)
+    newblock = realblock;
+
   newblock->startx    = startx;
   newblock->stopx     = stopx;
   newblock->startline = startline;
