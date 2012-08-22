@@ -185,20 +185,28 @@ BOOL ExpandLine(struct InstData *data, struct line_node *line, LONG length)
 BOOL CompressLine(struct InstData *data, struct line_node *line)
 {
   BOOL result = FALSE;
-  char *newbuffer;
   ULONG compressedSize;
 
   ENTER();
 
   compressedSize = strlen(line->line.Contents)+1;
-
-  if((newbuffer = AllocVecPooled(data->mypool, compressedSize)) != NULL)
+  if(compressedSize < line->line.allocatedContents)
   {
-    strlcpy(newbuffer, line->line.Contents, compressedSize);
-    FreeVecPooled(data->mypool, line->line.Contents);
-    line->line.Contents = newbuffer;
-    line->line.Length = strlen(newbuffer);
-    line->line.allocatedContents = compressedSize;
+    char *newbuffer;
+
+    if((newbuffer = AllocVecPooled(data->mypool, compressedSize)) != NULL)
+    {
+      strlcpy(newbuffer, line->line.Contents, compressedSize);
+      FreeVecPooled(data->mypool, line->line.Contents);
+      line->line.Contents = newbuffer;
+      line->line.Length = strlen(newbuffer);
+      line->line.allocatedContents = compressedSize;
+      result = TRUE;
+    }
+  }
+  else
+  {
+    // no compression necessary
     result = TRUE;
   }
 
