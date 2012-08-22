@@ -268,12 +268,12 @@ LONG LineCharsWidth(struct InstData *data, CONST_STRPTR text)
 
       if(data->WrapWords)
       {
-	      // search backwards for a linear whitespace (LWSP)
-	      while(text[tc] != ' ' && text[tc] != '\t' && tc != 0)
-	        tc--;
+	    // search backwards for a linear whitespace (LWSP)
+	    while(tc >= 0 && text[tc] != ' ' && text[tc] != '\t')
+	      tc--;
       }
 
-      if(tc != 0)
+      if(tc >= 0)
         c = tc+1;
     }
     else
