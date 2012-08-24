@@ -633,8 +633,6 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
     text = (STRPTR)CallHookA(&ExportHookPlain, NULL, &emsg);
   }
 
-  SHOWSTRING(DBF_ALWAYS, text);
-
   RETURN(text);
   return text;
 }
