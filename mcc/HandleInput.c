@@ -1390,14 +1390,13 @@ void ScrollIntoDisplay(struct InstData *data)
     {
       data->visual_y += diff-data->maxlines;
       D(DBF_INPUT,"scrollup: %ld", diff-data->maxlines);
-      ScrollUp(data, 0, diff-data->maxlines);
+      ScrollUpDown(data);
     }
-
-    if(diff < 1)
+    else if(diff < 1)
     {
       data->visual_y += diff-1;
       D(DBF_INPUT,"scrolldown: %ld", -diff+1);
-      ScrollDown(data, 0, (-diff)+1);
+      ScrollUpDown(data);
     }
   }
 
