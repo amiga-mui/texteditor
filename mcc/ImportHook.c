@@ -228,8 +228,8 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 
     len = eol - src + (msg->TabSize * tabs);
 
-    // allocate memory for the contents plus the trailing NUL byte
-    allocatedContents = len+1;
+    // allocate memory for the contents plus the trailing LF and NUL bytes
+    allocatedContents = len+2;
     if((line->Contents = AllocVecPooled(msg->PoolHandle, allocatedContents)) != NULL)
     {
       unsigned char *dest_start = (unsigned char *)line->Contents;
