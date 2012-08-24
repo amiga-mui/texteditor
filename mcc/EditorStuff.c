@@ -713,7 +713,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
     {
       data->totallines += 1;
       if(line_nr+line->visual-1 < data->maxlines)
-        ScrollDown(data, line_nr + line->visual - 2, 1);
+        ScrollUpDown(data);
     }
 
     if(emptyline == FALSE || line_nr + line->visual - 1 >= data->maxlines)
@@ -1096,7 +1096,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
 
         if(line_nr+next->visual-1 < data->maxlines && line->visual + next->visual > c)
         {
-          ScrollDown(data, line_nr+next->visual-1, 1);
+          ScrollUpDown(data);
         }
       }
       else
@@ -1106,7 +1106,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
         if(line_nr < data->maxlines && line->visual + next->visual < c)
         {
           data->totallines -= 1;
-          ScrollUp(data, line_nr, 1);
+          ScrollUpDown(data);
         }
       }
   /*------------------*/
@@ -1236,13 +1236,13 @@ static void UpdateChange(struct InstData *data, LONG x, struct line_node *line, 
     if(diff > 0)
     {
       if(movement < data->maxlines)
-        ScrollDown(data, movement, diff);
+        ScrollUpDown(data);
     }
     else
     {
       movement = orgline_nr + line->visual - 1;
       if(movement <= data->maxlines)
-        ScrollUp(data, movement, -diff);
+        ScrollUpDown(data);
     }
   }
 

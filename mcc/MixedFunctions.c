@@ -674,43 +674,15 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
 }
 
 ///
-/// ScrollUp()
-/*-----------------------*
- * Scroll up the display *
- *-----------------------*/
-void ScrollUp(struct InstData *data, LONG line_nr, LONG lines)
-{
-  struct pos_info pos;
-
-  ENTER();
-
-  if(data->update == FALSE || isFlagSet(data->flags, FLG_Quiet) || data->shown == FALSE)
-  {
-    LEAVE();
-    return;
-  }
-
-  DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
-
-  LEAVE();
-}
-
-///
-/// ScrollDown()
-/*-------------------------*
- * Scroll down the display *
- *-------------------------*/
-void ScrollDown(struct InstData *data, LONG line_nr, LONG lines)
+/// ScrollUpDOwn()
+void ScrollUpDown(struct InstData *data)
 {
   ENTER();
 
-  if(data->update == FALSE || isFlagSet(data->flags, FLG_Quiet) || data->shown == FALSE)
+  if(data->update == TRUE && isFlagClear(data->flags, FLG_Quiet) && data->shown == TRUE)
   {
-    LEAVE();
-    return;
+    DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
   }
-
-  DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
 
   LEAVE();
 }
