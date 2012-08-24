@@ -429,12 +429,12 @@ void GoNextWord(struct InstData *data)
 {
   ENTER();
 
-  while(CheckSep(data, data->actualline->line.Contents[data->CPos_X]) == FALSE && data->CPos_X < data->actualline->line.Length)
+  while(data->CPos_X < data->actualline->line.Length && CheckSep(data, data->actualline->line.Contents[data->CPos_X]) == FALSE)
     data->CPos_X++;
 
 FindNextWord:
 
-  while(CheckSep(data, data->actualline->line.Contents[data->CPos_X]) == TRUE && data->CPos_X < data->actualline->line.Length)
+  while(data->CPos_X < data->actualline->line.Length && CheckSep(data, data->actualline->line.Contents[data->CPos_X]) == TRUE)
     data->CPos_X++;
 
   if(data->CPos_X == data->actualline->line.Length)
@@ -460,15 +460,15 @@ void GoNextSentence(struct InstData *data)
 {
   ENTER();
 
-  while(CheckSent(data, data->actualline->line.Contents[data->CPos_X]) == FALSE && data->CPos_X < data->actualline->line.Length)
+  while(data->CPos_X < data->actualline->line.Length && CheckSent(data, data->actualline->line.Contents[data->CPos_X]) == FALSE)
     data->CPos_X++;
-  while(CheckSent(data, data->actualline->line.Contents[data->CPos_X]) == TRUE && data->CPos_X < data->actualline->line.Length)
+  while(data->CPos_X < data->actualline->line.Length && CheckSent(data, data->actualline->line.Contents[data->CPos_X]) == TRUE)
     data->CPos_X++;
   if(data->CPos_X >= data->actualline->line.Length-1)
     NextLine(data);
   else
   {
-    while(data->actualline->line.Contents[data->CPos_X] == ' ' && data->CPos_X < data->actualline->line.Length)
+    while(data->CPos_X < data->actualline->line.Length && data->actualline->line.Contents[data->CPos_X] == ' ')
       data->CPos_X++;
     if(data->CPos_X == data->actualline->line.Length-1)
       NextLine(data);
@@ -483,7 +483,7 @@ void GoRight(struct InstData *data)
 {
   ENTER();
 
-  if(data->actualline->line.Length > data->CPos_X+1)
+  if(data->CPos_X+1 < data->actualline->line.Length)
     data->CPos_X++;
   else
     NextLine(data);
@@ -517,12 +517,12 @@ void GoPreviousWord(struct InstData *data)
 
 FindWord:
 
-  if(CheckSep(data, data->actualline->line.Contents[data->CPos_X-1]) == TRUE && data->CPos_X > 0)
+  if(data->CPos_X > 0 && CheckSep(data, data->actualline->line.Contents[data->CPos_X-1]) == TRUE)
   {
     data->CPos_X--;
     moved = TRUE;
   }
-  while(CheckSep(data, data->actualline->line.Contents[data->CPos_X]) == TRUE && data->CPos_X > 0)
+  while(data->CPos_X > 0 && CheckSep(data, data->actualline->line.Contents[data->CPos_X]) == TRUE)
   {
     data->CPos_X--;
     moved = TRUE;
@@ -535,7 +535,7 @@ FindWord:
     goto FindWord;
   }
 
-  while(CheckSep(data, data->actualline->line.Contents[data->CPos_X-1]) == FALSE && data->CPos_X > 0)
+  while(data->CPos_X > 0 && CheckSep(data, data->actualline->line.Contents[data->CPos_X-1]) == FALSE)
     data->CPos_X--;
 
   LEAVE();
@@ -559,16 +559,16 @@ void GoPreviousSentence(struct InstData *data)
   if(data->CPos_X != 0)
   {
     data->CPos_X--;
-    while(data->actualline->line.Contents[data->CPos_X] == ' ' && data->CPos_X > 0)
+    while(data->CPos_X > 0 && data->actualline->line.Contents[data->CPos_X] == ' ')
       data->CPos_X--;
-    while(CheckSent(data, data->actualline->line.Contents[data->CPos_X]) == TRUE && data->CPos_X > 0)
+    while(data->CPos_X > 0 && CheckSent(data, data->actualline->line.Contents[data->CPos_X]) == TRUE)
       data->CPos_X--;
-    while(CheckSent(data, data->actualline->line.Contents[data->CPos_X]) == FALSE && data->CPos_X > 0)
+    while(data->CPos_X > 0 && CheckSent(data, data->actualline->line.Contents[data->CPos_X]) == FALSE)
       data->CPos_X--;
     if(data->CPos_X > 0)
     {
       data->CPos_X++;
-      while(data->actualline->line.Contents[data->CPos_X] == ' ' && data->CPos_X < data->actualline->line.Length)
+      while(data->CPos_X < data->actualline->line.Length && data->actualline->line.Contents[data->CPos_X] == ' ')
         data->CPos_X++;
     }
   }
