@@ -33,7 +33,7 @@ struct line_node *AllocLine(struct InstData *data)
   ENTER();
 
   line = AllocVecPooled(data->mypool, sizeof(*line));
-  MEMTRACK("AllocLine", newline, sizeof(*line));
+  MEMTRACK("AllocLine", line, sizeof(*line));
 
   RETURN(line);
   return line;
