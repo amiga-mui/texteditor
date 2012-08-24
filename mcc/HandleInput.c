@@ -1343,7 +1343,7 @@ void Key_Delete(struct InstData *data)
   {
     ScrollIntoDisplay(data);
 
-    if(data->actualline->line.Length >= data->CPos_X)
+    if(data->CPos_X+1 < data->actualline->line.Length)
     {
       struct marking block;
 
