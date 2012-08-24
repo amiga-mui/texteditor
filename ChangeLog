@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-08-24 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Navigation.c: fixed several "use before check" occurences.
+
 2012-08-22 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: moved a check to a more appropriate location to avoid
