@@ -553,7 +553,7 @@ void ResizeUndoBuffer(struct InstData *data, ULONG newMaxUndoSteps)
         if(data->undoSteps != NULL)
         {
           // copy over the old undo steps
-          CopyMem(data->undoSteps, newUndoSteps, MIN(oldSize, newSize));
+          memcpy(data->undoSteps, newUndoSteps, MIN(oldSize, newSize));
         }
       }
     }
