@@ -295,7 +295,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
           y_ptrn += _mtop(data->object);
         }
 
-        DoMethod(data->object, MUIM_DrawBackground, x_start, y_start, x_width, y_width, x_ptrn, y_ptrn);
+        DoMethod(data->object, MUIM_DrawBackground, x_start, y_start, x_width, y_width, x_ptrn, y_ptrn, 0);
       }
       _rp(data->object) = old;
     }
