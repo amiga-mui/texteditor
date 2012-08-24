@@ -638,7 +638,8 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
             _mwidth(data->object),
             (data->maxlines*data->fontheight) - ((data->totallines-data->visual_y+1)*data->fontheight),
             (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mleft(data->object)),
-            (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mtop(data->object)) + data->totallines*data->fontheight);
+            (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mtop(data->object)) + data->totallines*data->fontheight,
+            0);
 
       if(isFlagSet(data->flags, FLG_Ghosted) && isFlagClear(data->flags, FLG_MUI4))
       {
