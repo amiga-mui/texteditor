@@ -704,22 +704,9 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
       if(line_nr+line->visual-1 < data->maxlines)
       {
         if(emptyline == TRUE && line_nr > 0)
-        {
-          if(data->fastbackground == TRUE)
-          {
-            ScrollUp(data, line_nr - 1, 1);
-            SetCursor(data, data->CPos_X, data->actualline, TRUE);
-          }
-          else
-            DumpText(data, data->visual_y+line_nr-1, line_nr-1, data->maxlines, TRUE);
-        }
+          DumpText(data, data->visual_y+line_nr-1, line_nr-1, data->maxlines, TRUE);
         else
-        {
-          if(data->fastbackground == TRUE)
-            ScrollUp(data, line_nr + line->visual - 1, 1);
-          else
-            DumpText(data, data->visual_y+line_nr+line->visual-1, line_nr+line->visual-1, data->maxlines, TRUE);
-        }
+          DumpText(data, data->visual_y+line_nr+line->visual-1, line_nr+line->visual-1, data->maxlines, TRUE);
       }
     }
     else if(visual < line->visual)
@@ -753,10 +740,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
       data->visual_y--;
       data->totallines -= 1;
 
-      if(data->fastbackground == TRUE)
-        DumpText(data, data->visual_y, 0, visual-1, TRUE);
-      else
-        DumpText(data, data->visual_y, 0, data->maxlines, TRUE);
+      DumpText(data, data->visual_y, 0, data->maxlines, TRUE);
     }
 
     result = TRUE;
@@ -1045,20 +1029,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
       if(line_nr != data->maxlines)
       {
         data->totallines += 1;
-        if(data->fastbackground == TRUE)
-        {
-          if(line_nr != 0)
-          {
-            ScrollDown(data, line_nr-1, 1);
-            PrintLine(data, 0, line, line_nr, FALSE);
-          }
-          else
-          {
-            ScrollDown(data, line_nr, 1);
-          }
-        }
-        else
-          DumpText(data, data->visual_y+line_nr-1, line_nr-1, data->maxlines, TRUE);
+        DumpText(data, data->visual_y+line_nr-1, line_nr-1, data->maxlines, TRUE);
       }
       else
       {
@@ -1075,10 +1046,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
           InstallLayerHook(data->rport->Layer, oldhook);
 
           PrintLine(data, 0, line, data->maxlines-1, FALSE);
-          if(data->fastbackground == FALSE)
-          {
-            DumpText(data, data->visual_y+data->maxlines-1, data->maxlines-1, data->maxlines, TRUE);
-          }
+          DumpText(data, data->visual_y+data->maxlines-1, data->maxlines-1, data->maxlines, TRUE);
         }
       }
 
@@ -1102,16 +1070,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
       }
       SetCursor(data, crsr_x, crsr_l, FALSE);
       if(line_nr < data->maxlines)
-      {
-        if(data->fastbackground == TRUE)
-        {
-          ScrollDown(data, line_nr, 1);
-          if(line_nr+1 <= data->maxlines)
-            PrintLine(data, 0, GetNextLine(line), line_nr+1, FALSE);
-        }
-        else
-          DumpText(data, data->visual_y+line_nr, line_nr, data->maxlines, TRUE);
-      }
+        DumpText(data, data->visual_y+line_nr, line_nr, data->maxlines, TRUE);
 
       D(DBF_DUMP, "after split, old line");
       DumpLine(line);
