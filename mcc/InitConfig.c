@@ -136,7 +136,6 @@ void InitConfig(struct IClass *cl, Object *obj)
     IPTR background = MUII_BACKGROUND;
 
     data->backgroundcolor = 0;
-    data->fastbackground = TRUE;
 
     if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_Background, &setting) && setting != 0)
     {
@@ -149,15 +148,11 @@ void InitConfig(struct IClass *cl, Object *obj)
         data->backgroundcolor = MUI_ObtainPen(muiRenderInfo(obj), spec, 0L);
         data->allocatedpens |= 1<<8;
       }
-      else if(bg_setting[0] != '\0')
-        data->fastbackground = FALSE;
 
       background = (IPTR)setting;
     }
     set(obj, MUIA_Background, background);
   }
-  else
-    data->fastbackground = FALSE;
 
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_TabSize, &setting))
   {

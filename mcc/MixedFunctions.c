@@ -690,63 +690,7 @@ void ScrollUp(struct InstData *data, LONG line_nr, LONG lines)
     return;
   }
 
-  if(data->fastbackground == FALSE && line_nr > 0)
-  {
-    DumpText(data, data->visual_y+line_nr, line_nr, data->maxlines, FALSE);
-  }
-  else
-  {
-    if(lines < data->maxlines)
-    {
-      struct Hook *oldhook;
-
-      oldhook = InstallLayerHook(data->rport->Layer, LAYERS_NOBACKFILL);
-      ScrollRasterBF(data->rport, 0, data->fontheight * lines,
-                    _mleft(data->object), data->ypos + (data->fontheight * line_nr),
-                    _mright(data->object), (data->ypos + data->maxlines * data->fontheight) - 1);
-      InstallLayerHook(data->rport->Layer, oldhook);
-
-      {
-        struct Layer *layer = data->rport->Layer;
-
-        if(layer->DamageList && layer->DamageList->RegionRectangle)
-        {
-          if(MUI_BeginRefresh(muiRenderInfo(data->object),0))
-          {
-            MUI_Redraw(data->object, MADF_DRAWOBJECT);
-            MUI_EndRefresh(muiRenderInfo(data->object), 0);
-          }
-        }
-      }
-
-      if(lines == 1)
-      {
-        if(data->visual_y+data->maxlines-1 <= data->totallines)
-        {
-          GetLine(data, data->visual_y + data->maxlines - 1, &pos);
-          PrintLine(data, pos.x, pos.line, data->maxlines, TRUE);
-        }
-        else
-        {
-          DoMethod(data->object, MUIM_DrawBackground,
-              _mleft(data->object),
-              data->ypos+((data->maxlines-1)*data->fontheight),
-              _mwidth(data->object),
-              data->fontheight,
-              _mleft(data->object),
-              (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mtop(data->object)) + (data->visual_y+data->maxlines-1)*data->fontheight);
-        }
-      }
-      else
-      {
-        DumpText(data, data->visual_y+data->maxlines-lines, data->maxlines-lines, data->maxlines, FALSE);
-      }
-    }
-    else
-    {
-      DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
-    }
-  }
+  DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
 
   LEAVE();
 }
@@ -766,45 +710,7 @@ void ScrollDown(struct InstData *data, LONG line_nr, LONG lines)
     return;
   }
 
-  if(data->fastbackground == FALSE && line_nr > 0)
-  {
-    DumpText(data, data->visual_y+line_nr, line_nr, data->maxlines, FALSE);
-  }
-  else
-  {
-    if(lines <= data->maxlines-line_nr)
-    {
-      struct  Hook  *oldhook;
-
-      oldhook = InstallLayerHook(data->rport->Layer, LAYERS_NOBACKFILL);
-      ScrollRasterBF(data->rport, 0, -data->fontheight * lines,
-                    _mleft(data->object), data->ypos + (data->fontheight * line_nr),
-                    _mright(data->object), data->ypos + (data->maxlines * data->fontheight) - 1);
-      InstallLayerHook(data->rport->Layer, oldhook);
-
-      {
-        struct Layer *layer = data->rport->Layer;
-
-        if(layer->DamageList && layer->DamageList->RegionRectangle)
-        {
-          if(MUI_BeginRefresh(muiRenderInfo(data->object),0))
-          {
-            MUI_Redraw(data->object, MADF_DRAWOBJECT);
-            MUI_EndRefresh(muiRenderInfo(data->object), 0);
-          }
-        }
-      }
-
-      if(line_nr == 0)
-      {
-        DumpText(data, data->visual_y, 0, lines, FALSE);
-      }
-    }
-    else
-    {
-      DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
-    }
-  }
+  DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
 
   LEAVE();
 }

@@ -374,7 +374,6 @@ struct InstData
   ULONG   allocatedpens;
 
   STRPTR  background;
-  BOOL    fastbackground;
   BOOL    use_fixedfont;
 
   struct  TextFont  *normalfont;
