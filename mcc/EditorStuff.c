@@ -1248,7 +1248,7 @@ static void UpdateChange(struct InstData *data, LONG x, struct line_node *line, 
 
   if(orgline_nr != line_nr)
   {
-    if(skip-lineabove_width >= 0 && skip-lineabove_width < (LONG)line->line.Length)
+    if(skip-lineabove_width >= 0 && skip-lineabove_width < line->line.Length)
     {
       if(lineabove_width != LineCharsWidth(data, &line->line.Contents[skip-lineabove_width]))
       {
