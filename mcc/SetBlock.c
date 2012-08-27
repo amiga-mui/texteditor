@@ -86,31 +86,36 @@ IPTR mSetBlock(struct InstData *data, struct MUIP_TextEditor_SetBlock *msg)
   else
     result = FALSE;
 
+D(DBF_ALWAYS,"%08lx %ld %08lx %ld %ld %ld", newblock.startline, newblock.startx, newblock.stopline, newblock.stopx, msg->operation, msg->value);
   // check if valid values had been specified for our start/stop values
   if(result == TRUE)
   {
     if(isFlagSet(msg->operation, MUIF_TextEditor_SetBlock_Color))
     {
       newblock.enabled = TRUE;
-
       AddColor(data, &newblock, (UWORD)msg->value);
-
       newblock.enabled = FALSE;
     }
 
     if(isFlagSet(msg->operation, MUIF_TextEditor_SetBlock_StyleBold))
     {
+      newblock.enabled = TRUE;
       AddStyle(data, &newblock, BOLD, msg->value != 0);
+      newblock.enabled = FALSE;
     }
 
     if(isFlagSet(msg->operation, MUIF_TextEditor_SetBlock_StyleItalic))
     {
+      newblock.enabled = TRUE;
       AddStyle(data, &newblock, ITALIC, msg->value != 0);
+      newblock.enabled = FALSE;
     }
 
     if(isFlagSet(msg->operation, MUIF_TextEditor_SetBlock_StyleUnderline))
     {
+      newblock.enabled = TRUE;
       AddStyle(data, &newblock, UNDERLINE, msg->value != 0);
+      newblock.enabled = FALSE;
     }
 
     if(isFlagSet(msg->operation, MUIF_TextEditor_SetBlock_Flow))

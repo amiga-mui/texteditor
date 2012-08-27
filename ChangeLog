@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-08-27 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/SetBlock.c: added missing block enabling when style changes were
+    requested along with setting the now block. Thanks to Andreas Falkenhahn for
+    the hint.
+
 2012-08-24 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Navigation.c: fixed several "use before check" occurences.
