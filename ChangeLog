@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-08-28 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/CreatePrefsGroup.c: adjusted the crawling text to better match the
+    capabilities of Crawling.mcc.
+
 2012-08-27 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/SetBlock.c: added missing block enabling when style changes were
