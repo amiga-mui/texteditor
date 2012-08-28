@@ -658,6 +658,7 @@ static BOOL ReactOnRawKey(struct InstData *data, struct IntuiMessage *imsg)
 IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
+  IPTR result = 0;
   BOOL wasActivated;
 
   ENTER();
@@ -670,10 +671,71 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
 
   D(DBF_INPUT, "imsg->Code: %lx msg->muikey: %d", msg->imsg != NULL ? msg->imsg->Code : 0, msg->muikey);
 
-  if(msg->muikey == MUIKEY_UP && data->KeyUpFocus && _win(obj) && data->actualline == GetFirstLine(&data->linelist))
+  if(msg->muikey != MUIKEY_NONE)
   {
-    set(_win(obj), MUIA_Window_ActiveObject, data->KeyUpFocus);
+    switch(msg->muikey)
+    {
+	  case MUIKEY_UP:
+	  {
+	    if(data->KeyUpFocus != NULL && _win(obj) != NULL && data->actualline == GetFirstLine(&data->linelist))
+	    {
+		  set(_win(obj), MUIA_Window_ActiveObject, data->KeyUpFocus);
+		  result = MUI_EventHandlerRC_Eat;
+		}
+	  }
+	  break;
 
+	  case MUIKEY_COPY:
+	  {
+	    Key_Copy(data);
+	    result = MUI_EventHandlerRC_Eat;
+	  }
+	  break;
+
+	  case MUIKEY_CUT:
+	  {
+	    if(isFlagSet(data->flags, FLG_ReadOnly))
+	    {
+	      Key_Cut(data);
+	      result = MUI_EventHandlerRC_Eat;
+	    }
+	  }
+	  break;
+
+	  case MUIKEY_PASTE:
+	  {
+	    if(isFlagSet(data->flags, FLG_ReadOnly))
+	    {
+		  Key_Paste(data);
+	      result = MUI_EventHandlerRC_Eat;
+	    }
+	  }
+	  break;
+
+	  case MUIKEY_UNDO:
+	  {
+	    if(isFlagSet(data->flags, FLG_ReadOnly))
+	    {
+		  Undo(data);
+	      result = MUI_EventHandlerRC_Eat;
+	    }
+	  }
+	  break;
+
+	  case MUIKEY_REDO:
+	  {
+	    if(isFlagSet(data->flags, FLG_ReadOnly))
+	    {
+		  Redo(data);
+	      result = MUI_EventHandlerRC_Eat;
+	    }
+	  }
+	  break;
+	}
+  }
+
+  if(result != 0)
+  {
     RETURN(MUI_EventHandlerRC_Eat);
     return MUI_EventHandlerRC_Eat;
   }

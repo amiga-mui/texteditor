@@ -9,6 +9,8 @@ $URL$
 
   * mcp/CreatePrefsGroup.c: adjusted the crawling text to better match the
     capabilities of Crawling.mcc.
+  * mcc/HandleInput.c: added support for the standard cut, copy, paste, undo and
+    redo keys of MUI4.
 
 2012-08-27 Thore Böckelmann <tboeckel@gmx.de>
 

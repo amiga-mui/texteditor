@@ -760,4 +760,24 @@ ULONG xget(Object *obj, const IPTR attr);
 
 #define ARRAY_SIZE(x)         (sizeof(x[0]) ? sizeof(x)/sizeof(x[0]) : 0)
 
+#ifndef MUIKEY_CUT
+#define MUIKEY_CUT 22
+#endif
+
+#ifndef MUIKEY_COPY
+#define MUIKEY_COPY 23
+#endif
+
+#ifndef MUIKEY_PASTE
+#define MUIKEY_PASTE 24
+#endif
+
+#ifndef MUIKEY_UNDO
+#define MUIKEY_UNDO 25
+#endif
+
+#ifndef MUIKEY_REDO
+#define MUIKEY_REDO 26
+#endif
+
 #endif /* TEXTEDITOR_MCC_PRIV_H */
