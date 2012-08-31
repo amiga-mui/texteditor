@@ -1149,7 +1149,7 @@ static void OptimizedPrint(struct InstData *data, LONG x, struct line_node *line
     twidth = PrintLine(data, x, line, line_nr, TRUE);
     line_nr++;
 
-    if(twidth < width && x+twidth < line->line.Length && line_nr <= data->maxlines)
+    if(twidth != width && x+twidth < line->line.Length && line_nr <= data->maxlines)
     {
       x += twidth;
       width += LineCharsWidth(data, &line->line.Contents[x]) - twidth;
