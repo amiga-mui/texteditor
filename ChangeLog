@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-09-02 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/CreatePrefsGroup.c: the floattext object on the Spellchecking page now
+    accepts wheel scroll events.
+
 2012-09-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale/italian.ct: added italian translation kindly provided by Samir
