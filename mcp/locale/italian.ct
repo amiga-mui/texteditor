@@ -1,4 +1,4 @@
-## version $VER: TextEditor_mcp.ct 2.0 (31.08.2012)
+## version $VER: TextEditor_mcp.ct 2.1 (2.09.2012)
 ## language italiano
 ## codeset 0
 ## chunk AUTH Translated by Samir Hawamdeh (http://www.betatesting.it/backforthefuture)
@@ -24,7 +24,7 @@ un comodo suggerimento in tempo reale.
 ; and only show suggestions if the word is misspelled.
 ;
 HelpBubble_Smooth
-Attiva lo scorrimento continuo del pixel.
+Attiva lo scorrimento smooth del pixel.
 ; This enables pixel smooth scrolling.
 ;
 HelpBubble_TypeNSpell
@@ -37,8 +37,9 @@ scrivendo.
 HelpBubble_UndoLevel
 Ogni livello di ripristino utilizza almeno 10 byte di\n\
 memoria mentre le funzionalità di taglia e copia\n\
-possono richiederne più in base alla dimensione\n\
-del blocco che si desidera tagliare o copiare.
+possono richiederne di più, questo ovviamente in\n\
+base alle dimensioni reali del blocco di testo che si\n\
+desidera tagliare o copiare.
 ; Each undo level eats up 10 bytes of memory.\n\
 ; Cut and copy will take a little more,\n\
 ; depending on the size of the block you\n\
@@ -236,30 +237,32 @@ MSG_HelpTxt_SpellChecker
  \33u Introduzione \33n\n\
 \n\
 Il gadget TextEditor permette la facile intregrazione di un spell checkers rendendo possibile sia l'utilizzo\n\
-del classico correttore ortografico che dei comodi suggerimenti automatici mentre si scrive.\n\
+del classico correttore ortografico che dei comodi suggerimenti automatici durante la digitazione.\n\
 \n\
  \33u Comandi di ricerca \33n\n\
 \n\
-Per quanto riguarda il correttore ortografico è necessario impostare il comando in uno script che vada a\n\
-ricercare la parola esatta impostandola all'interno di una variabile d'ambiente \"Found\" o 0 nel caso non\n\
-fosse trovata, oppure 1 nel caso la corrispondenza della parola vada a buon fine.\n\
+Per quanto riguarda il correttore ortografico è necessario impostare il comando con uno script che vada\n\
+poi a ricercare la parola esatta impostandola all'interno di una variabile d'ambiente di tipo \"Found\" o "0"\n\
+nel caso questa non fosse trovata, oppure "1" nel caso la corrispondenza della parola vada a buon fine.\n\
+\n\
 Questo sistema ad esempio corrisponde al funzionamento di AlphaSpell dove potresti scrivere '%s' dove\n\
-si desidera inserire la parola, ad esempio sempre utilizzando AlphaSpell potresti usare:\n\n\
+desideri inserire una parola, ad esempio sempre utilizzando AlphaSpell potresti usare:\n\n\
 \33bARexx:\33n \"Options Results;Address ALPHASPELL Search For '%s' Path 'T:' Danish.ald\"\n\
 \n\
-Ricorda, è \33bassolutamente necessario\33n ricordarsi le virgolette in modo che ARexx lo esegua come un\n\
-comando anzichè come uno script.\n\
+Ricorda, è \33bassolutamente necessario\33n ricordarsi le virgolette in modo che ARexx lo possa eseguire come\n\
+fosse comando anzichè uno script.\n\
 \n\
  \33u Suggerimento sui comandi \33n\n\
 \n\
-Premendo il tasto <HELP> (nel momento in cui il cursore è sopra una parola) l'editor di testo avvierà\n\
-il comando %s sostituendolo con la parola ad esso attribuita.\n\
+Premendo il tasto <HELP> (nel momento in cui il cursore è sopra una parola) l'editor di testo avvierà il\n\
+comando %s sostituendolo con la parola ad esso attribuita.\n\
+\n\
 Lo script potrebbe creare un file in T: chiamato ad esempio \"Matches\", questo poi verrà letto dal gadget\n\
 ed il contenuto verrà listato in un apposito gadget popup dove sarà poi eventualmente possibile scegliere\n\
-altre parole in sostituzione a quelle attuali.\n\
+qualsiasi altra parola in sostituzione a quelle attuali.\n\
 \n\
 Ancora, gli utenti di AlphaSpell possono usare anche:\n\n\
-\33bARexx:\33n \"Options Results;Address ALPHASPELL Match '%s' To 'T:Matches' Path 'T:' Danish.ald\"\n\
+\33bARexx:\33n \"Options Results;Address ALPHASPELL Match '%s' To 'T:Matches' Path 'T:' Italian.ald\"\n\
 \n\
 Se stai usando i metodi descritti sopra allora è necessario avviare AlphaSpell con lo switch \"ARexx\".\n\
 \n\
@@ -429,7 +432,7 @@ Sinistra
 ; Left
 ;
 MSG_MenuItem_Mark
-Marca
+Selezione
 ; Mark
 ;
 MSG_MenuItem_Normal
@@ -649,7 +652,7 @@ Seleziona puntatore
 ;
 MSG_HELP_SelectPointer
 Se attivato verrà mostrato un puntatore di selezione personalizzato\n\
-qualora il puntatore del mouse sia sopra un gadget texteditor.
+qualora il puntatore del mouse sia al di sopra di un gadget texteditor.
 ; If enabled, a custom selection pointer will appear\n\
 ; when the mouse pointer is above the texteditor gadget.
 ;
@@ -662,7 +665,7 @@ Seleziona colore disattivo
 ; Select inactive color
 ;
 MSG_HELP_TABSIZE
-Quanti spazi utilizzare premendo il tasto <TAB>
+Quanti spazi utilizzare alla pressione del tasto <TAB>
 ; How many spaces hitting the <TAB> key will jump.
 ;
 MSG_HELP_DESIGN_FRAME
@@ -753,11 +756,11 @@ da tastiera predefinite.
 ; to the built-in defaults.
 ;
 MSG_HELP_BUTTON_SNOOP
-Utilizza questo campo per impostare una scorciatoia\n\
+Utilizza questo campo in modo da impostare una scorciatoia\n\
 da tastiera per questa specifica azione.\n\
-E' possibile modificare direttamente il gadget stringa\n\
-oppure usare il testo "Snoop" in modo da monitorare\n\
-la pressione del testo fino alla sua conferma.
+Ricorda che è possibile modificare direttamente la stringa del\n\
+gadget o usare il tasto Snoop per mantenere la pressione del\n\
+tasto fino a quando lo si preme di nuovo per la conferma.
 ; Use this field to set a keybinding for this action.\n\
 ; You can either edit the string gadget directly or press\n\
 ; the 'Snoop' button to make the gadget monitor keypresses\n\
@@ -780,7 +783,7 @@ lascialo vuoto in modo da disattivare il correttore ortografico.
 MSG_HELP_SPELLCHECKER_SUGGEST_CMD
 Specifica qui il comando che verrà utilizzato per i suggerimenti\n\
 automatici o per le parole alternative.\n\
-Generalmente potresti specificare un particolare script.
+Generalmente potresti specificarlo con un particolare script.
 ; Specify here the command that will be used\n\
 ; to suggest an alternate word. As explained above,\n\
 ; usually you should specify a script here.
