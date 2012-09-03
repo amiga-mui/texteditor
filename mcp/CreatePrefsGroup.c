@@ -644,7 +644,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
           GroupSpacing(0),
           Child, ListviewObject,
             MUIA_CycleChain, TRUE,
-            MUIA_Listview_Input, TRUE,
+            MUIA_Listview_Input, FALSE,
             MUIA_Listview_List, FloattextObject,
               MUIA_Frame, MUIV_Frame_ReadList,
               MUIA_Background, MUII_ReadListBack,
