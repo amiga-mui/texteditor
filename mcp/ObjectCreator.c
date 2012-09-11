@@ -325,31 +325,31 @@ IPTR New(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct opSet 
 
       if(MUIMasterBase->lib_Version >= 20)
       {
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->LookupExeType, MUICFG_TextEditor_LookupCmd, 1, tr(MSG_Label_LookupCmd));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->lookupcmd, MUICFG_TextEditor_LookupCmd, 1, tr(MSG_Label_LookupCmd));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->SuggestExeType, MUICFG_TextEditor_SuggestCmd, 1, tr(MSG_Label_SuggestCmd));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->suggestcmd, MUICFG_TextEditor_SuggestCmd, 1, tr(MSG_Label_SuggestCmd));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->keybindings, MUICFG_TextEditor_Keybindings, 1, tr(MSG_Page_Keybindings));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->frame, MUICFG_TextEditor_Frame, 1, tr(MSG_Label_Frame));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->background, MUICFG_TextEditor_Background, 1, tr(MSG_Label_Background));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->blinkspeed, MUICFG_TextEditor_BlinkSpeed, 1, tr(MSG_Label_BlinkSpeed));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->blockqual, MUICFG_TextEditor_BlockQual, 1, tr(MSG_Label_BlkQual));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->cursorcolor, MUICFG_TextEditor_CursorColor, 1, tr(MSG_Label_Cursor));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->cursorwidth, MUICFG_TextEditor_CursorWidth, 1, tr(MSG_Label_Width));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->fixedfont, MUICFG_TextEditor_FixedFont, 1, tr(MSG_Label_Fixed));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->highlightcolor, MUICFG_TextEditor_HighlightColor, 1, tr(MSG_Label_Highlight));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->markedcolor, MUICFG_TextEditor_MarkedColor, 1, tr(MSG_Label_Selected));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->inactiveColor, MUICFG_TextEditor_InactiveColor, 1, tr(MSG_Label_InactiveColor));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->normalfont, MUICFG_TextEditor_NormalFont, 1, tr(MSG_Label_Normal));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->smooth, MUICFG_TextEditor_Smooth, 1, tr(MSG_Label_Smooth));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->selectPointer, MUICFG_TextEditor_SelectPointer, 1, tr(MSG_Label_SelectPointer));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->typenspell, MUICFG_TextEditor_TypeNSpell, 1, tr(MSG_ConfigMenu_TypeNSpell));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->CheckWord, MUICFG_TextEditor_CheckWord, 1, tr(MSG_ConfigMenu_CheckWord));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->tabsize, MUICFG_TextEditor_TabSize, 1, tr(MSG_Label_TabSize));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->textcolor, MUICFG_TextEditor_TextColor, 1, tr(MSG_Label_Text));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->separatorshine, MUICFG_TextEditor_SeparatorShine, 1, tr(MSG_Label_SeparatorShine));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->separatorshadow, MUICFG_TextEditor_SeparatorShadow, 1, tr(MSG_Label_SeparatorShadow));
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->inactiveCursor, MUICFG_TextEditor_InactiveCursor, 1, tr(MSG_Label_InactiveCursor));
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->LookupExeType,   MUICFG_TextEditor_LookupCmd,       2, tr(MSG_Label_LookupCmd),       MUIA_Cycle_Active);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->lookupcmd,       MUICFG_TextEditor_LookupCmd,       2, tr(MSG_Label_LookupCmd),       MUIA_String_Contents);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->SuggestExeType,  MUICFG_TextEditor_SuggestCmd,      2, tr(MSG_Label_SuggestCmd),      MUIA_Cycle_Active);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->suggestcmd,      MUICFG_TextEditor_SuggestCmd,      2, tr(MSG_Label_SuggestCmd),      MUIA_String_Contents);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->keybindings,     MUICFG_TextEditor_Keybindings,     1, tr(MSG_Page_Keybindings)       );
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->frame,           MUICFG_TextEditor_Frame,           2, tr(MSG_Label_Frame),           MUIA_Framedisplay_Spec);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->background,      MUICFG_TextEditor_Background,      2, tr(MSG_Label_Background),      MUIA_Imagedisplay_Spec);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->blinkspeed,      MUICFG_TextEditor_BlinkSpeed,      2, tr(MSG_Label_BlinkSpeed),      MUIA_Numeric_Value);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->blockqual,       MUICFG_TextEditor_BlockQual,       2, tr(MSG_Label_BlkQual),         MUIA_Cycle_Active);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->cursorcolor,     MUICFG_TextEditor_CursorColor,     2, tr(MSG_Label_Cursor),          MUIA_Pendisplay_Spec);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->cursorwidth,     MUICFG_TextEditor_CursorWidth,     2, tr(MSG_Label_Width),           MUIA_Numeric_Value);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->fixedfont,       MUICFG_TextEditor_FixedFont,       2, tr(MSG_Label_Fixed),           MUIA_String_Contents);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->highlightcolor,  MUICFG_TextEditor_HighlightColor,  2, tr(MSG_Label_Highlight),       MUIA_Pendisplay_Spec);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->markedcolor,     MUICFG_TextEditor_MarkedColor,     2, tr(MSG_Label_Selected),        MUIA_Pendisplay_Spec);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->inactiveColor,   MUICFG_TextEditor_InactiveColor,   2, tr(MSG_Label_InactiveColor),   MUIA_Pendisplay_Spec);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->normalfont,      MUICFG_TextEditor_NormalFont,      2, tr(MSG_Label_Normal),          MUIA_String_Contents);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->smooth,          MUICFG_TextEditor_Smooth,          2, tr(MSG_Label_Smooth),          MUIA_Selected);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->selectPointer,   MUICFG_TextEditor_SelectPointer,   2, tr(MSG_Label_SelectPointer),   MUIA_Selected);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->typenspell,      MUICFG_TextEditor_TypeNSpell,      2, tr(MSG_ConfigMenu_TypeNSpell), MUIA_Selected);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->CheckWord,       MUICFG_TextEditor_CheckWord,       2, tr(MSG_ConfigMenu_CheckWord),  MUIA_Selected);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->tabsize,         MUICFG_TextEditor_TabSize,         2, tr(MSG_Label_TabSize),         MUIA_Numeric_Value);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->textcolor,       MUICFG_TextEditor_TextColor,       2, tr(MSG_Label_Text),            MUIA_Pendisplay_Spec);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->separatorshine,  MUICFG_TextEditor_SeparatorShine,  2, tr(MSG_Label_SeparatorShine),  MUIA_Pendisplay_Spec);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->separatorshadow, MUICFG_TextEditor_SeparatorShadow, 2, tr(MSG_Label_SeparatorShadow), MUIA_Pendisplay_Spec);
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->inactiveCursor,  MUICFG_TextEditor_InactiveCursor,  2, tr(MSG_Label_InactiveCursor),  MUIA_Pendisplay_Spec);
       }
       else
         set(data->frame, MUIA_Disabled, TRUE);

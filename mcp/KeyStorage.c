@@ -465,16 +465,16 @@ void ImportKeys(struct InstData_MCP *data, void *config)
 
 void ExportKeys(struct InstData_MCP *data, void *config)
 {
-    ULONG c, size;
-    struct te_key *entry;
-    struct te_key *entries;
+  ULONG c, size;
+  struct te_key *entry;
+  struct te_key *entries;
 
   c = xget(data->keybindings, MUIA_List_Entries);
   size = (c+1) * sizeof(struct te_key);
 
   if((entries = (struct te_key *)AllocVecShared(size, MEMF_ANY)))
   {
-      struct te_key *buffer = entries+c;
+    struct te_key *buffer = entries+c;
 
     buffer->code = -1;
     while(c--)
@@ -489,4 +489,3 @@ void ExportKeys(struct InstData_MCP *data, void *config)
     FreeVec(entries);
   }
 }
-
