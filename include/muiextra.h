@@ -40,12 +40,12 @@
 
 struct MUI_ImageSpec
 {
-  char buf[64];
+  char buf[128];
 };
 
 #if !defined(__AROS__)
 struct MUI_FrameSpec
 {
-  char buf[8];
+  char buf[128];
 };
 #endif
