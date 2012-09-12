@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-09-12 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Dispatcher.c, mcc/InitConfig.c: apply the current configuration before
+    calling the superclass' MUIM_Setup to ensure the frame settings are applied
+    correctly.
+
 2012-09-03 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale/italian.ct: updated italian translation kindly provided by Samir

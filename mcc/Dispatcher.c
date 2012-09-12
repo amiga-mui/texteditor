@@ -312,6 +312,9 @@ static IPTR mSetup(struct IClass *cl, Object *obj, Msg msg)
     }
   }
 
+  if(result == FALSE)
+    FreeConfig(cl, obj);
+
   RETURN(result);
   return result;
 }
