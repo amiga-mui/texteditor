@@ -9,6 +9,8 @@ $URL$
 
   * mcp/ObjectCreator.c: don't trigger notifications in
     MUIM_Mccprefs_ConfigToGadgets.
+  * mcp/ObjectCreator.c: save strings with their real length only instead of
+    their maximum length to assist MUI4's realtime prefs.
 
 2012-09-12 Thore Böckelmann <tboeckel@gmx.de>
 
