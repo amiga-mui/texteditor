@@ -90,3 +90,4 @@ cd release
 rm -f ../MCC_TextEditor-$releasever.$releaserev.lha
 lha -ao5q ../MCC_TextEditor-$releasever.$releaserev.lha *
 cp MCC_TextEditor/ReadMe ../MCC_TextEditor-$releasever.$releaserev.readme
+cd ..
