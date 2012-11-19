@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2012-11-19 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Pointer.c: make use of the standard mouse pointer images in the AmigaOS4
+    build if intuition.library 53.37 is available.
+
 2012-09-20 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/ObjectCreator.c: don't trigger notifications in

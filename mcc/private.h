@@ -56,9 +56,12 @@
 #define AllocVecShared(size, flags)  AllocVec((size), (flags))
 #endif
 
+#define VERSION_IS_AT_LEAST(ver, rev, minver, minrev) (((ver) > (minver)) || ((ver) == (minver) && (rev) == (minrev)) || ((ver) == (minver) && (rev) > (minrev)))
+#define LIB_VERSION_IS_AT_LEAST(lib, minver, minrev)  VERSION_IS_AT_LEAST(((struct Library *)(lib))->lib_Version, ((struct Library *)(lib))->lib_Revision, minver, minrev)
+
 #if defined(__MORPHOS__)
 #include <proto/exec.h>
-#define IS_MORPHOS2 (((struct Library *)SysBase)->lib_Version >= 51)
+#define IS_MORPHOS2 LIB_VERSION_IS_AT_LEAST(SysBase, 51, 0)
 #endif
 
 // proper RAWKEY_ defines were first introduced in OS4 and MorphOS
