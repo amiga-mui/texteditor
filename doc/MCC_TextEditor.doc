@@ -170,7 +170,11 @@ TextEditor.mcc/MUIM_TextEditor_Search
         Bear in mind that your application may change screen, so the best
         place to allocate/free colors is in the MUIM_Show and MUIM_Hide
         methods of the editor gadget.  An example of this can be found in
-        TextEditor-Demo.c
+        TextEditor-Demo.c.
+
+        Please keep in mind to convert pens allocated by MUI_ObtainPen() to
+        values usable by any kind of graphic functions (i.e. SetAPen()) by
+        using the MUIPEN() macro!
 
     EXAMPLE
         /*  Create a cycle gadget which allows the user
