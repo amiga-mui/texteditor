@@ -496,7 +496,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
       if(Set == TRUE ||
          (data->inactiveCursor == TRUE && isFlagClear(data->flags, FLG_Active) && isFlagClear(data->flags, FLG_Activated)))
       {
-        SetAPen(rp, data->cursorcolor);
+        SetAPen(rp, MUIPEN(data->cursorcolor));
         SetDrMd(rp, JAM2);
 
         // if the gadget is in inactive state we just draw a skeleton cursor instead

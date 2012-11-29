@@ -58,7 +58,7 @@ ULONG ConvertPen(struct InstData *data, UWORD color, BOOL highlight)
   if(color != 0)
   {
     if(data->colormap != NULL)
-      pen = data->colormap[color-1];
+      pen = MUIPEN(data->colormap[color-1]);
     else if(color <= 8)
       pen = _pens(data->object)[color-1];
     else
@@ -67,9 +67,9 @@ ULONG ConvertPen(struct InstData *data, UWORD color, BOOL highlight)
   else
   {
     if(highlight == TRUE)
-      pen = data->highlightcolor;
+      pen = MUIPEN(data->highlightcolor);
     else
-      pen = data->textcolor;
+      pen = MUIPEN(data->textcolor);
   }
 
   RETURN(pen);
@@ -84,11 +84,11 @@ void DrawSeparator(struct InstData *data, struct RastPort *rp, LONG X, LONG Y, L
 
   if(Width > 3*Height)
   {
-    SetAPen(rp, data->separatorshadow);
+    SetAPen(rp, MUIPEN(data->separatorshadow));
     RectFill(rp, X, Y, X+Width-2, Y);
     RectFill(rp, X, Y, X, Y+Height);
 
-    SetAPen(rp, data->separatorshine);
+    SetAPen(rp, MUIPEN(data->separatorshine));
     RectFill(rp, X+1, Y+Height, X+Width-1, Y+Height);
     RectFill(rp, X+Width-1, Y, X+Width-1, Y+Height);
   }
@@ -232,10 +232,10 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
            isFlagClear(data->flags, FLG_Activated) &&
            isFlagSet(data->flags, FLG_ActiveOnClick))
         {
-          color = data->inactivecolor;
+          color = MUIPEN(data->inactivecolor);
         }
         else
-          color = data->markedcolor;
+          color = MUIPEN(data->markedcolor);
 
         // if selectmode == 2 then a whole line should be drawn as being marked, so
         // we have to start at xoffset instead of xoffset+flow+blockstart.
@@ -303,7 +303,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     if(doublebuffer == FALSE)
       AddClipping(data);
 
-    SetAPen(rp, (line->line.Highlight ? data->highlightcolor : data->textcolor));
+    SetAPen(rp, line->line.Highlight ? MUIPEN(data->highlightcolor) : MUIPEN(data->textcolor));
 
     maxwidth = _mwidth(data->object) - flow;
     while(c_length > 0)
@@ -348,7 +348,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
             SetAPen(rp, 4);
           }
           else
-            SetAPen(rp, (line->color ? data->highlightcolor : data->textcolor));
+            SetAPen(rp, line->color ? MUIPEN(data->highlightcolor) : MUIPEN(data->textcolor));
         }
       }
 */
