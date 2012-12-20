@@ -17,6 +17,7 @@
 ;   1.4   11.06.2010: extended the final message that a reboot might be
 ;                     necessary to be able to use the just installed version.
 ;   1.5   21.05.2012: fixed the wrong selection of the builtin language.
+;   1.6   20.12.2013: changed MorphOS desription to include 3.x
 
 ;----------------------------------------------------------------------------
 ; /// language bit definition, do not change these!!
@@ -140,7 +141,7 @@
         (help @askchoice-help)
         (choices "AmigaOS 3.x"
                  "AmigaOS 4.x"
-                 "MorphOS 1.x/2.x"
+                 "MorphOS 1.x/2.x/3.x"
                  "AROS i386"
                  "AROS PPC"
                  "AROS x86_64"

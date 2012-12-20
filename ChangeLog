@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.40 RELEASE ############################################################
+
+2012-12-20 Jens Langner <Jens.Langner@light-speed.de>
+
+  * misc: final v15.40 release preparations
+
 2012-11-29 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/MixedFunctions.c, mcc/PrintLineWithStyle.c: apply MUIPEN() to all pen
