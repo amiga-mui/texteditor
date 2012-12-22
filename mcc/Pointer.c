@@ -306,7 +306,7 @@ void SetupSelectPointer(struct InstData *data)
   ENTER();
 
   #if defined(__amigaos4__)
-  if(LIB_VERSION_IS_AT_LEAST(IntuitionBase, 53, 37))
+  if(LIB_VERSION_IS_AT_LEAST(IntuitionBase, 53, 40))
     data->PointerObj = (APTR)POINTERTYPE_TEXT;
   #elif defined(__MORPHOS__)
   if(IS_MORPHOS2)
