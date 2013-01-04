@@ -1084,6 +1084,24 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                           }
                         }
                       }
+                      else
+                      {
+                        // If the double click was handled externally we immediately assume to
+                        // have received the corresponding mouse release event as well.
+                        // It might happen that the double click hook launches a program which
+                        // steals our focus and leaves us pending in a "mouse pressed" situation.
+                        // This will result in an immediate marking action as soon as we regain
+                        // the focus. For example this happens when a URL is double clicked in
+                        // YAM and if launching the browser takes some seconds.
+                        if(data->mousemove == TRUE)
+                        {
+                          data->mousemove = FALSE;
+                          RejectInput(data);
+
+                          if(isFlagSet(data->flags, FLG_ReadOnly) && isFlagSet(data->flags, FLG_AutoClip) && Enabled(data))
+                            Key_Copy(data);
+                        }
+                      }
                     }
                     else
                     {
