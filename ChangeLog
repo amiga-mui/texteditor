@@ -5,6 +5,17 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2013-01-04 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/HandleInput.c: for externally handled double clicks (i.e. the double
+    click hook) the not yet happend mouse release event will nevertheless be
+    treated as occured. Before it might have happened that the double click
+    hook launches a program which steals the focus and leaves the object
+    pending in a "mouse pressed" situation. This will result in an immediate
+    marking action as soon as the object regains the focus. For example this
+    happens when a URL is double clicked in YAM and if launching the browser
+    takes some seconds. This closes bug #106.
+
 2012-12-22 Thore Böckelmann <tboeckel@gmx.de>
 
   * tools/mkrelease: add italian catalog to the release archive.
