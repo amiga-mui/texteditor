@@ -782,6 +782,9 @@ LONG CutBlock2(struct InstData *data, ULONG flags, struct marking *newblock)
 
         //D(DBF_STARTUP, "FreeLine %08lx", cc_startline);
 
+        // check for possible references first
+        CheckBlock(data, c_startline);
+        // now remove and free the line
         RemLine(c_startline);
         FreeLine(data, c_startline);
 
@@ -860,6 +863,34 @@ end:
 
   RETURN(res);
   return res;
+}
+
+///
+/// CheckBlock
+// check if the global block structure references the given line and
+// adjust the block structure accordingly
+void CheckBlock(struct InstData *data, struct line_node *line)
+{
+  // we make sure the line is not referenced by other
+  // structures as well such as the global blockinfo structure.
+  if(data->blockinfo.startline == line)
+  {
+    data->blockinfo.startline = GetNextLine(line);
+    if(data->blockinfo.startline == NULL)
+    {
+      data->blockinfo.enabled = FALSE;
+    }
+  }
+
+  if(data->blockinfo.stopline == line)
+  {
+    data->blockinfo.stopline = GetPrevLine(line);
+    if(data->blockinfo.stopline == NULL)
+    {
+      data->blockinfo.enabled = FALSE;
+    }
+  }
+
 }
 
 ///

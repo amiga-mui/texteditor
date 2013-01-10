@@ -449,6 +449,7 @@ void RedrawArea(struct InstData *, LONG, struct line_node *, LONG, struct line_n
 void NiceBlock(struct marking *, struct marking *);
 LONG CutBlock(struct InstData *, ULONG);
 LONG CutBlock2(struct InstData *, ULONG, struct marking *);
+void CheckBlock(struct InstData *, struct line_node *);
 
 // flags for CutBlock() and CutBlock2()
 #define CUTF_CLIPBOARD (1<<0)
