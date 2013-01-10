@@ -682,6 +682,9 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
     line->line.Length = strlen(newbuffer);
     line->line.allocatedContents = newbufferSize;
 
+    // check for possible references first
+    CheckBlock(data, next);
+    // now remove and free the line
     RemLine(next);
     FreeLine(data, next);
 

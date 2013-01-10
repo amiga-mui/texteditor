@@ -45,27 +45,7 @@ void FreeLine(struct InstData *data, struct line_node *line)
 {
   ENTER();
 
-  // we make sure the line is not referenced by other
-  // structures as well such as the global blockinfo structure.
-  if(data->blockinfo.startline == line)
-  {
-    data->blockinfo.startline = GetNextLine(line);
-    if(data->blockinfo.startline == NULL)
-    {
-      data->blockinfo.enabled = FALSE;
-    }
-  }
-
-  if(data->blockinfo.stopline == line)
-  {
-    data->blockinfo.stopline = GetPrevLine(line);
-    if(data->blockinfo.stopline == NULL)
-    {
-      data->blockinfo.enabled = FALSE;
-    }
-  }
-
-  // finally free the line itself
+  // free the line itself
   FreeVecPooled(data->mypool, line);
   UNMEMTRACK("AllocLine", line);
 
