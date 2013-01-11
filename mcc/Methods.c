@@ -141,7 +141,7 @@ IPTR mClearText(struct IClass *cl, Object *obj, UNUSED Msg msg)
 
   ENTER();
 
-  if((newcontents = AllocLine(data)) != NULL)
+  if((newcontents = AllocVecPooled(data->mypool, sizeof(struct line_node))) != NULL)
   {
     if(Init_LineNode(data, newcontents, "\n") == TRUE)
     {
@@ -165,7 +165,7 @@ IPTR mClearText(struct IClass *cl, Object *obj, UNUSED Msg msg)
     }
     else
     {
-      FreeLine(data, newcontents);
+      FreeVecPooled(data->mypool, newcontents);
     }
   }
 

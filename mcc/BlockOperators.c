@@ -786,7 +786,7 @@ LONG CutBlock2(struct InstData *data, ULONG flags, struct marking *newblock)
         CheckBlock(data, c_startline);
         // now remove and free the line
         RemLine(c_startline);
-        FreeLine(data, c_startline);
+        FreeVecPooled(data->mypool, c_startline);
 
         c_startline = cc_startline;
       }

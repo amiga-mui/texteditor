@@ -176,7 +176,6 @@ LDLIBS   =
 LOBJS = library.o
 
 COBJS = AllocBitMap.o \
-        AllocFunctions.o \
         BlockOperators.o \
         CaseConversion.o \
         ClipboardServer.o \

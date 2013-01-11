@@ -438,10 +438,6 @@ struct InstData
 struct BitMap * SAVEDS ASM MUIG_AllocBitMap(REG(d0, LONG), REG(d1, LONG), REG(d2, LONG), REG(d3, LONG flags), REG(a0, struct BitMap *));
 void SAVEDS ASM MUIG_FreeBitMap(REG(a0, struct BitMap *));
 
-// AllocFunctions.c
-struct line_node *AllocLine(struct InstData *);
-void FreeLine(struct InstData *, struct line_node *);
-
 // BlockOperators.c
 void MarkAllBlock(struct InstData *, struct marking *);
 STRPTR GetBlock(struct InstData *, struct marking *);
