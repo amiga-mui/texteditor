@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2013-01-11 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/AllocFunctions.c, misc: removed the wrapper functions for allocating
+    and freeing a line as they covered a single line only.
+
 2013-01-10 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/AllocFunctions.c, mcc/EditorStuff.c, mcc/BlockOperators.c: check for

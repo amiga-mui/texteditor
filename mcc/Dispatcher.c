@@ -135,7 +135,7 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
       {
         struct line_node *firstLine;
 
-        if((firstLine = AllocLine(data)) != NULL)
+        if((firstLine = AllocVecPooled(data->mypool, sizeof(struct line_node))) != NULL)
         {
           if(Init_LineNode(data, firstLine, "\n") == TRUE)
           {

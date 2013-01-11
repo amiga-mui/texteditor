@@ -83,7 +83,7 @@ void FreeTextMem(struct InstData *data, struct MinList *lines)
     if(line->line.Colors != NULL)
       FreeVecPooled(data->mypool, line->line.Colors);
 
-    FreeLine(data, line);
+    FreeVecPooled(data->mypool, line);
   }
 
   InitLines(lines);

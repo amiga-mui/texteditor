@@ -41,7 +41,7 @@ BOOL ImportText(struct InstData *data, const char *contents, struct Hook *import
   // make sure we start with an empty list of lines
   InitLines(lines);
 
-  if((line = AllocLine(data)) != NULL)
+  if((line = AllocVecPooled(data->mypool, sizeof(struct line_node))) != NULL)
   {
     struct ImportMessage im;
 
@@ -75,7 +75,7 @@ BOOL ImportText(struct InstData *data, const char *contents, struct Hook *import
           // free the line node if it didn't contain any contents
           if(ContainsLines(lines) == FALSE)
           {
-            FreeLine(data, line);
+            FreeVecPooled(data->mypool, line);
           }
           else
           {
@@ -85,7 +85,7 @@ BOOL ImportText(struct InstData *data, const char *contents, struct Hook *import
             if(Init_LineNode(data, line, "\n") == TRUE)
               AddLine(lines, line);
             else
-              FreeLine(data, line);
+              FreeVecPooled(data->mypool, line);
           }
         }
 
@@ -96,7 +96,7 @@ BOOL ImportText(struct InstData *data, const char *contents, struct Hook *import
       // add the imported line to the list
       AddLine(lines, line);
 
-      if((new_line = AllocLine(data)) == NULL)
+      if((new_line = AllocVecPooled(data->mypool, sizeof(struct line_node))) == NULL)
         break;
 
       // inherit the flow from the current line for the next line,

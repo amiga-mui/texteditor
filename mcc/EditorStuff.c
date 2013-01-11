@@ -340,7 +340,7 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
 
             SHOWSTRING(DBF_CLIPBOARD, contents);
 
-            if((importedLine = AllocLine(data)) != NULL)
+            if((importedLine = AllocVecPooled(data->mypool, sizeof(struct line_node))) != NULL)
             {
               if((contents = AllocVecPooled(data->mypool, length+1)) != NULL)
               {
@@ -359,7 +359,7 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
               }
               else
               {
-                FreeLine(data, importedLine);
+                FreeVecPooled(data->mypool, importedLine);
                 importedLine = NULL;
               }
             }
@@ -686,7 +686,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
     CheckBlock(data, next);
     // now remove and free the line
     RemLine(next);
-    FreeLine(data, next);
+    FreeVecPooled(data->mypool, next);
 
     oldvisual = line->visual;
     line->visual = VisualHeight(data, line);
@@ -776,7 +776,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
   OffsetToLines(data, x, line, &pos);
   lines = pos.lines;
 
-  if((newline = AllocLine(data)) != NULL)
+  if((newline = AllocVecPooled(data->mypool, sizeof(struct line_node))) != NULL)
   {
     struct LineStyle *styles = line->line.Styles;
     struct LineColor *colors = line->line.Colors;
