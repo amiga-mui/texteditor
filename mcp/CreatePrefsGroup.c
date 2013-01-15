@@ -490,7 +490,6 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
             MUIA_Background, MUII_GroupBack,
             MUIA_Frame, MUIV_Frame_Group,
             MUIA_FrameTitle, tr(MSG_GroupTitle_Fonts),
-            Child, VSpace(0),
             Child, ColGroup(2),
               Child, TxtLabel(tr(MSG_Label_Normal), 0),
               Child, PopaslObject,
@@ -514,7 +513,6 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
                 MUIA_ShortHelp, tr(MSG_HELP_FONTS_FIXED),
               End,
             End,
-            Child, VSpace(0),
           End,
 
           Child, VGroup,
