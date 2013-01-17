@@ -189,9 +189,9 @@ void _UNMEMTRACK(const char *file, const int line, const char *func, const void 
 #define FreeSignal(s)                 ({_UNMEMTRACK(__FILE__, __LINE__, "AllocSignal", (APTR)s); IExec->FreeSignal(s);})
 #define StartNotify(p)                ({LONG P = IDOS->StartNotify(p); _MEMTRACK(__FILE__, __LINE__, "StartNotify", p, (size_t)p); P;})
 #define EndNotify(p)                  ({_UNMEMTRACK(__FILE__, __LINE__, "StartNotify", p); IDOS->EndNotify(p);})
-#define Remove(n)                     ({IExec->Remove(n); n->ln_Pred = n->ln_Succ = (struct Node *)0xcccccccc;})
-#define RemHead(l)                    ({struct Node *n = IExec->RemHead(l); if(n != NULL) n->ln_Pred = n->ln_Succ = (struct Node *)0xcccccccc; n;})
-#define RemTail(l)                    ({struct Node *n = IExec->RemTail(l); if(n != NULL) n->ln_Pred = n->ln_Succ = (struct Node *)0xcccccccc; n;})
+#define Remove(n)                     ({struct Node *P = (struct Node *)(n); IExec->Remove(P); P->ln_Pred = P->ln_Succ = (struct Node *)0xcccccccc;})
+#define RemHead(l)                    ({struct Node *P = IExec->RemHead(l); if(P != NULL) P->ln_Pred = P->ln_Succ = (struct Node *)0xcccccccc; P;})
+#define RemTail(l)                    ({struct Node *P = IExec->RemTail(l); if(P != NULL) P->ln_Pred = P->ln_Succ = (struct Node *)0xcccccccc; P;})
 
 #elif defined(__MORPHOS__)
 
