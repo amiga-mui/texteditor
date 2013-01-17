@@ -657,16 +657,9 @@ void MoveList(struct List *to, struct List *from);
 #define HasPrevLine(line)       (GetPred((struct Node *)(line)) != NULL)
 #define AddLine(lines, line)    AddTail((struct List *)(lines), (struct Node *)(line))
 #define InsertLine(line, after) Insert(NULL, (struct Node *)(line), (struct Node *)(after))
-#if defined(DEBUG)
-// do some pointer munging in the debug build
-#define RemLine(line)           ({ Remove((struct Node *)(line)); line->node.mln_Pred = line->node.mln_Succ = (struct MinNode *)0xcccccccc; })
-#define RemFirstLine(lines)     ({ struct line_node *ln = (struct line_node *)RemHead((struct List *)(lines)); ln->node.mln_Pred = ln->node.mln_Succ = (struct MinNode *)0xcccccccc; ln; })
-#define RemLastLine(lines)      ({ struct line_node *ln = (struct line_node *)RemTail((struct List *)(lines)); ln->node.mln_Pred = ln->node.mln_Succ = (struct MinNode *)0xcccccccc; ln; })
-#else
 #define RemLine(line)           Remove((struct Node *)(line))
 #define RemFirstLine(lines)     (struct line_node *)RemHead((struct List *)(lines))
 #define RemLastLine(lines)      (struct line_node *)RemTail((struct List *)(lines))
-#endif
 #define MoveLines(to, from)     MoveList((struct List *)(to), (struct List *)(from))
 #define InitLines(lines)        NewList((struct List *)(lines))
 #define ContainsLines(lines)    (IsListEmpty((struct List *)(lines)) == FALSE)
