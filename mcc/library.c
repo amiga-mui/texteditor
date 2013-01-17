@@ -32,6 +32,8 @@
 /******************************************************************************/
 
 #include "private.h"
+
+#define DEBUG_USE_MALLOC_REDEFINE 1
 #include "Debug.h"
 #include "version.h"
 
