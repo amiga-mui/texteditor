@@ -331,15 +331,15 @@ void _UNMEMTRACK(const char *file, const int line, const char *func, const void 
        struct List *, __p0, a0, \
        , EXEC_BASE_NAME, 0, 0, 0, 0, 0, 0); \
     if(P != NULL) P->ln_Pred = P->ln_Succ = (struct Node *)0xcccccccc; \
-    P;
+    P; \
 })
 
-#define RemHTail(__p0) ({ \
+#define RemTail(__p0) ({ \
     struct Node *P = LP1(264, struct Node *, RemTail, \
        struct List *, __p0, a0, \
        , EXEC_BASE_NAME, 0, 0, 0, 0, 0, 0); \
     if(P != NULL) P->ln_Pred = P->ln_Succ = (struct Node *)0xcccccccc; \
-    P;
+    P; \
 })
 
 #elif !defined(__AROS__) // AmigaOS 3
@@ -543,15 +543,15 @@ void _UNMEMTRACK(const char *file, const int line, const char *func, const void 
   register struct List *__RemHead__list __asm("a0") = (_RemHead_list); \
   __asm volatile ("jsr a6@(-258:W)" \
   : "=r"(__RemHead__re) \
-  : "r"(__RemHead__bn), "r"(__RemHead_list)  \
+  : "r"(__RemHead__bn), "r"(__RemHead__list)  \
   : "d1", "a0", "a1", "fp0", "fp1", "cc", "memory"); \
   __RemHead__re; \
   }); \
   if(_RemHead__re != NULL) _RemHead__re->ln_Pred = _RemHead__re->ln_Succ = (struct Node *)0xcccccccc; \
-  _RemHead__re;
+  _RemHead__re; \
 })
 
-#define RemHTail(list) ({ \
+#define RemTail(list) ({ \
   struct List *_RemTail_list = (list); \
   struct Node *_RemTail__re = \
   ({ \
@@ -560,12 +560,12 @@ void _UNMEMTRACK(const char *file, const int line, const char *func, const void 
   register struct List *__RemTail__list __asm("a0") = (_RemTail_list); \
   __asm volatile ("jsr a6@(-264:W)" \
   : "=r"(__RemTail__re) \
-  : "r"(__RemTail__bn), "r"(__RemTail_list)  \
+  : "r"(__RemTail__bn), "r"(__RemTail__list)  \
   : "d1", "a0", "a1", "fp0", "fp1", "cc", "memory"); \
   __RemTail__re; \
   }); \
   if(_RemTail__re != NULL) _RemTail__re->ln_Pred = _RemTail__re->ln_Succ = (struct Node *)0xcccccccc; \
-  _RemTail__re;
+  _RemTail__re; \
 })
 
 #endif // amigaos4
