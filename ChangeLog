@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2013-03-06 Thore Böckelmann <tboeckel@gmx.de>
+
+  * include/mccinit.c, include/shellstart.c: rearranged the code to ensure that
+    trying to start the final class from a shell does not crash.
+
 2013-01-11 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/AllocFunctions.c, misc: removed the wrapper functions for allocating
