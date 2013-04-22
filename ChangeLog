@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2013-04-22 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/CreatePrefsGroup.c: use the font popup button image for MUI 3.9+.
+
 2013-03-06 Thore Böckelmann <tboeckel@gmx.de>
 
   * include/mccinit.c, include/shellstart.c: rearranged the code to ensure that
