@@ -293,6 +293,7 @@ static Object *TxtLabel(const char *text, ULONG weight)
 
 Object *CreatePrefsGroup(struct InstData_MCP *data)
 {
+  BOOL mui39;
   BOOL hotkeystringOk = FALSE;
   Object *slider, *button, *group,
          *editor, *keylist, *defaultkeys, *functionname,
@@ -383,6 +384,8 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
     RETURN(NULL);
     return NULL;
   }
+
+  mui39 = LIB_VERSION_IS_AT_LEAST(MUIMasterBase, 20, 0);
 
   data->editpopup = MUI_MakeObject(MUIO_MenustripNM, editpopupdata, NULL);
 
@@ -497,7 +500,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
                   StringFrame,
                   MUIA_CycleChain, TRUE,
                 End,
-                MUIA_Popstring_Button,  popNormalFontButton = MUI_MakeObject(MUIO_PopButton, MUII_PopUp),
+                MUIA_Popstring_Button,  popNormalFontButton = MUI_MakeObject(MUIO_PopButton, mui39 == TRUE ? MUII_PopFont : MUII_PopUp),
                 MUIA_Popasl_Type,     ASL_FontRequest,
                 MUIA_ShortHelp, tr(MSG_HELP_FONTS_NORMAL),
               End,
@@ -507,7 +510,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
                   StringFrame,
                   MUIA_CycleChain, TRUE,
                 End,
-                MUIA_Popstring_Button,  popFixedFontButton = MUI_MakeObject(MUIO_PopButton, MUII_PopUp),
+                MUIA_Popstring_Button,  popFixedFontButton = MUI_MakeObject(MUIO_PopButton, mui39 == TRUE ? MUII_PopFont : MUII_PopUp),
                 MUIA_Popasl_Type,     ASL_FontRequest,
                 ASLFO_Flags,        FOF_FIXEDWIDTHONLY,
                 MUIA_ShortHelp, tr(MSG_HELP_FONTS_FIXED),
