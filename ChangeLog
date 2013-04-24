@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2013-04-24 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/locale/greek.ct: updated greek translation kindly provided by Antonis
+    Iliakis.
+
 2013-04-22 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/CreatePrefsGroup.c: use the font popup button image for MUI 3.9+.
