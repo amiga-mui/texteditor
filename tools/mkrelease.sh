@@ -64,7 +64,7 @@ for os in os3 os4 mos aros-i386 aros-ppc aros-x86_64; do
 done
 
 make -C mcp catalogs
-for language in czech danish french german italian polish russian swedish; do
+for language in czech danish french german greek italian polish russian swedish; do
 	mkdir -p "release/MCC_TextEditor/Locale/Catalogs/$language"
 	cp -a mcp/locale/$language.catalog "release/MCC_TextEditor/Locale/Catalogs/$language/TextEditor_mcp.catalog"
 done

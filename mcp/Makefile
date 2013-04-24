@@ -218,10 +218,11 @@ CATALOGS = $(LOCALE)/czech.catalog \
            $(LOCALE)/danish.catalog \
            $(LOCALE)/french.catalog \
            $(LOCALE)/german.catalog \
+           $(LOCALE)/greek.catalog \
            $(LOCALE)/italian.catalog \
+           $(LOCALE)/polish.catalog \
            $(LOCALE)/russian.catalog \
-           $(LOCALE)/swedish.catalog \
-           $(LOCALE)/polish.catalog
+           $(LOCALE)/swedish.catalog
 
 
 # different options per target OS
