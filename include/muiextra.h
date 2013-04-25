@@ -40,6 +40,9 @@
 #ifndef CrawlingObject
 #define CrawlingObject MUI_NewObject("Crawling.mcc"
 #endif
+#ifndef MUII_PopFont
+#define MUII_PopFont   42
+#endif
 
 struct MUI_ImageSpec
 {
