@@ -5,6 +5,14 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.41 RELEASE ############################################################
+
+2013-04-25 Jens Langner <Jens.Langner@light-speed.de>
+
+  * misc: final v15.41 release preparations
+  * include/muiextra.h: added definition of MUII_PopFont as some MUI SDK might
+    not have them yet.
+
 2013-04-24 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale/greek.ct: updated greek translation kindly provided by Antonis
