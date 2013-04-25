@@ -29,8 +29,8 @@
 
 // for setting all necessary version information
 #define LIB_VERSION    15
-#define LIB_REVISION   40
-#define LIB_DATE       "20.12.2012"
+#define LIB_REVISION   41
+#define LIB_DATE       "25.04.2013"
 #define LIB_COPYRIGHT  "Copyright (C) 2005-2013 TextEditor.mcc Open Source Team"
 
 // set the LIB_REV_STRING
