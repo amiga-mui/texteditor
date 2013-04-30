@@ -3,6 +3,7 @@
 ## codeset 0
 ## chunk AUTH Anthony Iliakis (amiga.phantom@yahoo.gr)
 ;
+; Greek translation by Anthony Iliakis (phantom@amigafuture.de)
 ;
 ; TextEditor_mcp.cd - TextEditor MUI custom prefs catalog description file
 ; $Id$
@@ -18,17 +19,17 @@ HelpBubble_BlockQual
 ; that you set here to mark text.
 ;
 HelpBubble_CheckWord
-Αν ενεργοποιηθεί, τότε ο κειμενογράφος θα ψάξει για την λέξη,\n\
-και θα δείξει μόνο τις προτιμήσεις αν η λέξη έχει γραφτεί λάθος.
+Αν ενεργοποιηθεί, τότε ο κειμενογράφος θα ψάξει για τη λέξη,\n\
+και θα δείξει μόνο τις εισηγήσεις αν η λέξη έχει γραφτεί λάθος.
 ; If enabled, then the editor will lookup the word,\n\
 ; and only show suggestions if the word is misspelled.
 ;
 HelpBubble_Smooth
-Αυτό ενεργοποιεί την ομαλή κύλιση των pixels.
+Αυτό ενεργοποιεί την ομαλή κύλιση των ιχνοστοιχείων.
 ; This enables pixel smooth scrolling.
 ;
 HelpBubble_TypeNSpell
-Ενεργοποιήστε το για να αφήσετε τον κειμενογράφο\n\
+Ενεργοποιήστε το για να αφήσετε το κειμενογράφο\n\
 να ψάχνει τις λέξεις ενώ εσείς τις τυπώνετε.
 ; Enable this to let the editor\n\
 ; lookup the words while you type them.
@@ -43,7 +44,7 @@ HelpBubble_UndoLevel
 ; are cutting or copying.
 ;
 MSG_Button_DefaultKeys
-Προκαθορισμένα _πλήκτρα
+Προεπιλεγμένα _πλήκτρα
 ; Default _keys
 ;
 MSG_Button_Delete
@@ -95,7 +96,7 @@ Backspace
 ; Backspace
 ;
 MSG_Function_Bottom
-Τέρμα
+Κάτω μέρος
 ; Bottom
 ;
 MSG_Function_Copy
@@ -107,19 +108,19 @@ MSG_Function_Cut
 ; Cut
 ;
 MSG_Function_DelBOL
-Διαγραφή στο BOL
+Διαγραφή στην έναρξη γραμμής
 ; Delete to BOL
 ;
 MSG_Function_DelBOW
-Διαγραφή στο BOW
+Διαγραφή στην έναρξη λέξης
 ; Delete to BOW
 ;
 MSG_Function_DelEOL
-Διαγρφή στο EOL
+Διαγραφή στο τέλος γραμμής
 ; Delete to EOL
 ;
 MSG_Function_DelEOW
-Διαγραφή στο EOW
+Διαγραφή στο τέλος λέξης
 ; Delete to EOW
 ;
 MSG_Function_Delete
@@ -139,7 +140,7 @@ MSG_Function_Left
 ; Left
 ;
 MSG_Function_NextGadget
-Επόμενο gadget
+Επόμενο αντικείμενο
 ; Next gadget
 ;
 MSG_Function_NxtPage
@@ -191,15 +192,15 @@ MSG_Function_Right
 ; Right
 ;
 MSG_Function_SuggestSpelling
-Προτινόμενη ορθογραφία
+Προτεινόμενη ορθογραφία
 ; Suggest spelling
 ;
 MSG_Function_Tab
-Tab
+Στηλοθέτης
 ; Tab
 ;
 MSG_Function_Top
-Κορυφή
+Πάνω μέρος
 ; Top
 ;
 MSG_Function_Undo
@@ -233,36 +234,36 @@ MSG_GroupTitle_Separator
 MSG_HelpTxt_SpellChecker
  \33u Εισαγωγή \33n\n\
 \n\
-Το gadget TextEditor επιτρέπει την εύκολη υλοποίηση εξωτερικών ορθογραφικών ελέγχων, \
-κάνοντάς το δυνατό να έχετε τόσο την πληκτρολόγηση & ορθογραφία όσο και κανονικό \
+Το αντικείμενο TextEditor επιτρέπει την εύκολη υλοποίηση εξωτερικών ορθογραφικών ελέγχων, \
+κάνοντάς το δυνατό να έχετε τόσο την πληκτρολόγηση και ορθογραφία όσο και κανονικό \
 εντοπισμό λέξης.\n\
 \n\
  \33u Αναζήτηση εντολής \33n\n\
 \n\
-Για την πληκτρολόγηση & ορθογραφία θα πρέπει να ορίσετε την αναζήτηση εντολής σε ένα \
-σενάριο που θα ψάχνει την λέξη και θα ορίζει την μεταβλητή περιβάλλοντος \"Found\" σε \
-0 (αν δεν βρεθεί) ή 1 (αν υπάρχει ταύτιση). Αυτή ταυτίζει την προκαθορισμένη διαγωγή \
+Για την πληκτρολόγηση και ορθογραφία θα πρέπει να ορίσετε την αναζήτηση εντολής σε ένα αρχείο \
+δέσμης εντολών που θα ψάχνει την λέξη και θα ορίζει την μεταβλητή περιβάλλοντος \"Found\" σε \
+0 (αν δε βρεθεί) ή 1 (αν υπάρχει ταύτιση). Αυτή ταυτίζει την προκαθορισμένη διαγωγή \
 του AlphaSpell.\n\n\
-Γράφετε %s εκεί που θέλετε την λέξη. Αν χρησιμοποιήσετε το AlphaSpell, τότε μπορείτε να χρησιμοποιήσετε:\n\n\
+Γράφετε %s εκεί που θέλετε τη λέξη. Αν χρησιμοποιήσετε το AlphaSpell, τότε μπορείτε να χρησιμοποιήσετε:\n\n\
 \33bARexx:\33n \"Options Results;Address ALPHASPELL Search For '%s' Path 'T:' Danish.ald\"\n\
 \n\
 Θα \33bπρέπει\33n να θυμάστε πάντα τις αποστρόφους, αφού θα επιτρέψει στην ARexx να το εκτελέσει \
-ως μια εντολή αντί για ένα σενάριο.\n\
+ως μια εντολή αντί για μια δέσμη εντολών.\n\
 \n\
- \33u Προτινόμενη εντολή \33n\n\
+ \33u Προτεινόμενη εντολή \33n\n\
 \n\
 Αν πατήσετε το <HELP> πάνω σε μια λέξη, τότε ο κειμενογράφος θα εκτελέσει ξανά αυτή την \
-εντολή, αντικαταστώντας το %s με την τρέχουσα λέξη.\n\
-Το σενάριό σας θα πρέπει να δημιουργήσει ένα αρχείο στο T: με το όνομα \"Matches\". Αυτό το αρχείο \
-διαβάζεται από το gadget, και τα περιεχόμενά του εμφανίζονται σε μια listview, από όπου μπορείτε \
-να διαλέξετε μια λέξη που θα αντικαταστήσει την λάθος λέξη. Οι χρήστες AlphaSpell μπορούν να γράψουν:\n\n\
+εντολή, αντικαθηστώντας το %s με τη τρέχουσα λέξη.\n\
+Οι δέσμες εντολών σας θα πρέπει να δημιουργήσουν ένα αρχείο στο T: με το όνομα \"Matches\". Αυτό το αρχείο \
+διαβάζεται από το αντικείμενο, και τα περιεχόμενά του εμφανίζονται σε μια προβολή λίστας, από όπου μπορείτε \
+να διαλέξετε μια λέξη που θα αντικαταστήσει τη λάθος λέξη. Οι χρήστες AlphaSpell μπορούν να γράψουν:\n\n\
 \33bARexx:\33n \"Options Results;Address ALPHASPELL Match '%s' To 'T:Matches' Path 'T:' Danish.ald\"\n\
 \n\
 Αν χρησιμοποιήσετε τις παραπάνω μεθόδους, τότε θα πρέπει να ξεκινήσετε το AlphaSpell με την \
 επιλογή \"ARexx\".\n\
 \n\
-Είναι προτιμότερο να διατηρήσετε το λεξικό σας στην RAM εαν ενεργοποιήσετε την επιλογή \
-πληκτρολόγηση & ορθογραφία.
+Είναι προτιμότερο να διατηρήσετε το λεξικό σας στη RAM αν ενεργοποιήσετε την επιλογή \
+πληκτρολόγηση και ορθογραφία.
 ;  \33u Intro \33n\n\
 ; \n\
 ; The TextEditor gadget allows for easy integration of external spell checkers, \
@@ -336,7 +337,7 @@ MSG_Label_LookupCmd
 ; Lookup command
 ;
 MSG_Label_LookupWords
-Αναζήτηση λέξης πριν την προτίμηση;
+Αναζήτηση λέξης πριν την υπόδειξη;
 ; Lookup word before suggesting?
 ;
 MSG_Label_Normal
@@ -364,11 +365,11 @@ MSG_Label_SpellNType
 ; Spell check as you type?
 ;
 MSG_Label_SuggestCmd
-Προτινόμενη εντολή
+Προτεινόμενη εντολή
 ; Suggest command
 ;
 MSG_Label_TabSize
-Μέγεθος tab
+Μέγεθος στηλοθέτη
 ; Tab size
 ;
 MSG_Label_Text
@@ -516,15 +517,15 @@ MSG_PopWinTitle_Selected
 ; Select block color
 ;
 MSG_PopWinTitle_SeparatorShadow
-Επιλογή χρώματος σκιάς διαχωριστικών
+Επιλογή χρώματος της σκιάς διαχωριστικών
 ; Select separators shadow color
 ;
 MSG_PopWinTitle_SeparatorShine
-Επιλογή χρώματος λάμψης διαχωριστικών
+Επιλογή χρώματος της λάμψης διαχωριστικών
 ; Select separators shine color
 ;
 MSG_PopWinTitle_Text
-Επιλογή χρώματος κειμένου
+Επιλογή χρώματος του κειμένου
 ; Select text color
 ;
 MSG_SliderText_MaxWidth
@@ -536,7 +537,7 @@ MSG_SliderText_MinSpeed
 ; Off
 ;
 MSG_SliderText_MinWidth
-1 pixel
+1 ιχνοστοιχείο
 ; 1 pixel
 ;
 MSG_SliderText_StdSpeed
@@ -544,7 +545,7 @@ MSG_SliderText_StdSpeed
 ; \33r%ld ms
 ;
 MSG_SliderText_StdWidth
-%ld pixels
+%ld ιχνοστοιχεία
 ; %ld pixels
 ;
 MSG_SliderText_TabSize
@@ -552,27 +553,27 @@ MSG_SliderText_TabSize
 ; %ld spaces
 ;
 MSG_Function_GotoBookmark1
-Πήγαινε στον σελιδοδείκτη 1
+Πηγαίνετε στο σελιδοδείκτη 1
 ; Goto bookmark 1
 ;
 MSG_Function_GotoBookmark2
-Πήγαινε στον σελιδοδείκτη 2
+Πηγαίνετε στο σελιδοδείκτη 2
 ; Goto bookmark 2
 ;
 MSG_Function_GotoBookmark3
-Πήγαινε στον σελιδοδείκτη 3
+Πηγαίνετε στο σελιδοδείκτη 3
 ; Goto bookmark 3
 ;
 MSG_Function_SetBookmark1
-Ορίστε τον σελιδοδείκτη 1
+Ορίστε το σελιδοδείκτη 1
 ; Set bookmark 1
 ;
 MSG_Function_SetBookmark2
-Ορίστε τον σελιδοδείκτη 2
+Ορίστε το σελιδοδείκτη 2
 ; Set bookmark 2
 ;
 MSG_Function_SetBookmark3
-Ορίστε τον σελιδοδείκτη 3
+Ορίστε το σελιδοδείκτη 3
 ; Set bookmark 3
 ;
 MSG_Button_Snoop
@@ -599,7 +600,7 @@ MSG_WarnConfigVersion
 Οι τρέχοντες αποθηκευμένες συντομεύσεις σας είναι μη συμβατές\n\
 με την έκδοση TextEditor.mcc που έχετε εγκαταστήσει.\n\
 \n\
-Είναι προτινόμενο να επαναφέρετε τις τρέχουσες συντομεύσεις\n\
+Είναι προτεινόμενο να επαναφέρετε τις τρέχουσες συντομεύσεις\n\
 στις εργοστασιακές ρυθμίσεις και να τις επεξεργαστείτε μετά\n\
 χειροκίνητα.
 ; Your currently saved keybindings setup is incompatible\n\
@@ -621,8 +622,8 @@ MSG_WarnHotkeyString
 απαιτείται της HotkeyString.mcc custom class και συνεπώς\n\
 απέτυχε κατά την αρχικοποίηση.\n\
 \n\
-Παρακαλώ βεβαιωθείτε ότι έχετε την τελευταία HotkeyString.mcc\n\
-class από την http://www.sf.net/projects/bstring-mcc/\n\
+Παρακαλώ βεβαιωθείτε ότι έχετε τη τελευταία HotkeyString.mcc\n\
+class από το http://www.sf.net/projects/bstring-mcc/\n\
 εγκατεστημένη και δοκιμάστε ξανά.
 ; TextEditor.mcp couldn't open the minimum required\n\
 ; version of the HotkeyString.mcc custom class and\n\
@@ -652,7 +653,7 @@ MSG_Label_SelectPointer
 ;
 MSG_HELP_SelectPointer
 Αν επιλεχτεί, ένας τροποποιημένος επιλεγμένος δείκτης θα εμφανιστεί\n\
-όταν το ποντίκι είναι πάνω από ενα texteditor gadget.
+όταν το ποντίκι είναι πάνω από ενα αντικείμενο texteditor.
 ; If enabled, a custom selection pointer will appear\n\
 ; when the mouse pointer is above the texteditor gadget.
 ;
@@ -669,7 +670,7 @@ MSG_HELP_TABSIZE
 ; How many spaces hitting the <TAB> key will jump.
 ;
 MSG_HELP_DESIGN_FRAME
-Αυτό είναι ένα κουμπί για την τροποποίηση του πλαισίου.\n\
+Αυτό είναι ένα κουμπί για τη τροποποίηση του πλαισίου.\n\
 Κάντε κλικ για να ανοίξετε ένα παράθυρο τροποποίησης ή\n\
 κάντε χρήση της μεταφοράς & απόθεσης για να αντιγράψετε\n\
 ένα κουμπί τροποποίησης πλαισίου από ή σε άλλο πλαίσιο.
@@ -679,7 +680,7 @@ MSG_HELP_DESIGN_FRAME
 ; from or to another frame adjust button.
 ;
 MSG_HELP_DESIGN_BACKGROUND
-Αυτό είναι ένα κουμπί για την τροποποίηση του χρώματος\n\
+Αυτό είναι ένα κουμπί για τη τροποποίηση του χρώματος\n\
 ή μοτίβου του φόντου. Κάντε κλικ για να ανοίξετε ένα\n\
 παράθυρο τροποποίησης ή κάντε χρήση της μεταφοράς &\n\
 απόθεσης για να αντιγράψετε ένα κουμπί τροποποίησης\n\
@@ -702,35 +703,35 @@ MSG_HELP_DESIGN_HIGHLIGHT
 ;
 MSG_HELP_SEPARATOR_SHINE
 Αυτό είναι το χρώμα που χρησιμοποιείται\n\
-για την εκτύπωση μπάρας διαχωριστικού.
+για την εκτύπωση της μπάρας διαχωριστικών.
 ; This is the color used to\n\
 ; print separator bars.
 ;
 MSG_HELP_SEPARATOR_SHADOW
 Αυτό είναι το χρώμα που χρησιμοποιείται για την\n\
-εκτύπωση μπάρας διαχωριστικού σε κατάσταση σκιάς.
+εκτύπωση της μπάρας διαχωριστικών με λειτουργία σκιάς.
 ; This is the color used to print\n\
 ; separator bars in shadow mode.
 ;
 MSG_HELP_FONTS_NORMAL
 Προκαθορισμένη γραμματοσειρά που θα\n\
-χρησιμοποιηθεί από τον κειμενογράφο.
+χρησιμοποιηθεί από το κειμενογράφο.
 ; Default font to be used by the editor.
 ;
 MSG_HELP_FONTS_FIXED
 Προκαθορισμένη γραμματοσειρά που θα χρησιμοποιηθεί\n\
-από τον κειμενογράφο, άσχετα αν ζητηθεί μια σταθερή\n\
+από το κειμενογράφο, άσχετα αν ζητηθεί μια σταθερή\n\
 γραμματοσειρά.
 ; Default font to be used by the editor\n\
 ; whenever a fixed width font is requested.
 ;
 MSG_HELP_CURSOR_NORMAL
 Προκαθορισμένο χρώμα που θα\n\
-χρησιμοποιηθεί για τον κέρσορα.
+χρησιμοποιηθεί για το κέρσορα.
 ; Default color to be used for the cursor.
 ;
 MSG_HELP_CURSOR_SELECTED
-Χρώμα που θα χρησιμοποιηθεί για τον\n\
+Χρώμα που θα χρησιμοποιηθεί για το\n\
 κέρσορα σε επιλεγμένο κείμενο.
 ; Color to be used for the cursor\n\
 ; in selected text.
@@ -748,7 +749,7 @@ MSG_HELP_CURSOR_WIDTH
 ;
 MSG_HELP_CURSOR_BLINKSPEED
 Μπορεί να θελήσετε ο κέρσορας να αναβοσβήνει\n\
-ώστε να τον βρίσκετε εύκολα. Επιλέξτε 'Κλειστό'\n\
+ώστε να το βρίσκετε εύκολα. Επιλέξτε 'Κλειστό'\n\
 για να το απανεργοποιήσετε.
 ; You may want the cursor to blink to make\n\
 ; it easier to find. Select 'Off' to disable\n\
@@ -763,8 +764,8 @@ MSG_HELP_BUTTON_DEFAULTKEYS
 MSG_HELP_BUTTON_SNOOP
 Χρησιμοποιήστε αυτό το πεδίο για να ορίστε συντομεύσεις\n\
 για αυτή την ενέργεια. Μπορείτε είτε να επεξεργαστείτε το\n\
-gadget συμβολοσειράς άμεσα ή να πατήσετε στο κουμπί 'Έκμάθηση'\n\
-για να καθορίσετε τον συνδυασμό πλήκτρων μέχρι να τα πατήσετε\n\
+αντικείμενο συμβολοσειράς άμεσα ή να πατήσετε στο κουμπί 'Έκμάθηση'\n\
+για να καθορίσετε το συνδυασμό πλήκτρων μέχρι να τα πατήσετε\n\
 ξανά για επιβεβαίωση.
 ; Use this field to set a keybinding for this action.\n\
 ; You can either edit the string gadget directly or press\n\
@@ -776,20 +777,20 @@ MSG_HELP_BUTTON_INSERT
 ; Add a new keybinding to the list.
 ;
 MSG_HELP_BUTTON_DELETE
-Διαγράψτε μια συντόμευση από την λίστα.
+Διαγράψτε μια συντόμευση από τη λίστα.
 ; Delete this keybinding from the list.
 ;
 MSG_HELP_SPELLCHECKER_LOOKUP_CMD
 Καθορίστε εδώ την εντολή αναζήτησης που θέλετε να χρησιμοποιήσετε\n\
-ή αφήστε το κενό για να απενεργοποιήσετε την λειτοργία πληκτρολόγησης\n\
+ή αφήστε το κενό για να απενεργοποιήσετε τη λειτουργία πληκτρολόγησης\n\
 και ορθογραφίας.
 ; Specify here the lookup command you want to use, or\n\
 ; leave this empty to disable the type'n'spell feature.
 ;
 MSG_HELP_SPELLCHECKER_SUGGEST_CMD
-Καθορίστε εδώ την εντολή που θα χρησιμοποιηθεί για την\n\
-προτίμηση εναλλακτικής λέξης. Όπως αναφέρθηκε παραπάνω,\n\
-θα πρέπει να καθορίσετε ένα σενάριο εδώ.
+Καθορίστε εδώ την εντολή που θα χρησιμοποιηθεί για τη\n\
+υπόδειξη εναλλακτικής λέξης. Όπως αναφέρθηκε παραπάνω,\n\
+θα πρέπει να καθορίσετε εδώ μια δέσμη εντολών.
 ; Specify here the command that will be used\n\
 ; to suggest an alternate word. As explained above,\n\
 ; usually you should specify a script here.
