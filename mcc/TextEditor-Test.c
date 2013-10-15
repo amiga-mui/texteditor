@@ -33,6 +33,9 @@
 #include <proto/muimaster.h>
 #include <proto/intuition.h>
 #include <proto/utility.h>
+#if defined(__amigaos4__)
+#include <dos/obsolete.h>
+#endif
 
 #include "private.h"
 #define DEBUG_USE_MALLOC_REDEFINE
@@ -494,9 +497,9 @@ int main(void)
             {
               if((fh = Open((char *)argarray[0], MODE_OLDFILE)))
               {
-                  char  *text = AllocVec(50*1024, 0L);
-                  char  *buffer = text;
-                  int size;
+                char  *text = AllocVec(50*1024, 0L);
+                char  *buffer = text;
+                int size;
 
                 size = Read(fh, text, (50*1024)-2);
                 text[size] = '\0';
