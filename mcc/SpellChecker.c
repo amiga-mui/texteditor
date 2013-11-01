@@ -548,8 +548,8 @@ void SuggestWord(struct InstData *data)
 }
 
 ///
-/// CheckWord()
-void CheckWord(struct InstData *data)
+/// SpellCheckWord()
+void SpellCheckWord(struct InstData *data)
 {
   ENTER();
 
@@ -576,6 +576,72 @@ void CheckWord(struct InstData *data)
 
       if(LookupWord(data, word) == FALSE)
         DisplayBeep(NULL);
+    }
+    else
+    {
+      data->actualline = line;
+    }
+  }
+
+  LEAVE();
+}
+
+///
+void kprintf(const char *,...);
+/// KeywordCheck
+void KeywordCheck(struct InstData *data)
+{
+  ENTER();
+
+  if(data->Keywords != NULL && data->CPos_X != 0 && IsAlpha(data->mylocale, data->actualline->line.Contents[data->CPos_X-1]))
+  {
+    LONG start;
+    LONG end = data->CPos_X;
+    struct line_node *line = data->actualline;
+
+    do
+    {
+      GoPreviousWord(data);
+    }
+    while(data->CPos_X != 0 && data->actualline == line && (data->actualline->line.Contents[data->CPos_X-1] == '-' || data->actualline->line.Contents[data->CPos_X-1] == '\''));
+
+    start = data->CPos_X;
+    data->CPos_X = end;
+
+    if(start-end < 256 && data->actualline == line)
+    {
+      char word[256];
+      ULONG i = 0;
+
+      strlcpy(word, &data->actualline->line.Contents[start], end-start+1);
+
+      while(data->Keywords[i] != NULL)
+      {
+        if(data->Keywords[i][0] == '.')
+        {
+          // check a file name extension at the end of the word
+          char *p;
+
+          if((p = strchr(word, '.')) != NULL && stricmp(p, data->Keywords[i]) == 0)
+          {
+            D(DBF_ALWAYS, "keyword '%s' found", data->Keywords[i]);
+            set(data->object, MUIA_TextEditor_KeywordFound, data->Keywords[i]);
+            break;
+          }
+        }
+        else
+        {
+          // check for a complete word
+          if(stricmp(word, data->Keywords[i]) == 0)
+          {
+            D(DBF_ALWAYS, "keyword '%s' found", data->Keywords[i]);
+            set(data->object, MUIA_TextEditor_KeywordFound, data->Keywords[i]);
+            break;
+          }
+        }
+
+        i++;
+      }
     }
     else
     {

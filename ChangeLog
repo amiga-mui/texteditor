@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2013-11-01 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/GetSetAttrs.c, mcc/HandleInput, mcc/SpellChecker.c: added a new
+    mechanism to trigger an attribute if the last entered word was found in a
+    list of keywords defined by the application. This feature will be used by
+    YAM's attachment reminder.
+
 2013-10-15 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/TextEditor-Test.c: updated AmigaOS4 build for the latest SDK.

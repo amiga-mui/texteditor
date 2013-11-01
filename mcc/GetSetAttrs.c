@@ -215,6 +215,10 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = data->TabSize;
     break;
 
+    case MUIA_TextEditor_KeywordFound:
+      ti_Data = TRUE;
+    break;
+
     default:
       LEAVE();
       return(DoSuperMethodA(cl, obj, (Msg)msg));
@@ -806,6 +810,10 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           ResetDisplay(data);
         }
       }
+      break;
+
+      case MUIA_TextEditor_Keywords:
+        data->Keywords = (char **)tag->ti_Data;
       break;
     }
   }
