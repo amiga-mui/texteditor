@@ -601,6 +601,8 @@ IPTR mSetBlock(struct InstData *, struct MUIP_TextEditor_SetBlock *msg);
 void SpellCheckWord(struct InstData *);
 void SuggestWord(struct InstData *);
 Object *SuggestWindow(struct InstData *);
+void ParseKeywords(struct InstData *data, const char *keywords);
+void FreeKeywords(struct InstData *data);
 void KeywordCheck(struct InstData *);
 
 // StyleOperators.c

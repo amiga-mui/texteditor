@@ -215,8 +215,9 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = data->TabSize;
     break;
 
-    case MUIA_TextEditor_KeywordFound:
-      ti_Data = TRUE;
+    case MUIA_TextEditor_MatchedKeyword:
+      // just a dummy to make notifications work
+      ti_Data = NULL;
     break;
 
     default:
@@ -813,7 +814,9 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       break;
 
       case MUIA_TextEditor_Keywords:
-        data->Keywords = (char **)tag->ti_Data;
+      {
+        ParseKeywords(data, (const char *)tag->ti_Data);
+      }
       break;
     }
   }

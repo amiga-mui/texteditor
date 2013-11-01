@@ -220,6 +220,8 @@ static IPTR mDispose(struct IClass *cl, Object *obj, Msg msg)
   // free all lines with their contents
   FreeTextMem(data, &data->linelist);
 
+  FreeKeywords(data);
+
   if(data->mylocale != NULL)
   {
     CloseLocale(data->mylocale);

@@ -20,6 +20,7 @@
 
 ***************************************************************************/
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -587,6 +588,83 @@ void SpellCheckWord(struct InstData *data)
 }
 
 ///
+/// ParseKeywords
+void ParseKeywords(struct InstData *data, const char *keywords)
+{
+  char *copy;
+
+  ENTER();
+
+  FreeKeywords(data);
+
+  if(keywords != NULL && (copy = strdup(keywords)) != NULL)
+  {
+    char *p = copy;
+    LONG wordCnt;
+
+    // count the number of words, we have one at least
+    wordCnt = 1;
+    do
+    {
+      if((p = strchr(p, ',')) != NULL)
+      {
+        wordCnt++;
+        p++;
+      }
+    }
+    while(p != NULL);
+
+    if((data->Keywords = calloc(wordCnt+1, sizeof(char *))) != NULL)
+    {
+      LONG i = 0;
+      char *word = copy;
+
+      // split the string
+      do
+      {
+        char *e;
+
+        if((e = strpbrk(word, ",")) != NULL)
+          *e++ = '\0';
+
+        data->Keywords[i] = strdup(word);
+        i++;
+
+        word = e;
+      }
+      while(word != NULL);
+    }
+
+    free(copy);
+  }
+
+  LEAVE();
+}
+
+///
+/// FreeKeywords
+void FreeKeywords(struct InstData *data)
+{
+  ENTER();
+
+  if(data->Keywords != NULL)
+  {
+    LONG i = 0;
+
+    while(data->Keywords[i] != NULL)
+    {
+      free(data->Keywords[i]);
+      i++;
+    }
+
+    free(data->Keywords);
+    data->Keywords = NULL;
+  }
+
+  LEAVE();
+}
+
+///
 /// KeywordCheck
 void KeywordCheck(struct InstData *data)
 {
@@ -623,8 +701,8 @@ void KeywordCheck(struct InstData *data)
 
           if((p = strchr(word, '.')) != NULL && stricmp(p, data->Keywords[i]) == 0)
           {
-            D(DBF_ALWAYS, "keyword '%s' found", data->Keywords[i]);
-            set(data->object, MUIA_TextEditor_KeywordFound, data->Keywords[i]);
+            D(DBF_ALWAYS, "matched keyword '%s'", data->Keywords[i]);
+            set(data->object, MUIA_TextEditor_MatchedKeyword, data->Keywords[i]);
             break;
           }
         }
@@ -633,8 +711,8 @@ void KeywordCheck(struct InstData *data)
           // check for a complete word
           if(stricmp(word, data->Keywords[i]) == 0)
           {
-            D(DBF_ALWAYS, "keyword '%s' found", data->Keywords[i]);
-            set(data->object, MUIA_TextEditor_KeywordFound, data->Keywords[i]);
+            D(DBF_ALWAYS, "matched keyword '%s'", data->Keywords[i]);
+            set(data->object, MUIA_TextEditor_MatchedKeyword, data->Keywords[i]);
             break;
           }
         }
