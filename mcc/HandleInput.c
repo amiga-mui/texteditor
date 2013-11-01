@@ -487,8 +487,10 @@ void Key_Normal(struct InstData *data, char key)
 
   // check if the user wants to do a direct spell checking while
   // writing some text.
-  if(data->TypeAndSpell == TRUE && !IsAlpha(data->mylocale, key) && key != '-')
-    CheckWord(data);
+  if(key != '-')
+    SpellCheckWord(data);
+  if(key == ' ')
+    KeywordCheck(data);
 
   // add the pastechar to the undobuffer and paste the current
   // key immediately.
@@ -1318,7 +1320,8 @@ void Key_Tab(struct InstData *data)
 	  data->CPos_X+1
 	};
 
-	CheckWord(data);
+	SpellCheckWord(data);
+	KeywordCheck(data);
 	AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
 	data->CPos_X++;
 	PasteChars(data, data->CPos_X-1, data->actualline, 1, "\t", NULL);
@@ -1334,7 +1337,8 @@ void Key_Tab(struct InstData *data)
 	  data->CPos_X+data->TabSize
 	};
 
-	CheckWord(data);
+	SpellCheckWord(data);
+	KeywordCheck(data);
 	AddToUndoBuffer(data, ET_PASTEBLOCK, &block);
 	data->CPos_X += data->TabSize;
 	PasteChars(data, data->CPos_X-data->TabSize, data->actualline, data->TabSize, "            ", NULL);
@@ -1354,7 +1358,8 @@ void Key_Return(struct InstData *data)
   else
     ScrollIntoDisplay(data);
 
-  CheckWord(data);
+  SpellCheckWord(data);
+  KeywordCheck(data);
   AddToUndoBuffer(data, ET_SPLITLINE, NULL);
   SplitLine(data, data->CPos_X, data->actualline, TRUE, NULL);
 

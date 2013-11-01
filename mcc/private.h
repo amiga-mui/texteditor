@@ -432,6 +432,8 @@ struct InstData
   UBYTE   CtrlChar;
 
   enum CursorState currentCursorState;
+
+  char **Keywords;
 };
 
 // AllocBitMap.c
@@ -596,9 +598,10 @@ IPTR mReplace(struct IClass *, Object *, struct MUIP_TextEditor_Replace *);
 IPTR mSetBlock(struct InstData *, struct MUIP_TextEditor_SetBlock *msg);
 
 // SpellChecker.c
-void CheckWord(struct InstData *);
+void SpellCheckWord(struct InstData *);
 void SuggestWord(struct InstData *);
 Object *SuggestWindow(struct InstData *);
+void KeywordCheck(struct InstData *);
 
 // StyleOperators.c
 void UpdateStyles(struct InstData *);

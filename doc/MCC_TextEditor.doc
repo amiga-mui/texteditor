@@ -22,6 +22,8 @@ TextEditor.mcc/MUIA_TextEditor_ImportWrap
 TextEditor.mcc/MUIA_TextEditor_InsertMode         (not yet implemented...)
 TextEditor.mcc/MUIA_TextEditor_InVirtualGroup
 TextEditor.mcc/MUIA_TextEditor_KeyUpFocus
+TextEditor.mcc/MUIA_TextEditor_Keywords
+TextEditor.mcc/MUIA_TextEditor_KeywordFound
 TextEditor.mcc/MUIA_TextEditor_PasteColors
 TextEditor.mcc/MUIA_TextEditor_PasteStyles
 TextEditor.mcc/MUIA_TextEditor_Pen
@@ -652,6 +654,34 @@ TextEditor.mcc/MUIM_TextEditor_Search
         Allows to specify a specific object that will be set as the new
         window's default object in case the user pressed the UP cursor key and
         the texteditor was already at the very first line.
+
+TextEditor.mcc/MUIA_TextEditor_Keywords
+
+    NAME
+        MUIA_TextEditor_Keywords -- [IS.], STRPTR *
+
+    FUNCTION
+        Allows to specify a NULL terminated list of keywords to check for while
+        the user is typing. If one of these keywords is found the attribute
+        MUIA_TextEditor_KeywordFound will be triggered with the found keyword
+        as trigger value. The check will happen after typing either a space or
+        TAB or RETURN after a word.
+
+    SEE ALSO
+        MUIA_TextEditor_KeywordFound
+
+TextEditor.mcc/TextEditor.mcc/MUIA_TextEditor_KeywordFound
+
+    NAME
+        MUIA_TextEditor_KeywordFound -- [..G], STRPTR
+
+    FUNCTION
+        This attribute is used as a notification trigger only. It will be set to
+        the keyword which was found in the list of keywords provided by the
+        attribute MUIA_TextEditor_Keywords.
+
+    SEE ALSO
+        MUIA_TextEditor_Keywords
 
 TextEditor.mcc/MUIA_TextEditor_PasteColors
 
