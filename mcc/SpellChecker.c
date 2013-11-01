@@ -665,65 +665,66 @@ void FreeKeywords(struct InstData *data)
 }
 
 ///
+/// CheckSingleWordAgainstKeywords
+void CheckSingleWordAgainstKeywords(struct InstData *data, const char *word)
+{
+  ENTER();
+
+  D(DBF_SPELL, "check word '%s' against keywords", word);
+  if(word[0] != '\0')
+  {
+    ULONG i = 0;
+
+    while(data->Keywords[i] != NULL)
+    {
+      if(data->Keywords[i][0] == '.')
+      {
+        // check a file name extension at the end of the word
+        char *p = strchr(word, '.');
+
+        if((p = strchr(word, '.')) != NULL && stricmp(p, data->Keywords[i]) == 0)
+        {
+          D(DBF_SPELL, "matched keyword '%s'", data->Keywords[i]);
+          set(data->object, MUIA_TextEditor_MatchedKeyword, data->Keywords[i]);
+          break;
+        }
+      }
+      else
+      {
+        // check for a complete word
+        if(stricmp(word, data->Keywords[i]) == 0)
+        {
+          D(DBF_SPELL, "matched keyword '%s'", data->Keywords[i]);
+          set(data->object, MUIA_TextEditor_MatchedKeyword, data->Keywords[i]);
+          break;
+        }
+      }
+
+      i++;
+    }
+  }
+
+  LEAVE();
+}
+
+///
 /// KeywordCheck
 void KeywordCheck(struct InstData *data)
 {
   ENTER();
 
-  if(data->Keywords != NULL && data->CPos_X != 0 && IsAlpha(data->mylocale, data->actualline->line.Contents[data->CPos_X-1]))
+  if(data->Keywords != NULL)
   {
-    LONG start;
-    LONG end = data->CPos_X;
-    struct line_node *line = data->actualline;
+    LONG start = data->CPos_X;
+    char *contents = data->actualline->line.Contents;
+    char word[256];
 
-    do
-    {
-      GoPreviousWord(data);
-    }
-    while(data->CPos_X != 0 && data->actualline == line && (data->actualline->line.Contents[data->CPos_X-1] == '-' || data->actualline->line.Contents[data->CPos_X-1] == '\''));
+    // extract the last entered word
+    while(start > 0 && contents[start-1] != ' ')
+      start--;
 
-    start = data->CPos_X;
-    data->CPos_X = end;
-
-    if(start-end < 256 && data->actualline == line)
-    {
-      char word[256];
-      ULONG i = 0;
-
-      strlcpy(word, &data->actualline->line.Contents[start], end-start+1);
-
-      while(data->Keywords[i] != NULL)
-      {
-        if(data->Keywords[i][0] == '.')
-        {
-          // check a file name extension at the end of the word
-          char *p = strchr(word, '.');
-
-          if((p = strchr(word, '.')) != NULL && stricmp(p, data->Keywords[i]) == 0)
-          {
-            D(DBF_ALWAYS, "matched keyword '%s'", data->Keywords[i]);
-            set(data->object, MUIA_TextEditor_MatchedKeyword, data->Keywords[i]);
-            break;
-          }
-        }
-        else
-        {
-          // check for a complete word
-          if(stricmp(word, data->Keywords[i]) == 0)
-          {
-            D(DBF_ALWAYS, "matched keyword '%s'", data->Keywords[i]);
-            set(data->object, MUIA_TextEditor_MatchedKeyword, data->Keywords[i]);
-            break;
-          }
-        }
-
-        i++;
-      }
-    }
-    else
-    {
-      data->actualline = line;
-    }
+    strlcpy(word, &contents[start], data->CPos_X-start+1);
+    CheckSingleWordAgainstKeywords(data, word);
   }
 
   LEAVE();
