@@ -587,7 +587,6 @@ void SpellCheckWord(struct InstData *data)
 }
 
 ///
-void kprintf(const char *,...);
 /// KeywordCheck
 void KeywordCheck(struct InstData *data)
 {
@@ -620,7 +619,7 @@ void KeywordCheck(struct InstData *data)
         if(data->Keywords[i][0] == '.')
         {
           // check a file name extension at the end of the word
-          char *p;
+          char *p = strchr(word, '.');
 
           if((p = strchr(word, '.')) != NULL && stricmp(p, data->Keywords[i]) == 0)
           {
