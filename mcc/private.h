@@ -603,6 +603,7 @@ void SuggestWord(struct InstData *);
 Object *SuggestWindow(struct InstData *);
 void ParseKeywords(struct InstData *data, const char *keywords);
 void FreeKeywords(struct InstData *data);
+void CheckSingleWordAgainstKeywords(struct InstData *data, const char *word);
 void KeywordCheck(struct InstData *);
 
 // StyleOperators.c
