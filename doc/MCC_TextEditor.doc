@@ -23,7 +23,7 @@ TextEditor.mcc/MUIA_TextEditor_InsertMode         (not yet implemented...)
 TextEditor.mcc/MUIA_TextEditor_InVirtualGroup
 TextEditor.mcc/MUIA_TextEditor_KeyUpFocus
 TextEditor.mcc/MUIA_TextEditor_Keywords
-TextEditor.mcc/MUIA_TextEditor_KeywordFound
+TextEditor.mcc/MUIA_TextEditor_MatchedKeyword
 TextEditor.mcc/MUIA_TextEditor_PasteColors
 TextEditor.mcc/MUIA_TextEditor_PasteStyles
 TextEditor.mcc/MUIA_TextEditor_Pen
@@ -661,19 +661,22 @@ TextEditor.mcc/MUIM_TextEditor_Search
         MUIA_TextEditor_Keywords -- [IS.], STRPTR *
 
     FUNCTION
-        Allows to specify a NULL terminated list of keywords to check for while
-        the user is typing. If one of these keywords is found the attribute
-        MUIA_TextEditor_KeywordFound will be triggered with the found keyword
-        as trigger value. The check will happen after typing either a space or
-        TAB or RETURN after a word.
+        Allows to specify a comma separated string of keywords to check for
+        while the user is typing. If one of these keywords is found the
+        attribute MUIA_TextEditor_MatchedKeyword will be triggered with the
+        matched keyword as trigger value. The check will happen after typing
+        either a space or TAB or RETURN after a word.
+
+    EXAMPLE
+        set(editorgad, MUIA_TextEditor_Keywords, "foo,bar,baz");
 
     SEE ALSO
-        MUIA_TextEditor_KeywordFound
+        MUIA_TextEditor_MatchedKeyword
 
-TextEditor.mcc/TextEditor.mcc/MUIA_TextEditor_KeywordFound
+TextEditor.mcc/TextEditor.mcc/MUIA_TextEditor_MatchedKeyword
 
     NAME
-        MUIA_TextEditor_KeywordFound -- [..G], STRPTR
+        MUIA_TextEditor_MatchedKeyword -- [..G], STRPTR
 
     FUNCTION
         This attribute is used as a notification trigger only. It will be set to
