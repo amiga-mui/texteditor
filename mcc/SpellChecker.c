@@ -715,7 +715,7 @@ void KeywordCheck(struct InstData *data)
 
   if(data->Keywords != NULL)
   {
-    LONG start = data->CPos_X;
+    ULONG start = data->CPos_X;
     char *contents = data->actualline->line.Contents;
     char word[256];
 
@@ -723,7 +723,7 @@ void KeywordCheck(struct InstData *data)
     while(start > 0 && contents[start-1] != ' ')
       start--;
 
-    strlcpy(word, &contents[start], data->CPos_X-start+1);
+    strlcpy(word, &contents[start], MIN(sizeof(word), data->CPos_X-start+1));
     CheckSingleWordAgainstKeywords(data, word);
   }
 
