@@ -217,7 +217,7 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
 
     case MUIA_TextEditor_MatchedKeyword:
       // just a dummy to make notifications work
-      ti_Data = NULL;
+      ti_Data = (IPTR)NULL;
     break;
 
     default:
