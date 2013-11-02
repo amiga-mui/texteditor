@@ -489,7 +489,7 @@ void Key_Normal(struct InstData *data, char key)
   // writing some text.
   if(key != '-')
     SpellCheckWord(data);
-  if(key == ' ')
+  if(key == ' ' || key == '.' || key == ',')
     KeywordCheck(data);
 
   // add the pastechar to the undobuffer and paste the current
