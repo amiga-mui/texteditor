@@ -291,7 +291,7 @@ ifeq ($(OS), mos)
 
   # Compiler/Linker flags
   CPU     = -mcpu=powerpc
-  CFLAGS  += -noixemul -DNO_PPCINLINE_STDARG -DAROS_ALMOST_COMPATIBLE
+  CFLAGS  += -noixemul
   LDFLAGS += -noixemul
   LDLIBS  += -ldebug
 

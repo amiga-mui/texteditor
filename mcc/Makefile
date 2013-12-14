@@ -279,12 +279,16 @@ ifeq ($(OS), mos)
 
   # Compiler/Linker flags
   CPU     = -mcpu=powerpc
-  CFLAGS  += -noixemul -DNO_PPCINLINE_STDARG -DAROS_ALMOST_COMPATIBLE
+  CFLAGS  += -noixemul
   LDFLAGS += -noixemul
   LDLIBS  += -ldebug
 
   # additional object files required
-  COBJS += extrasrc/MoveList.o
+  COBJS += extrasrc/MoveList.o \
+           extrasrc/GetHead.o \
+           extrasrc/GetPred.o \
+           extrasrc/GetSucc.o \
+           extrasrc/GetTail.o
 
 else
 ifeq ($(OS), aros-i386)

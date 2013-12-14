@@ -591,51 +591,66 @@ void SpellCheckWord(struct InstData *data)
 /// ParseKeywords
 void ParseKeywords(struct InstData *data, const char *keywords)
 {
-  char *copy;
-
   ENTER();
 
   FreeKeywords(data);
 
-  if(keywords != NULL && (copy = strdup(keywords)) != NULL)
+  if(keywords != NULL)
   {
-    char *p = copy;
-    LONG wordCnt;
+    char *copy;
+    size_t keywordslen = strlen(keywords);
 
-    // count the number of words, we have one at least
-    wordCnt = 1;
-    do
+    if((copy = AllocVecPooled(data->mypool, (keywordslen+1)*sizeof(char))) != NULL)
     {
-      if((p = strchr(p, ',')) != NULL)
-      {
-        wordCnt++;
-        p++;
-      }
-    }
-    while(p != NULL);
+      char *p = copy;
+      LONG wordCnt;
 
-    if((data->Keywords = calloc(wordCnt+1, sizeof(char *))) != NULL)
-    {
-      LONG i = 0;
-      char *word = copy;
+      strlcpy(copy, keywords, keywordslen+1);
 
-      // split the string
+      // count the number of words, we have one at least
+      wordCnt = 1;
       do
       {
-        char *e;
-
-        if((e = strpbrk(word, ",")) != NULL)
-          *e++ = '\0';
-
-        data->Keywords[i] = strdup(word);
-        i++;
-
-        word = e;
+        if((p = strchr(p, ',')) != NULL)
+        {
+          wordCnt++;
+          p++;
+        }
       }
-      while(word != NULL);
-    }
+      while(p != NULL);
 
-    free(copy);
+      if((data->Keywords = AllocVecPooled(data->mypool, (wordCnt+1)*sizeof(char *))) != NULL)
+      {
+        LONG i = 0;
+        char *word = copy;
+
+        // split the string
+        do
+        {
+          char *e;
+          size_t maxlen;
+
+          if((e = strpbrk(word, ",")) != NULL)
+            *e++ = '\0';
+
+          maxlen = strlen(word)+1;
+          if((data->Keywords[i] = AllocVecPooled(data->mypool, maxlen)) != NULL)
+            strlcpy(data->Keywords[i], word, maxlen);
+          else
+            break;
+
+          i++;
+
+          word = e;
+        }
+        while(word != NULL && i < wordCnt);
+
+        // NUL terminate
+        data->Keywords[i] = NULL;
+      }
+
+      FreeVecPooled(data->mypool, copy);
+    }
   }
 
   LEAVE();
@@ -653,11 +668,11 @@ void FreeKeywords(struct InstData *data)
 
     while(data->Keywords[i] != NULL)
     {
-      free(data->Keywords[i]);
+      FreeVecPooled(data->mypool, data->Keywords[i]);
       i++;
     }
 
-    free(data->Keywords);
+    FreeVecPooled(data->mypool, data->Keywords);
     data->Keywords = NULL;
   }
 
