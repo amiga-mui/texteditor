@@ -387,7 +387,7 @@ Object *SuggestWindow(struct InstData *data)
 /// LookupWord()
 static BOOL LookupWord(struct InstData *data, CONST_STRPTR word)
 {
-  BOOL res;
+  BOOL res = FALSE;
 
   ENTER();
 
@@ -395,32 +395,38 @@ static BOOL LookupWord(struct InstData *data, CONST_STRPTR word)
   SHOWSTRING(DBF_SPELL, word);
   SHOWVALUE(DBF_SPELL, data->LookupSpawn);
 
-  if(data->LookupSpawn == FALSE)
-    res = SendCLI(word, data->LookupCmd);
-  else
-    res = SendRexx(word, data->LookupCmd);
-
-  if(res == TRUE)
+  if(data->LookupCmd[0] != '\0')
   {
-    char buf[4];
+    if(data->LookupSpawn == FALSE)
+      res = SendCLI(word, data->LookupCmd);
+    else
+      res = SendRexx(word, data->LookupCmd);
 
-    buf[0] = '\0';
-    if(GetVar("Found", &buf[0], sizeof(buf), GVF_GLOBAL_ONLY) != -1)
+    if(res == TRUE)
     {
-      if(buf[0] == '0')
-        res = FALSE;
+      char buf[4];
+
+      buf[0] = '\0';
+      if(GetVar("Found", &buf[0], sizeof(buf), GVF_GLOBAL_ONLY) != -1)
+      {
+        if(buf[0] == '0')
+          res = FALSE;
+      }
+      else
+      {
+        D(DBF_SPELL, "cannot read ENV variable 'Found', error code %ld", IoErr());
+
+        // don't treat a missing "Found" variable as a failure, at least this
+        // is what previous releases did.
+      }
     }
     else
     {
-      D(DBF_SPELL, "cannot read ENV variable 'Found', error code %ld", IoErr());
-      // don't treat a missing "Found" variable as a failure, at least this
-      // is what previous releases did.
+      D(DBF_SPELL, "lookup of word '%s' failed", word);
     }
   }
   else
-  {
-    D(DBF_SPELL, "lookup of word '%s' failed", word);
-  }
+    W(DBF_SPELL, "empty lookupcmd found");
 
   RETURN(res);
   return res;

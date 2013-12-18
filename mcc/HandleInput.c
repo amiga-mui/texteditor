@@ -487,10 +487,16 @@ void Key_Normal(struct InstData *data, char key)
 
   // check if the user wants to do a direct spell checking while
   // writing some text.
-  if(key != '-')
-    SpellCheckWord(data);
-  if(key == ' ' || key == '.' || key == ',')
-    KeywordCheck(data);
+  if(key != '-' && IsAlpha(data->mylocale, key) == FALSE)
+  {
+    // only perform a spell check if it has been enabled
+    if(data->TypeAndSpell == TRUE)
+      SpellCheckWord(data);
+
+    // do a keyword lookup only if we have a keyword list
+    if(data->Keywords != NULL)
+      KeywordCheck(data);
+  }
 
   // add the pastechar to the undobuffer and paste the current
   // key immediately.
