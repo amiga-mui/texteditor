@@ -5,8 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.43 RELEASE ############################################################
+
 2013-12-18 Jens Maus <mail@jens-maus.de>
 
+  * misc: final v15.43 release preparations
   * mcc/HandleInput.c: fixed the internal spell checking functionality which was
     broken since 15.41 because it triggered the Lookup for every entered
     char instead of word. Now the SpellCheckWord() function should be correctly
