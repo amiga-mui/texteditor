@@ -453,7 +453,7 @@ int main(VOID)
 
               DoMethod(separator, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_InsertText, "\n\33c\33[s:2]\n");
 
-              DoMethod(config, MUIM_Notify, MUIA_Pressed, FALSE, MUIV_Notify_Application, 2, MUIM_Application_OpenConfigWindow, 1, "TextEditor.mcc");
+              DoMethod(config, MUIM_Notify, MUIA_Pressed, FALSE, MUIV_Notify_Application, 3, MUIM_Application_OpenConfigWindow, 1, "TextEditor.mcc");
 
               DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "Clear");
               DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_HasChanged, FALSE);
