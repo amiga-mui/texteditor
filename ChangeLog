@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2013-12-22 Jens Maus <mail@jens-maus.de>
+
+  * InitConfig.c: commented out a ReimportText() call which caused in YAM to
+    not show text in a write window uncolored while it contains colored
+    sequences. The root cause of the problem still have to be found but it
+    seems that call is definitly misplaced here!
+
 2013-12-21 Thore Böckelmann <tboeckel@gmx.de>
 
   * demo/TextEditor-Demo.c: correct wrong count parameter for

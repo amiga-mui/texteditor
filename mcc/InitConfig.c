@@ -393,7 +393,7 @@ void InitConfig(struct IClass *cl, Object *obj)
   if(data->TabSize != oldTabSize)
   {
     // reimport the current text if the TAB size has changed
-    ReimportText(cl, obj);
+    //ReimportText(cl, obj);
   }
 
   LEAVE();
