@@ -1,41 +1,50 @@
-## version $VER: TextEditor_mcp.catalog 2.13 (12.3.2007)
-## codeset 0
-## language dansk
+## version $VER: TextEditor_mcp.catalog 2.14 (9.1.2014)
+## language danish
+## codeset 111
+;
 ;
 ; TextEditor_mcp.cd - TextEditor MUI custom prefs catalog description file
-; Danish .ct file:
-; Original by duff; regenerated from catalog and updated by nbache 2007.
+; $Id$
+;
+;#version 2
+;#language english
 ;
 ;
 HelpBubble_BlockQual
 Angiver hvilken tast du kan\n\
-holde nede for at afmærke\n\
+holde nede for at markere\n\
 tekst med piletasterne.
-; Move the cursor key and hold down the qualifier\nthat you set here to mark text.
+; Move the cursor key and hold down the qualifier\n\
+; that you set here to mark text.
 ;
 HelpBubble_CheckWord
-Angiver om ordets korrekthed skal\n\
-tjekkes inden evt. forslag fremvises.
-; If enabled, then the editor will lookup the word,\nand only show suggestions if the word is misspelled.
+Angiver om ordet skal tjekkes, og staveforslag\n\
+fremvises hvis det er stavet forkert.
+; If enabled, then the editor will lookup the word,\n\
+; and only show suggestions if the word is misspelled.
 ;
 HelpBubble_Smooth
 Giver en mere glidende\n\
 rulning af teksten.
-; This will enable pixel smooth scrolling.
+; This enables pixel smooth scrolling.
 ;
 HelpBubble_TypeNSpell
 Angiver om der skal tjekkes for\n\
 retstavning mens du skriver.
-; Enable this to let the editor\nlookup the words while you type them.
+; Enable this to let the editor\n\
+; lookup the words while you type them.
 ;
 HelpBubble_UndoLevel
-Hver mulig fortrydelse koster 10 bytes\n\
-hukommelse. Klip og sæt ind lidt mere,\n\
-det afhænger af blokkens størrelse.
-; Each undo eats 10 bytes of memory.\nCut and Copy takes a little more,\ndepends on the block size!
+Hver mulig fortrydelse koster 10 bytes hukommelse.\n\
+Det koster lidt mere at klippe og kopiere, afhængigt\n\
+af størrelsen på det der klippes eller kopieres.
+; Each undo level eats up 10 bytes of memory.\n\
+; Cut and copy will take a little more,\n\
+; depending on the size of the block you\n\
+; are cutting or copying.
 ;
 MSG_Button_DefaultKeys
-_Grundtaster
+_Nulstille taster
 ; Default _keys
 ;
 MSG_Button_Delete
@@ -59,7 +68,7 @@ Alt
 ; Alt
 ;
 MSG_CycleItem_Ctrl
-Control
+Ctrl
 ; Control
 ;
 MSG_CycleItem_Mouse
@@ -67,7 +76,7 @@ MSG_CycleItem_Mouse
 ; (mouse only)
 ;
 MSG_CycleItem_Shift
-Shift
+Skift
 ; Shift
 ;
 MSG_Execution_ARexx
@@ -80,7 +89,7 @@ CLI
 ;
 MSG_Function_BOL
 Start af linje
-; Begin Of Line
+; Beginning of line
 ;
 MSG_Function_Backspace
 Slette bogstav til venstre
@@ -124,7 +133,7 @@ Gå ned
 ;
 MSG_Function_EOL
 Slutning af linje
-; End Of Line
+; End of line
 ;
 MSG_Function_Left
 Venstre
@@ -136,19 +145,19 @@ Gå til næste knap
 ;
 MSG_Function_NxtPage
 Næste side
-; Next Page
+; Next page
 ;
 MSG_Function_NxtPara
 Næste afsnit
-; Next Paragraph
+; Next paragraph
 ;
 MSG_Function_NxtSent
 Næste sætning
-; Next Sentence
+; Next sentence
 ;
 MSG_Function_NxtWord
 Næste ord
-; Next Word
+; Next word
 ;
 MSG_Function_Paste
 Sætte ind
@@ -156,19 +165,19 @@ Sætte ind
 ;
 MSG_Function_PrvPage
 Forrige side
-; Prev Page
+; Prev page
 ;
 MSG_Function_PrvPara
 Forrige afsnit
-; Prev Paragraph
+; Prev paragraph
 ;
 MSG_Function_PrvSent
 Forrige sætning
-; Prev Sentence
+; Prev sentence
 ;
 MSG_Function_PrvWord
 Forrige ord
-; Prev Word
+; Prev word
 ;
 MSG_Function_Redo
 Gendanne
@@ -203,7 +212,7 @@ Gå op
 ; Up
 ;
 MSG_GroupTitle_Control
-Kontrol
+Styring
 ; Control
 ;
 MSG_GroupTitle_Cursor
@@ -219,7 +228,7 @@ Skrifttyper
 ; Fonts
 ;
 MSG_GroupTitle_Separator
-Delelinje
+Skillelinje
 ; Separator
 ;
 MSG_HelpTxt_SpellChecker
@@ -236,17 +245,47 @@ Hvis du bruger AlphaSpell, kan du skrive:\n\
 \ebARexx:\en "Options Results;Address ALPHASPELL Search For '%s' Path 'T:' Danish.ald"\n\n\
 Du skal huske anførselstegnene da disse fortæller ARexx at det er en kommando og ikke et program.\n\n\
  \eu Forslagskommando \en\n\n\
-Hvis du trykker HELP over et ord, vil editoren starte forslagskommandoen, igen med %s \
+Hvis du trykker HELP over et ord, vil redigeringspanelet starte forslagskommandoen, igen med %s \
 erstattet af det ord markøren er over.\n\
 Din kommando skal producere en fil i T: med navnet "Matches". Denne fil bliver så \
-indlæst af editoren, og indholdet bliver vist i en liste hvorfra man kan vælge det \
+indlæst af redigeringspanelet, og indholdet bliver vist i en liste hvorfra man kan vælge det \
 ord som skal erstatte det fejlstavede.\n\
 Igen kan AlphaSpell-brugere skrive:\n\
 \ebARexx:\en "Options Results;Address ALPHASPELL Match '%s' To 'T:Matches' Path 'T:' Danish.ald"\n\n\
 Hvis du bruger metoderne som er beskrevet ovenfor, skal du have startet AlphaSpell \
 med "ARexx" som argument.\n\n\
 Det anbefales at have sine ordbøger liggende i RAM: hvis man gør brug af "skriv og ret".
-;  \33u Intro \33n\n\nThe TextEditor gadget offers you easy integration of external spell checkers, this allows you to have both type'n'spell and also normal word-guessing.\n\n \33u Lookup command \33n\n\nFor the type'n'spell you'll have to set the lookup command to a script that will lookup the word and set the environment variable \"Found\" to either 0 (for not found) or 1 (for a match).\nI have chosen this behavior because it is the default for AlphaSpell.\nYou write %s where you want the word.\nIf you use AlphaSpell, then you can write:\n\33bARexx:\33n \"Options Results;Address ALPHASPELL Search For '%s' Path 'T:' Danish.ald\"\n\nYou \33bmust\33n remember the quotes, this will let ARexx execute it as a command instead of a script.\n\n \33u Suggest command \33n\n\nIf you press HELP over a word, then the editor will launch this command, again with %s substituted with the current word.\nYour script should produce a file in T: named \"Matches\". This file are then read by the gadget, and the contents are shown in a popup-listview, from where you can choose a word which will replace the misspelled one.\nAgain, AlphaSpell users can write:\n\33bARexx:\33n \"Options Results;Address ALPHASPELL Match '%s' To 'T:Matches' Path 'T:' Danish.ald\"\n\nIf you use the methods described above, then you must start AlphaSpell with the \"ARexx\" switch.\n\nIt is advised to keep your dictionary in RAM if you enable the type'n'spell feature.
+;  \33u Intro \33n\n\
+; \n\
+; The TextEditor gadget allows for easy integration of external spell checkers, \
+; making it possible to have both type'n'spell and also normal word guessing.\n\
+; \n\
+;  \33u Lookup command \33n\n\
+; \n\
+; For the type'n'spell you'll have to set the lookup command to a script that \
+; will lookup the word and set the environment variable \"Found\" to either 0 \
+; (for not found) or 1 (for a match). This matches the default behaviour of AlphaSpell.\n\n\
+; You write %s where you want the word. If you use AlphaSpell, then you can use:\n\n\
+; \33bARexx:\33n \"Options Results;Address ALPHASPELL Search For '%s' Path 'T:' Danish.ald\"\n\
+; \n\
+; You \33bmust\33n remember the quotes, this will let ARexx execute it \
+; as a command instead of a script.\n\
+; \n\
+;  \33u Suggest command \33n\n\
+; \n\
+; If you press <HELP> over a word, then the editor will launch this command, \
+; again with %s substituted with the current word.\n\
+; Your script should produce a file in T: named \"Matches\". This file is \
+; then read by the gadget, and the contents are listed in a popup listview, \
+; from where you can choose a word which will replace the misspelled one. \
+; Again, AlphaSpell users can use:\n\n\
+; \33bARexx:\33n \"Options Results;Address ALPHASPELL Match '%s' To 'T:Matches' Path 'T:' Danish.ald\"\n\
+; \n\
+; If you use the methods described above, then you must start AlphaSpell \
+; with the \"ARexx\" switch.\n\
+; \n\
+; It is advised to keep your dictionary in RAM if you enable \
+; the type'n'spell feature.
 ;
 MSG_LVLabel_Action
 \ec\e3Handling:
@@ -270,7 +309,7 @@ Afmærkningstast
 ;
 MSG_Label_Cursor
 Markør
-; Cursor
+; Normal
 ;
 MSG_Label_Fixed
 Fast bredde
@@ -305,7 +344,7 @@ Skygge
 ; Shadow
 ;
 MSG_Label_SeparatorShine
-Lys
+Højlys
 ; Shine
 ;
 MSG_Label_Smooth
@@ -321,7 +360,7 @@ Forslagskommando
 ; Suggest command
 ;
 MSG_Label_TabSize
-Tabulatorstr.
+Tabulatorlgd.
 ; Tab size
 ;
 MSG_Label_Text
@@ -329,7 +368,7 @@ Tekst
 ; Text
 ;
 MSG_Label_UndoLevel
-Fortryde-lag
+Fortrydelseslag
 ; Undo levels
 ;
 MSG_Label_Width
@@ -361,7 +400,7 @@ Slette alt
 ; Delete
 ;
 MSG_MenuItem_Fill
-Fyld
+Udfyldning
 ; Fill
 ;
 MSG_MenuItem_Halfshadow
@@ -381,7 +420,7 @@ Venstre
 ; Left
 ;
 MSG_MenuItem_Mark
-Markeret
+Markering
 ; Mark
 ;
 MSG_MenuItem_Normal
@@ -405,7 +444,7 @@ Skygge
 ; Shadow
 ;
 MSG_MenuItem_Shine
-Lys
+Højlys
 ; Shine
 ;
 MSG_MenuItem_Text
@@ -433,7 +472,7 @@ Redigering
 ; Edit
 ;
 MSG_Page_Keybindings
-Tast-bindinger
+Tastebindinger
 ; Keybindings
 ;
 MSG_Page_Sample
@@ -458,7 +497,7 @@ Vælg markørens farve
 ;
 MSG_PopWinTitle_Frame
 Vælg ramme
-; Select frame
+; Adjust frame
 ;
 MSG_PopWinTitle_Highlight
 Vælg oplyst farve
@@ -469,11 +508,11 @@ Vælg markeringsfarve
 ; Select block color
 ;
 MSG_PopWinTitle_SeparatorShadow
-Vælg delelinjens skyggefarve
+Vælg skillelinjens skyggefarve
 ; Select separators shadow color
 ;
 MSG_PopWinTitle_SeparatorShine
-Vælg delelinjens lyse farve
+Vælg skillelinjens højlys-farve
 ; Select separators shine color
 ;
 MSG_PopWinTitle_Text
@@ -506,27 +545,27 @@ MSG_SliderText_TabSize
 ;
 MSG_Function_GotoBookmark1
 Hoppe til bogmærke 1
-; Goto Bookmark 1
+; Goto bookmark 1
 ;
 MSG_Function_GotoBookmark2
 Hoppe til bogmærke 2
-; Goto Bookmark 2
+; Goto bookmark 2
 ;
 MSG_Function_GotoBookmark3
 Hoppe til bogmærke 3
-; Goto Bookmark 3
+; Goto bookmark 3
 ;
 MSG_Function_SetBookmark1
 Anbringe bogmærke 1
-; Set Bookmark 1
+; Set bookmark 1
 ;
 MSG_Function_SetBookmark2
 Anbringe bogmærke 2
-; Set Bookmark 2
+; Set bookmark 2
 ;
 MSG_Function_SetBookmark3
 Anbringe bogmærke 3
-; Set Bookmark 3
+; Set bookmark 3
 ;
 MSG_Button_Snoop
 Opsnappe
@@ -538,22 +577,26 @@ Slette linje
 ;
 MSG_Function_SelectAll
 Markere alt
-; Select All
+; Select all
 ;
 MSG_Function_SelectNone
 Afmarkere alt
-; Select None
+; Select none
 ;
 MSG_WarnConfigVersion_Title
 Advarsel fra TextEditor.mcp
-; TextEditor.mcp Warning
+; TextEditor.mcp warning
 ;
 MSG_WarnConfigVersion
-Den tidligere gemte opsætning af tastbindinger er ikke\n\
+Den tidligere gemte opsætning af tastebindinger er ikke\n\
 kompatibel med den nu installerede version af TextEditor.mcc.\n\n\
-Det anbefales at nulstille de aktuelle tastbindinger og\n\
+Det anbefales at nulstille de aktuelle tastebindinger og\n\
 redigere dem manuelt igen bagefter.
-; Your currently saved keybindings setup is incompatible\nwith the version of TextEditor.mcc you have installed.\n\nIt is suggested that you reset the current keybindings\nto their defaults and edit them manually afterwards.
+; Your currently saved keybindings setup is incompatible\n\
+; with the version of TextEditor.mcc you have installed.\n\
+; \n\
+; It is suggested that you reset the current keybindings\n\
+; to their defaults and edit them manually afterwards.
 ;
 MSG_ResetAbort
 Nulstille|Afbryde
@@ -561,7 +604,7 @@ Nulstille|Afbryde
 ;
 MSG_WarnHotkeyString_Title
 Advarsel fra TextEditor.mcp
-; TextEditor.mcp Warning
+; TextEditor.mcp warning
 ;
 MSG_WarnHotkeyString
 TextEditor.mcp kunne ikke åbne den krævede eller\n\
@@ -570,9 +613,172 @@ og måtte derfor opgive initialisering.\n\n\
 Tjek at du har den seneste HotkeyString.mcc-klasse\n\
 fra http://www.sf.net/projects/bstring-mcc/\n\
 installeret og prøv igen.
-; TextEditor.mcp couldn't open the minimum required\nversion of the HotkeyString.mcc custom class and\ntherefore failed during initialization.\n\nPlease make sure you have the latest Hotkeystring.mcc\nclass from http://www.sf.net/projects/bstring-mcc/\ninstalled and try again.
+; TextEditor.mcp couldn't open the minimum required\n\
+; version of the HotkeyString.mcc custom class and\n\
+; therefore failed during initialization.\n\
+; \n\
+; Please make sure you have the latest Hotkeystring.mcc\n\
+; class from http://www.sf.net/projects/bstring-mcc/\n\
+; installed and try again.
 ;
 MSG_Ok
 OK
 ; Ok
+;
+MSG_Label_InactiveCursor
+Musepil ved inaktivitet
+; Inactive cursor
+;
+MSG_HELP_InactiveCursor
+Ved hak her vil en speciel musepil blive anvendt\n\
+når fokus ikke er på redigeringspanelet.
+; If enabled, a custom cursor will be used\n\
+; whenever the editor doesn't have the focus.
+;
+MSG_Label_SelectPointer
+Musepil over panelet
+; Selection pointer
+;
+MSG_HELP_SelectPointer
+Ved hak her vil en speciel musepil blive vist når\n\
+musen er over redigeringspanelet.
+; If enabled, a custom selection pointer will appear\n\
+; when the mouse pointer is above the texteditor gadget.
+;
+MSG_Label_InactiveColor
+Inaktiv
+; Inactive
+;
+MSG_PopWinTitle_InactiveColor
+Vælg farven for inaktivitet
+; Select inactive color
+;
+MSG_HELP_TABSIZE
+Antal tegn der flyttes ved brug af <TAB>-tasten.
+; How many spaces hitting the <TAB> key will jump.
+;
+MSG_HELP_DESIGN_FRAME
+Denne knap anvendes til indstilling af en ramme.\n\
+Ved klik på den åbnes et vindue til indstilling.\n\
+Man kan også bruge træk & slip til at kopiere\n\
+fra og til en anden rammeindstillingsknap.
+; This is a button to adjust a frame.\n\
+; Click it to open an adjust window or\n\
+; use the drag&drop facilities to copy\n\
+; from or to another frame adjust button.
+;
+MSG_HELP_DESIGN_BACKGROUND
+Denne knap anvendes til indstilling af en\n\
+baggrundsfarve eller et baggrundsmønster.\n\
+Ved klik på den åbner et indstillingsvindue.\n\
+Man kan også bruge træk & slip til at kopiere\n\
+fra og til en anden baggrundsindstillingsknap.
+; This is a button to adjust a background\n\
+; color or pattern. Click it to open an\n\
+; adjust window or use the drag&drop facilities\n\
+; to copy from or to another background adjust button.
+;
+MSG_HELP_DESIGN_TEXT
+Denne farve benyttes til at skrive teksten.
+; This is the color used to print the text.
+;
+MSG_HELP_DESIGN_HIGHLIGHT
+Denne farve benyttes til\n\
+at skrive fremhævet tekt.
+; This is the color used to\n\
+; print highlighted text.
+;
+MSG_HELP_SEPARATOR_SHINE
+Denne farve benyttes til\n\
+at tegne skillelinjers højlys.
+; This is the color used to\n\
+; print separator bars.
+;
+MSG_HELP_SEPARATOR_SHADOW
+Denne farve benyttes til at tegne\n\
+skillelinjers skygger.
+; This is the color used to print\n\
+; separator bars in shadow mode.
+;
+MSG_HELP_FONTS_NORMAL
+Skriftsnittet som benyttes som\n\
+standard i redigeringspanelet.
+; Default font to be used by the editor.
+;
+MSG_HELP_FONTS_FIXED
+Skriftsnittet som benyttes i redigeringspanelet\n\
+når der kræves et skriftsnit med fast bredde.
+; Default font to be used by the editor\n\
+; whenever a fixed width font is requested.
+;
+MSG_HELP_CURSOR_NORMAL
+Farven som benyttes som standard til markøren.
+; Default color to be used for the cursor.
+;
+MSG_HELP_CURSOR_SELECTED
+Farven som benyttes til markøren\n\
+i markeret tekst.
+; Color to be used for the cursor\n\
+; in selected text.
+;
+MSG_HELP_CURSOR_INACTIVE
+Farven som benyttes til at skrive markeret\n\
+tekst når fokus ikke er på redigeringspanelet.
+; Color to use to print selected text\n\
+; when the editor doesn't have the focus.
+;
+MSG_HELP_CURSOR_WIDTH
+Bredden som markøren skal have.
+; This is the width the cursor should have.
+;
+MSG_HELP_CURSOR_BLINKSPEED
+Måske foretrækker du at markøren blinker for at\n\
+gøre den lettere at få øje på. Man slår blinket\n\
+fra ved at vælge 'Ingen'.
+; You may want the cursor to blink to make\n\
+; it easier to find. Select 'Off' to disable\n\
+; this feature.
+;
+MSG_HELP_BUTTON_DEFAULTKEYS
+Nulstiller alle tastebindinger til\n\
+de indbyggede standardbindinger.
+; Restore all keybindings\n\
+; to the built-in defaults.
+;
+MSG_HELP_BUTTON_SNOOP
+Dette felt benyttes til at opsætte en tastebinding\n\
+for den tilhørende handling. Man kan enten redigere\n\
+teksten i feltet direkte, eller man kan klikke på knappen\n\
+'Opsnappe' og få optaget sine tastetryk indtil man bekræfter\n\
+ved at klikke på knappen igen.
+; Use this field to set a keybinding for this action.\n\
+; You can either edit the string gadget directly or press\n\
+; the 'Snoop' button to make the gadget monitor keypresses\n\
+; until you press it again to confirm.
+;
+MSG_HELP_BUTTON_INSERT
+Tilføjer en ny tastebinding til listen.
+; Add a new keybinding to the list.
+;
+MSG_HELP_BUTTON_DELETE
+Sletter den aktuelle tastebinding fra listen.
+; Delete this keybinding from the list.
+;
+MSG_HELP_SPELLCHECKER_LOOKUP_CMD
+Her angiver man den opslagskommando man vil anvende, eller lader\n\
+feltet står tomt hvis man vil slå "skriv og ret" funktionen fra.
+; Specify here the lookup command you want to use, or\n\
+; leave this empty to disable the type'n'spell feature.
+;
+MSG_HELP_SPELLCHECKER_SUGGEST_CMD
+Her angiver man den kommando som skal benyttes\n\
+til at foreslå et alternativt ord. Som forklaret\n\
+ovenfor skal man normalt angive et script her.
+; Specify here the command that will be used\n\
+; to suggest an alternate word. As explained above,\n\
+; usually you should specify a script here.
+;
+MSG_UNDO_SLIDER_FORMAT
+%ld (+/- 5)
+; %ld (+/- 5)
 ;
