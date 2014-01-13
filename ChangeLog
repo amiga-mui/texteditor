@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2014-01-13 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/locale/danish.ct: updated danish translation kindly provided by Niels
+    Bache.
+
 2013-12-22 Jens Maus <mail@jens-maus.de>
 
   * InitConfig.c: commented out a ReimportText() call which caused in YAM to
