@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2014-01-25 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/ImportText.c: remember the current export hook before doing the actual
+    export with a different hook.
+
 2014-01-13 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale/danish.ct: updated danish translation kindly provided by Niels
