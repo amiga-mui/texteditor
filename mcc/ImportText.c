@@ -119,17 +119,18 @@ BOOL ReimportText(struct IClass *cl, Object *obj)
 {
   struct InstData *data = INST_DATA(cl, obj);
   BOOL result = FALSE;
+  struct Hook *ExportHookCopy;
   char *buff;
 
   ENTER();
 
+  // use the plain export hook
+  ExportHookCopy = data->ExportHook;
+  data->ExportHook = &ExportHookPlain;
+
   if((buff = (char *)mExportText(cl, obj, NULL)) != NULL)
   {
     struct MinList newlines;
-    struct Hook *ExportHookCopy = data->ExportHook;
-
-    // use the plain export hook
-    data->ExportHook = &ExportHookPlain;
 
     if(ImportText(data, buff, data->ImportHook, data->ImportWrap, &newlines) == TRUE)
     {
@@ -141,10 +142,10 @@ BOOL ReimportText(struct IClass *cl, Object *obj)
     }
 
     FreeVec(buff);
-
-    // restore the former export hook
-    data->ExportHook = ExportHookCopy;
   }
+
+  // restore the former export hook
+  data->ExportHook = ExportHookCopy;
 
   RETURN(result);
   return result;
