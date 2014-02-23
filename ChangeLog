@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2014-02-23 Jens Maus <mail@jens-maus.de>
+
+  * mcp/locale: all catalog translations have now been moved to use the free
+    services of transifex (http://www.transifex.com/projects/p/texteditor-mcc/)
+
 #### v15.44 RELEASE ############################################################
 
 2014-01-26 Jens Maus <mail@jens-maus.de>
