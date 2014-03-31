@@ -369,7 +369,7 @@ Object *SuggestWindow(struct InstData *data)
         End;
 
   DoMethod(lvobj, MUIM_Notify, MUIA_Listview_DoubleClick, TRUE,
-      MUIV_Notify_Self, 3, MUIM_CallHook, &SelectHook);
+      MUIV_Notify_Self, 3, MUIM_CallHook, &SelectHook, data);
 
   DoMethod(window, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
       MUIV_Notify_Self, 3, MUIM_Set, MUIA_Window_Open, FALSE);
