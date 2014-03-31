@@ -11,6 +11,9 @@ $URL$
     got lots during the transition to .po files. Please note that I copied over
     the help texts for all non-slavic languages only. The old help texts are
     still available in previous .ct files in the SVN repository.
+  * mcc/SpellChecker.c: added missing parameter for a notification to call a
+    hook via MUIM_CallHook. This caused crashes when a spellchecker was about to
+    replace a mispelled word. Thanks to Mikhail Malyshev for the hint.
 
 2014-02-23 Jens Maus <mail@jens-maus.de>
 
