@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2014-04-01 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/locale: added a new header line to the .po files to specify a correct
+    name for the generated .catalog file.
+
 2014-03-31 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/CreatePrefsGroup.c, locale: restored the missing bubble help texts which
