@@ -64,9 +64,11 @@ for os in os3 os4 mos aros-i386 aros-ppc aros-x86_64; do
 done
 
 make -C mcp catalogs
-for language in czech danish french german greek italian polish russian swedish; do
-	mkdir -p "release/MCC_TextEditor/Locale/Catalogs/$language"
-	cp -a mcp/locale/$language.catalog "release/MCC_TextEditor/Locale/Catalogs/$language/TextEditor_mcp.catalog"
+for language in `ls mcp/locale/*.catalog`; do
+  catalog=$(basename "$language")
+  lang="${catalog%.*}"
+  mkdir -p "release/MCC_TextEditor/Locale/Catalogs/${lang}"
+  cp -a ${language} "release/MCC_TextEditor/Locale/Catalogs/${lang}/TextEditor_mcp.catalog"
 done
 
 cp -a -R dist/* "release/"
@@ -80,7 +82,7 @@ cp -a demo/*.c "release/MCC_TextEditor/Developer/C/Examples/"
 cp -a demo/Makefile "release/MCC_TextEditor/Developer/C/Examples/"
 cp -a include/mui/TextEditor_mcc.h "release/MCC_TextEditor/Developer/C/include/mui/"
 cp -a doc/MCC_TextEditor.guide "release/MCC_TextEditor/Docs/"
-cp -a mcp/locale/TextEditor_mcp.cd "release/MCC_TextEditor/Locale/"
+cp -a mcp/locale/TextEditor_mcp.pot "release/MCC_TextEditor/Locale/"
 
 releasever=`grep "#define LIB_VERSION" mcc/version.h | awk '{ print $3 }'`
 releaserev=`grep "#define LIB_REVISION" mcc/version.h | awk '{ print $3 }'`

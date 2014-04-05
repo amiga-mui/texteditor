@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.45 RELEASE ############################################################
+
+2014-04-05 Jens Maus <mail@jens-maus.de>
+
+  * misc: final v15.45 release preparations
+
 2014-04-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale: added a new header line to the .po files to specify a correct

@@ -20,6 +20,10 @@
 
 ***************************************************************************/
 
+#if defined(__amigaos4__)
+#include <hardware/blit.h>
+#endif
+
 #include <graphics/gfxmacros.h>
 #include <graphics/text.h>
 #include <clib/alib_protos.h>

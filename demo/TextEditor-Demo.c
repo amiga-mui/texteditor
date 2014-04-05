@@ -47,6 +47,10 @@
 
 #include <mui/TextEditor_mcc.h>
 
+#if defined(__amigaos4__)
+#include <dos/obsolete.h>
+#endif
+
 #include "SDI_hook.h"
 
 #ifndef __amigaos4__
