@@ -912,6 +912,9 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
 
     DoMethod(editor, MUIM_Notify, MUIA_TextEditor_UndoAvailable, MUIV_EveryTime, (Object *)DoMethod(data->editpopup,MUIM_FindUData, 5), 3, MUIM_Set, MUIA_Menuitem_Enabled, MUIV_TriggerValue);
     DoMethod(editor, MUIM_Notify, MUIA_TextEditor_RedoAvailable, MUIV_EveryTime, (Object *)DoMethod(data->editpopup,MUIM_FindUData, 6), 3, MUIM_Set, MUIA_Menuitem_Enabled, MUIV_TriggerValue);
+
+    // disable the pointer checkmark in case MUI already handles custom pointer types
+    set(data->selectPointer, MUIA_Disabled, xget(editor, MUIA_PointerType) != MUIV_PointerType_Normal);
   }
 
   RETURN(group);

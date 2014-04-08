@@ -183,6 +183,8 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             // initialize our temporary rastport
             InitRastPort(&data->tmprp);
 
+            set(obj, MUIA_PointerType, MUIV_PointerType_Text);
+
             // walk through all attributes and check if
             // they were set during OM_NEW
             mSet(cl, obj, (struct opSet *)msg);
@@ -293,8 +295,9 @@ static IPTR mSetup(struct IClass *cl, Object *obj, Msg msg)
       data->ehnode.ehn_Events  |= IDCMP_EXTENDEDMOUSE;
       #endif
 
-      // setup the selection pointer
-      if(data->selectPointer == TRUE)
+      // setup the selection pointer if this is requested and MUI doesn't already
+      // handle this for us
+      if(data->selectPointer == TRUE && xget(obj, MUIA_PointerType) == MUIV_PointerType_Normal)
       {
         setFlag(data->ehnode.ehn_Events, IDCMP_MOUSEMOVE);
         SetupSelectPointer(data);
