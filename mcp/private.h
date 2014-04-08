@@ -221,6 +221,23 @@ IPTR xget(Object *obj, const IPTR attr);
 #endif
 ///
 
+#ifndef MUIA_PointerType
+#define MUIA_PointerType        0x8042b467 /* V20 isg LONG              */
+#endif
+
+#ifndef MUIM_WhichPointerType
+#define MUIM_WhichPointerType   0x8042e212 /* V20 */
+struct  MUIP_WhichPointerType   { ULONG MethodID; LONG mx; LONG my; };
+#endif
+
+#ifndef MUIV_PointerType_Normal
+#define MUIV_PointerType_Normal 0
+#endif
+
+#ifndef MUIV_PointerType_Text
+#define MUIV_PointerType_Text   30
+#endif
+
 #if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
 // GetHead.c
 struct Node *GetHead(struct List *);

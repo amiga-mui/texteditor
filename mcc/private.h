@@ -764,26 +764,43 @@ ULONG xget(Object *obj, const IPTR attr);
 #endif
 ///
 
-#define ARRAY_SIZE(x)         (sizeof(x[0]) ? sizeof(x)/sizeof(x[0]) : 0)
+#define ARRAY_SIZE(x)           (sizeof(x[0]) ? sizeof(x)/sizeof(x[0]) : 0)
 
 #ifndef MUIKEY_CUT
-#define MUIKEY_CUT 22
+#define MUIKEY_CUT              22
 #endif
 
 #ifndef MUIKEY_COPY
-#define MUIKEY_COPY 23
+#define MUIKEY_COPY             23
 #endif
 
 #ifndef MUIKEY_PASTE
-#define MUIKEY_PASTE 24
+#define MUIKEY_PASTE            24
 #endif
 
 #ifndef MUIKEY_UNDO
-#define MUIKEY_UNDO 25
+#define MUIKEY_UNDO             25
 #endif
 
 #ifndef MUIKEY_REDO
-#define MUIKEY_REDO 26
+#define MUIKEY_REDO             26
+#endif
+
+#ifndef MUIA_PointerType
+#define MUIA_PointerType        0x8042b467 /* V20 isg LONG              */
+#endif
+
+#ifndef MUIM_WhichPointerType
+#define MUIM_WhichPointerType   0x8042e212 /* V20 */
+struct  MUIP_WhichPointerType   { ULONG MethodID; LONG mx; LONG my; };
+#endif
+
+#ifndef MUIV_PointerType_Normal
+#define MUIV_PointerType_Normal 0
+#endif
+
+#ifndef MUIV_PointerType_Text
+#define MUIV_PointerType_Text   30
 #endif
 
 #endif /* TEXTEDITOR_MCC_PRIV_H */
