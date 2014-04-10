@@ -575,12 +575,14 @@ void SpellCheckWord(struct InstData *data)
     start = data->CPos_X;
     data->CPos_X = end;
 
-    if(start-end < 256 && data->actualline == line)
+    if(data->actualline == line)
     {
       char word[256];
 
-      strlcpy(word, &data->actualline->line.Contents[start], end-start+1);
+      // make a copy of the selected word, 256 characters at most
+      strlcpy(word, &data->actualline->line.Contents[start], MIN((LONG)sizeof(word), end-start+1));
 
+      // now pass this to the spell checker
       if(LookupWord(data, word) == FALSE)
         DisplayBeep(NULL);
     }
