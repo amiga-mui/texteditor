@@ -123,8 +123,41 @@
 
 #endif
 
+enum
+{
+  MCP_Background,
+  MCP_BlinkSpeed,
+  MCP_BlockQual,
+  MCP_CheckWord,
+  MCP_CursorColor,
+  MCP_CursorTextColor,
+  MCP_CursorWidth,
+  MCP_FixedFont,
+  MCP_Frame,
+  MCP_HighlightColor,
+  MCP_MarkedColor,
+  MCP_NormalFont,
+  MCP_Smooth,
+  MCP_TabSize,
+  MCP_TextColor,
+  MCP_UndoSize,
+  MCP_TypeNSpell,
+  MCP_LookupExeType,
+  MCP_LookupCommand,
+  MCP_SuggestExeType,
+  MCP_SuggestCommand,
+  MCP_Keybindings,
+  MCP_SeparatorShine,
+  MCP_SeparatorShadow,
+  MCP_InactiveCursor,
+  MCP_SelectPointer,
+  MCP_InactiveColor,
+  MCP_Count
+};
+
 struct InstData_MCP
 {
+  Object *o[MCP_Count];
   Object *editpopup;
   Object *obj;
   Object *hotkey;
@@ -132,33 +165,8 @@ struct InstData_MCP
   Object *keyfunctions_txt;
   Object *insertkey;
   Object *deletekey;
-  Object *cursorwidth;
-  Object *blinkspeed;
-  Object *background;
-  Object *frame;
-  Object *textcolor;
-  Object *highlightcolor;
-  Object *cursorcolor;
-  Object *markedcolor;
-  Object *inactiveColor;
-  Object *blockqual;
-  Object *smooth;
-  Object *tabsize;
-  Object *normalfont;
-  Object *fixedfont;
-  Object *undosize;
-  Object *typenspell;
-  Object *lookupcmd;
-  Object *suggestcmd;
   Object *keybindings;
-  Object *SuggestExeType;
-  Object *LookupExeType;
-  Object *CheckWord;
-  Object *separatorshine;
-  Object *separatorshadow;
   Object *CfgObj;
-  Object *inactiveCursor;
-  Object *selectPointer;
 
   const char *gTitles[5];
   const char *functions[41];
@@ -206,8 +214,8 @@ void DeleteSubClasses(void);
 // main class methods
 IPTR New(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct opSet *msg));
 IPTR Dispose(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, Msg msg));
-IPTR GadgetsToConfig(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct MUIP_Settingsgroup_GadgetsToConfig *msg));
-IPTR ConfigToGadgets(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct MUIP_Settingsgroup_ConfigToGadgets *msg));
+IPTR GadgetsToConfig(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct MUIP_Mccprefs_GadgetsToConfig *msg));
+IPTR ConfigToGadgets(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct MUIP_Mccprefs_ConfigToGadgets *msg));
 
 /// xget()
 //  Gets an attribute value from a MUI object
@@ -249,4 +257,4 @@ struct Node *GetSucc(struct Node *);
 struct Node *GetTail(struct List *);
 #endif
 
-#endif /* MUI_NLISTVIEWS_priv_MCP_H */
+#endif /* TEXTEDITOR_MCP_PRIV_H */

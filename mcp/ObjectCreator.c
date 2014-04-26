@@ -292,23 +292,79 @@ static Object *PrefsObject(struct InstData_MCP *data)
   data->obj = CreatePrefsGroup(data);
   if(data->obj)
   {
-    set(data->normalfont, MUIA_String_AdvanceOnCR, TRUE);
-    set(data->fixedfont, MUIA_String_AdvanceOnCR, TRUE);
+    set(data->o[MCP_NormalFont], MUIA_String_AdvanceOnCR, TRUE);
+    set(data->o[MCP_FixedFont], MUIA_String_AdvanceOnCR, TRUE);
 
-    DoMethod(data->blockqual, MUIM_MultiSet, MUIA_CycleChain, TRUE,
-            data->blockqual, data->tabsize, data->smooth,
-            data->normalfont, data->fixedfont, data->textcolor, data->frame,
-            data->highlightcolor, data->background, data->cursorcolor,
-            data->markedcolor, data->cursorwidth, data->deletekey,
-            data->blinkspeed, data->suggestcmd, data->lookupcmd,
-            data->typenspell, data->undosize, data->LookupExeType,
-            data->SuggestExeType, data->CheckWord, data->insertkey,
-            data->separatorshadow, data->separatorshine, data->inactiveCursor,
-            data->selectPointer, data->inactiveColor, NULL);
+    DoMethod(data->obj, MUIM_MultiSet, MUIA_CycleChain, TRUE,
+            data->o[MCP_BlockQual],
+            data->o[MCP_TabSize],
+            data->o[MCP_Smooth],
+            data->o[MCP_NormalFont],
+            data->o[MCP_FixedFont],
+            data->o[MCP_TextColor],
+            data->o[MCP_Frame],
+            data->o[MCP_HighlightColor],
+            data->o[MCP_Background],
+            data->o[MCP_CursorColor],
+            data->o[MCP_MarkedColor],
+            data->o[MCP_CursorWidth],
+            data->deletekey,
+            data->o[MCP_BlinkSpeed],
+            data->o[MCP_SuggestExeType],
+            data->o[MCP_SuggestCommand],
+            data->o[MCP_LookupExeType],
+            data->o[MCP_LookupCommand],
+            data->o[MCP_TypeNSpell],
+            data->o[MCP_UndoSize],
+            data->o[MCP_CheckWord],
+            data->insertkey,
+            data->o[MCP_SeparatorShadow],
+            data->o[MCP_SeparatorShine],
+            data->o[MCP_InactiveCursor],
+            data->o[MCP_SelectPointer],
+            data->o[MCP_InactiveColor],
+            NULL);
   }
 
   return(data->obj);
 }
+
+static const struct
+{
+  LONG index;
+  ULONG cfgAttr;
+  ULONG attr;
+  APTR defValue;
+} prefsInfo[MCP_Count] =
+{
+  { MCP_Background,      MUICFG_TextEditor_Background,      MUIA_Imagedisplay_Spec, (APTR)CFG_TextEditor_Background_Def      },
+  { MCP_BlinkSpeed,      MUICFG_TextEditor_BlinkSpeed,      MUIA_Numeric_Value,     (APTR)CFG_TextEditor_BlinkSpeed_Def      },
+  { MCP_BlockQual,       MUICFG_TextEditor_BlockQual,       MUIA_Pendisplay_Spec,   (APTR)CFG_TextEditor_BlockQual_Def       },
+  { MCP_CheckWord,       MUICFG_TextEditor_CheckWord,       MUIA_Selected,          (APTR)CFG_TextEditor_CheckWord_Def       },
+  { MCP_CursorColor,     MUICFG_TextEditor_CursorColor,     MUIA_Pendisplay_Spec,   (APTR)CFG_TextEditor_CursorColor_Def     },
+  { MCP_CursorTextColor, MUICFG_TextEditor_CursorTextColor, MUIA_Pendisplay_Spec,   (APTR)CFG_TextEditor_CursorTextColor_Def },
+  { MCP_CursorWidth,     MUICFG_TextEditor_CursorWidth,     MUIA_Numeric_Value,     (APTR)CFG_TextEditor_CursorWidth_Def     },
+  { MCP_FixedFont,       MUICFG_TextEditor_FixedFont,       MUIA_String_Contents,   (APTR)CFG_TextEditor_FixedFont_Def       },
+  { MCP_Frame,           MUICFG_TextEditor_Frame,           MUIA_Framedisplay_Spec, (APTR)CFG_TextEditor_Frame_Def           },
+  { MCP_HighlightColor,  MUICFG_TextEditor_HighlightColor,  MUIA_Pendisplay_Spec,   (APTR)CFG_TextEditor_HighlightColor_Def  },
+  { MCP_MarkedColor,     MUICFG_TextEditor_MarkedColor,     MUIA_Pendisplay_Spec,   (APTR)CFG_TextEditor_MarkedColor_Def     },
+  { MCP_NormalFont,      MUICFG_TextEditor_NormalFont,      MUIA_String_Contents,   (APTR)CFG_TextEditor_NormalFont_Def      },
+  { MCP_Smooth,          MUICFG_TextEditor_Smooth,          MUIA_Selected,          (APTR)CFG_TextEditor_Smooth_Def          },
+  { MCP_TabSize,         MUICFG_TextEditor_TabSize,         MUIA_Numeric_Value,     (APTR)CFG_TextEditor_TabSize_Def         },
+  { MCP_TextColor,       MUICFG_TextEditor_TextColor,       MUIA_Pendisplay_Spec,   (APTR)CFG_TextEditor_TextColor_Def       },
+  { MCP_UndoSize,        MUICFG_TextEditor_UndoSize,        MUIA_Numeric_Value,     (APTR)CFG_TextEditor_UndoSize_Def        },
+  { MCP_TypeNSpell,      MUICFG_TextEditor_TypeNSpell,      MUIA_Selected,          (APTR)CFG_TextEditor_TypeNSpell_Def      },
+  { MCP_LookupExeType,   MUICFG_TextEditor_LookupExeType,   MUIA_Cycle_Active,      (APTR)CFG_TextEditor_LookupExeType_Def   },
+  { MCP_LookupCommand,   MUICFG_TextEditor_LookupCommand,   MUIA_String_Contents,   (APTR)CFG_TextEditor_LookupCommand_Def   },
+  { MCP_SuggestExeType,  MUICFG_TextEditor_SuggestCommand,  MUIA_Cycle_Active,      (APTR)CFG_TextEditor_SuggestExeType_Def  },
+  { MCP_SuggestCommand,  MUICFG_TextEditor_SuggestCommand,  MUIA_String_Contents,   (APTR)CFG_TextEditor_SuggestCommand_Def  },
+  { MCP_Keybindings,     MUICFG_TextEditor_Keybindings,     0,                      (APTR)0                                  },
+  { MCP_SeparatorShine,  MUICFG_TextEditor_SeparatorShine,  MUIA_Pendisplay_Spec,   (APTR)CFG_TextEditor_SeparatorShine_Def  },
+  { MCP_SeparatorShadow, MUICFG_TextEditor_SeparatorShadow, MUIA_Pendisplay_Spec,   (APTR)CFG_TextEditor_SeparatorShadow_Def },
+  { MCP_InactiveCursor,  MUICFG_TextEditor_InactiveCursor,  MUIA_Selected,          (APTR)CFG_TextEditor_InactiveCursor_Def  },
+  { MCP_SelectPointer,   MUICFG_TextEditor_SelectPointer,   MUIA_Selected,          (APTR)CFG_TextEditor_SelectPointer_Def   },
+  { MCP_InactiveColor,   MUICFG_TextEditor_InactiveColor,   MUIA_Pendisplay_Spec,   (APTR)CFG_TextEditor_InactiveColor_Def   },
+};
 
 IPTR New(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct opSet *msg))
 {
@@ -325,34 +381,20 @@ IPTR New(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct opSet 
 
       if(MUIMasterBase->lib_Version >= 20)
       {
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->LookupExeType,   MUICFG_TextEditor_LookupCmd,       2, tr(MSG_Label_LookupCmd),       MUIA_Cycle_Active);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->lookupcmd,       MUICFG_TextEditor_LookupCmd,       2, tr(MSG_Label_LookupCmd),       MUIA_String_Contents);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->SuggestExeType,  MUICFG_TextEditor_SuggestCmd,      2, tr(MSG_Label_SuggestCmd),      MUIA_Cycle_Active);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->suggestcmd,      MUICFG_TextEditor_SuggestCmd,      2, tr(MSG_Label_SuggestCmd),      MUIA_String_Contents);
+        ULONG i;
+
         DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->keybindings,     MUICFG_TextEditor_Keybindings,     1, tr(MSG_Page_Keybindings)       );
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->frame,           MUICFG_TextEditor_Frame,           2, tr(MSG_Label_Frame),           MUIA_Framedisplay_Spec);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->background,      MUICFG_TextEditor_Background,      2, tr(MSG_Label_Background),      MUIA_Imagedisplay_Spec);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->blinkspeed,      MUICFG_TextEditor_BlinkSpeed,      2, tr(MSG_Label_BlinkSpeed),      MUIA_Numeric_Value);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->blockqual,       MUICFG_TextEditor_BlockQual,       2, tr(MSG_Label_BlkQual),         MUIA_Cycle_Active);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->cursorcolor,     MUICFG_TextEditor_CursorColor,     2, tr(MSG_Label_Cursor),          MUIA_Pendisplay_Spec);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->cursorwidth,     MUICFG_TextEditor_CursorWidth,     2, tr(MSG_Label_Width),           MUIA_Numeric_Value);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->fixedfont,       MUICFG_TextEditor_FixedFont,       2, tr(MSG_Label_Fixed),           MUIA_String_Contents);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->highlightcolor,  MUICFG_TextEditor_HighlightColor,  2, tr(MSG_Label_Highlight),       MUIA_Pendisplay_Spec);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->markedcolor,     MUICFG_TextEditor_MarkedColor,     2, tr(MSG_Label_Selected),        MUIA_Pendisplay_Spec);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->inactiveColor,   MUICFG_TextEditor_InactiveColor,   2, tr(MSG_Label_InactiveColor),   MUIA_Pendisplay_Spec);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->normalfont,      MUICFG_TextEditor_NormalFont,      2, tr(MSG_Label_Normal),          MUIA_String_Contents);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->smooth,          MUICFG_TextEditor_Smooth,          2, tr(MSG_Label_Smooth),          MUIA_Selected);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->selectPointer,   MUICFG_TextEditor_SelectPointer,   2, tr(MSG_Label_SelectPointer),   MUIA_Selected);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->typenspell,      MUICFG_TextEditor_TypeNSpell,      2, tr(MSG_ConfigMenu_TypeNSpell), MUIA_Selected);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->CheckWord,       MUICFG_TextEditor_CheckWord,       2, tr(MSG_ConfigMenu_CheckWord),  MUIA_Selected);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->tabsize,         MUICFG_TextEditor_TabSize,         2, tr(MSG_Label_TabSize),         MUIA_Numeric_Value);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->textcolor,       MUICFG_TextEditor_TextColor,       2, tr(MSG_Label_Text),            MUIA_Pendisplay_Spec);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->separatorshine,  MUICFG_TextEditor_SeparatorShine,  2, tr(MSG_Label_SeparatorShine),  MUIA_Pendisplay_Spec);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->separatorshadow, MUICFG_TextEditor_SeparatorShadow, 2, tr(MSG_Label_SeparatorShadow), MUIA_Pendisplay_Spec);
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->inactiveCursor,  MUICFG_TextEditor_InactiveCursor,  2, tr(MSG_Label_InactiveCursor),  MUIA_Pendisplay_Spec);
+
+		for(i = 0; i < MCP_Count; i++)
+		{
+          if(i == MCP_Keybindings)
+            continue;
+
+          DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->o[prefsInfo[i].index], prefsInfo[i].cfgAttr, 2, NULL, prefsInfo[i].attr);
+        }
       }
       else
-        set(data->frame, MUIA_Disabled, TRUE);
+        set(data->o[MCP_Frame], MUIA_Disabled, TRUE);
 
       return((IPTR)obj);
     }
@@ -379,111 +421,86 @@ IPTR Dispose(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, Msg msg))
   return(DoSuperMethodA(cl, obj, msg));
 }
 
-IPTR GadgetsToConfig(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct MUIP_Settingsgroup_GadgetsToConfig *msg))
+IPTR GadgetsToConfig(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct MUIP_Mccprefs_GadgetsToConfig *msg))
 {
   struct InstData_MCP *data = INST_DATA(cl, obj);
-  IPTR cfg_data;
+  ULONG i;
+  ULONG version = CONFIG_VERSION;
+  BOOL mui38;
 
   ENTER();
 
+  mui38 = !LIB_VERSION_IS_AT_LEAST(MUIMasterBase, 20, 0);
   // first save the config version
-  cfg_data = CONFIG_VERSION;
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(cfg_data), MUICFG_TextEditor_ConfigVersion);
+  DoMethod(msg->configdata, MUIM_Dataspace_Add, &version, sizeof(version), MUICFG_TextEditor_ConfigVersion);
 
   ExportKeys(data, msg->configdata);
 
-  cfg_data = xget(data->frame, MUIA_Framedisplay_Spec);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, strlen((char *)cfg_data)+1, MUICFG_TextEditor_Frame);
-
-  cfg_data = xget(data->background, MUIA_Imagedisplay_Spec);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, strlen((char *)cfg_data)+1, MUICFG_TextEditor_Background);
-
-  cfg_data = xget(data->blinkspeed, MUIA_Numeric_Value);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(cfg_data), MUICFG_TextEditor_BlinkSpeed);
-
-  cfg_data = xget(data->blockqual, MUIA_Cycle_Active);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(cfg_data), MUICFG_TextEditor_BlockQual);
-
-  cfg_data = xget(data->cursorcolor, MUIA_Pendisplay_Spec);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, strlen((char *)cfg_data)+1, MUICFG_TextEditor_CursorColor);
-
-  cfg_data = xget(data->cursorwidth, MUIA_Numeric_Value);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(cfg_data), MUICFG_TextEditor_CursorWidth);
-
-  cfg_data = xget(data->fixedfont, MUIA_String_Contents);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, strlen((char *)cfg_data)+1, MUICFG_TextEditor_FixedFont);
-
-  cfg_data = xget(data->frame, MUIA_Framedisplay_Spec);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, strlen((char *)cfg_data)+1, MUICFG_TextEditor_Frame);
-
-  cfg_data = xget(data->highlightcolor, MUIA_Pendisplay_Spec);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, strlen((char *)cfg_data)+1, MUICFG_TextEditor_HighlightColor);
-
-  cfg_data = xget(data->markedcolor, MUIA_Pendisplay_Spec);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, strlen((char *)cfg_data)+1, MUICFG_TextEditor_MarkedColor);
-
-  cfg_data = xget(data->inactiveColor, MUIA_Pendisplay_Spec);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, strlen((char *)cfg_data)+1, MUICFG_TextEditor_InactiveColor);
-
-  cfg_data = xget(data->normalfont, MUIA_String_Contents);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, strlen((char *)cfg_data)+1, MUICFG_TextEditor_NormalFont);
-
+  for(i = 0; i < MCP_Count; i++)
   {
-    ULONG buffer[260/4];
+    if(i == MCP_Keybindings)
+      continue;
 
-    get(data->LookupExeType, MUIA_Cycle_Active, buffer);
-    cfg_data = xget(data->lookupcmd, MUIA_String_Contents);
-    CopyMem((APTR)cfg_data, &buffer[1], 256);
-    DoMethod(msg->configdata, MUIM_Dataspace_Add, buffer, strlen((char *)cfg_data)+5, MUICFG_TextEditor_LookupCmd);
+    if(mui38 == TRUE || msg->originator == NULL || msg->originator == data->o[prefsInfo[i].index])
+    {
+      switch(prefsInfo[i].attr)
+      {
+        case MUIA_Pendisplay_Spec:
+        case MUIA_Framedisplay_Spec:
+        case MUIA_Imagedisplay_Spec:
+        {
+          char *v = (char *)xget(data->o[prefsInfo[i].index], prefsInfo[i].attr);
 
-    get(data->SuggestExeType, MUIA_Cycle_Active, buffer);
-    cfg_data = xget(data->suggestcmd, MUIA_String_Contents);
-    CopyMem((APTR)cfg_data, &buffer[1], 256);
-    DoMethod(msg->configdata, MUIM_Dataspace_Add, buffer, strlen((char *)cfg_data)+5, MUICFG_TextEditor_SuggestCmd);
+          if(stricmp(v, prefsInfo[i].defValue) != 0)
+            DoMethod(msg->configdata, MUIM_Dataspace_Add, v, strlen(v)+1, prefsInfo[i].cfgAttr);
+          else
+            DoMethod(msg->configdata, MUIM_Dataspace_Remove, prefsInfo[i].cfgAttr);
+        }
+        break;
+
+        case MUIA_String_Contents:
+        {
+          char *v = (char *)xget(data->o[prefsInfo[i].index], prefsInfo[i].attr);
+
+          if(strcmp(v, prefsInfo[i].defValue) != 0)
+            DoMethod(msg->configdata, MUIM_Dataspace_Add, v, strlen(v)+1, prefsInfo[i].cfgAttr);
+          else
+            DoMethod(msg->configdata, MUIM_Dataspace_Remove, prefsInfo[i].cfgAttr);
+        }
+        break;
+
+        default:
+        {
+          ULONG v = xget(data->o[prefsInfo[i].index], prefsInfo[i].attr);
+
+          if(v != (ULONG)prefsInfo[i].defValue)
+            DoMethod(msg->configdata, MUIM_Dataspace_Add, &v, sizeof(v), prefsInfo[i].cfgAttr);
+          else
+            DoMethod(msg->configdata, MUIM_Dataspace_Remove, prefsInfo[i].cfgAttr);
+        }
+        break;
+      }
+    }
   }
 
-  cfg_data = xget(data->smooth, MUIA_Selected);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(cfg_data), MUICFG_TextEditor_Smooth);
-
-  cfg_data = xget(data->selectPointer, MUIA_Selected);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(cfg_data), MUICFG_TextEditor_SelectPointer);
-
-  cfg_data = xget(data->typenspell, MUIA_Selected);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(cfg_data), MUICFG_TextEditor_TypeNSpell);
-
-  cfg_data = xget(data->CheckWord, MUIA_Selected);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(cfg_data), MUICFG_TextEditor_CheckWord);
-
-  cfg_data = xget(data->tabsize, MUIA_Numeric_Value);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(cfg_data), MUICFG_TextEditor_TabSize);
-
-  cfg_data = xget(data->undosize, MUIA_Numeric_Value);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(cfg_data), MUICFG_TextEditor_UndoSize);
-
-  cfg_data = xget(data->textcolor, MUIA_Pendisplay_Spec);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, strlen((char *)cfg_data)+1, MUICFG_TextEditor_TextColor);
-
-  cfg_data = xget(data->separatorshine, MUIA_Pendisplay_Spec);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, strlen((char *)cfg_data)+1, MUICFG_TextEditor_SeparatorShine);
-
-  cfg_data = xget(data->separatorshadow, MUIA_Pendisplay_Spec);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, cfg_data, strlen((char *)cfg_data)+1, MUICFG_TextEditor_SeparatorShadow);
-
-  cfg_data = xget(data->inactiveCursor, MUIA_Selected);
-  DoMethod(msg->configdata, MUIM_Dataspace_Add, &cfg_data, sizeof(cfg_data), MUICFG_TextEditor_InactiveCursor);
+  // erase old obsolete items
+  DoMethod(msg->configdata, MUIM_Dataspace_Remove, MUICFG_TextEditor_LookupCmd);
+  DoMethod(msg->configdata, MUIM_Dataspace_Remove, MUICFG_TextEditor_SuggestCmd);
 
   RETURN(0);
   return(0);
 }
 
-IPTR ConfigToGadgets(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct MUIP_Settingsgroup_ConfigToGadgets *msg))
+IPTR ConfigToGadgets(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct MUIP_Mccprefs_ConfigToGadgets *msg))
 {
   struct InstData_MCP *data = INST_DATA(cl, obj);
   APTR cfg_data;
+  ULONG i;
   BOOL importKeys = TRUE;
 
-  if((cfg_data = (APTR)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_ConfigVersion)))
+  if((cfg_data = (APTR)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_ConfigVersion)) != NULL)
   {
+    D(DBF_ALWAYS, "config version %ld vs %ld\n", *((ULONG *)cfg_data), CONFIG_VERSION);
     if(*((ULONG *)cfg_data) != CONFIG_VERSION)
     {
       if(MUI_Request(NULL, NULL, 0L, tr(MSG_WarnConfigVersion_Title), tr(MSG_ResetAbort), tr(MSG_WarnConfigVersion)) == 1)
@@ -498,49 +515,60 @@ IPTR ConfigToGadgets(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, s
   if(importKeys == TRUE)
     ImportKeys(data, msg->configdata);
 
-  if((cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_LookupCmd)))
+  for(i = 0; i < MCP_Count; i++)
   {
-    nnset(data->LookupExeType, MUIA_Cycle_Active, *(ULONG *)cfg_data);
-    nnset(data->lookupcmd, MUIA_String_Contents, (ULONG *)cfg_data+1);
-  }
-  else
-  {
-    nnset(data->LookupExeType, MUIA_Cycle_Active, 0);
-    nnset(data->lookupcmd, MUIA_String_Contents, "");
+    APTR v;
+
+    if(i == MCP_Keybindings)
+      continue;
+
+    if((v = (APTR)DoMethod(msg->configdata, MUIM_Dataspace_Find, prefsInfo[i].cfgAttr)) != NULL)
+    {
+      switch(prefsInfo[i].attr)
+      {
+        case MUIA_Framedisplay_Spec:
+        case MUIA_Imagedisplay_Spec:
+        case MUIA_Pendisplay_Spec:
+        {
+          // don't accept empty frame, image or pen specs
+          if(*(char *)v == '\0')
+            v = prefsInfo[i].defValue;
+        }
+        break;
+
+        case MUIA_String_Contents:
+        {
+          // nothing to do
+        }
+        break;
+
+        default:
+        {
+          v = (APTR)(*(LONG *)v);
+        }
+        break;
+      }
+    }
+    else
+    {
+      // use default value
+      v = prefsInfo[i].defValue;
+    }
+
+    nnset(data->o[prefsInfo[i].index], prefsInfo[i].attr, v);
   }
 
-  if((cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_SuggestCmd)))
+  // handle some old obsolete items
+  if((cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_LookupCmd)) != NULL)
   {
-    nnset(data->SuggestExeType, MUIA_Cycle_Active, *(ULONG *)cfg_data);
-    nnset(data->suggestcmd, MUIA_String_Contents, (ULONG *)cfg_data+1);
+    nnset(data->o[MCP_LookupExeType], MUIA_Cycle_Active, *(ULONG *)cfg_data);
+    nnset(data->o[MCP_LookupCommand], MUIA_String_Contents, (ULONG *)cfg_data+1);
   }
-  else
+  if((cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_SuggestCmd)) != NULL)
   {
-    nnset(data->SuggestExeType, MUIA_Cycle_Active, 1);
-    nnset(data->suggestcmd, MUIA_String_Contents, "\"Open('f', 'T:Matches', 'W');WriteLn('f', '%s');Close('f')");
+    nnset(data->o[MCP_SuggestExeType], MUIA_Cycle_Active, *(ULONG *)cfg_data);
+    nnset(data->o[MCP_SuggestCommand], MUIA_String_Contents, (ULONG *)cfg_data+1);
   }
-
-  nnset(data->frame, MUIA_Framedisplay_Spec, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_Frame)) ?  cfg_data : "302200");
-  nnset(data->background, MUIA_Imagedisplay_Spec, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_Background)) ? cfg_data : "2:m2");
-  nnset(data->blinkspeed, MUIA_Numeric_Value, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_BlinkSpeed)) ? *(ULONG *)cfg_data : 0);
-  nnset(data->blockqual, MUIA_Cycle_Active, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_BlockQual)) ? *(ULONG *)cfg_data : 0);
-  nnset(data->cursorcolor, MUIA_Pendisplay_Spec, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_CursorColor)) ? cfg_data : "m0");
-  nnset(data->cursorwidth, MUIA_Numeric_Value, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_CursorWidth)) ? *(ULONG *)cfg_data : 6);
-  nnset(data->fixedfont, MUIA_String_Contents, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_FixedFont)) ? cfg_data : "");
-  nnset(data->highlightcolor, MUIA_Pendisplay_Spec, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_HighlightColor)) ? cfg_data : "m0");
-  nnset(data->markedcolor, MUIA_Pendisplay_Spec, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_MarkedColor)) ? cfg_data : "m6");
-  nnset(data->inactiveColor, MUIA_Pendisplay_Spec, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_InactiveColor)) ? cfg_data : "m3");
-  nnset(data->normalfont, MUIA_String_Contents, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_NormalFont)) ? cfg_data : "");
-  nnset(data->smooth, MUIA_Selected, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_Smooth)) ? *(ULONG *)cfg_data : TRUE);
-  nnset(data->selectPointer, MUIA_Selected, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_SelectPointer)) ? *(ULONG *)cfg_data : TRUE);
-  nnset(data->typenspell, MUIA_Selected, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_TypeNSpell)) ? *(ULONG *)cfg_data : FALSE);
-  nnset(data->CheckWord, MUIA_Selected, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_CheckWord)) ? *(ULONG *)cfg_data : FALSE);
-  nnset(data->tabsize, MUIA_Numeric_Value, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_TabSize)) ? *(ULONG *)cfg_data : 4);
-  nnset(data->undosize, MUIA_Numeric_Value, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_UndoSize)) ? *(ULONG *)cfg_data : 500);
-  nnset(data->textcolor, MUIA_Pendisplay_Spec, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_TextColor)) ? cfg_data : "m5");
-  nnset(data->separatorshine, MUIA_Pendisplay_Spec, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_SeparatorShine)) ? cfg_data : "m1");
-  nnset(data->separatorshadow, MUIA_Pendisplay_Spec, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_SeparatorShadow)) ? cfg_data : "m3");
-  nnset(data->inactiveCursor, MUIA_Selected, (cfg_data = (void *)DoMethod(msg->configdata, MUIM_Dataspace_Find, MUICFG_TextEditor_InactiveCursor)) ? *(ULONG *)cfg_data : TRUE);
 
   return(0);
 }

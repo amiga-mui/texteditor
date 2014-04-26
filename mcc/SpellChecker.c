@@ -336,6 +336,8 @@ Object *SuggestWindow(struct InstData *data)
   Object *window;
   Object *lvobj;
 
+  ENTER();
+
   window = WindowObject,
         MUIA_Window_Borderless,     TRUE,
         MUIA_Window_CloseGadget,    FALSE,
