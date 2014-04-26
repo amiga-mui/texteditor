@@ -266,6 +266,7 @@ static IPTR mSetup(struct IClass *cl, Object *obj, Msg msg)
 
     // now we check whether we have a valid font or not
     // and if not we take the default one of our muiAreaData
+    data->font = (data->use_fixedfont == TRUE) ? data->fixedfont : data->normalfont;
     if(data->font == NULL)
       data->font = _font(obj);
 

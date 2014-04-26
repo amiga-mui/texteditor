@@ -2564,7 +2564,7 @@ extern char MUIC_Mccprefs[];
 #define MUIM_Mccprefs_GadgetsToConfig       0x80425242 /* V11 */
 #define MUIM_Mccprefs_RegisterGadget        0x80424828 /* V20 */
 struct  MUIP_Mccprefs_ConfigToGadgets       { ULONG MethodID; Object *configdata; };
-struct  MUIP_Mccprefs_GadgetsToConfig       { ULONG MethodID; Object *configdata; };
+struct  MUIP_Mccprefs_GadgetsToConfig       { ULONG MethodID; Object *configdata; Object *originator; };
 struct  MUIP_Mccprefs_RegisterGadget        { ULONG MethodID; Object *gadget; ULONG id; ULONG flags; STRPTR title; };
 
 /* Attributes */

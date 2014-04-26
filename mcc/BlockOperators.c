@@ -871,6 +871,8 @@ end:
 // adjust the block structure accordingly
 void CheckBlock(struct InstData *data, struct line_node *line)
 {
+  ENTER();
+
   // we make sure the line is not referenced by other
   // structures as well such as the global blockinfo structure.
   if(data->blockinfo.startline == line)
@@ -891,6 +893,7 @@ void CheckBlock(struct InstData *data, struct line_node *line)
     }
   }
 
+  LEAVE();
 }
 
 ///

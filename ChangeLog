@@ -5,6 +5,16 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2014-04-26 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc, mcp: reworked the complete configuration object handling to massively
+    simplify things. Furthermore the .mcp and the .mcc class refer to the same
+    default settings instead of replicating the same stuff in two places. The
+    two spell checking command settings have been split into two separate items
+    for each setting to simplify their handling. All in all resetting the
+    settings to their default values should now really be working in a reliable
+    fashion which was not the case before.
+
 2014-04-10 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/SpellChecker.c: fixed a possibly wrong index check when extracting words
