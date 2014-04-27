@@ -577,7 +577,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
           Child, TxtLabel(tr(MSG_Label_BlkQual), 1000),
           Child, data->o[MCP_BlockQual] = MUI_MakeObject(MUIO_Cycle, NULL, data->cycleentries),
         End,
-        Child, data->keybindings = ListviewObject,
+        Child, data->o[MCP_Keybindings] = ListviewObject,
           MUIA_CycleChain, TRUE,
           MUIA_Listview_DragType, MUIV_Listview_DragType_Immediate,
           MUIA_Listview_List, keylist = ListObject,
@@ -777,7 +777,7 @@ Object *CreatePrefsGroup(struct InstData_MCP *data)
     set(data->insertkey, MUIA_ShortHelp, tr(MSG_HELP_BUTTON_INSERT));
     set(data->deletekey, MUIA_ShortHelp, tr(MSG_HELP_BUTTON_DELETE));
 
-    set(data->hotkey, MUIA_String_AttachedList, data->keybindings);
+    set(data->hotkey, MUIA_String_AttachedList, data->o[MCP_Keybindings]);
     set(popbutton, MUIA_CycleChain, TRUE);
     set(popNormalFontButton, MUIA_CycleChain, TRUE);
     set(popFixedFontButton, MUIA_CycleChain, TRUE);

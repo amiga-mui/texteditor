@@ -368,14 +368,14 @@ static const struct
 
 IPTR New(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct opSet *msg))
 {
-  if((obj = (Object *)DoSuperMethodA(cl, obj, (Msg)msg)))
+  if((obj = (Object *)DoSuperMethodA(cl, obj, (Msg)msg)) != NULL)
   {
     struct InstData_MCP *data = INST_DATA(cl, obj);
 
     // create the main prefs object
     Object *prefsobject = PrefsObject(data);
 
-    if((data->CfgObj = prefsobject))
+    if((data->CfgObj = prefsobject) != NULL)
     {
       DoMethod(obj, OM_ADDMEMBER, prefsobject);
 
@@ -383,7 +383,7 @@ IPTR New(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct opSet 
       {
         ULONG i;
 
-        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->keybindings,     MUICFG_TextEditor_Keybindings,     1, tr(MSG_Page_Keybindings)       );
+        DoMethod(obj, MUIM_Mccprefs_RegisterGadget, data->o[MCP_Keybindings], MUICFG_TextEditor_Keybindings, 1, tr(MSG_Page_Keybindings)       );
 
 		for(i = 0; i < MCP_Count; i++)
 		{
@@ -396,12 +396,13 @@ IPTR New(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, struct opSet 
       else
         set(data->o[MCP_Frame], MUIA_Disabled, TRUE);
 
-      return((IPTR)obj);
+      return (IPTR)obj;
     }
 
     CoerceMethod(cl, obj, OM_DISPOSE);
   }
-  return(FALSE);
+
+  return (IPTR)NULL;
 }
 
 IPTR Dispose(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, Msg msg))
