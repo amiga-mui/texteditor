@@ -165,7 +165,6 @@ struct InstData_MCP
   Object *keyfunctions_txt;
   Object *insertkey;
   Object *deletekey;
-  Object *keybindings;
   Object *CfgObj;
 
   const char *gTitles[5];

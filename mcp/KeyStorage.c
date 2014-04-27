@@ -447,18 +447,18 @@ void ImportKeys(struct InstData_MCP *data, void *config)
   else
     userkeys = (struct te_key *)default_keybindings;
 
-  DoMethod(data->keybindings, MUIM_List_Clear);
+  DoMethod(data->o[MCP_Keybindings], MUIM_List_Clear);
 
-  set(data->keybindings, MUIA_List_Quiet, TRUE);
+  set(data->o[MCP_Keybindings], MUIA_List_Quiet, TRUE);
 
   while((WORD)userkeys->code != -1)
   {
-    DoMethod(data->keybindings, MUIM_List_InsertSingle, userkeys, MUIV_List_Insert_Bottom);
+    DoMethod(data->o[MCP_Keybindings], MUIM_List_InsertSingle, userkeys, MUIV_List_Insert_Bottom);
 
     userkeys++;
   }
 
-  set(data->keybindings, MUIA_List_Quiet, FALSE);
+  set(data->o[MCP_Keybindings], MUIA_List_Quiet, FALSE);
 
   LEAVE();
 }
@@ -466,25 +466,22 @@ void ImportKeys(struct InstData_MCP *data, void *config)
 void ExportKeys(struct InstData_MCP *data, void *config)
 {
   ULONG c, size;
-  struct te_key *entry;
   struct te_key *entries;
 
-  c = xget(data->keybindings, MUIA_List_Entries);
+  c = xget(data->o[MCP_Keybindings], MUIA_List_Entries);
   size = (c+1) * sizeof(struct te_key);
 
-  if((entries = (struct te_key *)AllocVecShared(size, MEMF_ANY)))
+  if((entries = (struct te_key *)AllocVecShared(size, MEMF_ANY)) != NULL)
   {
-    struct te_key *buffer = entries+c;
+    struct te_key *buffer = entries;
+    ULONG i;
 
-    buffer->code = -1;
-    while(c--)
+    for(i = 0; i < c; i++)
     {
-      DoMethod(data->keybindings, MUIM_List_GetEntry, c, &entry);
-      buffer--;
-      buffer->code = entry->code;
-      buffer->qual = entry->qual;
-      buffer->act  = entry->act;
+      DoMethod(data->o[MCP_Keybindings], MUIM_List_GetEntry, i, &buffer);
+      buffer++;
     }
+    buffer->code = -1;
     DoMethod(config, MUIM_Dataspace_Add, entries, size, MUICFG_TextEditor_Keybindings);
     FreeVec(entries);
   }
