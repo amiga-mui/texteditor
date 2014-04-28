@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2014-04-28 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/KeyStorage: make sure that the saved keybindings contain no trash in the
+    terminating entry to make them properly comparable when checking for a
+    modified configuration.
+
 2014-04-26 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc, mcp: reworked the complete configuration object handling to massively

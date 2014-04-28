@@ -478,10 +478,17 @@ void ExportKeys(struct InstData_MCP *data, void *config)
 
     for(i = 0; i < c; i++)
     {
-      DoMethod(data->o[MCP_Keybindings], MUIM_List_GetEntry, i, &buffer);
-      buffer++;
+      struct te_key *entry;
+
+      DoMethod(data->o[MCP_Keybindings], MUIM_List_GetEntry, i, &entry);
+      *buffer++ = *entry;
     }
+    // add a terminating element and make sure we don't keep any trash to make the
+    // whole buffer comparable when updating the config
     buffer->code = -1;
+    buffer->qual = 0;
+    buffer->act = 0;
+
     DoMethod(config, MUIM_Dataspace_Add, entries, size, MUICFG_TextEditor_Keybindings);
     FreeVec(entries);
   }
