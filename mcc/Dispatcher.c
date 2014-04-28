@@ -288,44 +288,36 @@ static IPTR mSetup(struct IClass *cl, Object *obj, Msg msg)
     data->TabSizePixels = data->TabSize*TextLength(&data->tmprp, " ", 1);
     D(DBF_INPUT, "TabSizePixels: %d", data->TabSizePixels);
 
-    // make sure we have a proper font setup here and
-    // that our spellchecker suggest window object is also
-    // correctly initialized.
-    if(data->font != NULL && (data->SuggestWindow = SuggestWindow(data)) != NULL)
+    data->mousemove = FALSE;
+    data->ehnode.ehn_Priority = 0;
+    data->ehnode.ehn_Flags    = MUI_EHF_GUIMODE;
+    data->ehnode.ehn_Object   = obj;
+    data->ehnode.ehn_Class    = cl;
+    data->ehnode.ehn_Events   = IDCMP_INACTIVEWINDOW | IDCMP_MOUSEBUTTONS | IDCMP_RAWKEY;
+
+    #if defined(__amigaos4__)
+    data->ehnode.ehn_Events  |= IDCMP_EXTENDEDMOUSE;
+    #endif
+
+    // setup the selection pointer if this is requested and MUI doesn't already
+    // handle this for us
+    if(data->selectPointer == TRUE && xget(obj, MUIA_PointerType) == MUIV_PointerType_Normal)
     {
-      DoMethod(_app(obj), OM_ADDMEMBER, data->SuggestWindow);
-
-      data->mousemove = FALSE;
-      data->ehnode.ehn_Priority = 0;
-      data->ehnode.ehn_Flags    = MUI_EHF_GUIMODE;
-      data->ehnode.ehn_Object   = obj;
-      data->ehnode.ehn_Class    = cl;
-      data->ehnode.ehn_Events   = IDCMP_INACTIVEWINDOW | IDCMP_MOUSEBUTTONS | IDCMP_RAWKEY;
-
-      #if defined(__amigaos4__)
-      data->ehnode.ehn_Events  |= IDCMP_EXTENDEDMOUSE;
-      #endif
-
-      // setup the selection pointer if this is requested and MUI doesn't already
-      // handle this for us
-      if(data->selectPointer == TRUE && xget(obj, MUIA_PointerType) == MUIV_PointerType_Normal)
-      {
-        setFlag(data->ehnode.ehn_Events, IDCMP_MOUSEMOVE);
-        SetupSelectPointer(data);
-      }
-
-      data->ihnode.ihn_Object   = obj;
-      data->ihnode.ihn_Millis   = 20;
-      data->ihnode.ihn_Method   = MUIM_TextEditor_InputTrigger;
-      data->ihnode.ihn_Flags    = MUIIHNF_TIMER;
-
-      DoMethod(_win(obj), MUIM_Window_AddEventHandler, &data->ehnode);
-
-      data->smooth_wait = 0;
-      data->scrollaction = FALSE;
-
-      result = TRUE;
+      setFlag(data->ehnode.ehn_Events, IDCMP_MOUSEMOVE);
+      SetupSelectPointer(data);
     }
+
+    data->ihnode.ihn_Object   = obj;
+    data->ihnode.ihn_Millis   = 20;
+    data->ihnode.ihn_Method   = MUIM_TextEditor_InputTrigger;
+    data->ihnode.ihn_Flags    = MUIIHNF_TIMER;
+
+    DoMethod(_win(obj), MUIM_Window_AddEventHandler, &data->ehnode);
+
+    data->smooth_wait = 0;
+    data->scrollaction = FALSE;
+
+    result = TRUE;
   }
 
   if(result == FALSE)
@@ -349,12 +341,7 @@ static IPTR mCleanup(struct IClass *cl, Object *obj, Msg msg)
 
   DoMethod(_win(obj), MUIM_Window_RemEventHandler, &data->ehnode);
 
-  if(data->SuggestWindow != NULL)
-  {
-    DoMethod(_app(obj), OM_REMMEMBER, data->SuggestWindow);
-    MUI_DisposeObject(data->SuggestWindow);
-    data->SuggestWindow = NULL;
-  }
+  DisposeSuggestWindow(data);
 
   // enable that the object will automatically get a border when
   // the ActiveObjectOnClick option is active
@@ -481,7 +468,8 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
   InitRastPort(&data->tmprp);
   SetFont(&data->tmprp, data->font);
 
-  set(data->SuggestWindow, MUIA_Window_Open, isFlagSet(data->flags, FLG_PopWindow));
+  if(data->SuggestWindow != NULL)
+    set(data->SuggestWindow, MUIA_Window_Open, isFlagSet(data->flags, FLG_PopWindow));
 
   data->shown = TRUE;
 
@@ -499,7 +487,8 @@ static IPTR mHide(struct IClass *cl, Object *obj, Msg msg)
 
   data->shown = FALSE;
   HideSelectPointer(data, obj);
-  nnset(data->SuggestWindow, MUIA_Window_Open, FALSE);
+  if(data->SuggestWindow != NULL)
+    set(data->SuggestWindow, MUIA_Window_Open, FALSE);
   set(_win(obj), MUIA_Window_DisableKeys, 0L);
   MUIG_FreeBitMap(data->doublebuffer);
   data->doublerp.BitMap = NULL;

@@ -79,7 +79,8 @@ HOOKPROTONH(SelectCode, void, void *lvobj, long **parms)
     data->CPos_X += length;
     PasteChars(data, oldpos, data->actualline, length, entry, NULL);
   }
-  set(data->SuggestWindow, MUIA_Window_Open, FALSE);
+  if(data->SuggestWindow != NULL)
+    set(data->SuggestWindow, MUIA_Window_Open, FALSE);
   DoMethod(lvobj, MUIM_List_Clear);
   set(data->object, MUIA_TextEditor_AreaMarked, FALSE);
 
@@ -330,59 +331,90 @@ static BOOL SendCLI(CONST_STRPTR word, CONST_STRPTR command)
 }
 
 ///
-/// SuggestWindow()
-Object *SuggestWindow(struct InstData *data)
+/// CreateSuggestWindow()
+BOOL CreateSuggestWindow(struct InstData *data)
 {
-  Object *window;
-  Object *lvobj;
+  BOOL result;
 
   ENTER();
 
-  window = WindowObject,
-        MUIA_Window_Borderless,     TRUE,
-        MUIA_Window_CloseGadget,    FALSE,
-        MUIA_Window_DepthGadget,    FALSE,
-        MUIA_Window_DragBar,        FALSE,
-        MUIA_Window_SizeGadget,     FALSE,
-        WindowContents, VGroup,
-          MUIA_InnerBottom,       0,
-          MUIA_InnerLeft,         0,
-          MUIA_InnerRight,        0,
-          MUIA_InnerTop,          0,
-          MUIA_Group_PageMode,      TRUE,
-          Child, ListviewObject,
-            MUIA_Listview_Input, FALSE,
-            MUIA_Listview_List, FloattextObject,
-              MUIA_Floattext_Text, "Word is spelled correctly.",
-              MUIA_Frame, MUIV_Frame_ReadList,
-              MUIA_Background, MUII_ListBack,
-              End,
-            End,
-          Child, lvobj = ListviewObject,
-            MUIA_Listview_List, ListObject,
-              MUIA_Frame, MUIV_Frame_InputList,
-              MUIA_Background, MUII_ListBack,
-              MUIA_List_ConstructHook, MUIV_List_ConstructHook_String,
-              MUIA_List_DestructHook, MUIV_List_DestructHook_String,
-              MUIA_List_Pool, data->mypool,
-              End,
+  if(data->SuggestWindow == NULL)
+  {
+    Object *lvobj;
+
+    if((data->SuggestWindow = WindowObject,
+      MUIA_Window_Borderless,  TRUE,
+      MUIA_Window_CloseGadget, FALSE,
+      MUIA_Window_DepthGadget, FALSE,
+      MUIA_Window_DragBar,     FALSE,
+      MUIA_Window_SizeGadget,  FALSE,
+      WindowContents, data->SuggestPageGroup = VGroup,
+        MUIA_InnerBottom, 0,
+        MUIA_InnerLeft,   0,
+        MUIA_InnerRight,  0,
+        MUIA_InnerTop,    0,
+        MUIA_Group_PageMode,      TRUE,
+        Child, ListviewObject,
+          MUIA_Listview_Input, FALSE,
+          MUIA_Listview_List, FloattextObject,
+            MUIA_Floattext_Text, "Word is spelled correctly.",
+            MUIA_Frame, MUIV_Frame_ReadList,
+            MUIA_Background, MUII_ListBack,
             End,
           End,
-        End;
+        Child, lvobj = ListviewObject,
+          MUIA_Listview_List, ListObject,
+            MUIA_Frame, MUIV_Frame_InputList,
+            MUIA_Background, MUII_ListBack,
+            MUIA_List_ConstructHook, MUIV_List_ConstructHook_String,
+            MUIA_List_DestructHook, MUIV_List_DestructHook_String,
+            MUIA_List_Pool, data->mypool,
+            End,
+          End,
+        End,
+      End) != NULL)
+    {
+      DoMethod(lvobj, MUIM_Notify, MUIA_Listview_DoubleClick, TRUE, MUIV_Notify_Self, 3, MUIM_CallHook, &SelectHook, data);
+      DoMethod(data->SuggestWindow, MUIM_Notify, MUIA_Window_CloseRequest, TRUE, MUIV_Notify_Self, 3, MUIM_Set, MUIA_Window_Open, FALSE);
+      DoMethod(data->SuggestWindow, MUIM_Notify, MUIA_Window_Open, MUIV_EveryTime, data->object, 3, MUIM_Set, MUIA_TextEditor_PopWindow_Open, MUIV_TriggerValue);
 
-  DoMethod(lvobj, MUIM_Notify, MUIA_Listview_DoubleClick, TRUE,
-      MUIV_Notify_Self, 3, MUIM_CallHook, &SelectHook, data);
+      data->SuggestListview = lvobj;
 
-  DoMethod(window, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
-      MUIV_Notify_Self, 3, MUIM_Set, MUIA_Window_Open, FALSE);
+      DoMethod(_app(data->object), OM_ADDMEMBER, data->SuggestWindow);
 
-  DoMethod(window, MUIM_Notify, MUIA_Window_Open, MUIV_EveryTime,
-      data->object, 3, MUIM_Set, MUIA_TextEditor_PopWindow_Open, MUIV_TriggerValue);
+      result = TRUE;
+    }
+    else
+    {
+      result = FALSE;
+    }
+  }
+  else
+  {
+    result = TRUE;
+  }
 
-  data->SuggestListview = lvobj;
+  RETURN(result);
+  return result;
+}
 
-  RETURN(window);
-  return window;
+///
+/// DisposeSuggestWindow()
+void DisposeSuggestWindow(struct InstData *data)
+{
+  ENTER();
+
+  if(data->SuggestWindow != NULL)
+  {
+    set(data->SuggestWindow, MUIA_Window_Open, FALSE);
+    DoMethod(_app(data->object), OM_REMMEMBER, data->SuggestWindow);
+    MUI_DisposeObject(data->SuggestWindow);
+    data->SuggestWindow = NULL;
+    data->SuggestPageGroup = NULL;
+    data->SuggestListview = NULL;
+  }
+
+  LEAVE();
 }
 
 ///
@@ -446,7 +478,7 @@ void SuggestWord(struct InstData *data)
 
   ENTER();
 
-  if(IsAlpha(data->mylocale, line->line.Contents[data->CPos_X]))
+  if(IsAlpha(data->mylocale, line->line.Contents[data->CPos_X]) && CreateSuggestWindow(data) == TRUE)
   {
     if(Enabled(data))
     {
@@ -500,9 +532,7 @@ void SuggestWord(struct InstData *data)
 
       if(isFlagSet(data->flags, FLG_CheckWords) && LookupWord(data, word) == TRUE)
       {
-        Object *group = (Object *)xget(data->SuggestWindow, MUIA_Window_RootObject);
-
-        set(group, MUIA_Group_ActivePage, MUIV_Group_ActivePage_First);
+        set(data->SuggestPageGroup, MUIA_Group_ActivePage, MUIV_Group_ActivePage_First);
 
         SetAttrs(data->SuggestWindow, MUIA_Window_Activate, TRUE,
                                       MUIA_Window_DefaultObject, NULL,

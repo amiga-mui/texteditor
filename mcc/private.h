@@ -406,6 +406,7 @@ struct InstData
   BOOL            selectPointer;
   BOOL            activeSelectPointer;
   Object *        SuggestWindow;
+  Object *        SuggestPageGroup;
   Object *        SuggestListview;
   BOOL            SuggestSpawn;
   BOOL            LookupSpawn;
@@ -597,9 +598,10 @@ IPTR mReplace(struct IClass *, Object *, struct MUIP_TextEditor_Replace *);
 IPTR mSetBlock(struct InstData *, struct MUIP_TextEditor_SetBlock *msg);
 
 // SpellChecker.c
+BOOL CreateSuggestWindow(struct InstData *);
+void DisposeSuggestWindow(struct InstData *);
 void SpellCheckWord(struct InstData *);
 void SuggestWord(struct InstData *);
-Object *SuggestWindow(struct InstData *);
 void ParseKeywords(struct InstData *data, const char *keywords);
 void FreeKeywords(struct InstData *data);
 void CheckSingleWordAgainstKeywords(struct InstData *data, const char *word);
