@@ -365,16 +365,15 @@ struct InstData
   struct te_key *RawkeyBindings;
   ULONG   blockqual;
 
-  ULONG   textcolor;
-  ULONG   backgroundcolor;
-  ULONG   highlightcolor;
-  ULONG   cursorcolor;
-  ULONG   cursortextcolor;
-  ULONG   markedcolor;
-  ULONG   inactivecolor;
-  ULONG   separatorshine;
-  ULONG   separatorshadow;
-  ULONG   allocatedpens;
+  LONG    textcolor;
+  LONG    backgroundcolor;
+  LONG    highlightcolor;
+  LONG    cursorcolor;
+  LONG    cursortextcolor;
+  LONG    markedcolor;
+  LONG    inactivecolor;
+  LONG    separatorshine;
+  LONG    separatorshadow;
 
   STRPTR  background;
   BOOL    use_fixedfont;
