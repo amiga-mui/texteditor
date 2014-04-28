@@ -435,7 +435,7 @@ void KeyToString(STRPTR buffer, ULONG buffer_len, struct KeyAction *ka)
   }
 }
 
-void ImportKeys(struct InstData_MCP *data, void *config)
+void ImportKeys(struct InstData_MCP *data, Object *config)
 {
   void *cfg_data;
   struct te_key *userkeys;
@@ -463,7 +463,7 @@ void ImportKeys(struct InstData_MCP *data, void *config)
   LEAVE();
 }
 
-void ExportKeys(struct InstData_MCP *data, void *config)
+void ExportKeys(struct InstData_MCP *data, Object *config)
 {
   ULONG c, size;
   struct te_key *entries;
@@ -489,7 +489,12 @@ void ExportKeys(struct InstData_MCP *data, void *config)
     buffer->qual = 0;
     buffer->act = 0;
 
-    DoMethod(config, MUIM_Dataspace_Add, entries, size, MUICFG_TextEditor_Keybindings);
+    // add the key bindings to the config if they don't match the default ones
+    if(size != sizeof(default_keybindings) || memcmp(entries, default_keybindings, sizeof(default_keybindings)) != 0)
+      DoMethod(config, MUIM_Dataspace_Add, entries, size, MUICFG_TextEditor_Keybindings);
+    else
+      DoMethod(config, MUIM_Dataspace_Remove, MUICFG_TextEditor_Keybindings);
+
     FreeVec(entries);
   }
 }

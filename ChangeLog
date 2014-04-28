@@ -10,6 +10,7 @@ $URL$
   * mcp/KeyStorage: make sure that the saved keybindings contain no trash in the
     terminating entry to make them properly comparable when checking for a
     modified configuration.
+  * mcp/KeyStorage: store modified keybindings in the MUI configuration only.
 
 2014-04-26 Thore Böckelmann <tboeckel@gmx.de>
 

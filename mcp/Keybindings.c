@@ -25,7 +25,7 @@
 #include "private.h"
 
 // our default keybindings (every rawkey value with +500 is a vanilla key specification)
-const struct te_key default_keybindings[] =
+const struct te_key default_keybindings[48] =
 {
   { RAWKEY_CRSRUP,    0, MUIV_TextEditor_KeyAction_Up },
   { RAWKEY_CRSRUP,    IEQUALIFIER_ALT | IEQUALIFIER_CONTROL, MUIV_TextEditor_KeyAction_PrevLine },
