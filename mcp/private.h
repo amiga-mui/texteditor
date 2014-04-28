@@ -198,11 +198,11 @@ extern struct MUI_CustomClass *widthslider_mcc;
 extern struct MUI_CustomClass *speedslider_mcc;
 extern struct MUI_CustomClass *text_mcc;
 
-extern const struct te_key default_keybindings[];
+extern const struct te_key default_keybindings[48];
 
 Object *CreatePrefsGroup(struct InstData_MCP *data);
-void ImportKeys(struct InstData_MCP *data, void *);
-void ExportKeys(struct InstData_MCP *data, void *);
+void ImportKeys(struct InstData_MCP *data, Object *);
+void ExportKeys(struct InstData_MCP *data, Object *);
 void AddKeyBinding (STRPTR keystring, UWORD action, struct KeyAction *storage);
 void ConvertKeyString (STRPTR keystring, UWORD action, struct KeyAction *storage);
 void KeyToString(STRPTR buffer, ULONG buffer_len, struct KeyAction *ka);
