@@ -15,6 +15,9 @@ $URL$
     classes.
   * mcc/InitConfig.c: free really allocated pens only and remove dispose the
     suggest window only if it was really added before.
+  * mcc/SpellChecker.c: the suggest window is now created dynamically as soon as
+    it is required. This solves the known issues with the realtime prefs of
+    MUI4.
 
 2014-04-26 Thore Böckelmann <tboeckel@gmx.de>
 
