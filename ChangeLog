@@ -11,6 +11,8 @@ $URL$
     terminating entry to make them properly comparable when checking for a
     modified configuration.
   * mcp/KeyStorage: store modified keybindings in the MUI configuration only.
+  * demo/TextEditor-Demo.c: fixed the missing NULL termination for array of used
+    classes.
 
 2014-04-26 Thore Böckelmann <tboeckel@gmx.de>
 
