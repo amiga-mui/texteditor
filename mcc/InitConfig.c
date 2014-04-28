@@ -424,15 +424,51 @@ void FreeConfig(struct IClass *cl, Object *obj)
   if(data->RawkeyBindings != NULL)
     FreeVecPooled(data->mypool, data->RawkeyBindings);
 
-  MUI_ReleasePen(muiRenderInfo(obj), data->textcolor);
-  MUI_ReleasePen(muiRenderInfo(obj), data->cursorcolor);
-  MUI_ReleasePen(muiRenderInfo(obj), data->cursortextcolor);
-  MUI_ReleasePen(muiRenderInfo(obj), data->highlightcolor);
-  MUI_ReleasePen(muiRenderInfo(obj), data->markedcolor);
-  MUI_ReleasePen(muiRenderInfo(obj), data->separatorshine);
-  MUI_ReleasePen(muiRenderInfo(obj), data->separatorshadow);
-  MUI_ReleasePen(muiRenderInfo(obj), data->inactivecolor);
-  MUI_ReleasePen(muiRenderInfo(obj), data->backgroundcolor);
+  if(data->textcolor != -1)
+  {
+    MUI_ReleasePen(muiRenderInfo(obj), data->textcolor);
+    data->textcolor = -1;
+  }
+  if(data->cursorcolor != -1)
+  {
+    MUI_ReleasePen(muiRenderInfo(obj), data->cursorcolor);
+    data->cursorcolor = -1;
+  }
+  if(data->cursortextcolor != -1)
+  {
+    MUI_ReleasePen(muiRenderInfo(obj), data->cursortextcolor);
+    data->cursortextcolor = -1;
+  }
+  if(data->highlightcolor != -1)
+  {
+    MUI_ReleasePen(muiRenderInfo(obj), data->highlightcolor);
+    data->highlightcolor = -1;
+  }
+  if(data->markedcolor != -1)
+  {
+    MUI_ReleasePen(muiRenderInfo(obj), data->markedcolor);
+    data->markedcolor = -1;
+  }
+  if(data->separatorshine != -1)
+  {
+    MUI_ReleasePen(muiRenderInfo(obj), data->separatorshine);
+    data->separatorshine = -1;
+  }
+  if(data->separatorshadow != -1)
+  {
+    MUI_ReleasePen(muiRenderInfo(obj), data->separatorshadow);
+    data->separatorshadow = -1;
+  }
+  if(data->inactivecolor != -1)
+  {
+    MUI_ReleasePen(muiRenderInfo(obj), data->inactivecolor);
+    data->inactivecolor = -1;
+  }
+  if(data->backgroundcolor != -1)
+  {
+    MUI_ReleasePen(muiRenderInfo(obj), data->backgroundcolor);
+    data->backgroundcolor = -1;
+  }
 
   if(data->normalfont != NULL)
     CloseFont(data->normalfont);

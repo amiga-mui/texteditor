@@ -13,6 +13,8 @@ $URL$
   * mcp/KeyStorage: store modified keybindings in the MUI configuration only.
   * demo/TextEditor-Demo.c: fixed the missing NULL termination for array of used
     classes.
+  * mcc/InitConfig.c: free really allocated pens only and remove dispose the
+    suggest window only if it was really added before.
 
 2014-04-26 Thore Böckelmann <tboeckel@gmx.de>
 

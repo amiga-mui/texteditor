@@ -193,6 +193,16 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             // start with an inactive cursor
             data->currentCursorState = CS_INACTIVE;
 
+            data->textcolor = -1;
+            data->cursorcolor = -1;
+            data->cursortextcolor = -1;
+            data->highlightcolor = -1;
+            data->markedcolor = -1;
+            data->separatorshine = -1;
+            data->separatorshadow = -1;
+            data->inactivecolor = -1;
+            data->backgroundcolor = -1;
+
             RETURN((IPTR)obj);
             return (IPTR)obj;
           }
@@ -339,8 +349,12 @@ static IPTR mCleanup(struct IClass *cl, Object *obj, Msg msg)
 
   DoMethod(_win(obj), MUIM_Window_RemEventHandler, &data->ehnode);
 
-  if(DoMethod(_app(obj), OM_REMMEMBER, data->SuggestWindow))
+  if(data->SuggestWindow != NULL)
+  {
+    DoMethod(_app(obj), OM_REMMEMBER, data->SuggestWindow);
     MUI_DisposeObject(data->SuggestWindow);
+    data->SuggestWindow = NULL;
+  }
 
   // enable that the object will automatically get a border when
   // the ActiveObjectOnClick option is active
