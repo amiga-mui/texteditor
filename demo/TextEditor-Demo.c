@@ -291,7 +291,7 @@ int main(VOID)
              *flow, *separator, *color, *config;
       const char *flow_text[] = { "Left", "Center", "Right", NULL };
       const char *colors[] = { "Normal", "Black", "White", "Red", "Green", "Cyan", "Yellow", "Blue", "Magenta", NULL };
-      const char *classes[] = { "TextEditor.mcc" };
+      const char *classes[] = { "TextEditor.mcc", NULL };
 
       if((editor_mcc = MUI_CreateCustomClass(NULL, "TextEditor.mcc", NULL, 0, ENTRY(TextEditor_Dispatcher))))
       {
