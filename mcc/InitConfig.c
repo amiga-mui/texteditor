@@ -104,6 +104,7 @@ static LONG SetCol(Object *obj, long item, const void *def)
 
 ///
 /// InitConfig()
+void kprintf(const char *,...);
 void InitConfig(struct IClass *cl, Object *obj)
 {
   struct InstData *data = INST_DATA(cl, obj);
@@ -209,7 +210,7 @@ void InitConfig(struct IClass *cl, Object *obj)
   if(value != 0)
   {
     data->blinkhandler.ihn_Object    = obj;
-    data->blinkhandler.ihn_Millis    = MINMAX(1, *(LONG *)setting, 20)*25;
+    data->blinkhandler.ihn_Millis    = MINMAX(1, value, 20) * 25;
     data->blinkhandler.ihn_Method    = MUIM_TextEditor_ToggleCursor;
     data->blinkhandler.ihn_Flags     = MUIIHNF_TIMER;
     data->BlinkSpeed = 1;
