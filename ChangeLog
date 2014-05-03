@@ -9,6 +9,7 @@ $URL$
 
   * mcp/ObjectCreator.c: added some NULL pointer checks when setting up the new
     configuration. This closes MUI ticket #28.
+  * mcc/PrintLineWithStyles.c: fix a wrong color pen handling.
 
 2014-04-28 Thore Böckelmann <tboeckel@gmx.de>
 

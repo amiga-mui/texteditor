@@ -228,7 +228,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
       if(blockwidth)
       {
-        ULONG color;
+        LONG color;
 
         // in case the gadget is in inactive state we use a different background
         // color for our selected area
@@ -261,7 +261,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         {
           LONG right = MIN(_mright(data->object), xoffset+flow+blockstart+blockwidth-1);
 
-          SetAPen(rp, cursor ? data->cursorcolor : color);
+          SetAPen(rp, cursor ? MUIPEN(data->cursorcolor) : color);
           RectFill(rp, xoffset+flow+blockstart, starty, right, starty+data->fontheight-1);
 
           // if the gadget is in inactive state we just draw a skeleton cursor instead
