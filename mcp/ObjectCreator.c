@@ -452,7 +452,7 @@ IPTR GadgetsToConfig(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, s
         {
           char *v = (char *)xget(data->o[prefsInfo[i].index], prefsInfo[i].attr);
 
-          if(stricmp(v, prefsInfo[i].defValue) != 0)
+          if(v != NULL && stricmp(v, prefsInfo[i].defValue) != 0)
             DoMethod(msg->configdata, MUIM_Dataspace_Add, v, strlen(v)+1, prefsInfo[i].cfgAttr);
           else
             DoMethod(msg->configdata, MUIM_Dataspace_Remove, prefsInfo[i].cfgAttr);
@@ -463,7 +463,7 @@ IPTR GadgetsToConfig(REG(a0, struct IClass *cl), REG(a2, Object *obj), REG(a1, s
         {
           char *v = (char *)xget(data->o[prefsInfo[i].index], prefsInfo[i].attr);
 
-          if(strcmp(v, prefsInfo[i].defValue) != 0)
+          if(v != NULL && strcmp(v, prefsInfo[i].defValue) != 0)
             DoMethod(msg->configdata, MUIM_Dataspace_Add, v, strlen(v)+1, prefsInfo[i].cfgAttr);
           else
             DoMethod(msg->configdata, MUIM_Dataspace_Remove, prefsInfo[i].cfgAttr);
