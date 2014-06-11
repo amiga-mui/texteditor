@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2014-06-11 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/InitConfig.c: ensure that a custom fixed font is really a monospaced
+    font. Otherwise the class will fall back to MUI's internal fixed font
+    settings.
+
 2014-05-03 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/ObjectCreator.c: added some NULL pointer checks when setting up the new
