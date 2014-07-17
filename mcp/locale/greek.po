@@ -3,14 +3,15 @@
 # 
 # version 2
 # Translators:
-# Phantom, 2014
+# Anthony I., 2014
+# Anthony I., 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: MCC TextEditor\n"
 "Report-Msgid-Bugs-To: http://sf.net/p/texteditor-mcc/\n"
 "POT-Creation-Date: 2014-02-23 12:29+0100\n"
-"PO-Revision-Date: 2014-04-11 13:28+0000\n"
-"Last-Translator: Phantom\n"
+"PO-Revision-Date: 2014-07-07 19:26+0000\n"
+"Last-Translator: Anthony I.\n"
 "Language-Team: Greek (http://www.transifex.com/projects/p/texteditor-mcc/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,7 +24,7 @@ msgctxt "MSG_HelpBubble_BlockQual (0//)"
 msgid ""
 "Move the cursor key and hold down the qualifier\n"
 "that you set here to mark text."
-msgstr "Μετακινήστε το πλήκτρο του κέρσορα και κρατήστε πατημένο το προσδιοριστικό πλήκτρο που ορίσατε εδώ για να μαρκάρετε το κείμενο."
+msgstr "Μετακινήστε το πλήκτρο του κέρσορα και κρατήστε πατημένο το\nπροσδιοριστικό πλήκτρο που ορίσατε εδώ για να μαρκάρετε το κείμενο."
 
 msgctxt "MSG_HelpBubble_CheckWord (1//)"
 msgid ""
@@ -287,7 +288,7 @@ msgstr "Προσδιοριστικό τμήματος"
 
 msgctxt "MSG_Label_Cursor (58//)"
 msgid "Normal"
-msgstr "Κανονικός"
+msgstr "Κανονική"
 
 msgctxt "MSG_Label_Fixed (59//)"
 msgid "Fixed"
@@ -315,7 +316,7 @@ msgstr "Κανονική"
 
 msgctxt "MSG_Label_Selected (65//)"
 msgid "Selected"
-msgstr "Επιλεγμένος"
+msgstr "Επιλεγμένη"
 
 msgctxt "MSG_Label_SeparatorShadow (66//)"
 msgid "Shadow"
@@ -459,7 +460,7 @@ msgstr "Δείγμα"
 
 msgctxt "MSG_Page_Settings (101//)"
 msgid "Settings"
-msgstr "Επιλογές"
+msgstr "Ρυθμίσεις"
 
 msgctxt "MSG_Page_SpellChecker (102//)"
 msgid "Spell checker"
@@ -523,27 +524,27 @@ msgstr "%ld διαστήματα"
 
 msgctxt "MSG_Function_GotoBookmark1 (117//)"
 msgid "Goto bookmark 1"
-msgstr "Πηγαίνετε στο σελιδοδείκτη 1"
+msgstr "Πηγαίνετε στον σελιδοδείκτη 1"
 
 msgctxt "MSG_Function_GotoBookmark2 (118//)"
 msgid "Goto bookmark 2"
-msgstr "Πηγαίνετε στο σελιδοδείκτη 2"
+msgstr "Πηγαίνετε στον σελιδοδείκτη 2"
 
 msgctxt "MSG_Function_GotoBookmark3 (119//)"
 msgid "Goto bookmark 3"
-msgstr "Πηγαίνετε στο σελιδοδείκτη 3"
+msgstr "Πηγαίνετε στον σελιδοδείκτη 3"
 
 msgctxt "MSG_Function_SetBookmark1 (120//)"
 msgid "Set bookmark 1"
-msgstr "Ορίστε το σελιδοδείκτη 1"
+msgstr "Ορίστε τον σελιδοδείκτη 1"
 
 msgctxt "MSG_Function_SetBookmark2 (121//)"
 msgid "Set bookmark 2"
-msgstr "Ορίστε το σελιδοδείκτη 2"
+msgstr "Ορίστε τον σελιδοδείκτη 2"
 
 msgctxt "MSG_Function_SetBookmark3 (122//)"
 msgid "Set bookmark 3"
-msgstr "Ορίστε το σελιδοδείκτη 3"
+msgstr "Ορίστε τον σελιδοδείκτη 3"
 
 msgctxt "MSG_Button_Snoop (123//)"
 msgid "Snoop"
@@ -591,7 +592,7 @@ msgid ""
 "Please make sure you have the latest Hotkeystring.mcc\n"
 "class from http://www.sf.net/projects/bstring-mcc/\n"
 "installed and try again."
-msgstr "Ο TextEditor.mcp αδυνατεί να ανοίξει την ελάχιστη έκδοση που\nαπαιτείται της HotkeyString.mcc custom class και συνεπώς\nαπέτυχε κατά την αρχικοποίηση.\n\nΠαρακαλώ βεβαιωθείτε ότι έχετε τη τελευταία HotkeyString.mcc\nclass από το http://www.sf.net/projects/bstring-mcc/\nεγκατεστημένη και δοκιμάστε ξανά."
+msgstr "Ο TextEditor.mcp αδυνατεί να ανοίξει την ελάχιστη έκδοση που\nαπαιτείται της HotkeyString.mcc custom class και συνεπώς\nαπέτυχε κατά την προετοιμασία.\n\nΠαρακαλώ βεβαιωθείτε ότι έχετε τη τελευταία HotkeyString.mcc\nclass από το http://www.sf.net/projects/bstring-mcc/\nεγκατεστημένη και δοκιμάστε ξανά."
 
 msgctxt "MSG_Ok (132//)"
 msgid "Ok"
@@ -665,27 +666,27 @@ msgctxt "MSG_HELP_SEPARATOR_SHADOW (145//)"
 msgid ""
 "This is the color used to print\n"
 "separator bars in shadow mode."
-msgstr "Αυτό είναι το χρώμα που χρησιμοποιείται για την\nεκτύπωση της μπάρας διαχωριστικών με λειτουργία σκιάς."
+msgstr "Αυτό είναι το χρώμα που χρησιμοποιείται για την\nεκτύπωση της μπάρας διαχωριστικών σε λειτουργία σκιάς."
 
 msgctxt "MSG_HELP_FONTS_NORMAL (146//)"
 msgid "Default font to be used by the editor."
-msgstr "Προκαθορισμένη γραμματοσειρά που θα\nχρησιμοποιηθεί από το κειμενογράφο."
+msgstr "Προκαθορισμένη γραμματοσειρά που θα\nχρησιμοποιηθεί από τον κειμενογράφο."
 
 msgctxt "MSG_HELP_FONTS_FIXED (147//)"
 msgid ""
 "Default font to be used by the editor\n"
 "whenever a fixed width font is requested."
-msgstr "Προκαθορισμένη γραμματοσειρά που θα χρησιμοποιηθεί\nαπό το κειμενογράφο, άσχετα αν ζητηθεί μια σταθερή\nγραμματοσειρά."
+msgstr "Προκαθορισμένη γραμματοσειρά που θα χρησιμοποιηθεί\nαπό τον κειμενογράφο, άσχετα αν ζητηθεί μια σταθερή\nγραμματοσειρά."
 
 msgctxt "MSG_HELP_CURSOR_NORMAL (148//)"
 msgid "Default color to be used for the cursor."
-msgstr "Προκαθορισμένο χρώμα που θα\nχρησιμοποιηθεί για το κέρσορα."
+msgstr "Προκαθορισμένο χρώμα που θα\nχρησιμοποιηθεί για τον κέρσορα."
 
 msgctxt "MSG_HELP_CURSOR_SELECTED (149//)"
 msgid ""
 "Color to be used for the cursor\n"
 "in selected text."
-msgstr "Χρώμα που θα χρησιμοποιηθεί για το\nκέρσορα σε επιλεγμένο κείμενο."
+msgstr "Χρώμα που θα χρησιμοποιηθεί για τον\nκέρσορα σε επιλεγμένο κείμενο."
 
 msgctxt "MSG_HELP_CURSOR_INACTIVE (150//)"
 msgid ""
@@ -702,7 +703,7 @@ msgid ""
 "You may want the cursor to blink to make\n"
 "it easier to find. Select 'Off' to disable\n"
 "this feature."
-msgstr "Μπορεί να θελήσετε ο κέρσορας να αναβοσβήνει\nώστε να το βρίσκετε εύκολα. Επιλέξτε 'Κλειστό'\nγια να το απανεργοποιήσετε."
+msgstr "Μπορεί να θελήσετε ο κέρσορας να αναβοσβήνει\nώστε να το βρίσκετε εύκολα. Επιλέξτε 'Κλειστό'\nγια να το απενεργοποιήσετε."
 
 msgctxt "MSG_HELP_BUTTON_DEFAULTKEYS (153//)"
 msgid ""
@@ -737,7 +738,7 @@ msgid ""
 "Specify here the command that will be used\n"
 "to suggest an alternate word. As explained above,\n"
 "usually you should specify a script here."
-msgstr "Καθορίστε εδώ την εντολή που θα χρησιμοποιηθεί για τη\nυπόδειξη εναλλακτικής λέξης. Όπως αναφέρθηκε παραπάνω,\nθα πρέπει να καθορίσετε εδώ μια δέσμη εντολών."
+msgstr "Καθορίστε εδώ την εντολή που θα χρησιμοποιηθεί για τη\nυπόδειξη εναλλακτικής λέξης. Όπως αναφέρθηκε παραπάνω,\nθα πρέπει να καθορίσετε εδώ ένα σενάριο εντολών."
 
 msgctxt "MSG_UNDO_SLIDER_FORMAT (159//)"
 msgid "%ld (+/- 5)"
