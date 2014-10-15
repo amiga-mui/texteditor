@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MCC TextEditor\n"
 "Report-Msgid-Bugs-To: http://sf.net/p/texteditor-mcc/\n"
 "POT-Creation-Date: 2014-02-23 12:29+0100\n"
-"PO-Revision-Date: 2014-06-11 12:33+0000\n"
+"PO-Revision-Date: 2014-10-10 11:15+0000\n"
 "Last-Translator: Javier de las Rivas <jabierdlr@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/texteditor-mcc/language/es/)\n"
 "MIME-Version: 1.0\n"
@@ -151,11 +151,11 @@ msgstr "Siguiente elemento"
 
 msgctxt "MSG_Function_NxtPage (30//)"
 msgid "Next page"
-msgstr "Avanzar página"
+msgstr "Página abajo"
 
 msgctxt "MSG_Function_NxtPara (31//)"
 msgid "Next paragraph"
-msgstr "Siguiente párrafo"
+msgstr "Siguiente línea"
 
 msgctxt "MSG_Function_NxtSent (32//)"
 msgid "Next sentence"
@@ -171,11 +171,11 @@ msgstr "Pegar"
 
 msgctxt "MSG_Function_PrvPage (35//)"
 msgid "Prev page"
-msgstr "Retroceder página"
+msgstr "Página arriba"
 
 msgctxt "MSG_Function_PrvPara (36//)"
 msgid "Prev paragraph"
-msgstr "Anterior párrafo"
+msgstr "Anterior línea"
 
 msgctxt "MSG_Function_PrvSent (37//)"
 msgid "Prev sentence"
@@ -599,7 +599,7 @@ msgstr "Aceptar"
 
 msgctxt "MSG_Label_InactiveCursor (133//)"
 msgid "Inactive cursor"
-msgstr "Cursor de\\ninactivo"
+msgstr "Cursor de\ninactivo"
 
 msgctxt "MSG_HELP_InactiveCursor (134//)"
 msgid ""
@@ -609,7 +609,7 @@ msgstr "Mostrar un cursor diferente cuando la ventana de TextEditor está inacti
 
 msgctxt "MSG_Label_SelectPointer (135//)"
 msgid "Selection pointer"
-msgstr "Cambiar\\npuntero"
+msgstr "Cambiar\npuntero"
 
 msgctxt "MSG_HELP_SelectPointer (136//)"
 msgid ""
@@ -619,7 +619,7 @@ msgstr "Mostrar un puntero diferente cuando este está en una ventana de TextEdi
 
 msgctxt "MSG_Label_InactiveColor (137//)"
 msgid "Inactive"
-msgstr "Marcado\\n(inactivo)"
+msgstr "Marcado\n(inactivo)"
 
 msgctxt "MSG_PopWinTitle_InactiveColor (138//)"
 msgid "Select inactive color"
