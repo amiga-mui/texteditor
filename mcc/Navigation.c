@@ -603,13 +603,13 @@ void GoLeft(struct InstData *data)
 /*-----------------------------------------*
  * Check if given char is a word-seperator *
  *-----------------------------------------*/
-BOOL CheckSep(struct InstData *data, char character)
+BOOL CheckSep(struct InstData *data, ULONG character)
 {
   BOOL isSep = FALSE;
 
   ENTER();
 
-  if(!IsAlNum(data->mylocale, (long)character))
+  if(!IsAlNum(data->mylocale, character))
   	isSep = TRUE;
 
   RETURN(isSep);
