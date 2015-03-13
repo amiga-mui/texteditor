@@ -5,6 +5,14 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2015-03-13 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Navigation.c: treat the character to be checked for being a separation
+    character as an unsigned values instead of a simple "char". This works
+    around possible problems with locale drivers (i.e. russian) which return the
+    wrong result for negative character values due to sign extension by the
+    compiler.
+
 2014-08-27 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale: added dutch, spanish and turkish translations and updated all
