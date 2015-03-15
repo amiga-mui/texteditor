@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2015-03-15 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/HandleInput.c, mcc/SpellChecker.c: cast all characters passed to any
+    locale.library function to ULONG to avoid any possible sign extension which
+    might cause the called function to return wrong results.
+
 2015-03-13 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Navigation.c: treat the character to be checked for being a separation
