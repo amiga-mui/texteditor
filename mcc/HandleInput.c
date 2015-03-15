@@ -487,7 +487,7 @@ void Key_Normal(struct InstData *data, char key)
 
   // check if the user wants to do a direct spell checking while
   // writing some text.
-  if(key != '-' && IsAlpha(data->mylocale, key) == FALSE)
+  if(key != '-' && IsAlpha(data->mylocale, (ULONG)key) == FALSE)
   {
     // only perform a spell check if it has been enabled
     if(data->TypeAndSpell == TRUE)

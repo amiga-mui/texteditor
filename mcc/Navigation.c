@@ -602,6 +602,8 @@ void GoLeft(struct InstData *data)
 /// CheckSep()
 /*-----------------------------------------*
  * Check if given char is a word-seperator *
+ * The character *MUST* be ULONG to avoid  *
+ * any possible sign extension             *
  *-----------------------------------------*/
 BOOL CheckSep(struct InstData *data, ULONG character)
 {

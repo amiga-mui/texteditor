@@ -478,7 +478,7 @@ void SuggestWord(struct InstData *data)
 
   ENTER();
 
-  if(IsAlpha(data->mylocale, line->line.Contents[data->CPos_X]) && CreateSuggestWindow(data) == TRUE)
+  if(IsAlpha(data->mylocale, (ULONG)line->line.Contents[data->CPos_X]) && CreateSuggestWindow(data) == TRUE)
   {
     if(Enabled(data))
     {
@@ -491,7 +491,7 @@ void SuggestWord(struct InstData *data)
     }
 */
 
-    while(data->CPos_X != 0 && (IsAlpha(data->mylocale, line->line.Contents[data->CPos_X-1]) || line->line.Contents[data->CPos_X-1] == '-' || line->line.Contents[data->CPos_X-1] == '\''))
+    while(data->CPos_X != 0 && (IsAlpha(data->mylocale, (ULONG)line->line.Contents[data->CPos_X-1]) || line->line.Contents[data->CPos_X-1] == '-' || line->line.Contents[data->CPos_X-1] == '\''))
     {
       GoPreviousWord(data);
     }
@@ -507,7 +507,7 @@ void SuggestWord(struct InstData *data)
     left  += _mleft(data->object) + FlowSpace(data, line->line.Flow, line->line.Contents+(data->CPos_X-pos.x)) + TextLength(&data->tmprp, line->line.Contents+(data->CPos_X-pos.x), pos.x);
     top += data->ypos + (data->fontheight * (line_nr + pos.lines));
 
-    while(data->CPos_X < line->line.Length && (IsAlpha(data->mylocale, line->line.Contents[data->CPos_X]) || line->line.Contents[data->CPos_X] == '-' || line->line.Contents[data->CPos_X] == '\''))
+    while(data->CPos_X < line->line.Length && (IsAlpha(data->mylocale, (ULONG)line->line.Contents[data->CPos_X]) || line->line.Contents[data->CPos_X] == '-' || line->line.Contents[data->CPos_X] == '\''))
     {
       data->CPos_X++;
     }
@@ -592,7 +592,7 @@ void SpellCheckWord(struct InstData *data)
 {
   ENTER();
 
-  if(data->TypeAndSpell == TRUE && data->CPos_X != 0 && IsAlpha(data->mylocale, data->actualline->line.Contents[data->CPos_X-1]))
+  if(data->TypeAndSpell == TRUE && data->CPos_X != 0 && IsAlpha(data->mylocale, (ULONG)data->actualline->line.Contents[data->CPos_X-1]))
   {
     LONG start;
     LONG end = data->CPos_X;
