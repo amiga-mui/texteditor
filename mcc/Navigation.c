@@ -602,16 +602,15 @@ void GoLeft(struct InstData *data)
 /// CheckSep()
 /*-----------------------------------------*
  * Check if given char is a word-seperator *
- * The character *MUST* be ULONG to avoid  *
- * any possible sign extension             *
  *-----------------------------------------*/
-BOOL CheckSep(struct InstData *data, ULONG character)
+BOOL CheckSep(struct InstData *data, char character)
 {
   BOOL isSep = FALSE;
 
   ENTER();
 
-  if(!IsAlNum(data->mylocale, character))
+  // make sure to strip any possibly implicitly extended sign
+  if(!IsAlNum(data->mylocale, character & 0x000000ff))
   	isSep = TRUE;
 
   RETURN(isSep);

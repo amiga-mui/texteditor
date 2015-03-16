@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2015-03-16 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/HandleInput.c, mcc/Navigation.c: reverted the type cast to ULONG as
+    it does not produce the wanted code for direct calls on locale.library
+    functions. Instead the characters are now explicitly ANDed with 0xff to make
+    sure that no extended signs are passed to the called function.
+
 2015-03-15 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c, mcc/SpellChecker.c: cast all characters passed to any

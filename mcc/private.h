@@ -572,7 +572,7 @@ void GoPreviousWord(struct InstData *);
 void GoStartOfLine(struct InstData *);
 void GoPreviousSentence(struct InstData *);
 void GoLeft(struct InstData *);
-BOOL CheckSep(struct InstData *, ULONG);
+BOOL CheckSep(struct InstData *, char);
 BOOL CheckSent(struct InstData *, char);
 void NextLine(struct InstData *);
 LONG FlowSpace(struct InstData *, UWORD, STRPTR);
