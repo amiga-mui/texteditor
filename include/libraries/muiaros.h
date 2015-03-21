@@ -3294,6 +3294,8 @@ struct MUIP_Pendisplay_SetRGB        {STACKED ULONG MethodID; STACKED ULONG r; S
 
 #define MUIC_Mccprefs "Mccprefs.mui"
 
+struct  MUIP_Mccprefs_ConfigToGadgets  { STACKED ULONG MethodID; STACKED Object *configdata; };
+struct  MUIP_Mccprefs_GadgetsToConfig  { STACKED ULONG MethodID; STACKED Object *configdata; STACKED Object *originator; };
 
 #endif
 #endif
