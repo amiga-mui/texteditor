@@ -5,6 +5,12 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+#### v15.46 RELEASE ############################################################
+
+2015-03-21 Jens Maus <mail@jens-maus.de>
+
+  * misc: final v15.46 release preparations
+
 2015-03-16 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c, mcc/Navigation.c: reverted the type cast to ULONG as

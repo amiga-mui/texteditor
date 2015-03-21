@@ -1,11 +1,11 @@
 @DataBase TextEditor.guide
-@$VER: TextEditor.guide 15.44 (26.01.2014)
+@$VER: TextEditor.guide 15.45 (21.03.2015)
 
 @Node Main "TextEditor - AmigaGuide(R) documentation"
 
 Welcome to the @{b}TextEditor @{ub}AmigaGuide(R) documentation.
 
-(C) 2005-2014 TextEditor.mcc Open Source Team
+(C) 2005-2015 TextEditor.mcc Open Source Team
 (C) 1997-2000 by Allan Odgaard
 
 
