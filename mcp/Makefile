@@ -390,7 +390,7 @@ $(BINDIR):
 # for compiling single .c files
 $(OBJDIR)/%.o: %.c
 	@echo "  CC $<"
-	$(CC) $(CFLAGS) $< -o $@
+	@$(CC) $(CFLAGS) $< -o $@
 
 $(OBJDIR)/mccclass_68k.o: ../include/mccclass_68k.c
 	@echo "  CC $<"
