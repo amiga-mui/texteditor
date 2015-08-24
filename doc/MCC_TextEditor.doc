@@ -8,6 +8,7 @@ TextEditor.mcc/MUIA_TextEditor_ColorMap
 TextEditor.mcc/MUIA_TextEditor_Columns
 TextEditor.mcc/MUIA_TextEditor_Contents
 TextEditor.mcc/MUIA_TextEditor_ConvertTabs
+TextEditor.mcc/MUIA_TextEditor_CursorIndex
 TextEditor.mcc/MUIA_TextEditor_CursorPosition
 TextEditor.mcc/MUIA_TextEditor_CursorX
 TextEditor.mcc/MUIA_TextEditor_CursorY
@@ -278,6 +279,18 @@ TextEditor.mcc/MUIM_TextEditor_Search
     SEE ALSO
 
 
+TextEditor.mcc/MUIA_TextEditor_CursorIndex
+
+    NAME
+        MUIA_TextEditor_CursorIndex -- [ISG], ULONG
+
+    FUNCTION
+        You can get or set the cursor's X and Y position with this tag.
+        The first character of the full text has index 0.
+
+    SEE ALSO
+        MUIA_TextEditor_CursorX, MUIA_TextEditor_CursorY
+
 TextEditor.mcc/MUIA_TextEditor_CursorPosition
 
     NAME
@@ -315,7 +328,7 @@ TextEditor.mcc/MUIM_TextEditor_Search
         it will be automatically truncated.
 
     SEE ALSO
-        MUIA_TextEditor_CursorY
+        MUIA_TextEditor_CursorIndex, MUIA_TextEditor_CursorY
 
 TextEditor.mcc/MUIA_TextEditor_CursorY
 
@@ -330,7 +343,7 @@ TextEditor.mcc/MUIM_TextEditor_Search
         be automatically truncated.
 
     SEE ALSO
-        MUIA_TextEditor_CursorX
+        MUIA_TextEditor_CursorIndex, MUIA_TextEditor_CursorX
 
 TextEditor.mcc/MUIA_TextEditor_DoubleClickHook
 
