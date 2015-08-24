@@ -221,7 +221,7 @@ int main(void)
         {
             Object *app, *window, *clear, *cut, *copy, *paste, *erase,
                    *bold, *italic, *underline, *ischanged, *undo, *redo, *string,
-                   *xslider, *yslider, *flow, *search, *replace, *wrapmode, *wrapborder,
+                   *xslider, *yslider, *xyslider, *flow, *search, *replace, *wrapmode, *wrapborder,
                    *rgroup, *isdisabled, *isreadonly, *converttabs, *wrapwords;
             Object *lower,*upper;
             Object *undoslider;
@@ -448,6 +448,7 @@ int main(void)
   */                    Child, HGroup,
                           Child, xslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 10000),
                           Child, yslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 1000),
+                          Child, xyslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 10000),
                         End,
                       Child, undoslider = MUI_MakeObject(MUIO_Slider, NULL, 0, 1000),
                       Child, string = StringObject,
@@ -487,6 +488,7 @@ int main(void)
             set(editorgad, MUIA_TextEditor_Slider, slider);
             set(xslider, MUIA_CycleChain, TRUE);
             set(yslider, MUIA_CycleChain, TRUE);
+            set(xyslider, MUIA_CycleChain, TRUE);
 
             if(argarray[4])
             {
@@ -536,9 +538,11 @@ int main(void)
             DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_Flow, MUIV_EveryTime, flow, 3, MUIM_NoNotifySet, MUIA_Cycle_Active, MUIV_TriggerValue);
 
             DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_CursorX, MUIV_EveryTime, xslider, 3, MUIM_NoNotifySet, MUIA_Numeric_Value, MUIV_TriggerValue);
-  //          DoMethod(xslider, MUIM_Notify, MUIA_Numeric_Value, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_Position, MUIV_TriggerValue);
+            DoMethod(xslider, MUIM_Notify, MUIA_Numeric_Value, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_CursorX, MUIV_TriggerValue);
             DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_CursorY, MUIV_EveryTime, yslider, 3, MUIM_NoNotifySet, MUIA_Numeric_Value, MUIV_TriggerValue);
             DoMethod(yslider, MUIM_Notify, MUIA_Numeric_Value, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_CursorY, MUIV_TriggerValue);
+            DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_CursorIndex, MUIV_EveryTime, xyslider, 3, MUIM_NoNotifySet, MUIA_Numeric_Value, MUIV_TriggerValue);
+            DoMethod(xyslider, MUIM_Notify, MUIA_Numeric_Value, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_CursorIndex, MUIV_TriggerValue);
 
             DoMethod(undoslider, MUIM_Notify, MUIA_Numeric_Value, MUIV_EveryTime, editorgad, 3, MUIM_Set, MUIA_TextEditor_UndoLevels, MUIV_TriggerValue);
 

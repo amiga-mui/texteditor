@@ -220,6 +220,10 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = (IPTR)NULL;
     break;
 
+    case MUIA_TextEditor_CursorIndex:
+      ti_Data = CursorPosToIndex(data);
+    break;
+
     default:
       LEAVE();
       return(DoSuperMethodA(cl, obj, (Msg)msg));
@@ -816,6 +820,12 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       case MUIA_TextEditor_Keywords:
       {
         ParseKeywords(data, (const char *)tag->ti_Data);
+      }
+      break;
+
+      case MUIA_TextEditor_CursorIndex:
+      {
+        IndexToCursorPos(data, tag->ti_Data);
       }
       break;
     }

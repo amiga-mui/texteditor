@@ -552,6 +552,8 @@ void DumpText(struct InstData *, LONG, LONG, LONG, BOOL);
 void GetLine(struct InstData *, LONG, struct pos_info *);
 LONG LineToVisual(struct InstData *, struct line_node *);
 LONG CountLines(struct InstData *, struct MinList *);
+LONG CursorPosToIndex(struct InstData *);
+void IndexToCursorPos(struct InstData *, LONG);
 
 // Navigation.c
 void SetBookmark(struct InstData *, ULONG);

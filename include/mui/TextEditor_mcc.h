@@ -107,6 +107,7 @@ extern "C" {
 #define MUIA_TextEditor_TabSize               (TextEditor_Dummy + 0x3f)
 #define MUIA_TextEditor_Keywords              (TextEditor_Dummy + 0x40)
 #define MUIA_TextEditor_MatchedKeyword        (TextEditor_Dummy + 0x41)
+#define MUIA_TextEditor_CursorIndex           (TextEditor_Dummy + 0x42)
 
 #define MUIM_TextEditor_HandleError           (TextEditor_Dummy + 0x1f)
 #define MUIM_TextEditor_AddKeyBindings        (TextEditor_Dummy + 0x22)

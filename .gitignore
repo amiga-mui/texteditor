@@ -1,0 +1,4 @@
+*.catalog
+bin_*
+.obj_*
+mcp/locale.*

@@ -811,17 +811,15 @@ DISPATCHER(_Dispatcher)
       // process all input events
       result = mHandleInput(cl, obj, (struct MUIP_HandleEvent *)msg);
 
-      // see if the cursor was moved and if so we go and notify
-      // others
-      data->NoNotify = TRUE;
-
-      if(data->CPos_X != oldx)
-        set(obj, MUIA_TextEditor_CursorX, data->CPos_X);
-
-      if(data->actualline != oldy)
-        set(obj, MUIA_TextEditor_CursorY, LineNr(data, data->actualline)-1);
-
-      data->NoNotify = FALSE;
+      // see if the cursor was moved and if so we go and trigger the notifications
+      if(data->CPos_X != oldx || data->actualline != oldy)
+      {
+        SetSuperAttrs(cl, obj,
+          (data->CPos_X != oldx)     ? MUIA_TextEditor_CursorX : TAG_IGNORE, data->CPos_X,
+          (data->actualline != oldy) ? MUIA_TextEditor_CursorY : TAG_IGNORE, LineNr(data, data->actualline)-1,
+          MUIA_TextEditor_CursorIndex, CursorPosToIndex(data),
+          TAG_DONE);
+      }
 
       // if the HandleInput() function didn't return
       // an MUI_EventHandlerRC_Eat we can return immediately
