@@ -51,10 +51,11 @@ TextEditor.mcc/MUIA_TextEditor_WrapWords
 TextEditor.mcc/MUIM_TextEditor_ARexxCmd
 TextEditor.mcc/MUIM_TextEditor_BlockInfo
 TextEditor.mcc/MUIM_TextEditor_ClearText
-TextEditor.mcc/MUIM_TextEditor_SetBlock
+TextEditor.mcc/MUIM_TextEditor_CursorXYToIndex
 TextEditor.mcc/MUIM_TextEditor_ExportBlock
 TextEditor.mcc/MUIM_TextEditor_ExportText
 TextEditor.mcc/MUIM_TextEditor_HandleError
+TextEditor.mcc/MUIM_TextEditor_IndexToCursorXY
 TextEditor.mcc/MUIM_TextEditor_InsertText
 TextEditor.mcc/MUIM_TextEditor_MacroBegin         (not yet implemented...)
 TextEditor.mcc/MUIM_TextEditor_MacroEnd           (not yet implemented...)
@@ -63,6 +64,7 @@ TextEditor.mcc/MUIM_TextEditor_MarkText
 TextEditor.mcc/MUIM_TextEditor_QueryKeyAction
 TextEditor.mcc/MUIM_TextEditor_Replace
 TextEditor.mcc/MUIM_TextEditor_Search
+TextEditor.mcc/MUIM_TextEditor_SetBlock
 TextEditor.mcc/TextEditor.mcc
 
     *******************************************************************
@@ -1247,6 +1249,17 @@ TextEditor.mcc/MUIM_TextEditor_Search
     FUNCTION
         This will clear all the text in the gadget.
 
+TextEditor.mcc/MUIM_TextEditor_CursorXYToIndex
+
+    NAME
+        MUIM_TextEditor_CursorXYToIndex
+
+    SYNOPSIS
+        DoMethod(obj, MUIM_TextEditor_CursorXYToIndex, xpos, ypos, &index);
+
+    FUNCTION
+        Convert an X/Y cursor position pair into an index value.
+
 TextEditor.mcc/MUIM_TextEditor_ExportBlock
 
     NAME
@@ -1293,83 +1306,6 @@ TextEditor.mcc/MUIM_TextEditor_Search
         MUIA_TextEditor_ExportHook
         MUIM_TextEditor_InsertText
         MUIM_TextEditor_ExportText
-
- TextEditor.mcc/MUIM_TextEditor_SetBlock
-
-    NAME
-        MUIM_TextEditor_SetBlock (v15.29)
-
-    SYNOPSIS
-        DoMethod(obj, MUIM_TextEditor_SetBlock,
-                      ULONG startx, ULONG starty,
-                      ULONG stopx, ULONG stopy,
-                      ULONG operation, ULONG value);
-
-    FUNCTION
-        This method performs a specific operation on a text block that
-        is defined by four coordinates (startx,starty,stopx,stopy)
-        (see MUIM_TextEditor_BlockInfo). The types of operations that
-        can be performed are supplied via a flag variable 'operation'
-        and an optional value for all operations can be supplied via
-        'value'.
-
-        For the start/stop values these special values can be used
-        together with normal integer values:
-
-          MUIV_TextEditor_SetBlock_Min:
-            The value of the start/stop parameter where this special
-            value is used will be set to the minimum available (e.g.
-            start of line for startx).
-
-          MUIV_TextEditor_SetBlock_Max:
-            The value of the start/stop parameter where this special
-            value is used will be set to the maximum available (e.g.
-            end of line for stopx).
-
-        Possible flags for the 'operation' variable are:
-
-          MUIF_TextEditor_SetBlock_Color:
-            The text block will be assigned a text color in accordance
-            to the supplied color number in parameter 'value'.
-            (see MUIA_TextEditor_ColorMap and MUIA_TextEditor_Pen).
-
-          MUIF_TextEditor_SetBlock_StyleBold:
-            Depending on the content of the 'value' (TRUE/FALSE) the
-            selected text block will get the bold style added or
-            removed.
-
-          MUIF_TextEditor_SetBlock_StyleItalic:
-            Depending on the content of 'value' (TRUE/FALSE) the
-            selected text block will get the italic style added or
-            removed.
-
-          MUIF_TextEditor_SetBlock_StyleUnderline:
-            Depending on the content of 'value' (TRUE/FALSE) the
-            selected text block will get the underline style added or
-            removed.
-
-          MUIF_TextEditor_SetBlock_Flow:
-            Depending on the content of 'value' the selected text block
-            will change it's alignment.
-            (see MUIA_TextEditor_Flow for possible values)
-
-    RESULT
-        TRUE if operation succeeded, FALSE if it failed (e.g. invalid
-        start or stop values have been specified)
-
-    NOTE
-        When combining multiple operations via flags, care have to be
-        taken for the content of 'value'. E.g. it is not possible to
-        have bold style added and italic style removed because of the
-        global usage of the 'value' parameter. So for mutual exclusive
-        operations you will have to call this method multiple times.
-
-    SEE ALSO
-        MUIA_TextEditor_ExportBlock
-        MUIM_TextEditor_BlockInfo
-        MUIA_TextEditor_ColorMap
-        MUIA_TextEditor_Pen
-        MUIA_TextEditor_Flow
 
 TextEditor.mcc/MUIM_TextEditor_ExportText
 
@@ -1425,6 +1361,17 @@ TextEditor.mcc/MUIM_TextEditor_Search
 
     RESULT
         NONE
+
+TextEditor.mcc/MUIM_TextEditor_IndexToCursorXY
+
+    NAME
+        MUIM_TextEditor_IndexToCursorXY
+
+    SYNOPSIS
+        DoMethod(obj, MUIM_TextEditor_IndexToCursorXY, index, &xpos, &ypos);
+
+    FUNCTION
+        Convert an index value into an X/Y cursor position pair.
 
 TextEditor.mcc/MUIM_TextEditor_InsertText
 
@@ -1602,5 +1549,82 @@ TextEditor.mcc/MUIM_TextEditor_Search
         If the string is found, it will be automatically marked.  Thus,
         in case you want to replace it, simply clear the marked string and
         insert the new one.
+
+TextEditor.mcc/MUIM_TextEditor_SetBlock
+
+    NAME
+        MUIM_TextEditor_SetBlock (v15.29)
+
+    SYNOPSIS
+        DoMethod(obj, MUIM_TextEditor_SetBlock,
+                      ULONG startx, ULONG starty,
+                      ULONG stopx, ULONG stopy,
+                      ULONG operation, ULONG value);
+
+    FUNCTION
+        This method performs a specific operation on a text block that
+        is defined by four coordinates (startx,starty,stopx,stopy)
+        (see MUIM_TextEditor_BlockInfo). The types of operations that
+        can be performed are supplied via a flag variable 'operation'
+        and an optional value for all operations can be supplied via
+        'value'.
+
+        For the start/stop values these special values can be used
+        together with normal integer values:
+
+          MUIV_TextEditor_SetBlock_Min:
+            The value of the start/stop parameter where this special
+            value is used will be set to the minimum available (e.g.
+            start of line for startx).
+
+          MUIV_TextEditor_SetBlock_Max:
+            The value of the start/stop parameter where this special
+            value is used will be set to the maximum available (e.g.
+            end of line for stopx).
+
+        Possible flags for the 'operation' variable are:
+
+          MUIF_TextEditor_SetBlock_Color:
+            The text block will be assigned a text color in accordance
+            to the supplied color number in parameter 'value'.
+            (see MUIA_TextEditor_ColorMap and MUIA_TextEditor_Pen).
+
+          MUIF_TextEditor_SetBlock_StyleBold:
+            Depending on the content of the 'value' (TRUE/FALSE) the
+            selected text block will get the bold style added or
+            removed.
+
+          MUIF_TextEditor_SetBlock_StyleItalic:
+            Depending on the content of 'value' (TRUE/FALSE) the
+            selected text block will get the italic style added or
+            removed.
+
+          MUIF_TextEditor_SetBlock_StyleUnderline:
+            Depending on the content of 'value' (TRUE/FALSE) the
+            selected text block will get the underline style added or
+            removed.
+
+          MUIF_TextEditor_SetBlock_Flow:
+            Depending on the content of 'value' the selected text block
+            will change it's alignment.
+            (see MUIA_TextEditor_Flow for possible values)
+
+    RESULT
+        TRUE if operation succeeded, FALSE if it failed (e.g. invalid
+        start or stop values have been specified)
+
+    NOTE
+        When combining multiple operations via flags, care have to be
+        taken for the content of 'value'. E.g. it is not possible to
+        have bold style added and italic style removed because of the
+        global usage of the 'value' parameter. So for mutual exclusive
+        operations you will have to call this method multiple times.
+
+    SEE ALSO
+        MUIA_TextEditor_ExportBlock
+        MUIM_TextEditor_BlockInfo
+        MUIA_TextEditor_ColorMap
+        MUIA_TextEditor_Pen
+        MUIA_TextEditor_Flow
 
 
