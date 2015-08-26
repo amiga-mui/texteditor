@@ -487,3 +487,68 @@ ULONG InsertText(struct InstData *data, STRPTR text, BOOL moveCursor)
 }
 
 ///
+/// mCursorXYToIndex
+IPTR mCursorXYToIndex(struct InstData *data, struct MUIP_TextEditor_CursorXYToIndex *msg)
+{
+  LONG idx = 0;
+  LONG lineNumber = 0;
+  struct line_node *line;
+
+  ENTER();
+
+  // count the length of all lines up to the requested one
+  line = GetFirstLine(&data->linelist);
+  while(line != NULL && lineNumber < msg->y)
+  {
+    idx += line->line.Length;
+    line = GetNextLine(line);
+    lineNumber++;
+  }
+
+  // add the X position
+  idx += msg->x;
+
+  *msg->index = idx;
+
+  RETURN(0);
+  return 0;
+}
+
+///
+/// mIndexToCursorXY
+IPTR mIndexToCursorXY(struct InstData *data, struct MUIP_TextEditor_IndexToCursorXY *msg)
+{
+  LONG idx;
+  LONG lineNumber = 0;
+  struct line_node *line;
+
+  ENTER();
+
+  idx = msg->index;
+
+  // substract the length of all lines until the remaining value is less than
+  // the line length. This is then considered to be the new cursor position
+  // within that line.
+  line = GetFirstLine(&data->linelist);
+  while(line != NULL && idx >= 0)
+  {
+    if(idx > line->line.Length-1)
+    {
+      idx -= line->line.Length;
+      line = GetNextLine(line);
+      lineNumber++;
+    }
+    else
+    {
+      break;
+	}
+  }
+
+  *msg->x = idx;
+  *msg->y = lineNumber;
+
+  RETURN(0);
+  return 0;
+}
+
+///

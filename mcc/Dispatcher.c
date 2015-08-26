@@ -790,19 +790,19 @@ DISPATCHER(_Dispatcher)
 
   switch(msg->MethodID)
   {
-    case OM_DISPOSE:                     result = mDispose(cl, obj, msg);                  RETURN(result); return result; break;
-    case OM_GET:                         result = mGet(cl, obj, (APTR)msg);                RETURN(result); return result; break;
-    case OM_SET:                         result = mSet(cl, obj, (APTR)msg);                                               break;
-    case MUIM_Setup:                     result = mSetup(cl, obj, msg);                    RETURN(result); return result; break;
-    case MUIM_Show:                      result = mShow(cl, obj, msg);                     RETURN(result); return result; break;
-    case MUIM_AskMinMax:                 result = mAskMinMax(cl, obj, (APTR)msg);          RETURN(result); return result; break;
-    case MUIM_Draw:                      result = mDraw(cl, obj, (APTR)msg);               RETURN(result); return result; break;
-    case MUIM_Hide:                      result = mHide(cl, obj, msg);                     RETURN(result); return result; break;
-    case MUIM_Cleanup:                   result = mCleanup(cl, obj, msg);                  RETURN(result); return result; break;
-    case MUIM_Export:                    result = mExport(cl, obj, (APTR)msg);                                            break;
-    case MUIM_Import:                    result = mImport(cl, obj, (APTR)msg);                                            break;
-    case MUIM_GoActive:                  result = mGoActive(cl, obj, msg);                 RETURN(result); return result; break;
-    case MUIM_GoInactive:                result = mGoInactive(cl, obj, msg);               RETURN(result); return result; break;
+    case OM_DISPOSE:                      result = mDispose(cl, obj, msg);                  RETURN(result); return result; break;
+    case OM_GET:                          result = mGet(cl, obj, (APTR)msg);                RETURN(result); return result; break;
+    case OM_SET:                          result = mSet(cl, obj, (APTR)msg);                                               break;
+    case MUIM_Setup:                      result = mSetup(cl, obj, msg);                    RETURN(result); return result; break;
+    case MUIM_Show:                       result = mShow(cl, obj, msg);                     RETURN(result); return result; break;
+    case MUIM_AskMinMax:                  result = mAskMinMax(cl, obj, (APTR)msg);          RETURN(result); return result; break;
+    case MUIM_Draw:                       result = mDraw(cl, obj, (APTR)msg);               RETURN(result); return result; break;
+    case MUIM_Hide:                       result = mHide(cl, obj, msg);                     RETURN(result); return result; break;
+    case MUIM_Cleanup:                    result = mCleanup(cl, obj, msg);                  RETURN(result); return result; break;
+    case MUIM_Export:                     result = mExport(cl, obj, (APTR)msg);                                            break;
+    case MUIM_Import:                     result = mImport(cl, obj, (APTR)msg);                                            break;
+    case MUIM_GoActive:                   result = mGoActive(cl, obj, msg);                 RETURN(result); return result; break;
+    case MUIM_GoInactive:                 result = mGoInactive(cl, obj, msg);               RETURN(result); return result; break;
     case MUIM_HandleEvent:
     {
       LONG oldx = data->CPos_X;
@@ -814,10 +814,14 @@ DISPATCHER(_Dispatcher)
       // see if the cursor was moved and if so we go and trigger the notifications
       if(data->CPos_X != oldx || data->actualline != oldy)
       {
+        LONG cposY = LineNr(data, data->actualline)-1;
+        LONG index;
+
+        DoMethod(obj, MUIM_TextEditor_CursorXYToIndex, data->CPos_X, cposY, &index);
         SetSuperAttrs(cl, obj,
           (data->CPos_X != oldx)     ? MUIA_TextEditor_CursorX : TAG_IGNORE, data->CPos_X,
-          (data->actualline != oldy) ? MUIA_TextEditor_CursorY : TAG_IGNORE, LineNr(data, data->actualline)-1,
-          MUIA_TextEditor_CursorIndex, CursorPosToIndex(data),
+          (data->actualline != oldy) ? MUIA_TextEditor_CursorY : TAG_IGNORE, cposY,
+          MUIA_TextEditor_CursorIndex, index,
           TAG_DONE);
       }
 
@@ -831,20 +835,22 @@ DISPATCHER(_Dispatcher)
     }
     break;
 
-    case MUIM_TextEditor_ClearText:      result = mClearText(cl, obj, msg);                                               break;
-    case MUIM_TextEditor_ToggleCursor:   result = mToggleCursor(cl, obj, msg);             RETURN(result); return result; break;
-    case MUIM_TextEditor_InputTrigger:   result = mInputTrigger(cl, obj, msg);                                            break;
-    case MUIM_TextEditor_InsertText:     result = mInsertText(cl, obj, (APTR)msg);                                        break;
-    case MUIM_TextEditor_ExportBlock:    result = mExportBlock(cl, obj, (APTR)msg);        RETURN(result); return result; break;
-    case MUIM_TextEditor_ExportText:     result = mExportText(cl, obj, (APTR)msg);         RETURN(result); return result; break;
-    case MUIM_TextEditor_ARexxCmd:       result = mHandleARexx(cl, obj, (APTR)msg);                                       break;
-    case MUIM_TextEditor_MarkText:       result = mMarkText(data, (APTR)msg);                                             break;
-    case MUIM_TextEditor_BlockInfo:      result = mBlockInfo(data, (APTR)msg);                                            break;
-    case MUIM_TextEditor_Search:         result = mSearch(cl, obj, (APTR)msg);                                            break;
-    case MUIM_TextEditor_Replace:        result = mReplace(cl, obj, (APTR)msg);                                           break;
-    case MUIM_TextEditor_QueryKeyAction: result = mQueryKeyAction(cl, obj, (APTR)msg);                                    break;
-    case MUIM_TextEditor_SetBlock:       result = mSetBlock(data, (APTR)msg);              RETURN(result); return result; break;
-    default:                             result = DoSuperMethodA(cl, obj, msg);            RETURN(result); return result; break;
+    case MUIM_TextEditor_ClearText:       result = mClearText(cl, obj, msg);                                               break;
+    case MUIM_TextEditor_ToggleCursor:    result = mToggleCursor(cl, obj, msg);             RETURN(result); return result; break;
+    case MUIM_TextEditor_InputTrigger:    result = mInputTrigger(cl, obj, msg);                                            break;
+    case MUIM_TextEditor_InsertText:      result = mInsertText(cl, obj, (APTR)msg);                                        break;
+    case MUIM_TextEditor_ExportBlock:     result = mExportBlock(cl, obj, (APTR)msg);        RETURN(result); return result; break;
+    case MUIM_TextEditor_ExportText:      result = mExportText(cl, obj, (APTR)msg);         RETURN(result); return result; break;
+    case MUIM_TextEditor_ARexxCmd:        result = mHandleARexx(cl, obj, (APTR)msg);                                       break;
+    case MUIM_TextEditor_MarkText:        result = mMarkText(data, (APTR)msg);                                             break;
+    case MUIM_TextEditor_BlockInfo:       result = mBlockInfo(data, (APTR)msg);                                            break;
+    case MUIM_TextEditor_Search:          result = mSearch(cl, obj, (APTR)msg);                                            break;
+    case MUIM_TextEditor_Replace:         result = mReplace(cl, obj, (APTR)msg);                                           break;
+    case MUIM_TextEditor_QueryKeyAction:  result = mQueryKeyAction(cl, obj, (APTR)msg);                                    break;
+    case MUIM_TextEditor_SetBlock:        result = mSetBlock(data, (APTR)msg);              RETURN(result); return result; break;
+    case MUIM_TextEditor_CursorXYToIndex: result = mCursorXYToIndex(data, (APTR)msg);       RETURN(result); return result; break;
+    case MUIM_TextEditor_IndexToCursorXY: result = mIndexToCursorXY(data, (APTR)msg);       RETURN(result); return result; break;
+    default:                              result = DoSuperMethodA(cl, obj, msg);            RETURN(result); return result; break;
   }
 
   if(t_haschanged != data->HasChanged)

@@ -221,7 +221,7 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
     break;
 
     case MUIA_TextEditor_CursorIndex:
-      ti_Data = CursorPosToIndex(data);
+      DoMethod(obj, MUIM_TextEditor_CursorXYToIndex, data->CPos_X, LineNr(data, data->actualline)-1, &ti_Data);
     break;
 
     default:
@@ -825,7 +825,15 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_TextEditor_CursorIndex:
       {
-        IndexToCursorPos(data, tag->ti_Data);
+        LONG x;
+        LONG y;
+
+        DoMethod(obj, MUIM_TextEditor_IndexToCursorXY, tag->ti_Data, &x, &y);
+        // set the new cursor position
+        SetAttrs(data->object,
+          MUIA_TextEditor_CursorX, x,
+          MUIA_TextEditor_CursorY, y,
+          TAG_DONE);
       }
       break;
     }
