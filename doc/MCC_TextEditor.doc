@@ -284,7 +284,7 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
 TextEditor.mcc/MUIA_TextEditor_CursorIndex
 
     NAME
-        MUIA_TextEditor_CursorIndex -- [ISG], ULONG
+        MUIA_TextEditor_CursorIndex (v15.47) -- [ISG], ULONG
 
     FUNCTION
         You can get or set the cursor's X and Y position with this tag.
@@ -1252,7 +1252,7 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
 TextEditor.mcc/MUIM_TextEditor_CursorXYToIndex
 
     NAME
-        MUIM_TextEditor_CursorXYToIndex
+        MUIM_TextEditor_CursorXYToIndex (v15.47)
 
     SYNOPSIS
         DoMethod(obj, MUIM_TextEditor_CursorXYToIndex, xpos, ypos, &index);
@@ -1365,7 +1365,7 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
 TextEditor.mcc/MUIM_TextEditor_IndexToCursorXY
 
     NAME
-        MUIM_TextEditor_IndexToCursorXY
+        MUIM_TextEditor_IndexToCursorXY (v15.47)
 
     SYNOPSIS
         DoMethod(obj, MUIM_TextEditor_IndexToCursorXY, index, &xpos, &ypos);
