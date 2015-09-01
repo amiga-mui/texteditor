@@ -196,10 +196,16 @@ struct LineStyle
   UWORD style;
 };
 
+struct TEColor
+{
+  ULONG color;
+  BOOL isRGB;
+};
+
 struct LineColor
 {
   LONG column;
-  UWORD color;
+  struct TEColor color;
 };
 
 struct LineNode
@@ -419,7 +425,7 @@ struct InstData
 
   ULONG           HStart;
 
-  UWORD           Pen;
+  struct TEColor  Pen;
   BOOL            NoNotify;
   ULONG           *colormap;
 
@@ -468,8 +474,12 @@ void ClientWriteLine(IPTR session, struct line_node *line);
 LONG ClientReadLine(IPTR session, struct line_node **line, ULONG *cset);
 
 // ColorOperators.c
-UWORD GetColor(LONG, struct line_node *);
-void AddColor(struct InstData *, struct marking *, UWORD);
+void GetColor(LONG, struct line_node *, struct TEColor *);
+void AddColor(struct InstData *, struct marking *, const struct TEColor *);
+#define SetDefaultColor(c)  { (c)->color = 0, (c)->isRGB = FALSE; }
+#define IsDefaultColor(c)   ((c)->color == 0 && (c)->isRGB == FALSE)
+#define IsSameColor(c1, c2) ((c1)->color == (c2)->color && (c1)->isRGB == (c2)->isRGB)
+#define IsRGBColor(c)       (c)->isRGB
 
 // Dispatcher.c
 void ResetDisplay(struct InstData *);
@@ -590,6 +600,7 @@ void HideSelectPointer(struct InstData *data, Object *obj);
 ULONG ConvertStyle(UWORD);
 LONG PrintLine(struct InstData *, LONG, struct line_node *, LONG, BOOL);
 ULONG ConvertPen(struct InstData *, UWORD, BOOL);
+void SetColor(struct InstData *, struct RastPort *, const struct TEColor *, BOOL);
 void DrawSeparator(struct InstData *, struct RastPort *, LONG, LONG, LONG, LONG);
 
 // Search.c
@@ -726,6 +737,7 @@ enum
   FLG_PasteStyles    = 1L << 21, // respect styles when pasting text
   FLG_PasteColors    = 1L << 22, // respect colors when pasting text
   FLG_ForcedTabSize  = 1L << 23, // override the user defined TAB size
+  FLG_RGBPens        = 1L << 30, // graphics.library can handle direct RGB pens
   FLG_MUI4           = 1L << 31, // running under MUI4
 
   FLG_NumberOf

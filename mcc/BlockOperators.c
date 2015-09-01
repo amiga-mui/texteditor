@@ -190,15 +190,16 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
       if(startline->line.Colors != NULL && startline->line.Colors[0].column != EOC)
       {
         struct Grow colorGrow;
-        UWORD lastcolor = GetColor(startx, startline);
+        struct TEColor lastcolor;
         struct LineColor *oldcolors = startline->line.Colors;
 
         D(DBF_BLOCK, "export colors");
 
         InitGrow(&colorGrow, data->mypool, sizeof(struct LineColor));
+        GetColor(startx, startline, &lastcolor);
 
         // apply the active color
-        if(lastcolor != 0)
+        if(IsDefaultColor(&lastcolor) == TRUE)
         {
           struct LineColor newColor;
 
@@ -215,7 +216,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
         while(oldcolors->column != EOC)
         {
           // apply real color changes only
-          if(oldcolors->color != lastcolor)
+          if(IsSameColor(&oldcolors->color, &lastcolor) == FALSE)
           {
             struct LineColor newColor;
 
@@ -230,12 +231,12 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
         }
 
         // unapply the last active color
-        if(lastcolor != 0)
+        if(IsDefaultColor(&lastcolor) == TRUE)
         {
           struct LineColor newColor;
 
           newColor.column = strlen(startline->line.Contents)-startx+1;
-          newColor.color = 0;
+          SetDefaultColor(&newColor.color);
           AddToGrow(&colorGrow, &newColor);
         }
 
@@ -245,7 +246,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
           struct LineColor terminator;
 
           terminator.column = EOC;
-          terminator.color = 0;
+          SetDefaultColor(&terminator.color);
           AddToGrow(&colorGrow, &terminator);
         }
 
@@ -356,18 +357,19 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
       if(stopline->line.Colors != NULL && stopline->line.Colors[0].column != EOC)
       {
         struct Grow colorGrow;
-        UWORD lastcolor = 0;
+        struct TEColor lastcolor;
         struct LineColor *oldcolors = stopline->line.Colors;
 
         D(DBF_BLOCK, "export colors");
 
         InitGrow(&colorGrow, data->mypool, sizeof(struct LineColor));
+        SetDefaultColor(&lastcolor);
 
         // copy all colors until the end of the block
         while(oldcolors->column <= stopx)
         {
           // apply real color changes only
-          if(oldcolors->color != lastcolor)
+          if(IsSameColor(&oldcolors->color, &lastcolor) == FALSE)
           {
             AddToGrow(&colorGrow, oldcolors);
             // remember this color change
@@ -377,12 +379,12 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
         }
 
         // unapply the last active color
-        if(lastcolor != 0)
+        if(IsDefaultColor(&lastcolor) == FALSE)
         {
           struct LineColor newColor;
 
           newColor.column = stopx + 1;
-          newColor.color = 0;
+          SetDefaultColor(&newColor.color);
           AddToGrow(&colorGrow, &newColor);
         }
 
@@ -392,7 +394,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
           struct LineColor terminator;
 
           terminator.column = EOC;
-          terminator.color = 0;
+          SetDefaultColor(&terminator.color);
           AddToGrow(&colorGrow, &terminator);
         }
 
@@ -527,13 +529,14 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
       if(startline->line.Colors != NULL && startline->line.Colors[0].column != EOC)
       {
         struct Grow colorGrow;
-        UWORD lastcolor = GetColor(startx, startline);
+        struct TEColor lastcolor;
         struct LineColor *oldcolors = startline->line.Colors;
 
         InitGrow(&colorGrow, data->mypool, sizeof(struct LineColor));
+        GetColor(startx, startline, &lastcolor);
 
         // apply the active color
-        if(lastcolor != 0)
+        if(IsDefaultColor(&lastcolor) == FALSE)
         {
           struct LineColor newColor;
 
@@ -550,7 +553,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
         while(oldcolors->column <= stopx)
         {
           // apply real color changes only
-          if(oldcolors->color != lastcolor)
+          if(IsSameColor(&oldcolors->color, &lastcolor) == FALSE)
           {
             struct LineColor newColor;
 
@@ -565,12 +568,12 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
         }
 
         // unapply the last active color
-        if(lastcolor != 0)
+        if(IsDefaultColor(&lastcolor) == FALSE)
         {
           struct LineColor newColor;
 
           newColor.column = stopx - startx + 1;
-          newColor.color = 0;
+          SetDefaultColor(&newColor.color);
           AddToGrow(&colorGrow, &newColor);
         }
 
@@ -580,7 +583,7 @@ STRPTR GetBlock(struct InstData *data, struct marking *block)
           struct LineColor terminator;
 
           terminator.column = EOC;
-          terminator.color = 0;
+          SetDefaultColor(&terminator.color);
           AddToGrow(&colorGrow, &terminator);
         }
 

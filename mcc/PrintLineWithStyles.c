@@ -26,6 +26,7 @@
 #endif
 
 #include <graphics/gfxmacros.h>
+#include <graphics/rpattr.h>
 #include <graphics/text.h>
 #include <clib/alib_protos.h>
 #include <proto/graphics.h>
@@ -33,6 +34,18 @@
 
 #include "private.h"
 #include "Debug.h"
+
+#if defined(__amigaos3__)
+#ifndef RPTAG_PenMode
+#define RPTAG_PenMode         0x80000080
+#endif
+#ifndef RPTAG_FgColor
+#define RPTAG_FgColor         0x80000081
+#endif
+#ifndef RPTAG_BgColor
+#define RPTAG_BgColor         0x80000082
+#endif
+#endif
 
 /// ConvertStyle()
 ULONG ConvertStyle(UWORD style)
@@ -330,7 +343,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       {
         while(colors->column-1 <= x)
         {
-          SetAPen(rp, ConvertPen(data, colors->color, line->line.Highlight));
+          SetColor(data, rp, &colors->color, line->line.Highlight);
           colors++;
         }
 
@@ -481,6 +494,42 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
   RETURN(length);
   return(length);
+}
+
+///
+/// SetColor
+void SetColor(struct InstData *data, struct RastPort *rp, const struct TEColor *c, BOOL highlight)
+{
+  ENTER();
+
+  if(IsRGBColor(c) == TRUE)
+  {
+    if(isFlagSet(data->flags, FLG_RGBPens))
+    {
+      SetRPAttrs(rp,
+        #if defined(__MORPHOS__)
+        RPTAG_PenMode,   FALSE,
+        RPTAG_AlphaMode, FALSE,
+        #endif
+        #if defined(__amigaos4__)
+        RPTAG_APenColor, c->color,
+        #else
+        RPTAG_FgColor,   c->color,
+        #endif
+        TAG_DONE);
+    }
+    else
+    {
+      // fall back to standard pen 0
+      SetAPen(rp, ConvertPen(data, 0, highlight));
+    }
+  }
+  else
+  {
+    SetAPen(rp, ConvertPen(data, c->color, highlight));
+  }
+
+  LEAVE();
 }
 
 ///

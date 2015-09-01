@@ -527,10 +527,11 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
       struct Grow styleGrow;
       struct Grow colorGrow;
       UWORD style = 0;
-      UWORD end_color = 0;
+      struct TEColor end_color;
 
       InitGrow(&styleGrow, data->mypool, sizeof(struct LineStyle));
       InitGrow(&colorGrow, data->mypool, sizeof(struct LineColor));
+      SetDefaultColor(&end_color);
 
       if((line2Styles = next->line.Styles) != NULL)
       {
@@ -610,7 +611,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
       {
         while(line1Colors->column != EOC && line1Colors->column < line->line.Length)
         {
-          D(DBF_STYLE, "applying color change from %ld to %ld in column %ld (1)", end_color, line1Colors->color, line1Colors->column);
+          D(DBF_STYLE, "applying color change from %ld/%ld to %ld/%ld in column %ld (1)", end_color.color, end_color.isRGB, line1Colors->color, line1Colors->isRGB, line1Colors->column);
           end_color = line1Colors->color;
           AddToGrow(&colorGrow, line1Colors);
           line1Colors++;
@@ -619,20 +620,21 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
         FreeVecPooled(data->mypool, line->line.Colors);
       }
 
-      if(end_color != 0 && (line2Colors == NULL || (line2Colors->column != 1 && line2Colors->column != EOC)))
+      if(IsDefaultColor(&end_color) == FALSE && (line2Colors == NULL || (line2Colors->column != 1 && line2Colors->column != EOC)))
       {
         struct LineColor newColor;
 
         D(DBF_STYLE, "resetting color in column %ld (1)", line->line.Length - 1);
-        end_color = 0;
         newColor.column = line->line.Length;
-        newColor.color = 0;
+        SetDefaultColor(&newColor.color);
         AddToGrow(&colorGrow, &newColor);
+
+        SetDefaultColor(&end_color);
       }
 
       if((line2Colors = next->line.Colors) != NULL)
       {
-        if(line2Colors->column == 1 && line2Colors->color == end_color)
+        if(line2Colors->column == 1 && IsSameColor(&line2Colors->color, &end_color) == TRUE)
         {
           D(DBF_STYLE, "skipping 1st color change of 2nd line");
           line2Colors++;
@@ -653,16 +655,16 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
 
         FreeVecPooled(data->mypool, next->line.Colors);
 
-        if(end_color != 0)
+        if(IsDefaultColor(&end_color) == FALSE)
         {
           struct LineColor newColor;
 
           D(DBF_STYLE, "resetting color in column %ld (2)", newbufferSize - next->line.Length - 1);
           newColor.column = newbufferSize - next->line.Length - 1;
-          newColor.color = 0;
+          SetDefaultColor(&newColor.color);
           AddToGrow(&colorGrow, &newColor);
 
-          end_color = 0;
+          end_color = newColor.color;
         }
       }
 
@@ -671,7 +673,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
         struct LineColor terminator;
 
         terminator.column = EOC;
-        terminator.color = 0;
+        SetDefaultColor(&terminator.color);
         AddToGrow(&colorGrow, &terminator);
       }
 
@@ -929,9 +931,10 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
     if(colors != NULL)
     {
       struct Grow oldColorGrow;
-      UWORD color = GetColor(x, line);
+      struct TEColor color;
 
       InitGrow(&oldColorGrow, data->mypool, sizeof(struct LineColor));
+      GetColor(x, line, &color);
 
       // ignore all color changes up to the given position
       while(colors->column <= x+1)
@@ -942,11 +945,11 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
         colors++;
       }
 
-      if(color != 0 && colors->column-x != 1)
+      if(IsDefaultColor(&color) == FALSE && colors->column-x != 1)
       {
         struct LineColor newColor;
 
-        D(DBF_STYLE, "adding new color %ld", color);
+        D(DBF_STYLE, "adding new color %ld/%ld", color.color, color.isRGB);
         newColor.column = 1;
         newColor.color = color;
         AddToGrow(&newColorGrow, &newColor);
@@ -957,7 +960,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
       {
         struct LineColor newColor;
 
-        D(DBF_STYLE, "copying color %ld from column %ld to column %ld", colors->color, colors->column, colors->column-x);
+        D(DBF_STYLE, "copying color %ld/%ld from column %ld to column %ld", colors->color.color, colors->color.isRGB, colors->column, colors->column-x);
         newColor.column = colors->column - x;
         newColor.color = colors->color;
         AddToGrow(&newColorGrow, &newColor);
@@ -970,7 +973,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
         struct LineColor terminator;
 
         terminator.column = EOC;
-        terminator.color = 0;
+        SetDefaultColor(&terminator.color);
         AddToGrow(&newColorGrow, &terminator);
       }
 
@@ -982,7 +985,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
         struct LineColor terminator;
 
         terminator.column = EOC;
-        terminator.color = 0;
+        SetDefaultColor(&terminator.color);
         AddToGrow(&oldColorGrow, &terminator);
       }
 
@@ -1468,11 +1471,13 @@ BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG len
   if(line->line.Colors != NULL && line->line.Colors[0].column != EOC)
   {
     struct Grow colorGrow;
-    UWORD start_color = GetColor(x-1, line);
-    UWORD end_color = GetColor(x+length, line);
+    struct TEColor start_color;
+    struct TEColor end_color;
     ULONG c = 0;
 
     InitGrow(&colorGrow, data->mypool, sizeof(struct LineColor));
+    GetColor(x-1, line, &start_color);
+    GetColor(x+length, line, &end_color);
 
     // skip all colors before the the starting column
     while(line->line.Colors[c].column <= x)
@@ -1483,7 +1488,7 @@ BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG len
 
     // if the colors differs between the start and the end of the range
     // then we must add color changes accordingly
-    if(start_color != end_color)
+    if(IsSameColor(&start_color, &end_color) == FALSE)
     {
       struct LineColor newColor;
 
@@ -1515,7 +1520,7 @@ BOOL RemoveChars(struct InstData *data, LONG x, struct line_node *line, LONG len
       struct LineColor terminator;
 
       terminator.column = EOC;
-      terminator.color = 0;
+      SetDefaultColor(&terminator.color);
       AddToGrow(&colorGrow, &terminator);
     }
 

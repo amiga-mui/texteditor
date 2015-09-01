@@ -196,11 +196,17 @@ static void ServerWriteChars(IPTR session, struct line_node *line, LONG start, L
 {
   struct IFFHandle *iff = (struct IFFHandle *)session;
   LONG error;
-  struct LineStyle style = {1, GetStyle(start-1, line)};
-  struct LineColor color = {1, 0};
+  struct LineStyle style;
+  struct LineColor color;
   struct LineColor *colors = line->line.Colors;
 
   ENTER();
+
+  style.column = 1;
+  style.style = GetStyle(start-1, line);
+
+  color.column = 1;
+  SetDefaultColor(&color.color);
 
   ServerWriteInfo(session, line);
 
@@ -216,7 +222,7 @@ static void ServerWriteChars(IPTR session, struct line_node *line, LONG start, L
       colors++;
     }
 
-    if(color.color != 0 && colors->column-start != 1)
+    if(IsDefaultColor(&color.color) == FALSE && colors->column-start != 1)
     {
       error = WriteChunkBytes(iff, &color, sizeof(color));
       SHOWVALUE(DBF_CLIPBOARD, error);

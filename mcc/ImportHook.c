@@ -25,6 +25,8 @@
 #include <proto/dos.h>
 #include <proto/exec.h>
 
+#include <stdlib.h>
+
 #include "private.h"
 #include "Debug.h"
 
@@ -379,8 +381,9 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
                   if(*src == ']')
                   {
                     newColor.column = dest - dest_start + 1;
-                    newColor.color = pen;
-                    D(DBF_IMPORT, "adding color %ld at column %ld", newColor.color, newColor.column);
+                    newColor.color.color = pen;
+                    newColor.color.isRGB = FALSE;
+                    D(DBF_IMPORT, "adding color %ld/0 at column %ld", newColor.color, newColor.column);
                     AddToGrow(&color_grow, &newColor);
 
                     if(pen == 0)
@@ -390,6 +393,33 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
 
                     src++;
                   }
+                }
+              }
+            }
+            break;
+
+            case 'P':
+            {
+              if(*src == '[')
+              {
+                ULONG rgb;
+
+                src++;
+
+                rgb = strtoul(src, (char **)&src, 16);
+                if(*src == ']')
+                {
+                  newColor.column = dest - dest_start + 1;
+                  newColor.color.color = 0xff000000 | rgb;
+                  newColor.color.isRGB = TRUE;
+                  D(DBF_IMPORT, "adding color %ld/1 at column %ld", newColor.color, newColor.column);
+                  AddToGrow(&color_grow, &newColor);
+
+                  // using direct RGB colors is alwayws considered as "colored" text
+                  // no matter which RGB color is actually used
+                  setFlag(state, COLOURED);
+
+                  src++;
                 }
               }
             }
@@ -454,12 +484,12 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
         {
           D(DBF_IMPORT, "removing color as termination");
           newColor.column = strlen(line->Contents)+1;
-          newColor.color = 0;
+          SetDefaultColor(&newColor.color);
           AddToGrow(&color_grow, &newColor);
         }
 
         newColor.column = EOC;
-        newColor.color = 0;
+        SetDefaultColor(&newColor.color);
         AddToGrow(&color_grow, &newColor);
       }
 
@@ -715,19 +745,24 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
           if(escstate == 0)
           {
             if(shownext & COLOURED)
+            {
               shownext ^= COLOURED;
+            }
             else if(isFlagSet(state, COLOURED) || (lastWasSeparator == TRUE && ContainsText(src, '#') == TRUE))
             {
               newColor.column = dest - dest_start + 1;
-              newColor.color = isFlagSet(state, COLOURED) ? 0 : 7;
-              AddToGrow(&style_grow, &newStyle);
+              SetDefaultColor(&newColor.color);
+              newColor.color.color = isFlagSet(state, COLOURED) ? 0 : 7;
+              AddToGrow(&color_grow, &newColor);
               state ^= COLOURED;
 
               lastWasSeparator = TRUE;
               continue;
             }
             else
+            {
               shownext |= COLOURED;
+            }
           }
 
           lastWasSeparator = TRUE;
@@ -869,7 +904,8 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
                   if(*src == ']')
                   {
                     newColor.column = dest - dest_start + 1;
-                    newColor.color = pen;
+                    newColor.color.color = pen;
+                    newColor.color.isRGB = FALSE;
                     AddToGrow(&color_grow, &newColor);
 
                     if(pen == 0)
@@ -879,6 +915,32 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
 
                     src++;
                   }
+                }
+              }
+            }
+            break;
+
+            case 'P':
+            {
+              if(*src == '[')
+              {
+                ULONG rgb;
+
+                src++;
+
+                rgb = strtoul(src, (char **)&src, 16);
+                if(*src == ']')
+                {
+                  newColor.column = dest - dest_start + 1;
+                  newColor.color.color = 0xff000000 | rgb;
+                  newColor.color.isRGB = TRUE;
+                  AddToGrow(&color_grow, &newColor);
+
+                  // using direct RGB colors is alwayws considered as "colored" text
+                  // no matter which RGB color is actually used
+                  setFlag(escstate, COLOURED);
+
+                  src++;
                 }
               }
             }
@@ -950,7 +1012,7 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
       if(color_grow.itemCount > 0)
       {
         newColor.column = EOC;
-        newColor.color = 0;
+        SetDefaultColor(&newColor.color);
         AddToGrow(&color_grow, &newColor);
       }
 

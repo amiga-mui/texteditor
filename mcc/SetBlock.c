@@ -94,7 +94,13 @@ IPTR mSetBlock(struct InstData *data, struct MUIP_TextEditor_SetBlock *msg)
 
     if(isFlagSet(msg->operation, MUIF_TextEditor_SetBlock_Color))
     {
-      AddColor(data, &newblock, (UWORD)msg->value);
+      struct TEColor color;
+
+      SetDefaultColor(&color);
+      color.color = msg->value;
+      color.isRGB = ((msg->value & 0xff000000) == 0xff000000) ? TRUE : FALSE;
+
+      AddColor(data, &newblock, &color);
     }
 
     if(isFlagSet(msg->operation, MUIF_TextEditor_SetBlock_StyleBold))

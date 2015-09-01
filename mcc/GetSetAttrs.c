@@ -127,7 +127,7 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = data->use_fixedfont;
       break;
     case MUIA_TextEditor_Pen:
-      ti_Data = data->Pen;
+      ti_Data = data->Pen.color;
       break;
     case MUIA_TextEditor_Flow:
       ti_Data = data->Flow;
@@ -539,8 +539,9 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       {
         if(data->NoNotify == FALSE)
         {
-          data->Pen = ti_Data;
-          AddColor(data, &data->blockinfo, (UWORD)ti_Data);
+          data->Pen.color = ti_Data;
+          data->Pen.isRGB = ((ti_Data & 0xff000000) == 0xff000000) ? TRUE : FALSE;
+          AddColor(data, &data->blockinfo, &data->Pen);
           data->HasChanged = TRUE;
         }
       }

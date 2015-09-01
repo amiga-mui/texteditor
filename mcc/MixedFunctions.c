@@ -425,7 +425,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
   struct RastPort *rp = data->rport;
 
   UWORD styles[3] = {0, 0, 0};
-  UWORD colors[3] = {0, 0, 0};
+  struct TEColor colors[3];
   LONG start = 0;
   LONG stop = 0;
   LONG c;
@@ -448,6 +448,10 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
     return;
   }
 
+  SetDefaultColor(&colors[0]);
+  SetDefaultColor(&colors[1]);
+  SetDefaultColor(&colors[2]);
+
   line_nr = LineToVisual(data, line) - 1;
   OffsetToLines(data, x, line, &pos);
 
@@ -463,7 +467,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
           stop = c;
 
         styles[c+1] = GetStyle(x+c, line);
-        colors[c+1] = GetColor(x+c, line);
+        GetColor(x+c, line, &colors[c+1]);
         chars[c+1] = (line->line.Contents[x+c] != '\n') ? line->line.Contents[x+c] : ' ';
       }
     }
@@ -547,7 +551,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
 
       for(c = start; c <= stop; c++)
       {
-        SetAPen(rp, ConvertPen(data, colors[1+c], line->line.Highlight));
+        SetColor(data, rp, &colors[1+c], line->line.Highlight);
         SetSoftStyle(rp, ConvertStyle(styles[1+c]), AskSoftStyle(rp));
         TextNew(rp, (STRPTR)&chars[1+c], 1, data->TabSizePixels);
       }

@@ -5,6 +5,23 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2015-09-01 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc: implemented support for direct RGB color specs as known from MUI4's
+    text engine. Use escape sequences like \033P[RRGGBB] to set the RGB color
+    "RRGGBB" encoded in hex. The visual display of such RGB colors requires a
+    hi/truecolor screen and a graphics.library which is able to handle such RGB
+    colors. The latter is true for AmigaOS 4, MorphOS and AROS. For AmigaOS 3.x
+    a patch like AfAOS is required.
+
+2015-08-24 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Dispatcher.c, mcc/GetSetAttrs.c, mcc/MixedFunctions.c: implemented an
+    alternative way to handle the current cursor position. This way no longer
+    treats the position as separate X and Y values but as an index into the text
+    buffer. This index value is then converted into the known X and Y values
+    automatically. Thanks to Andreas Falkenhahn for the suggestion.
+
 #### v15.46 RELEASE ############################################################
 
 2015-03-21 Jens Maus <mail@jens-maus.de>

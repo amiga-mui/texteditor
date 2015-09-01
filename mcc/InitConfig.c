@@ -248,7 +248,7 @@ void InitConfig(struct IClass *cl, Object *obj)
     clearFlag(data->flags, FLG_CheckWords);
 
   data->Flow = data->actualline->line.Flow;
-  data->Pen = GetColor(data->CPos_X, data->actualline);
+  GetColor(data->CPos_X, data->actualline, &data->Pen);
 
   if(isFlagClear(data->flags, FLG_FirstInit))
   {
@@ -257,7 +257,7 @@ void InitConfig(struct IClass *cl, Object *obj)
     SetAttrs(obj,
       MUIA_FillArea, FALSE,
       MUIA_TextEditor_Flow, data->Flow,
-      MUIA_TextEditor_Pen, data->Pen,
+      MUIA_TextEditor_Pen, data->Pen.color,
       MUIA_TextEditor_AreaMarked, FALSE,
       MUIA_TextEditor_UndoAvailable, FALSE,
       MUIA_TextEditor_RedoAvailable, FALSE,

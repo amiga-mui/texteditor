@@ -26,36 +26,38 @@
 #include "Debug.h"
 
 /// GetColor()
-UWORD GetColor(LONG x, struct line_node *line)
+void GetColor(LONG x, struct line_node *line, struct TEColor *color)
 {
-  UWORD color = 0;
   struct LineColor *colors = line->line.Colors;
 
   ENTER();
+
+  color->color = 0;
+  color->isRGB = FALSE;
 
   if(colors != NULL && x >= 0)
   {
     while(colors->column != EOC && colors->column <= x+1)
     {
-      color = colors->color;
+      *color = colors->color;
       colors++;
     }
   }
 
-  RETURN(color);
-  return(color);
+  LEAVE();
 }
 
 ///
 /// AddColorToLine()
-static void AddColorToLine(struct InstData *data, LONG x, struct line_node *line, LONG length, UWORD color)
+static void AddColorToLine(struct InstData *data, LONG x, struct line_node *line, LONG length, const struct TEColor *color)
 {
   struct Grow colorGrow;
   struct LineColor *colors;
-  UWORD oldcol = 0;
+  struct TEColor oldcol;
 
   ENTER();
 
+  SetDefaultColor(&oldcol);
   x++;
 
   InitGrow(&colorGrow, data->mypool, sizeof(struct LineColor));
@@ -71,12 +73,12 @@ static void AddColorToLine(struct InstData *data, LONG x, struct line_node *line
     }
   }
   // add the new color if it is different from the last one
-  if(color != oldcol)
+  if(IsSameColor(color, &oldcol) == FALSE)
   {
     struct LineColor newColor;
 
     newColor.column = x;
-    newColor.color = color;
+    newColor.color = *color;
     AddToGrow(&colorGrow, &newColor);
   }
   // skip and forget all color changes in the new range
@@ -89,7 +91,7 @@ static void AddColorToLine(struct InstData *data, LONG x, struct line_node *line
     }
   }
   // add another color change if the new color is different from the last skipped one within the range
-  if(color != oldcol)
+  if(IsSameColor(color, &oldcol) == FALSE)
   {
     struct LineColor newColor;
 
@@ -113,7 +115,8 @@ static void AddColorToLine(struct InstData *data, LONG x, struct line_node *line
     struct LineColor newColor;
 
     newColor.column = EOC;
-    newColor.color = 0;
+    newColor.color.color = 0;
+    newColor.color.isRGB = FALSE;
     AddToGrow(&colorGrow, &newColor);
   }
 
@@ -125,9 +128,10 @@ static void AddColorToLine(struct InstData *data, LONG x, struct line_node *line
 
   LEAVE();
 }
+
 ///
 /// AddColor()
-void AddColor(struct InstData *data, struct marking *realblock, UWORD color)
+void AddColor(struct InstData *data, struct marking *realblock, const struct TEColor *color)
 {
   struct marking newblock;
   struct line_node *startline;

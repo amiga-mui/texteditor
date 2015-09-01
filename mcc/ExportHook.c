@@ -174,8 +174,9 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
       {
         LONG pos;
         WORD style;
-        BOOL coloured = FALSE;
-        UWORD colour_state = 7;
+        struct TEColor color;
+        struct TEColor color_state;
+        BOOL colored = FALSE;
         LONG nextStyleColumn;
         LONG nextColorColumn;
 
@@ -189,6 +190,11 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
         else
           nextColorColumn = colors[0].column;
 
+        style = 0;
+        SetDefaultColor(&color);
+        SetDefaultColor(&color_state);
+        color_state.color = 7;
+
         while(length > 0 && (nextStyleColumn != EOS || nextColorColumn != EOC))
         {
           BOOL isColorChange;
@@ -198,8 +204,8 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
           SHOWVALUE(DBF_EXPORT, nextColorColumn);
 
           // check whether a style change or a color change is first to be handled
-          if((coloured == TRUE  && nextStyleColumn <  nextColorColumn) ||
-             (coloured == FALSE && nextStyleColumn <= nextColorColumn))
+          if((colored == TRUE  && nextStyleColumn <  nextColorColumn) ||
+             (colored == FALSE && nextStyleColumn <= nextColorColumn))
           {
             pos = styles->column - 1;
             style = styles->style;
@@ -211,9 +217,9 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
           else
           {
             pos = colors->column - 1;
-            style = colors->color;
+            color = colors->color;
             isColorChange = TRUE;
-            // remember the next style change column
+            // remember the next color change column
             colors++;
             nextColorColumn = colors->column;
           }
@@ -223,7 +229,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
             continue;
 
           // depending on how much we export
-          // we have to fire up the style convert routines.
+          // we have to fire up the style conversion routines
           if(pos-lastpos <= length)
           {
             len = pos-lastpos;
@@ -234,10 +240,10 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
             {
               if(isColorChange == TRUE)
               {
-                if((coloured = (style == colour_state ? TRUE : FALSE)))
+                if((colored = (IsSameColor(&color, &color_state) ? TRUE : FALSE)))
                 {
                   *buf->pointer++ = '#';
-                  colour_state ^= 7;
+                  color_state.color ^= 7;
                 }
               }
               else
@@ -271,8 +277,11 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
             {
               if(isColorChange == TRUE)
               {
-                D(DBF_EXPORT, "exporting color %ld of column %ld", style, pos+1);
-                snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033p[%d]", style);
+                D(DBF_EXPORT, "exporting color %ld/%ld of column %ld", color.color, color.isRGB, pos+1);
+                if(color.isRGB == TRUE)
+                  snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033P[%08lx]", color.color);
+                else
+                  snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033p[%d]", color.color);
                 buf->pointer += strlen(buf->pointer);
               }
               else
