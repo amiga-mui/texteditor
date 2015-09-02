@@ -9,6 +9,7 @@ $URL$
 
   * mcc/ExportHook.c: export the lower 24bits of the RGB color only for
     consistency with the documentation and the import functions.
+  * mcc/PrintLineWithStyle.c: use SetRPAttrs() only to set the text color.
 
 2015-09-01 Thore Böckelmann <tboeckel@gmx.de>
 

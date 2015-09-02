@@ -521,12 +521,24 @@ void SetColor(struct InstData *data, struct RastPort *rp, const struct TEColor *
     else
     {
       // fall back to standard pen 0
-      SetAPen(rp, ConvertPen(data, 0, highlight));
+      SetRPAttrs(rp,
+        #if defined(__MORPHOS__)
+        RPTAG_PenMode,   TRUE,
+        RPTAG_AlphaMode, FALSE,
+        #endif
+        RPTAG_APen, ConvertPen(data, 0, highlight),
+        TAG_DONE);
     }
   }
   else
   {
-    SetAPen(rp, ConvertPen(data, c->color, highlight));
+    SetRPAttrs(rp,
+      #if defined(__MORPHOS__)
+      RPTAG_PenMode,   TRUE,
+      RPTAG_AlphaMode, FALSE,
+      #endif
+      RPTAG_APen, ConvertPen(data, c->color, highlight),
+      TAG_DONE);
   }
 
   LEAVE();
