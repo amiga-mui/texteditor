@@ -279,7 +279,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
               {
                 D(DBF_EXPORT, "exporting color %ld/%ld of column %ld", color.color, color.isRGB, pos+1);
                 if(color.isRGB == TRUE)
-                  snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033P[%08lx]", color.color);
+                  snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033P[%06lx]", color.color & ~0xff000000);
                 else
                   snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033p[%d]", color.color);
                 buf->pointer += strlen(buf->pointer);

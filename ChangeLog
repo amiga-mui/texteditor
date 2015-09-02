@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2015-09-02 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/ExportHook.c: export the lower 24bits of the RGB color only for
+    consistency with the documentation and the import functions.
+
 2015-09-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc: implemented support for direct RGB color specs as known from MUI4's
