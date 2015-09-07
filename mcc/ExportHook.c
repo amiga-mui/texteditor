@@ -281,7 +281,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
                 if(color.isRGB == TRUE)
                   snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033P[%06lx]", color.color & ~0xff000000);
                 else
-                  snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033p[%d]", color.color);
+                  snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033p[%ld]", color.color);
                 buf->pointer += strlen(buf->pointer);
               }
               else
