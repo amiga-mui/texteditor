@@ -59,7 +59,7 @@ void ResetDisplay(struct InstData *data)
   if(data->shown == TRUE)
   {
     data->totallines = CountLines(data, &data->linelist);
-    data->Pen = GetColor(data->CPos_X, data->actualline);
+    GetColor(data->CPos_X, data->actualline, &data->Pen);
     data->Flow = data->actualline->line.Flow;
     data->Separator = data->actualline->line.Separator;
     data->NoNotify = TRUE;
@@ -724,7 +724,7 @@ DISPATCHER(_Dispatcher)
   LONG t_totallines;
   LONG t_visual_y;
   BOOL t_haschanged;
-  UWORD t_pen;
+  struct TEColor t_pen;
   BOOL areamarked;
   IPTR result = 0;
 
@@ -888,13 +888,15 @@ DISPATCHER(_Dispatcher)
     struct marking newblock;
 
     NiceBlock(&data->blockinfo, &newblock);
-    data->Pen = GetColor(data->blockinfo.stopx - ((data->blockinfo.stopx && newblock.startx == data->blockinfo.startx && newblock.startline == data->blockinfo.startline) ? 1 : 0), data->blockinfo.stopline);
+    GetColor(data->blockinfo.stopx - ((data->blockinfo.stopx && newblock.startx == data->blockinfo.startx && newblock.startline == data->blockinfo.startline) ? 1 : 0), data->blockinfo.stopline, &data->Pen);
   }
   else
-    data->Pen = GetColor(data->CPos_X, data->actualline);
+  {
+    GetColor(data->CPos_X, data->actualline, &data->Pen);
+  }
 
-  if(t_pen != data->Pen)
-    set(obj, MUIA_TextEditor_Pen, data->Pen);
+  if(IsSameColor(&t_pen, &data->Pen) == FALSE)
+    set(obj, MUIA_TextEditor_Pen, data->Pen.color);
 
   if(data->actualline->line.Flow != data->Flow)
   {
