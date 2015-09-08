@@ -380,6 +380,7 @@ struct InstData
   LONG    inactivecolor;
   LONG    separatorshine;
   LONG    separatorshadow;
+  LONG    exclusivePen; // exclusively allocated pen for systems without direct RGB pen support (i.e. AmigaOS3)
 
   STRPTR  background;
   BOOL    use_fixedfont;
@@ -737,7 +738,7 @@ enum
   FLG_PasteStyles    = 1L << 21, // respect styles when pasting text
   FLG_PasteColors    = 1L << 22, // respect colors when pasting text
   FLG_ForcedTabSize  = 1L << 23, // override the user defined TAB size
-  FLG_RGBPens        = 1L << 30, // graphics.library can handle direct RGB pens
+  FLG_Truecolor      = 1L << 30, // truecolor screen
   FLG_MUI4           = 1L << 31, // running under MUI4
 
   FLG_NumberOf

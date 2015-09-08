@@ -504,29 +504,45 @@ void SetColor(struct InstData *data, struct RastPort *rp, const struct TEColor *
 
   if(IsRGBColor(c) == TRUE)
   {
-    if(isFlagSet(data->flags, FLG_RGBPens))
+    if(isFlagSet(data->flags, FLG_Truecolor))
     {
-      SetRPAttrs(rp,
-        #if defined(__MORPHOS__)
-        RPTAG_PenMode,   FALSE,
-        RPTAG_AlphaMode, FALSE,
-        #endif
-        #if defined(__amigaos4__)
-        RPTAG_APenColor, c->color,
-        #else
-        RPTAG_FgColor,   c->color,
-        #endif
-        TAG_DONE);
+      if(data->exclusivePen != -1)
+      {
+        // set the appropriate RGB color for the exclusive pen and use it
+        SetRGB32(&_screen(data->object)->ViewPort, data->exclusivePen, (c->color & 0xff0000) << 8, (c->color & 0x00ff00) << 16, (c->color & 0x0000ff) << 24);
+        SetRPAttrs(rp,
+          #if defined(__MORPHOS__)
+          RPTAG_PenMode,   TRUE,
+          RPTAG_AlphaMode, FALSE,
+          #endif
+          RPTAG_APen, data->exclusivePen,
+          TAG_DONE);
+      }
+      else
+      {
+        // we can use RGB colors directly
+        SetRPAttrs(rp,
+          #if defined(__MORPHOS__)
+          RPTAG_PenMode,   FALSE,
+          RPTAG_AlphaMode, FALSE,
+          #endif
+          #if defined(__amigaos4__)
+          RPTAG_APenColor, c->color,
+          #else
+          RPTAG_FgColor,   c->color,
+          #endif
+          TAG_DONE);
+      }
     }
     else
     {
-      // fall back to standard pen 0
+      // fall back to the standard foreground color
       SetRPAttrs(rp,
         #if defined(__MORPHOS__)
         RPTAG_PenMode,   TRUE,
         RPTAG_AlphaMode, FALSE,
         #endif
-        RPTAG_APen, ConvertPen(data, 0, highlight),
+        RPTAG_APen, ConvertPen(data, 1, highlight),
         TAG_DONE);
     }
   }

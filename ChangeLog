@@ -5,6 +5,11 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2015-09-08 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Dispatcher.c, mcc/PrintLineWithStyles.c: reworked the RGB color handling
+    to be independent of patches like AfAOS on AmigaOS3.
+
 2015-09-02 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ExportHook.c: export the lower 24bits of the RGB color only for

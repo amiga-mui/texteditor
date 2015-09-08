@@ -317,23 +317,20 @@ static IPTR mSetup(struct IClass *cl, Object *obj, Msg msg)
     data->smooth_wait = 0;
     data->scrollaction = FALSE;
 
-    // support for direct RGB pens requires at least a hi/truecolor screen
-    #if defined(__amigaos4__) || defined(__MORPHOS__) || defined(__AROS__)
     if(GetBitMapAttr(_screen(obj)->RastPort.BitMap, BMA_DEPTH) > 8)
-      setFlag(data->flags, FLG_RGBPens);
-    #elif defined(__amigaos3__)
-    if(GetBitMapAttr(_screen(obj)->RastPort.BitMap, BMA_DEPTH) > 8)
-    {
-      // on AmigaOS3 we require AfAOS to be running for direct RGB pen support
-      // AfAOS patches cybergraphics.library to version 45
-      struct Library *cgfxBase;
+      setFlag(data->flags, FLG_Truecolor);
+    else
+      clearFlag(data->flags, FLG_Truecolor);
 
-      if((cgfxBase = OpenLibrary("cybergraphics.library", 45)) != NULL)
-      {
-        CloseLibrary(cgfxBase);
-        setFlag(data->flags, FLG_RGBPens);
-      }
-    }
+    #if defined(__amigaos3__)
+    // allocate an exclusive pen for truecolor screens
+    // this will be SetRGB32()'d before it is actually SetAPen()'d
+    if(isFlagSet(data->flags, FLG_Truecolor))
+	  data->exclusivePen = ObtainPen(_screen(obj)->ViewPort.ColorMap, -1, 0, 0, 0, PENF_EXCLUSIVE|PENF_NO_SETCOLOR);
+	else
+	  data->exclusivePen = -1;
+    #else
+    data->exclusivePen = -1;
     #endif
 
     result = TRUE;
@@ -354,6 +351,12 @@ static IPTR mCleanup(struct IClass *cl, Object *obj, Msg msg)
   IPTR result = 0;
 
   ENTER();
+
+  if(data->exclusivePen != -1)
+  {
+    ReleasePen(_screen(obj)->ViewPort.ColorMap, data->exclusivePen);
+    data->exclusivePen = -1;
+  }
 
   // cleanup the selection pointer
   CleanupSelectPointer(data);
