@@ -317,6 +317,25 @@ static IPTR mSetup(struct IClass *cl, Object *obj, Msg msg)
     data->smooth_wait = 0;
     data->scrollaction = FALSE;
 
+    // support for direct RGB pens requires at least a hi/truecolor screen
+    #if defined(__amigaos4__) || defined(__MORPHOS__) || defined(__AROS__)
+    if(GetBitMapAttr(_screen(obj)->RastPort.BitMap, BMA_DEPTH) > 8)
+      setFlag(data->flags, FLG_RGBPens);
+    #elif defined(__amigaos3__)
+    if(GetBitMapAttr(_screen(obj)->RastPort.BitMap, BMA_DEPTH) > 8)
+    {
+      // on AmigaOS3 we require AfAOS to be running for direct RGB pen support
+      // AfAOS patches cybergraphics.library to version 45
+      struct Library *cgfxBase;
+
+      if((cgfxBase = OpenLibrary("cybergraphics.library", 45)) != NULL)
+      {
+        CloseLibrary(cgfxBase);
+        setFlag(data->flags, FLG_RGBPens);
+      }
+    }
+    #endif
+
     result = TRUE;
   }
 
