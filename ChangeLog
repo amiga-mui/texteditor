@@ -5,6 +5,13 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2015-09-22 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/misc: implemented MUIA_TextEditor_RGBMode to completely avoid the usage
+    of pens for text rendering. All pen numbers will be converted to direct
+    RGB values as soon as their color information is available, i.e. MUIM_Setup
+    was called for the TextEditor object.
+
 2015-09-08 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Dispatcher.c, mcc/PrintLineWithStyles.c: reworked the RGB color handling

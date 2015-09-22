@@ -371,9 +371,11 @@ struct InstData
   struct te_key *RawkeyBindings;
   ULONG   blockqual;
 
-  LONG    textcolor;
+  LONG    textColor;
+  ULONG   textRGB;
+  LONG    highlightColor;
+  ULONG   highlightRGB;
   LONG    backgroundcolor;
-  LONG    highlightcolor;
   LONG    cursorcolor;
   LONG    cursortextcolor;
   LONG    markedcolor;
@@ -429,6 +431,7 @@ struct InstData
   struct TEColor  Pen;
   BOOL            NoNotify;
   ULONG           *colormap;
+  BOOL            rgbMode;
 
   struct  bookmark    bookmarks[4];
 
@@ -475,10 +478,12 @@ void ClientWriteLine(IPTR session, struct line_node *line);
 LONG ClientReadLine(IPTR session, struct line_node **line, ULONG *cset);
 
 // ColorOperators.c
-void GetColor(LONG, struct line_node *, struct TEColor *);
+void GetColor(struct InstData *, LONG, struct line_node *, struct TEColor *);
 void AddColor(struct InstData *, struct marking *, const struct TEColor *);
-#define SetDefaultColor(c)  { (c)->color = 0, (c)->isRGB = FALSE; }
-#define IsDefaultColor(c)   ((c)->color == 0 && (c)->isRGB == FALSE)
+void SetDefaultColor(struct InstData *, struct TEColor *);
+BOOL IsDefaultColor(struct InstData *, const struct TEColor *);
+ULONG ConvertSinglePenToRGB(struct InstData *, LONG);
+void ConvertPensToRGB(struct InstData *);
 #define IsSameColor(c1, c2) ((c1)->color == (c2)->color && (c1)->isRGB == (c2)->isRGB)
 #define IsRGBColor(c)       (c)->isRGB
 
@@ -738,6 +743,7 @@ enum
   FLG_PasteStyles    = 1L << 21, // respect styles when pasting text
   FLG_PasteColors    = 1L << 22, // respect colors when pasting text
   FLG_ForcedTabSize  = 1L << 23, // override the user defined TAB size
+  FLG_SetupDone      = 1L << 29, // MUIM_Setup finished successfully
   FLG_Truecolor      = 1L << 30, // truecolor screen
   FLG_MUI4           = 1L << 31, // running under MUI4
 

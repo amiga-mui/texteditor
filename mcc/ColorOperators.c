@@ -21,19 +21,19 @@
 ***************************************************************************/
 
 #include <proto/exec.h>
+#include <proto/graphics.h>
 
 #include "private.h"
 #include "Debug.h"
 
 /// GetColor()
-void GetColor(LONG x, struct line_node *line, struct TEColor *color)
+void GetColor(struct InstData *data, LONG x, struct line_node *line, struct TEColor *color)
 {
   struct LineColor *colors = line->line.Colors;
 
   ENTER();
 
-  color->color = 0;
-  color->isRGB = FALSE;
+  SetDefaultColor(data, color);
 
   if(colors != NULL && x >= 0)
   {
@@ -57,7 +57,7 @@ static void AddColorToLine(struct InstData *data, LONG x, struct line_node *line
 
   ENTER();
 
-  SetDefaultColor(&oldcol);
+  SetDefaultColor(data, &oldcol);
   x++;
 
   InitGrow(&colorGrow, data->mypool, sizeof(struct LineColor));
@@ -176,6 +176,100 @@ void AddColor(struct InstData *data, struct marking *realblock, const struct TEC
     AddColorToLine(data, 0, line, stopx, color);
   }
   RedrawArea(data, startx, startline, stopx, stopline);
+
+  LEAVE();
+}
+
+///
+/// SetDefaultColor()
+void SetDefaultColor(struct InstData *data, struct TEColor *c)
+{
+  ENTER();
+
+  if(data != NULL && data->rgbMode == TRUE)
+  {
+    c->color = data->textRGB;
+    c->isRGB = TRUE;
+  }
+  else
+  {
+    c->color = 0;
+    c->isRGB = FALSE;
+  }
+
+  LEAVE();
+}
+
+///
+/// IsDefaultColor()
+BOOL IsDefaultColor(struct InstData *data, const struct TEColor *c)
+{
+  BOOL isDefault;
+  struct TEColor def;
+
+  ENTER();
+
+  SetDefaultColor(data, &def);
+  isDefault = IsSameColor(c, &def);
+
+  RETURN(isDefault);
+  return isDefault;
+}
+
+///
+/// ConvertSinglePenToRGB()
+ULONG ConvertSinglePenToRGB(struct InstData *data, LONG pen)
+{
+  ULONG rgb3[3];
+  ULONG rgb;
+
+  ENTER();
+
+  // get the RGB values of the pen and turn the pen based color change into a RGB base color change
+  GetRGB32(_screen(data->object)->ViewPort.ColorMap, pen, 1, rgb3);
+  rgb = 0xff000000 | ((rgb3[0] >> 24) & 0xff) << 16 | ((rgb3[1] >> 24) & 0xff) << 8 | ((rgb3[2] >> 24) & 0xff) << 0;
+
+  RETURN(rgb);
+  return rgb;
+}
+
+/// ConvertPensToRGB()
+void ConvertPensToRGB(struct InstData *data)
+{
+  struct line_node *line;
+  struct ColorMap *cm;
+
+  ENTER();
+
+  cm = _screen(data->object)->ViewPort.ColorMap;
+
+  // iterate over all lines
+  line = GetFirstLine(&data->linelist);
+  while(line != NULL)
+  {
+    if(line->line.Colors != NULL)
+    {
+      struct LineColor *colors = line->line.Colors;
+
+      // iterate over all color changes of the line
+      while(colors->column != EOC)
+      {
+        if(IsRGBColor(&colors->color) == FALSE)
+        {
+          ULONG rgb3[3];
+
+          // get the RGB values of the pen and turn the pen based color change into a RGB base color change
+          GetRGB32(cm, ConvertPen(data, colors->color.color, FALSE), 1, rgb3);
+          colors->color.color = 0xff000000 | ((rgb3[0] >> 24) & 0xff) << 16 | ((rgb3[1] >> 24) & 0xff) << 8 | ((rgb3[2] >> 24) & 0xff) << 0;
+          colors->color.isRGB = TRUE;
+        }
+
+        colors++;
+      }
+    }
+
+    line = GetNextLine(line);
+  }
 
   LEAVE();
 }

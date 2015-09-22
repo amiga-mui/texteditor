@@ -21,6 +21,7 @@
 ***************************************************************************/
 
 #include <string.h>
+#include <stdlib.h>
 
 #include <exec/memory.h>
 #include <libraries/mui.h>
@@ -103,6 +104,79 @@ static LONG SetCol(Object *obj, long item, const void *def)
 }
 
 ///
+/// StringToRGB()
+void StringToRGB(const char *str, ULONG *rgb)
+{
+  size_t len;
+
+  ENTER();
+
+  len = strlen(str);
+  if(len == 0)
+  {
+    *rgb = 0xff000000;
+  }
+  else if(len == 6)
+  {
+    // "rrggbb"
+    *rgb = 0xff000000 | strtoul(str, NULL, 16);
+  }
+  else
+  {
+    // "rrrrrrrr,gggggggg,bbbbbbbb"
+    ULONG tmp;
+
+    *rgb = 0xff000000;
+    tmp = strtoul(&str[ 0], NULL, 16);
+    *rgb |= ((tmp >> 24) & 0xff) << 16;
+    tmp = strtoul(&str[ 9], NULL, 16);
+    *rgb |= ((tmp >> 24) & 0xff) << 8;
+    tmp = strtoul(&str[18], NULL, 16);
+    *rgb |= ((tmp >> 24) & 0xff) << 0;
+  }
+}
+
+///
+/// GetPenAndRGB()
+LONG GetPenAndRGB(struct InstData *data, LONG item, CONST_APTR def, ULONG *rgb)
+{
+  struct MUI_PenSpec *spec;
+  LONG pen;
+  BOOL haveRGB;
+
+  ENTER();
+
+  if(DoMethod(data->object, MUIM_GetConfigItem, item, &spec) == FALSE)
+    spec = (struct MUI_PenSpec *)def;
+
+  if(spec != NULL && spec->buf[0] == 'r')
+  {
+    StringToRGB(&spec->buf[1], rgb);
+    haveRGB = TRUE;
+  }
+  else
+  {
+    haveRGB = FALSE;
+  }
+
+  if(data->rgbMode == FALSE || isFlagClear(data->flags, FLG_Truecolor) || haveRGB == FALSE)
+    pen = MUI_ObtainPen(muiRenderInfo(data->object), spec, 0);
+  else
+    pen = -1;
+
+  if(haveRGB == FALSE && pen != -1)
+  {
+    ULONG rgb3[3];
+
+    GetRGB32(_screen(data->object)->ViewPort.ColorMap, MUIPEN(pen), 1, rgb3);
+    *rgb = 0xff000000 | ((rgb3[0] >> 24) & 0xff) << 16 | ((rgb3[1] >> 24) & 0xff) << 8 | ((rgb3[2] >> 24) & 0xff) << 0;
+  }
+
+  RETURN(pen);
+  return pen;
+}
+
+///
 /// InitConfig()
 void kprintf(const char *,...);
 void InitConfig(struct IClass *cl, Object *obj)
@@ -115,10 +189,11 @@ void InitConfig(struct IClass *cl, Object *obj)
 
   ENTER();
 
-  data->textcolor         = SetCol(obj, MUICFG_TextEditor_TextColor,       CFG_TextEditor_TextColor_Def);
+  data->textColor         = GetPenAndRGB(data, MUICFG_TextEditor_TextColor, CFG_TextEditor_TextColor_Def, &data->textRGB);
+  data->highlightColor    = GetPenAndRGB(data, MUICFG_TextEditor_HighlightColor, CFG_TextEditor_HighlightColor_Def, &data->highlightRGB);
+
   data->cursorcolor       = SetCol(obj, MUICFG_TextEditor_CursorColor,     CFG_TextEditor_CursorColor_Def);
   data->cursortextcolor   = SetCol(obj, MUICFG_TextEditor_CursorTextColor, CFG_TextEditor_CursorTextColor_Def);
-  data->highlightcolor    = SetCol(obj, MUICFG_TextEditor_HighlightColor,  CFG_TextEditor_HighlightColor_Def);
   data->markedcolor       = SetCol(obj, MUICFG_TextEditor_MarkedColor,     CFG_TextEditor_MarkedColor_Def);
   data->separatorshine    = SetCol(obj, MUICFG_TextEditor_SeparatorShine,  CFG_TextEditor_SeparatorShine_Def);
   data->separatorshadow   = SetCol(obj, MUICFG_TextEditor_SeparatorShadow, CFG_TextEditor_SeparatorShadow_Def);
@@ -248,7 +323,7 @@ void InitConfig(struct IClass *cl, Object *obj)
     clearFlag(data->flags, FLG_CheckWords);
 
   data->Flow = data->actualline->line.Flow;
-  GetColor(data->CPos_X, data->actualline, &data->Pen);
+  GetColor(data, data->CPos_X, data->actualline, &data->Pen);
 
   if(isFlagClear(data->flags, FLG_FirstInit))
   {
@@ -433,10 +508,15 @@ void FreeConfig(struct IClass *cl, Object *obj)
   if(data->RawkeyBindings != NULL)
     FreeVecPooled(data->mypool, data->RawkeyBindings);
 
-  if(data->textcolor != -1)
+  if(data->textColor != -1)
   {
-    MUI_ReleasePen(muiRenderInfo(obj), data->textcolor);
-    data->textcolor = -1;
+    MUI_ReleasePen(muiRenderInfo(obj), data->textColor);
+    data->textColor = -1;
+  }
+  if(data->highlightColor != -1)
+  {
+    MUI_ReleasePen(muiRenderInfo(obj), data->highlightColor);
+    data->highlightColor = -1;
   }
   if(data->cursorcolor != -1)
   {
@@ -447,11 +527,6 @@ void FreeConfig(struct IClass *cl, Object *obj)
   {
     MUI_ReleasePen(muiRenderInfo(obj), data->cursortextcolor);
     data->cursortextcolor = -1;
-  }
-  if(data->highlightcolor != -1)
-  {
-    MUI_ReleasePen(muiRenderInfo(obj), data->highlightcolor);
-    data->highlightcolor = -1;
   }
   if(data->markedcolor != -1)
   {

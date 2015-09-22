@@ -224,6 +224,10 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       DoMethod(obj, MUIM_TextEditor_CursorXYToIndex, data->CPos_X, LineNr(data, data->actualline)-1, &ti_Data);
     break;
 
+    case MUIA_TextEditor_RGBMode:
+      ti_Data = data->rgbMode;
+    break;
+
     default:
       LEAVE();
       return(DoSuperMethodA(cl, obj, (Msg)msg));
@@ -539,8 +543,16 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       {
         if(data->NoNotify == FALSE)
         {
-          data->Pen.color = ti_Data;
-          data->Pen.isRGB = ((ti_Data & 0xff000000) == 0xff000000) ? TRUE : FALSE;
+          struct TEColor pen;
+
+          pen.color = ti_Data;
+          pen.isRGB = ((ti_Data & 0xff000000) == 0xff000000) ? TRUE : FALSE;
+          if(data->rgbMode == TRUE && IsRGBColor(&pen) == FALSE && isFlagSet(data->flags, FLG_SetupDone))
+          {
+            pen.color = ConvertSinglePenToRGB(data, pen.color);
+            pen.isRGB = TRUE;
+          }
+          data->Pen = pen;
           AddColor(data, &data->blockinfo, &data->Pen);
           data->HasChanged = TRUE;
         }
@@ -837,6 +849,10 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           TAG_DONE);
       }
       break;
+
+      case MUIA_TextEditor_RGBMode:
+        data->rgbMode = ti_Data;
+      break;
     }
   }
 
@@ -856,6 +872,9 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       MoveLines(&data->linelist, &newlines);
       ResetDisplay(data);
       ResetUndoBuffer(data);
+      // convert all pens to RGB values if RGB mode is active
+      if(data->rgbMode == TRUE && isFlagSet(data->flags, FLG_SetupDone))
+        ConvertPensToRGB(data);
       result = TRUE;
     }
   }

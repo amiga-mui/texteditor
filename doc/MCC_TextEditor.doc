@@ -35,6 +35,7 @@ TextEditor.mcc/MUIA_TextEditor_Prop_Visible
 TextEditor.mcc/MUIA_TextEditor_Quiet
 TextEditor.mcc/MUIA_TextEditor_ReadOnly
 TextEditor.mcc/MUIA_TextEditor_RedoAvailable
+TextEditor.mcc/MUIA_TextEditor_RGBMode
 TextEditor.mcc/MUIA_TextEditor_Rows
 TextEditor.mcc/MUIA_TextEditor_Separator
 TextEditor.mcc/MUIA_TextEditor_Slider
@@ -880,6 +881,24 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
 
     SEE ALSO
         MUIA_TextEditor_UndoAvailable
+
+TextEditor.mcc/MUIA_TextEditor_RGBMode
+
+    NAME
+        MUIA_TextEditor_RGBMode -- [ISG], BOOL
+
+    FUNCTION
+        Setting this attribute to TRUE will cause TextEditor.mcc to convert
+        all pen usages within the text to direct RGB values. The former pen
+        values will be completely forgotten then and only direct RGB values
+        will be used and exported from that time on. Note that such an object
+        will no longer produce the intended coloring on colormapped screens
+        as these cannot handle arbitrary direct RGB colors. Furthermore
+        already converted pens cannot be restored again when this attribute
+        is set to FALSE again.
+
+    SEE ALSO
+        MUIA_TextEditor_Contents
 
 TextEditor.mcc/MUIA_TextEditor_Rows
 

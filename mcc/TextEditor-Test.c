@@ -388,6 +388,7 @@ int main(void)
   //                                MUIA_TextEditor_CursorX, 30,
   //                                MUIA_TextEditor_CursorY, 7,
                                     MUIA_ControlChar, 'a',
+                                    MUIA_TextEditor_RGBMode, TRUE,
                                     MUIA_TextEditor_Contents,
 
                                       "\n"

@@ -47,10 +47,16 @@ static struct MsgPort *serverPort = NULL;
 static struct MsgPort replyPort;
 static struct Message msg;
 
+struct ClipboardSession
+{
+  struct InstData *data;
+  struct IFFHandle *iff;
+};
+
 struct ServerData
 {
   ULONG sd_Command;
-  IPTR sd_Session;
+  struct ClipboardSession *sd_Session;
   ULONG sd_Mode;
   struct line_node *sd_Line;
   LONG sd_Start;
@@ -72,46 +78,52 @@ struct ServerData
 #define ID_CSET    MAKE_ID('C','S','E','T')
 
 /// ServerStartSession
-static IPTR ServerStartSession(ULONG mode)
+static struct ClipboardSession *ServerStartSession(ULONG mode)
 {
-  IPTR result = (IPTR)NULL;
-  struct IFFHandle *iff;
+  struct ClipboardSession *result = NULL;
+  struct ClipboardSession *session;
 
   ENTER();
 
-  if((iff = AllocIFF()) != NULL)
+  if((session = AllocVecShared(sizeof(*session), MEMF_ANY)) != NULL)
   {
-    if((iff->iff_Stream = (IPTR)OpenClipboard(0)) != 0)
+    if((session->iff = AllocIFF()) != NULL)
     {
-      InitIFFasClip(iff);
-
-      if(OpenIFF(iff, mode) == 0)
+      if((session->iff->iff_Stream = (IPTR)OpenClipboard(0)) != 0)
       {
-        if(mode == IFFF_WRITE)
-        {
-          PushChunk(iff, ID_FTXT, ID_FORM, IFFSIZE_UNKNOWN);
-        }
-        else if(mode == IFFF_READ)
-        {
-          StopChunk(iff, ID_FTXT, ID_CHRS);
-          StopChunk(iff, ID_FTXT, ID_FLOW);
-          StopChunk(iff, ID_FTXT, ID_HIGH);
-          StopChunk(iff, ID_FTXT, ID_SBAR);
-          StopChunk(iff, ID_FTXT, ID_COLS);
-          StopChunk(iff, ID_FTXT, ID_STYL);
-          StopChunk(iff, ID_FTXT, ID_CSET);
-        }
+        InitIFFasClip(session->iff);
 
-        result = (IPTR)iff;
+        if(OpenIFF(session->iff, mode) == 0)
+        {
+          if(mode == IFFF_WRITE)
+          {
+            PushChunk(session->iff, ID_FTXT, ID_FORM, IFFSIZE_UNKNOWN);
+          }
+          else if(mode == IFFF_READ)
+          {
+            StopChunk(session->iff, ID_FTXT, ID_CHRS);
+            StopChunk(session->iff, ID_FTXT, ID_FLOW);
+            StopChunk(session->iff, ID_FTXT, ID_HIGH);
+            StopChunk(session->iff, ID_FTXT, ID_SBAR);
+            StopChunk(session->iff, ID_FTXT, ID_COLS);
+            StopChunk(session->iff, ID_FTXT, ID_STYL);
+            StopChunk(session->iff, ID_FTXT, ID_CSET);
+          }
+
+          result = session;
+        }
+        else
+        {
+          CloseClipboard((struct ClipboardHandle *)session->iff->iff_Stream);
+          FreeIFF(session->iff);
+        }
       }
       else
-      {
-        CloseClipboard((struct ClipboardHandle *)iff->iff_Stream);
-        FreeIFF(iff);
-      }
+        FreeIFF(session->iff);
     }
-    else
-      FreeIFF(iff);
+
+    if(result == NULL)
+      FreeVec(session);
   }
 
   RETURN(result);
@@ -120,20 +132,25 @@ static IPTR ServerStartSession(ULONG mode)
 
 ///
 /// ServerEndSession
-static void ServerEndSession(IPTR session)
+static void ServerEndSession(struct ClipboardSession *session)
 {
-  struct IFFHandle *iff = (struct IFFHandle *)session;
-
   ENTER();
 
-  if(iff != NULL)
+  if(session != NULL)
   {
-    CloseIFF(iff);
+    struct IFFHandle *iff = session->iff;
 
-    if(iff->iff_Stream != 0)
-      CloseClipboard((struct ClipboardHandle *)iff->iff_Stream);
+    if(iff != NULL)
+    {
+      CloseIFF(iff);
 
-    FreeIFF(iff);
+      if(iff->iff_Stream != 0)
+        CloseClipboard((struct ClipboardHandle *)iff->iff_Stream);
+
+      FreeIFF(iff);
+    }
+
+    FreeVec(session);
   }
 
   LEAVE();
@@ -141,9 +158,9 @@ static void ServerEndSession(IPTR session)
 
 ///
 /// ServerWriteInfo
-static void ServerWriteInfo(IPTR session, struct line_node *line)
+static void ServerWriteInfo(struct ClipboardSession *session, struct line_node *line)
 {
-  struct IFFHandle *iff = (struct IFFHandle *)session;
+  struct IFFHandle *iff = session->iff;
   LONG error;
 
   ENTER();
@@ -192,9 +209,10 @@ static void ServerWriteInfo(IPTR session, struct line_node *line)
 
 ///
 /// ServerWriteChars
-static void ServerWriteChars(IPTR session, struct line_node *line, LONG start, LONG length)
+static void ServerWriteChars(struct ClipboardSession *session, struct line_node *line, LONG start, LONG length)
 {
-  struct IFFHandle *iff = (struct IFFHandle *)session;
+  struct InstData *data = session->data;
+  struct IFFHandle *iff = session->iff;
   LONG error;
   struct LineStyle style;
   struct LineColor color;
@@ -206,7 +224,7 @@ static void ServerWriteChars(IPTR session, struct line_node *line, LONG start, L
   style.style = GetStyle(start-1, line);
 
   color.column = 1;
-  SetDefaultColor(&color.color);
+  SetDefaultColor(data, &color.color);
 
   ServerWriteInfo(session, line);
 
@@ -222,7 +240,7 @@ static void ServerWriteChars(IPTR session, struct line_node *line, LONG start, L
       colors++;
     }
 
-    if(IsDefaultColor(&color.color) == FALSE && colors->column-start != 1)
+    if(IsDefaultColor(data, &color.color) == FALSE && colors->column-start != 1)
     {
       error = WriteChunkBytes(iff, &color, sizeof(color));
       SHOWVALUE(DBF_CLIPBOARD, error);
@@ -335,9 +353,9 @@ static void ServerWriteChars(IPTR session, struct line_node *line, LONG start, L
 
 ///
 /// ServerWriteLine
-static void ServerWriteLine(IPTR session, struct line_node *line)
+static void ServerWriteLine(struct ClipboardSession *session, struct line_node *line)
 {
-  struct IFFHandle *iff = (struct IFFHandle *)session;
+  struct IFFHandle *iff = session->iff;
   LONG error;
   struct LineStyle *styles = line->line.Styles;
   struct LineColor *colors = line->line.Colors;
@@ -401,9 +419,9 @@ static void ServerWriteLine(IPTR session, struct line_node *line)
 
 ///
 /// ServerReadLine
-static LONG ServerReadLine(IPTR session, struct line_node **linePtr, ULONG *csetPtr)
+static LONG ServerReadLine(struct ClipboardSession *session, struct line_node **linePtr, ULONG *csetPtr)
 {
-  struct IFFHandle *iff = (struct IFFHandle *)session;
+  struct IFFHandle *iff = session->iff;
   struct line_node *line = NULL;
   struct LineStyle *styles = NULL;
   struct LineColor *colors = NULL;
@@ -644,7 +662,7 @@ IPTR ClientStartSession(ULONG mode)
     PutMsg(serverPort, &msg);
     Remove((struct Node *)WaitPort(&replyPort));
 
-    session = sd.sd_Session;
+    session = (IPTR)sd.sd_Session;
 
     // allow other tasks again
     ReleaseSemaphore(serverLock);
@@ -667,7 +685,7 @@ void ClientEndSession(IPTR session)
 
     // set up the data packet
     sd.sd_Command = SERVER_END_SESSION;
-    sd.sd_Session = session;
+    sd.sd_Session = (struct ClipboardSession *)session;
 
     // set up the message, send it and wait for a reply
     msg.mn_Node.ln_Name = (STRPTR)&sd;
@@ -694,7 +712,7 @@ void ClientWriteChars(IPTR session, struct line_node *line, LONG start, LONG len
 
     // set up the data packet
     sd.sd_Command = SERVER_WRITE_CHARS;
-    sd.sd_Session = session;
+    sd.sd_Session = (struct ClipboardSession *)session;
     sd.sd_Line = line;
     sd.sd_Start = start;
     sd.sd_Length = length;
@@ -724,7 +742,7 @@ void ClientWriteLine(IPTR session, struct line_node *line)
 
     // set up the data packet
     sd.sd_Command = SERVER_WRITE_LINE;
-    sd.sd_Session = session;
+    sd.sd_Session = (struct ClipboardSession *)session;
     sd.sd_Line = line;
 
     // set up the message, send it and wait for a reply
@@ -754,7 +772,7 @@ LONG ClientReadLine(IPTR session, struct line_node **line, ULONG *cset)
 
     // set up the data packet
     sd.sd_Command = SERVER_READ_LINE;
-    sd.sd_Session = session;
+    sd.sd_Session = (struct ClipboardSession *)session;
 
     // set up the message, send it and wait for a reply
     msg.mn_Node.ln_Name = (STRPTR)&sd;

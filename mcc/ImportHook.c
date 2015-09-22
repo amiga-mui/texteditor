@@ -484,12 +484,12 @@ HOOKPROTONHNO(PlainImportHookFunc, STRPTR, struct ImportMessage *msg)
         {
           D(DBF_IMPORT, "removing color as termination");
           newColor.column = strlen(line->Contents)+1;
-          SetDefaultColor(&newColor.color);
+          SetDefaultColor(NULL, &newColor.color);
           AddToGrow(&color_grow, &newColor);
         }
 
         newColor.column = EOC;
-        SetDefaultColor(&newColor.color);
+        SetDefaultColor(NULL, &newColor.color);
         AddToGrow(&color_grow, &newColor);
       }
 
@@ -751,7 +751,7 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
             else if(isFlagSet(state, COLOURED) || (lastWasSeparator == TRUE && ContainsText(src, '#') == TRUE))
             {
               newColor.column = dest - dest_start + 1;
-              SetDefaultColor(&newColor.color);
+              SetDefaultColor(NULL, &newColor.color);
               newColor.color.color = isFlagSet(state, COLOURED) ? 0 : 7;
               AddToGrow(&color_grow, &newColor);
               state ^= COLOURED;
@@ -1012,7 +1012,7 @@ static STRPTR MimeImport(struct ImportMessage *msg, LONG type)
       if(color_grow.itemCount > 0)
       {
         newColor.column = EOC;
-        SetDefaultColor(&newColor.color);
+        SetDefaultColor(NULL, &newColor.color);
         AddToGrow(&color_grow, &newColor);
       }
 

@@ -96,9 +96,13 @@ IPTR mSetBlock(struct InstData *data, struct MUIP_TextEditor_SetBlock *msg)
     {
       struct TEColor color;
 
-      SetDefaultColor(&color);
       color.color = msg->value;
       color.isRGB = ((msg->value & 0xff000000) == 0xff000000) ? TRUE : FALSE;
+      if(data->rgbMode == TRUE && IsRGBColor(&color) == FALSE && isFlagSet(data->flags, FLG_SetupDone))
+      {
+        color.color = ConvertSinglePenToRGB(data, color.color);
+        color.isRGB = TRUE;
+      }
 
       AddColor(data, &newblock, &color);
     }

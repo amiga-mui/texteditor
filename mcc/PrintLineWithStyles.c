@@ -85,9 +85,9 @@ ULONG ConvertPen(struct InstData *data, UWORD color, BOOL highlight)
   else
   {
     if(highlight == TRUE)
-      pen = MUIPEN(data->highlightcolor);
+      pen = MUIPEN(data->highlightColor);
     else
-      pen = MUIPEN(data->textcolor);
+      pen = MUIPEN(data->textColor);
   }
 
   RETURN(pen);
@@ -140,6 +140,23 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     struct LineColor *colors = line->line.Colors;
     struct marking block;
     BOOL cursor = FALSE;
+    struct TEColor textColor;
+    struct TEColor highlightColor;
+
+    if(data->rgbMode == TRUE)
+    {
+      textColor.isRGB = TRUE;
+      textColor.color = data->textRGB;
+      highlightColor.isRGB = TRUE;
+      highlightColor.color = data->highlightRGB;
+	}
+	else
+	{
+      textColor.isRGB = FALSE;
+      textColor.color = data->textColor;
+      highlightColor.isRGB = FALSE;
+      highlightColor.color = data->highlightColor;
+	}
 
     if(line->line.Highlight == TRUE && x == 0 && line->line.Length == 1)
       line->line.Highlight = FALSE;
@@ -321,7 +338,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     if(doublebuffer == FALSE)
       AddClipping(data);
 
-    SetAPen(rp, line->line.Highlight ? MUIPEN(data->highlightcolor) : MUIPEN(data->textcolor));
+    SetColor(data, rp, line->line.Highlight ? &highlightColor : &textColor, FALSE);
 
     maxwidth = _mwidth(data->object) - flow;
     while(c_length > 0)

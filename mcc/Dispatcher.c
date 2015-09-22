@@ -59,7 +59,7 @@ void ResetDisplay(struct InstData *data)
   if(data->shown == TRUE)
   {
     data->totallines = CountLines(data, &data->linelist);
-    GetColor(data->CPos_X, data->actualline, &data->Pen);
+    GetColor(data, data->CPos_X, data->actualline, &data->Pen);
     data->Flow = data->actualline->line.Flow;
     data->Separator = data->actualline->line.Separator;
     data->NoNotify = TRUE;
@@ -193,10 +193,12 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             // start with an inactive cursor
             data->currentCursorState = CS_INACTIVE;
 
-            data->textcolor = -1;
+            data->textColor = -1;
+            data->textRGB = 0xff000000;
+            data->highlightColor = -1;
+            data->highlightRGB = 0xff00000;
             data->cursorcolor = -1;
             data->cursortextcolor = -1;
-            data->highlightcolor = -1;
             data->markedcolor = -1;
             data->separatorshine = -1;
             data->separatorshadow = -1;
@@ -263,6 +265,11 @@ static IPTR mSetup(struct IClass *cl, Object *obj, Msg msg)
 
   ENTER();
 
+  if(GetBitMapAttr(_screen(obj)->RastPort.BitMap, BMA_DEPTH) > 8)
+    setFlag(data->flags, FLG_Truecolor);
+  else
+    clearFlag(data->flags, FLG_Truecolor);
+
   // initialize the configuration of our TextEditor
   // object from the configuration set by the user
   InitConfig(cl, obj);
@@ -317,11 +324,6 @@ static IPTR mSetup(struct IClass *cl, Object *obj, Msg msg)
     data->smooth_wait = 0;
     data->scrollaction = FALSE;
 
-    if(GetBitMapAttr(_screen(obj)->RastPort.BitMap, BMA_DEPTH) > 8)
-      setFlag(data->flags, FLG_Truecolor);
-    else
-      clearFlag(data->flags, FLG_Truecolor);
-
     #if defined(__amigaos3__)
     // allocate an exclusive pen for truecolor screens
     // this will be SetRGB32()'d before it is actually SetAPen()'d
@@ -332,6 +334,12 @@ static IPTR mSetup(struct IClass *cl, Object *obj, Msg msg)
     #else
     data->exclusivePen = -1;
     #endif
+
+    // convert all pens to RGB values if RGB mode is active
+    if(data->rgbMode == TRUE)
+      ConvertPensToRGB(data);
+
+    setFlag(data->flags, FLG_SetupDone);
 
     result = TRUE;
   }
@@ -377,6 +385,8 @@ static IPTR mCleanup(struct IClass *cl, Object *obj, Msg msg)
   }
 
   FreeConfig(cl, obj);
+
+  clearFlag(data->flags, FLG_SetupDone);
 
   result = DoSuperMethodA(cl, obj, msg);
 
@@ -910,11 +920,11 @@ DISPATCHER(_Dispatcher)
     struct marking newblock;
 
     NiceBlock(&data->blockinfo, &newblock);
-    GetColor(data->blockinfo.stopx - ((data->blockinfo.stopx && newblock.startx == data->blockinfo.startx && newblock.startline == data->blockinfo.startline) ? 1 : 0), data->blockinfo.stopline, &data->Pen);
+    GetColor(data, data->blockinfo.stopx - ((data->blockinfo.stopx && newblock.startx == data->blockinfo.startx && newblock.startline == data->blockinfo.startline) ? 1 : 0), data->blockinfo.stopline, &data->Pen);
   }
   else
   {
-    GetColor(data->CPos_X, data->actualline, &data->Pen);
+    GetColor(data, data->CPos_X, data->actualline, &data->Pen);
   }
 
   if(IsSameColor(&t_pen, &data->Pen) == FALSE)

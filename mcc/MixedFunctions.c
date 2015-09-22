@@ -448,9 +448,9 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
     return;
   }
 
-  SetDefaultColor(&colors[0]);
-  SetDefaultColor(&colors[1]);
-  SetDefaultColor(&colors[2]);
+  SetDefaultColor(data, &colors[0]);
+  SetDefaultColor(data, &colors[1]);
+  SetDefaultColor(data, &colors[2]);
 
   line_nr = LineToVisual(data, line) - 1;
   OffsetToLines(data, x, line, &pos);
@@ -467,7 +467,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
           stop = c;
 
         styles[c+1] = GetStyle(x+c, line);
-        GetColor(x+c, line, &colors[c+1]);
+        GetColor(data, x+c, line, &colors[c+1]);
         chars[c+1] = (line->line.Contents[x+c] != '\n') ? line->line.Contents[x+c] : ' ';
       }
     }

@@ -191,8 +191,8 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
           nextColorColumn = colors[0].column;
 
         style = 0;
-        SetDefaultColor(&color);
-        SetDefaultColor(&color_state);
+        SetDefaultColor(data, &color);
+        SetDefaultColor(data, &color_state);
         color_state.color = 7;
 
         while(length > 0 && (nextStyleColumn != EOS || nextColorColumn != EOC))
@@ -278,7 +278,7 @@ HOOKPROTONO(ExportHookFunc, STRPTR, struct ExportMessage *emsg)
               if(isColorChange == TRUE)
               {
                 D(DBF_EXPORT, "exporting color %ld/%ld of column %ld", color.color, color.isRGB, pos+1);
-                if(color.isRGB == TRUE)
+                if(IsRGBColor(&color) == TRUE)
                   snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033P[%06lx]", color.color & ~0xff000000);
                 else
                   snprintf(buf->pointer, buf->size-(buf->pointer-buf->buffer), "\033p[%ld]", color.color);
