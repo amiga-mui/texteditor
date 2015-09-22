@@ -534,8 +534,11 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
          <ESC> + i      Set the soft style to italic.
          <ESC> + n      Set the soft style back to normal.
          <ESC> + h      Highlight the current line.
-         <ESC> + p[x]   Change to color x, where x is taken from the colormap.
-                        0 means normal.  The color is reset for each new line.
+         <ESC> + p[x]   Change the color to pen #x, where x is taken from the
+                        colormap. 0 means normal. The color is reset for each
+                        new line.
+         <ESC> + P[RRGGBB]   Change the color to RGB value RRGGBB (encoded in
+                        hexadecimal). The color is reset for each new line.
 
         The following sequences are only valid at the beginning of a line.
         If they are placed elsewhere, the result is undefined (they might
