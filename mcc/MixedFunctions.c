@@ -551,7 +551,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
 
       for(c = start; c <= stop; c++)
       {
-        SetColor(data, rp, &colors[1+c], line->line.Highlight);
+        SetColor(data, rp, &colors[1+c], line->line.Highlight, TRUE);
         SetSoftStyle(rp, ConvertStyle(styles[1+c]), AskSoftStyle(rp));
         TextNew(rp, (STRPTR)&chars[1+c], 1, data->TabSizePixels);
       }

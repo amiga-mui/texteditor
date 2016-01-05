@@ -76,7 +76,7 @@ ULONG ConvertPen(struct InstData *data, UWORD color, BOOL highlight)
   if(color != 0)
   {
     if(data->colormap != NULL)
-      pen = MUIPEN(data->colormap[color-1]);
+      pen = data->colormap[color-1];
     else if(color <= 8)
       pen = _pens(data->object)[color-1];
     else
@@ -338,7 +338,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     if(doublebuffer == FALSE)
       AddClipping(data);
 
-    SetColor(data, rp, line->line.Highlight ? &highlightColor : &textColor, FALSE);
+    SetColor(data, rp, line->line.Highlight ? &highlightColor : &textColor, FALSE, FALSE);
 
     maxwidth = _mwidth(data->object) - flow;
     while(c_length > 0)
@@ -360,7 +360,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       {
         while(colors->column-1 <= x)
         {
-          SetColor(data, rp, &colors->color, line->line.Highlight);
+          SetColor(data, rp, &colors->color, line->line.Highlight, TRUE);
           colors++;
         }
 
@@ -515,7 +515,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
 ///
 /// SetColor
-void SetColor(struct InstData *data, struct RastPort *rp, const struct TEColor *c, BOOL highlight)
+void SetColor(struct InstData *data, struct RastPort *rp, const struct TEColor *c, BOOL highlight, BOOL convert)
 {
   ENTER();
 
@@ -559,7 +559,7 @@ void SetColor(struct InstData *data, struct RastPort *rp, const struct TEColor *
         RPTAG_PenMode,   TRUE,
         RPTAG_AlphaMode, FALSE,
         #endif
-        RPTAG_APen, ConvertPen(data, 1, highlight),
+        RPTAG_APen, convert == TRUE ? ConvertPen(data, 1, highlight) : 1,
         TAG_DONE);
     }
   }
@@ -570,7 +570,7 @@ void SetColor(struct InstData *data, struct RastPort *rp, const struct TEColor *
       RPTAG_PenMode,   TRUE,
       RPTAG_AlphaMode, FALSE,
       #endif
-      RPTAG_APen, ConvertPen(data, c->color, highlight),
+      RPTAG_APen, convert == TRUE ? ConvertPen(data, MUIPEN(c->color), highlight) : MUIPEN(c->color),
       TAG_DONE);
   }
 

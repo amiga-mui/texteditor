@@ -606,7 +606,7 @@ void HideSelectPointer(struct InstData *data, Object *obj);
 ULONG ConvertStyle(UWORD);
 LONG PrintLine(struct InstData *, LONG, struct line_node *, LONG, BOOL);
 ULONG ConvertPen(struct InstData *, UWORD, BOOL);
-void SetColor(struct InstData *, struct RastPort *, const struct TEColor *, BOOL);
+void SetColor(struct InstData *, struct RastPort *, const struct TEColor *, BOOL, BOOL);
 void DrawSeparator(struct InstData *, struct RastPort *, LONG, LONG, LONG, LONG);
 
 // Search.c

@@ -5,6 +5,10 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2016-01-05 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/PrintLineWithStyles.c: fixed a coloring issue in pen mode.
+
 2015-09-22 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: implemented MUIA_TextEditor_RGBMode to completely avoid the usage
