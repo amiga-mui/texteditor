@@ -749,6 +749,18 @@ IPTR mImport(UNUSED struct IClass *cl, Object *obj, struct MUIP_Import *msg)
 }
 
 ///
+/// mRedraw
+IPTR mRedraw(UNUSED struct IClass *cl, Object *obj, struct MUIP_TextEditor_Redraw *msg)
+{
+  ENTER();
+
+  MUI_Redraw(obj, msg->flags);
+
+  RETURN(0);
+  return 0;
+}
+
+///
 /// _Dispatcher()
 DISPATCHER(_Dispatcher)
 {
@@ -882,6 +894,7 @@ DISPATCHER(_Dispatcher)
     case MUIM_TextEditor_SetBlock:        result = mSetBlock(data, (APTR)msg);              RETURN(result); return result; break;
     case MUIM_TextEditor_CursorXYToIndex: result = mCursorXYToIndex(data, (APTR)msg);       RETURN(result); return result; break;
     case MUIM_TextEditor_IndexToCursorXY: result = mIndexToCursorXY(data, (APTR)msg);       RETURN(result); return result; break;
+    case MUIM_TextEditor_Redraw:          result = mRedraw(cl, obj, (APTR)msg);             RETURN(result); return result; break;
     default:                              result = DoSuperMethodA(cl, obj, msg);            RETURN(result); return result; break;
   }
 

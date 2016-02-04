@@ -5,6 +5,14 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2016-02-04 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/GetSetAttrs.c, mcc/Dispatcher.c: implemented a new method to cause
+    asynchronous redraws. This is necessary, because MUI4 forbids recursive
+    invokations of MUIM_Draw to avoid infinit loops. However, the best approach
+    would be to fix this in TextEditor.mcc directly and NOT to call MUI_Redraw()
+    recursively. This fixes the invisible text in AmiKit8's LiveUpdate.
+
 2016-01-05 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/PrintLineWithStyles.c: fixed a coloring issue in pen mode.

@@ -240,6 +240,7 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
 }
 
 ///
+void kprintf(const char *,...);
 /// mSet()
 IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 {
@@ -517,7 +518,8 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
         else
         {
           clearFlag(data->flags, FLG_Quiet);
-          MUI_Redraw(obj, MADF_DRAWOBJECT);
+          //MUI_Redraw(obj, MADF_DRAWOBJECT);
+          DoMethod(_app(obj), MUIM_Application_PushMethod, obj, 2, MUIM_TextEditor_Redraw, MADF_DRAWOBJECT);
           if(data->maxlines > data->totallines)
             set(obj, MUIA_TextEditor_Prop_Entries, data->maxlines*data->fontheight);
           else
