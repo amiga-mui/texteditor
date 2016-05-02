@@ -120,11 +120,15 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 {
   STRPTR text = line->line.Contents;
   LONG length;
-  struct RastPort *rp = &data->doublerp;
+  struct RastPort *rp = data->doublerp;
 
   ENTER();
 
   length = LineCharsWidth(data, text+x);
+
+  // fall back to non-doublebuffered drawing in case we have no layered double buffer rastport
+  if(rp == NULL)
+    doublebuffer = FALSE;
 
   if(doublebuffer == FALSE)
     rp = &data->copyrp;

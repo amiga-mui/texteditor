@@ -5,6 +5,14 @@ MUI TextEditor MCC class - ChangeLog
 $Id$
 $URL$
 
+2016-05-02 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Dispatcher.c: create a fully layered rastport for double buffering
+    instead of using a non-layered one. This fixes the issues with italic text
+    starting in the first column. Italic text might cause drawing to coordinates
+    left of the desired text position and hence requires proper clipping. This
+    closes #3.
+
 2016-02-04 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/GetSetAttrs.c, mcc/Dispatcher.c: implemented a new method to cause

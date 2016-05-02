@@ -31,6 +31,7 @@
 #include <proto/utility.h>
 #include <proto/locale.h>
 #include <proto/exec.h>
+#include <proto/layers.h>
 
 #ifdef __MORPHOS__
 #include <proto/alib.h>
@@ -450,6 +451,8 @@ static IPTR mAskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *ms
 static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
 {
   struct InstData *data = INST_DATA(cl, obj);
+  LONG bmwidth;
+  LONG bmheight;
 
   ENTER();
 
@@ -487,10 +490,27 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
     TAG_DONE);
 
   // initialize the doublebuffering rastport
-  InitRastPort(&data->doublerp);
-  data->doublebuffer = MUIG_AllocBitMap(_mwidth(obj)+((data->fontheight-data->font->tf_Baseline+1)>>1)+1, data->fontheight, GetBitMapAttr(data->rport->BitMap, BMA_DEPTH), (BMF_CLEAR | BMF_INTERLEAVED), data->rport->BitMap);
-  data->doublerp.BitMap = data->doublebuffer;
-  SetFont(&data->doublerp, data->font);
+  bmwidth = _mwidth(obj)+((data->fontheight-data->font->tf_Baseline+1)>>1)+1;
+  bmheight = data->fontheight;
+  if((data->doublebuffer = MUIG_AllocBitMap(bmwidth, bmheight, GetBitMapAttr(data->rport->BitMap, BMA_DEPTH), (BMF_CLEAR | BMF_INTERLEAVED), data->rport->BitMap)) != NULL)
+  {
+    struct Layer_Info *li;
+
+    if((li = NewLayerInfo()) != NULL)
+    {
+      struct Layer *l;
+
+      if((l = CreateUpfrontLayer(li, data->doublebuffer, 0, 0, bmwidth-1, bmheight-1, LAYERSIMPLE, NULL)) != NULL)
+      {
+        data->doublerp = l->rp;
+        SetFont(data->doublerp, data->font);
+      }
+	  else
+	  {
+	    DisposeLayerInfo(li);
+	  }
+	}
+  }
 
   // initialize the copyrp rastport
   data->copyrp = *_rp(obj);
@@ -522,8 +542,19 @@ static IPTR mHide(struct IClass *cl, Object *obj, Msg msg)
   if(data->SuggestWindow != NULL)
     set(data->SuggestWindow, MUIA_Window_Open, FALSE);
   set(_win(obj), MUIA_Window_DisableKeys, 0L);
-  MUIG_FreeBitMap(data->doublebuffer);
-  data->doublerp.BitMap = NULL;
+
+  if(data->doublerp != NULL)
+  {
+    struct Layer_Info *li = data->doublerp->Layer->LayerInfo;
+
+    DeleteLayer(0, data->doublerp->Layer);
+    DisposeLayerInfo(li);
+    data->doublerp = NULL;
+  }
+
+  if(data->doublebuffer != NULL)
+    MUIG_FreeBitMap(data->doublebuffer);
+
   data->rport = NULL;
 
   LEAVE();

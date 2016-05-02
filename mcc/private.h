@@ -343,7 +343,7 @@ struct InstData
   UWORD   smooth_wait;        // Counter to see if smooth scroll is happening
   BOOL    scrollaction;       // If scrolling takes place
   WORD    scr_direction;      // Scroll direction
-  struct  RastPort  doublerp; // Doublebuffer rastport
+  struct  RastPort *doublerp; // Doublebuffer rastport
   struct  RastPort  copyrp;
   struct  RastPort  tmprp;    // temporary rastport (for TextFit/TextLength checks)
   struct  marking   blockinfo;
