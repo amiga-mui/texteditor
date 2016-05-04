@@ -149,11 +149,21 @@ LONG GetPenAndRGB(struct InstData *data, LONG item, CONST_APTR def, ULONG *rgb)
   if(DoMethod(data->object, MUIM_GetConfigItem, item, &spec) == FALSE)
     spec = (struct MUI_PenSpec *)def;
 
-  if(spec != NULL && spec->buf[0] == 'r')
+  #if !defined(__AROS__)
+  if(spec != NULL &&
+     spec->buf[0] == 'r')
   {
     StringToRGB(&spec->buf[1], rgb);
     haveRGB = TRUE;
   }
+  #else
+  if(spec != NULL &&
+     spec->ps_buf[0] == 'r')
+  {
+    StringToRGB(&spec->ps_buf[1], rgb);
+    haveRGB = TRUE;
+  }
+  #endif
   else
   {
     haveRGB = FALSE;

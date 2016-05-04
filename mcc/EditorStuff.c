@@ -611,7 +611,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
       {
         while(line1Colors->column != EOC && line1Colors->column < line->line.Length)
         {
-          D(DBF_STYLE, "applying color change from %ld/%ld to %ld/%ld in column %ld (1)", end_color.color, end_color.isRGB, line1Colors->color, line1Colors->isRGB, line1Colors->column);
+          D(DBF_STYLE, "applying color change from %ld/%ld to %ld/%ld in column %ld (1)", end_color.color, end_color.isRGB, line1Colors->color, line1Colors->color.isRGB, line1Colors->column);
           end_color = line1Colors->color;
           AddToGrow(&colorGrow, line1Colors);
           line1Colors++;
