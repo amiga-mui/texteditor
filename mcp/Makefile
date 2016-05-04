@@ -260,7 +260,6 @@ ifeq ($(OS), os3)
   LDLIBS  += -ldebug -lmui
 
   # additional object files required
-  # additional object files required
   COBJS += vastubs.o \
            extrasrc/GetHead.o \
            extrasrc/GetPred.o \
@@ -285,6 +284,9 @@ ifeq ($(OS), mos)
   CFLAGS  += -noixemul
   LDFLAGS += -noixemul
   LDLIBS  += -ldebug
+
+  COBJS += extrasrc/GetHead.o \
+           extrasrc/GetSucc.o
 
 else
 ifeq ($(OS), aros-i386)
