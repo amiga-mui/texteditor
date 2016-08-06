@@ -2,8 +2,11 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
-$Id$
-$URL$
+#### v15.47 RELEASE ############################################################
+
+2016-08-06 Jens Maus <mail@jens-maus.de>
+
+  * misc: final v15.47 release preparations
 
 2016-05-02 Thore Böckelmann <tboeckel@gmx.de>
 
