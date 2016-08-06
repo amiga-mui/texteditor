@@ -7,6 +7,7 @@ MUI TextEditor MCC class - ChangeLog
 2016-08-06 Jens Maus <mail@jens-maus.de>
 
   * misc: final v15.47 release preparations
+  * include: updated SDI headers.
 
 2016-05-02 Thore Böckelmann <tboeckel@gmx.de>
 

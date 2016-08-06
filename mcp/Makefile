@@ -415,13 +415,13 @@ $(TESTTARGET): $(TESTOBJS)
 locale.h: locale.c
 locale.c: $(LOCALE)/TextEditor_mcp.pot C_h.sd C_c.sd
 	@echo "  MK $@"
-	@$(FC) $(LOCALE)/TextEditor_mcp.pot locale.h=C_h.sd locale.c=C_c.sd
+	@$(FC) $(LOCALE)/TextEditor_mcp.pot locale.h=C_h.sd locale.c=C_c.sd CODESET ISO-8859-1
 
 ## CATALOG GENERATION #################
 
 $(LOCALE)/%.catalog: $(LOCALE)/%.po
 	@echo "  MK $@"
-	@$(FC) REVISION $(shell git rev-list --all --count $<) POFILE $< CATALOG $@
+	@$(FC) REVISION $(shell git rev-list --all --count $<) POFILE $< CATALOG $@ CODESET UTF-8
 
 .IGNORE: $(CATALOGS)
 

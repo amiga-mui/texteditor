@@ -2,3 +2,6 @@
 bin_*
 .obj_*
 mcp/locale.*
+/release
+/MCC_TextEditor-*.lha
+/MCC_TextEditor-*.readme

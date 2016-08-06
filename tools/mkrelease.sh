@@ -73,7 +73,7 @@ done
 
 cp -a -R dist/* "release/"
 rm "release/MCC_TextEditor/Demos/TextEditor-Demo.info"
-cp -a AUTHORS ChangeLog COPYING "release/MCC_TextEditor/"
+cp -a ChangeLog COPYING "release/MCC_TextEditor/"
 cp -a doc/MCC_TextEditor.readme "release/MCC_TextEditor/ReadMe"
 cp -a demo/*.ilbm "release/MCC_TextEditor/Demos/"
 cp -a -R demo/rexx/* "release/MCC_TextEditor/Demos/Rexx/"
