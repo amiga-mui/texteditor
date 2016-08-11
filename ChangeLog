@@ -2,6 +2,12 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2016-08-11 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/ClipboardServer.c: fixed a missing initialization of the session local
+    instance data pointer which caused a crash when copying text to the
+    clipboard. This closes #4.
+
 #### v15.47 RELEASE ############################################################
 
 2016-08-06 Jens Maus <mail@jens-maus.de>

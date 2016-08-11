@@ -57,6 +57,7 @@ struct ServerData
 {
   ULONG sd_Command;
   struct ClipboardSession *sd_Session;
+  struct InstData *sd_InstanceData;
   ULONG sd_Mode;
   struct line_node *sd_Line;
   LONG sd_Start;
@@ -78,15 +79,17 @@ struct ServerData
 #define ID_CSET    MAKE_ID('C','S','E','T')
 
 /// ServerStartSession
-static struct ClipboardSession *ServerStartSession(ULONG mode)
+static struct ClipboardSession *ServerStartSession(struct InstData *data, ULONG mode)
 {
   struct ClipboardSession *result = NULL;
   struct ClipboardSession *session;
 
   ENTER();
 
-  if((session = AllocVecShared(sizeof(*session), MEMF_ANY)) != NULL)
+  if((session = AllocVecShared(sizeof(*session), MEMF_CLEAR)) != NULL)
   {
+    session->data = data;
+
     if((session->iff = AllocIFF()) != NULL)
     {
       if((session->iff->iff_Stream = (IPTR)OpenClipboard(0)) != 0)
@@ -642,7 +645,7 @@ static LONG ServerReadLine(struct ClipboardSession *session, struct line_node **
 ///
 /// ClientStartSession
 // copy a line to the clipboard, public callable function
-IPTR ClientStartSession(ULONG mode)
+IPTR ClientStartSession(struct InstData *data, ULONG mode)
 {
   IPTR session = (IPTR)NULL;
 
@@ -653,6 +656,7 @@ IPTR ClientStartSession(ULONG mode)
 
     // set up the data packet
     sd.sd_Command = SERVER_START_SESSION;
+    sd.sd_InstanceData = data;
     sd.sd_Mode = mode;
 
     // set up the message, send it and wait for a reply
@@ -853,7 +857,7 @@ static SAVEDS ASM LONG ClipboardServer(UNUSED REG(a0, STRPTR args), UNUSED REG(d
 
             case SERVER_START_SESSION:
             {
-              sd->sd_Session = ServerStartSession(sd->sd_Mode);
+              sd->sd_Session = ServerStartSession(sd->sd_InstanceData, sd->sd_Mode);
             }
             break;
 

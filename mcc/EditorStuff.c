@@ -192,7 +192,7 @@ BOOL PasteClip(struct InstData *data, LONG x, struct line_node *actline)
 
   ENTER();
 
-  if((clipSession = ClientStartSession(IFFF_READ)) != (IPTR)NULL)
+  if((clipSession = ClientStartSession(data, IFFF_READ)) != (IPTR)NULL)
   {
     LONG error;
     BOOL newline = TRUE;

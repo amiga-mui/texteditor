@@ -471,7 +471,7 @@ void Key_ToLower(struct InstData *);
 // ClipboardServer.c
 BOOL StartClipboardServer(void);
 void ShutdownClipboardServer(void);
-IPTR ClientStartSession(ULONG mode);
+IPTR ClientStartSession(struct InstData *data, ULONG mode);
 void ClientEndSession(IPTR session);
 void ClientWriteChars(IPTR session, struct line_node *line, LONG start, LONG length);
 void ClientWriteLine(IPTR session, struct line_node *line);
