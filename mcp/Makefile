@@ -421,7 +421,7 @@ locale.c: $(LOCALE)/TextEditor_mcp.pot C_h.sd C_c.sd
 
 $(LOCALE)/%.catalog: $(LOCALE)/%.po
 	@echo "  MK $@"
-	@$(FC) REVISION $(shell git rev-list --all --count $<) POFILE $< CATALOG $@ CODESET UTF-8
+	@$(FC) REVISION $(shell git rev-list --all --count $<) POFILE $< CATALOG $@ CODESET ISO-8859-1
 
 .IGNORE: $(CATALOGS)
 
