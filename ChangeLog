@@ -2,6 +2,11 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2016-08-12 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/Makefile: generate ISO8859-1 encoded catalogs instead of UTF8 encoded
+    ones.
+
 2016-08-11 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ClipboardServer.c: fixed a missing initialization of the session local
