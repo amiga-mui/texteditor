@@ -2,7 +2,7 @@
 #
 # TextEditor.mcc - Textediting MUI Custom Class
 # Copyright (C) 1997-2000 Allan Odgaard
-# Copyright (C) 2005-2015 TextEditor.mcc Open Source Team
+# Copyright (C) 2005-2016 TextEditor.mcc Open Source Team
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -159,7 +159,7 @@ TARGET    = $(BINDIR)/TextEditor-Demo
 
 # Common compiler/linker flags
 WARN     = -W -Wall -Wwrite-strings -Wpointer-arith -Wsign-compare
-OPTFLAGS = -O3 -fomit-frame-pointer 
+OPTFLAGS = -O3 -fomit-frame-pointer
 DEBUG    = -DDEBUG -O0
 DEBUGSYM = -g -gstabs
 CFLAGS   = -I. -I../mcp -I../include $(CPU) $(WARN) $(OPTFLAGS) \
