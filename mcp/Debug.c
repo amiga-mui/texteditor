@@ -254,7 +254,7 @@ void CleanupDebug(void)
 
 /****************************************************************************/
 
-INLINE void _INDENT(void)
+STATIC INLINE void _INDENT(void)
 {
   int i;
   for(i=0; i < indent_level; i++)
