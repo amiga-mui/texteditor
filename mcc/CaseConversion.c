@@ -81,7 +81,8 @@ static void MangleCharacters(struct InstData *data, char (*change)(char c))
     startline = GetNextLine(startline);
   }
 
-  data->HasChanged = TRUE;
+  data->HasChanged  = TRUE;
+  data->ChangeEvent = TRUE;              // Alpyre Add-On
   RedrawArea(data, _startx, _startline, stopx, stopline);
 
   LEAVE();

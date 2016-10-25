@@ -239,7 +239,7 @@ LONG LineCharsWidth(struct InstData *data, CONST_STRPTR text)
   // take care of any of the word wrapping techniques we provide
   if(width > 0 && textlen > 0 && data->WrapMode != MUIV_TextEditor_WrapMode_NoWrap)
   {
-    struct TextExtent tExtend;
+    struct TextExtentNew tExtend;
     ULONG fontheight = data->font ? data->font->tf_YSize : 0;
 
     // see how many chars of our text fit to the current innerwidth of the
@@ -300,7 +300,7 @@ ULONG VisualHeight(struct InstData *data, struct line_node *line)
 
   ENTER();
 
-  if(isFlagSet(data->flags, FLG_HScroll))
+  if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
     lines = 1;
   else
   {
@@ -426,10 +426,18 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
 
   UWORD styles[3] = {0, 0, 0};
   struct TEColor colors[3];
+  struct TEColor highlightColor;                   // Alpyre Add-On (This is a bad quick fix and should be revised)
   LONG start = 0;
   LONG stop = 0;
   LONG c;
   UWORD flow;
+
+  if(data->rgbMode == TRUE)                        // Alpyre Add-On (This is a bad quick fix and should be revised)
+  { highlightColor.isRGB = TRUE;                   // Alpyre Add-On (This is a bad quick fix and should be revised)
+    highlightColor.color = data->highlightRGB;}    // Alpyre Add-On (This is a bad quick fix and should be revised)
+  else                                             // Alpyre Add-On (This is a bad quick fix and should be revised)
+  { highlightColor.isRGB = FALSE;                  // Alpyre Add-On (This is a bad quick fix and should be revised)
+    highlightColor.color = data->highlightColor;}  // Alpyre Add-On (This is a bad quick fix and should be revised)
 
   ENTER();
 
@@ -479,13 +487,19 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
     else
       cursor_width = data->CursorWidth;
 
-    xplace  = _mleft(data->object) + TextLengthNew(&data->tmprp, &line->line.Contents[x-pos.x], pos.x+start, data->TabSizePixels);
+    xplace  = _mleft(data->object) - data->xpos + TextLengthNew(&data->tmprp, &line->line.Contents[x-pos.x], pos.x+start, data->TabSizePixels); //Alpyre Edit
     flow = FlowSpace(data, line->line.Flow, &line->line.Contents[pos.bytes]);
     xplace += flow;
     yplace  = data->ypos + (data->fontheight * (line_nr + pos.lines - 1));
     cursorxplace = xplace + TextLengthNew(&data->tmprp, &line->line.Contents[x+start], 0-start, data->TabSizePixels);
 
     //D(DBF_STARTUP, "xplace: %ld, yplace: %ld cplace: %ld, innerwidth: %ld width: %ld %ld", xplace, yplace, cursorxplace, _mwidth(data->object), _width(data->object), _mleft(data->object));
+
+    if((data->font->tf_Flags & FPF_PROPORTIONAL) || data->WrapMode != MUIV_TextEditor_WrapMode_NoWrap)  // Alpyre Edit
+    {                                                                                                   // This was at the position
+      clipping = TRUE;                                                                                  // where Alpyre Remark below is!
+      AddClipping(data);
+    }
 
     if(xplace <= _mright(data->object))
     {
@@ -543,15 +557,13 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
       SetFont(rp, data->font);
       Move(rp, xplace, yplace + rp->TxBaseline);
 
-      if(data->font->tf_Flags & FPF_PROPORTIONAL)
-      {
-        clipping = TRUE;
-        AddClipping(data);
-      }
+      // Alpyre Remark!
 
       for(c = start; c <= stop; c++)
       {
         SetColor(data, rp, &colors[1+c], line->line.Highlight, TRUE);
+        if (line->line.Highlight)                                       // Alpyre Add-On (This is a bad quick fix and should be revised)
+          SetColor(data, rp, &highlightColor, FALSE, FALSE);            // Alpyre Add-On (This is a bad quick fix and should be revised)
         SetSoftStyle(rp, ConvertStyle(styles[1+c]), AskSoftStyle(rp));
         TextNew(rp, (STRPTR)&chars[1+c], 1, data->TabSizePixels);
       }
@@ -565,9 +577,11 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
         LONG Y, Height;
 
         LeftX = _mleft(data->object);
-        LeftWidth = flow-3;
-        RightX = _mleft(data->object) + flow + TextLengthNew(&data->tmprp, &line->line.Contents[pos.bytes], pos.extra-pos.bytes-1, data->TabSizePixels) + 3;
-        RightWidth = _mleft(data->object)+_mwidth(data->object) - RightX;
+        LeftWidth = flow - data->xpos - 3;                    // Alpyre Edit
+        LeftWidth = LeftWidth < 0 ? 0 : LeftWidth;            // Alpyre Add-On
+        RightX = LeftX - data->xpos + flow + TextLengthNew(&data->tmprp, &line->line.Contents[pos.bytes], pos.extra-pos.bytes-1, data->TabSizePixels) + 3;  // Alpyre Edit
+        RightX = RightX < LeftX ? LeftX : RightX;             // Alpyre Add-On
+        RightWidth = LeftX +_mwidth(data->object) - RightX;   // Alpyre Edit
         Y = yplace;
         Height = isFlagSet(line->line.Separator, LNSF_Thick) ? 2 : 1;
 
@@ -586,11 +600,11 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
         }
         DrawSeparator(data, rp, LeftX, Y, LeftWidth, Height);
       }
-
-      if(clipping)
-        RemoveClipping(data);
+        // Alpyre Remark2!
     }
-  }
+    if(clipping)             // Alpyre Edit
+      RemoveClipping(data);  // This was at the position
+  }                          // where the Alpyre Remark2 is.
 
   LEAVE();
 }
@@ -778,4 +792,108 @@ LONG CountLines(struct InstData *data, struct MinList *lines)
   return lineCount;
 }
 
+///
+/// LongestLine()    <-- Alpyre Add-On
+/*----------------------------------------------------------*
+ * Find the graphically longest line of the displayed lines *
+ *----------------------------------------------------------*/
+LONG LongestLine(struct InstData *data)
+{
+  struct line_node *line = GetFirstLine(&data->linelist);
+  LONG line_nr = 0;
+  LONG last_line;
+  LONG result = 0;
+  LONG cursor_width = data->CursorWidth == 6 ? TextLength(&data->tmprp, (char *)" ", 1) : data->CursorWidth;
+
+  /* Since this function will be only used in NoWrapMode and
+     in that mode line_nr's will always match the real lines
+     we can find the top (real) line just by traversing the list */
+
+  while(line != NULL && line_nr != data->visual_y - 1)
+  {
+    line = GetNextLine(line);
+    line_nr++;
+  }
+
+  // Calculate the line_nr of the last line displayed
+  last_line = line_nr + data->maxlines - 1;
+
+  /* We found the top line displayed. Now we'll traverse until the
+     last displayed line meanwhile calculating their pixel lengths */
+
+  while(line != NULL && line_nr <= last_line)
+  {
+    result = MAX(result, TextLengthNew(&data->tmprp, line->line.Contents, line->line.Length - 1, data->TabSizePixels));
+    line = GetNextLine(line);
+    line_nr++;
+  }
+
+return(result + cursor_width);
+}
+///
+/// ScrollIntoView() <-- Alpyre Add-On
+/* ***************************************************************** /
+/  Scrolls the gadget horizontally to make the cursor visible again. /
+/  Do not mistake this with ScrollIntoDisplay() function!            /
+/  (This function is supposed to be used only in NoWrapMode)         /
+/  ******************************************************************/
+void ScrollIntoView(struct InstData *data)
+{
+  struct line_node *line = data->actualline;
+  LONG cursor_width;
+  LONG xmin = 0;
+  LONG xmax;
+  LONG mwidth = _mwidth(data->object);
+
+  if (isFlagClear(data->flags, FLG_HScroll))
+    return;
+
+  xmin  = TextLengthNew(&data->tmprp, line->line.Contents, data->CPos_X, data->TabSizePixels);
+  xmin += FlowSpace(data, line->line.Flow, line->line.Contents);
+
+  // calculate the cursor width
+  // if it is set to 6 then we should find out how the width of the current char is
+  if(data->CursorWidth == 6)
+    cursor_width = TextLength(&data->tmprp, line->line.Contents[data->CPos_X] < ' ' ? (char *)" " : (char *)&line->line.Contents[data->CPos_X], 1);
+  else
+    cursor_width = data->CursorWidth;
+
+  xmax = xmin + cursor_width;
+
+  if (xmin < (LONG)data->xpos)
+  {
+    data->xpos = xmin;
+    DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
+  }
+  else if (xmax > (LONG)(data->xpos + mwidth))
+  {
+    data->xpos = xmax - mwidth;
+    DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
+  }
+}
+
+///
+/// MovedIntoDisplay() <-- Alpyre Add-On
+/*---------------------------------------------------------------*
+ *  A function to test if the user moved the cursor into display *
+ *  when it was scrolled out of it                               *
+ *  This function is supposed to work only in NoWrapMode         *
+ *---------------------------------------------------------------*/
+BOOL MovedIntoDisplay(struct InstData *data, struct line_node *oldline)
+{
+    struct line_node *line = GetFirstLine(&data->linelist);
+    LONG oldline_nr = 1;
+
+    /* Since this function will be only used in NoWrapMode and
+     in that mode line_nr's will always match the real lines
+     we can find the top (real) line just by traversing the list */
+
+    while(line != NULL && line != oldline)
+    {
+      line = GetNextLine(line);
+      oldline_nr++;
+    }
+
+return (oldline_nr < data->visual_y || oldline_nr >= data->visual_y + data->maxlines);
+}
 ///

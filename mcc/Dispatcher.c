@@ -52,6 +52,7 @@ void ResetDisplay(struct InstData *data)
 
   data->blockinfo.enabled = FALSE;
   data->visual_y = 1;
+  data->xpos     = 0;                            // Alpyre Add-On
   data->CPos_X = 0;
   data->pixel_x = 0;
   data->actualline = GetFirstLine(&data->linelist);
@@ -60,6 +61,7 @@ void ResetDisplay(struct InstData *data)
   if(data->shown == TRUE)
   {
     data->totallines = CountLines(data, &data->linelist);
+    data->longestline = LongestLine(data);                                      // Alpyre Add-On
     GetColor(data, data->CPos_X, data->actualline, &data->Pen);
     data->Flow = data->actualline->line.Flow;
     data->Separator = data->actualline->line.Separator;
@@ -72,6 +74,9 @@ void ResetDisplay(struct InstData *data)
       MUIA_TextEditor_Prop_Visible,     data->maxlines*data->fontheight,
       MUIA_TextEditor_Prop_First,       (data->visual_y-1)*data->fontheight,
       MUIA_TextEditor_Prop_DeltaFactor, data->fontheight,
+      MUIA_TextEditor_HScroller_Ent,    data->longestline,                       // Alpyre Add-On
+      MUIA_TextEditor_HScroller_Vis,    _mwidth(data->object),                   // Alpyre Add-On
+      MUIA_TextEditor_HScroller_Pos,    data->xpos,                              // Alpyre Add-On
       TAG_DONE);
     data->NoNotify = FALSE;
 
@@ -159,6 +164,7 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             setFlag(data->flags, FLG_ActiveOnClick);
             setFlag(data->flags, FLG_PasteStyles);
             setFlag(data->flags, FLG_PasteColors);
+            setFlag(data->flags, FLG_HScroll);         // Alpyre Add-On
 
             #if defined(__amigaos3__) || defined(__amigaos4__)
             if(MUIMasterBase->lib_Version > 20 || (MUIMasterBase->lib_Version == 20 && MUIMasterBase->lib_Revision >= 5640))
@@ -190,6 +196,7 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             // they were set during OM_NEW
             mSet(cl, obj, (struct opSet *)msg);
             data->visual_y = 1;
+            data->xpos     = 0;                                 // Alpyre Add-On
 
             // start with an inactive cursor
             data->currentCursorState = CS_INACTIVE;
@@ -469,6 +476,7 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
   data->ypos        = _mtop(obj);
 
   data->totallines = CountLines(data, &data->linelist);
+  data->longestline = LongestLine(data);                 // Alpyre Add-On
 
   data->shown = TRUE;
   data->update = FALSE;
@@ -488,6 +496,19 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
     MUIA_TextEditor_Prop_First,     (data->visual_y-1)*data->fontheight,
     MUIA_TextEditor_Prop_Visible,     data->maxlines*data->fontheight,
     TAG_DONE);
+
+  {
+  LONG mwidth = _mwidth(obj);                                            // Alpyre Add-On
+  SetAttrs(obj,                                                          // Alpyre Add-On
+    MUIA_TextEditor_HScroller_Ent,                                       // Alpyre Add-On
+              (data->longestline - (LONG)(data->xpos) < mwidth) ?        // Alpyre Add-On
+               ((data->xpos) + mwidth) :                                 // Alpyre Add-On
+               ((mwidth > data->longestline) ?                           // Alpyre Add-On
+                 mwidth : data->longestline),                            // Alpyre Add-On
+    MUIA_TextEditor_HScroller_Pos, data->xpos,                           // Alpyre Add-On
+    MUIA_TextEditor_HScroller_Vis, mwidth,                               // Alpyre Add-On
+    TAG_DONE);                                                           // Alpyre Add-On
+  }                                                                      // Alpyre Add-On
 
   // initialize the doublebuffering rastport
   bmwidth = _mwidth(obj)+((data->fontheight-data->font->tf_Baseline+1)>>1)+1;
@@ -799,6 +820,8 @@ DISPATCHER(_Dispatcher)
   LONG t_totallines;
   LONG t_visual_y;
   BOOL t_haschanged;
+  ULONG t_xpos;               // Alpyre Add-On
+  LONG t_longestline;         // Alpyre Add-On
   struct TEColor t_pen;
   BOOL areamarked;
   IPTR result = 0;
@@ -834,6 +857,8 @@ DISPATCHER(_Dispatcher)
   t_haschanged = data->HasChanged;
   t_pen = data->Pen;
   areamarked = Enabled(data);
+  t_xpos        = data->xpos;         // Alpyre Add-On
+  t_longestline = data->longestline;  // Alpyre Add-On
 
 //  D(DBF_STARTUP, "cont...");
 
@@ -898,7 +923,29 @@ DISPATCHER(_Dispatcher)
           (data->actualline != oldy) ? MUIA_TextEditor_CursorY : TAG_IGNORE, cposY,
           MUIA_TextEditor_CursorIndex, index,
           TAG_DONE);
-      }
+      }                                                                                      
+
+      if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)                                 // Alpyre Add-On
+      { /* If we are in the NoWrapMode and the cursor position changed horizontally         // Alpyre Comment
+           we should check if the cursor got out of gadget bounds and scroll it into view!  // Alpyre Comment */
+        if(data->CPos_X != oldx)                                                            // Alpyre Add-On
+          ScrollIntoView(data);                                                             // Alpyre Add-On
+                                                                                            // Alpyre Add-On
+        if (data->hscroller)                                                                // Alpyre Add-On
+        { LONG prop_entries;                                                                // Alpyre Add-On
+          get(data->hscroller, MUIA_Prop_Entries, &prop_entries);                           // Alpyre Add-On
+                                                                                            // Alpyre Add-On
+          if (prop_entries != data->longestline)                                            // Alpyre Add-On
+          { LONG mwidth = _mwidth(obj);                                                     // Alpyre Add-On
+            SetAttrs(data->object, MUIA_TextEditor_HScroller_Ent,                           // Alpyre Add-On
+                    (data->longestline - (LONG)(data->xpos) < mwidth) ?                     // Alpyre Add-On
+                    ((data->xpos) + mwidth) :                                               // Alpyre Add-On
+                    ((mwidth > data->longestline) ?                                         // Alpyre Add-On
+                      mwidth : data->longestline),                                          // Alpyre Add-On
+                      TAG_DONE);                                                            // Alpyre Add-On
+          }                                                                                 // Alpyre Add-On
+        }                                                                                   // Alpyre Add-On
+      }                                                                                     // Alpyre Add-On
 
       // if the HandleInput() function didn't return
       // an MUI_EventHandlerRC_Eat we can return immediately
@@ -932,6 +979,10 @@ DISPATCHER(_Dispatcher)
   if(t_haschanged != data->HasChanged)
     set(obj, MUIA_TextEditor_HasChanged, data->HasChanged);
 
+  if(data->ChangeEvent){                       // Alpyre Add-On
+    data->longestline = LongestLine(data);     // Alpyre Add-On
+    data->ChangeEvent = FALSE;}                // Alpyre Add-On
+
   if(msg->MethodID == OM_SET)
   {
     ULONG newresult = DoSuperMethodA(cl, obj, msg);
@@ -956,7 +1007,25 @@ DISPATCHER(_Dispatcher)
                 * data->fontheight,
               MUIA_TextEditor_Prop_First, (data->visual_y-1)*data->fontheight,
               TAG_DONE);
+    // visual_y is changed it is best to recalculate longest visible line here               // Alpyre Comment
+    if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)                                    // Alpyre Add-On
+       data->longestline = LongestLine(data);                                                // Alpyre Add-On
   }
+
+  if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap && data->hscroller)  // Alpyre Add-On
+  {                                                                         // Alpyre Add-On
+    if(data->xpos != t_xpos || data->longestline != t_longestline)          // Alpyre Add-On
+    {                                                                       // Alpyre Add-On
+      LONG mwidth = _mwidth(obj);                                           // Alpyre Add-On
+      SetAttrs(obj, MUIA_TextEditor_HScroller_Ent,                          // Alpyre Add-On
+                 (data->longestline - (LONG)(data->xpos) < mwidth) ?        // Alpyre Add-On
+                  ((data->xpos) + mwidth) :                                 // Alpyre Add-On
+                  ((mwidth > data->longestline) ?                           // Alpyre Add-On
+                    mwidth : data->longestline),                            // Alpyre Add-On
+                MUIA_TextEditor_HScroller_Pos, data->xpos,                  // Alpyre Add-On
+                TAG_DONE);                                                  // Alpyre Add-On
+    }                                                                       // Alpyre Add-On
+  }                                                                         // Alpyre Add-On
 
   data->NoNotify = TRUE;
   if(Enabled(data))

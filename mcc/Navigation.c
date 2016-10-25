@@ -34,12 +34,19 @@ struct pos_info pos;
 LONG FlowSpace(struct InstData *data, UWORD flow, STRPTR text)
 {
   LONG flowspace = 0;
+  LONG textlength = TextLengthNew(&data->tmprp, text, LineCharsWidth(data, text)-1, data->TabSizePixels); // Alpyre Edit
+  LONG mwidth = _mwidth(data->object);                                                                    // Alpyre Edit
+
+  /* Alpyre Comment:
+     With these edits here, a line which is longer than the gadget width will have
+     zero flowspace (means will be alligned left) even if it is centered or right alligned.
+     So that we can horizontally scroll it right to see the rest of it. */
 
   ENTER();
 
-  if(flow != MUIV_TextEditor_Flow_Left)
+  if((flow != MUIV_TextEditor_Flow_Left) && (textlength < mwidth))                                         //Alpyre Edit
   {
-    flowspace  = (_mwidth(data->object)-TextLengthNew(&data->tmprp, text, LineCharsWidth(data, text)-1, data->TabSizePixels));
+    flowspace  = (mwidth - textlength);
     flowspace -= (data->CursorWidth == 6) ? TextLength(&data->tmprp, " ", 1) : data->CursorWidth;
     if(flow == MUIV_TextEditor_Flow_Center)
     {
@@ -65,7 +72,7 @@ static LONG CursorOffset(struct InstData *data)
   // call TextFitNew() to find out how many chars would fit.
   if((lineCharsWidth = LineCharsWidth(data, text)) > 0)
   {
-    struct TextExtent tExtend;
+    struct TextExtentNew tExtend;
     LONG offset = data->pixel_x-FlowSpace(data, line->line.Flow, text);
 
     if(offset < 1)
@@ -684,7 +691,7 @@ void PosFromCursor(struct InstData *data, LONG MouseX, LONG MouseY)
 
   data->actualline = pos.line;
 
-  data->pixel_x = MouseX-_mleft(data->object)+1;
+  data->pixel_x = MouseX - _mleft(data->object)+1 + data->xpos; // Alpyre Edit
 
   if(data->pixel_x < 1)
     data->pixel_x = 1;

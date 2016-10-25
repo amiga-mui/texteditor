@@ -176,7 +176,7 @@ static const char *page_titles[] = { "Shown", "Hidden", NULL };
 
 int main(void)
 {
-  void    *slider;
+  void    *slider, *hscroller;
   long    argarray[6] = {0,0,0,0,0,0};
   struct  MUI_CustomClass *mcc;
   struct  RDArgs        *args;
@@ -359,7 +359,8 @@ int main(void)
   */
                               Child, rgroup = RegisterGroup(page_titles),
                                 MUIA_Register_Frame, TRUE,
-                                Child,HGroup,
+                                Child, VGroup,
+                                 Child,HGroup,
                                   MUIA_Group_Spacing, 0,
                                   Child, editorgad = NewObject(mcc->mcc_Class, NULL,
   //                                MUIA_Frame, "602211",
@@ -367,18 +368,18 @@ int main(void)
   //                                MUIA_Background, MUII_GroupBack,
   //                                MUIA_TextEditor_FixedFont, TRUE,
                                     MUIA_TextEditor_AutoClip, FALSE,
-  //                        MUIA_TextEditor_ReadOnly, TRUE,
-  //                                 MUIA_TextEditor_ActiveObjectOnClick, TRUE,
+  //                                MUIA_TextEditor_ReadOnly, TRUE,
+  //                                MUIA_TextEditor_ActiveObjectOnClick, TRUE,
                                     MUIA_TextEditor_DoubleClickHook, &URLHook,
-  //                                MUIA_TextEditor_HorizontalScroll, TRUE,
-                                  MUIA_TextEditor_ImportWrap, 10023,
-  //                                  MUIA_TextEditor_WrapBorder, wrap_border,
+  //                                MUIA_TextEditor_HorizontalScroll, FALSE,
+                                    MUIA_TextEditor_ImportWrap, 10023,
+  //                                MUIA_TextEditor_WrapBorder, wrap_border,
   //                                MUIA_TextEditor_ExportWrap, 80,
                                     MUIA_TextEditor_WrapMode, MUIV_TextEditor_WrapMode_NoWrap,
                                     MUIA_TextEditor_ConvertTabs, FALSE,
                                     MUIA_TextEditor_WrapWords, FALSE,
 
-                                  MUIA_TextEditor_ExportHook, MUIV_TextEditor_ExportHook_NoStyle,
+                                    MUIA_TextEditor_ExportHook, MUIV_TextEditor_ExportHook_NoStyle,
   //                                MUIA_TextEditor_ImportHook, MUIV_TextEditor_ImportHook_EMail,
                                     MUIA_CycleChain,    TRUE,
   //                                MUIA_TextEditor_ReadOnly, TRUE,
@@ -431,6 +432,9 @@ int main(void)
                                       "Alt + Backspace, Delete = \"Delele To BOW\", \"Delete To NextWord\".\n",
                                   End,
                                   Child, slider = MUI_NewObject("Scrollbar.mui", End,
+                                 End,
+                                  Child, hscroller = MUI_NewObject("Scrollbar.mui",
+                                  MUIA_Group_Horiz, TRUE, End,
                                 End,
                                 Child, VGroup,
                                   Child, TextObject,
@@ -489,6 +493,7 @@ int main(void)
             set(wrapmode, MUIA_CycleChain, TRUE);
             set(wrapborder, MUIA_CycleChain, TRUE);
             set(editorgad, MUIA_TextEditor_Slider, slider);
+            set(editorgad, MUIA_TextEditor_HorizontalScroller, hscroller);
             set(xslider, MUIA_CycleChain, TRUE);
             set(yslider, MUIA_CycleChain, TRUE);
             set(xyslider, MUIA_CycleChain, TRUE);
