@@ -932,7 +932,8 @@ DISPATCHER(_Dispatcher)
           ScrollIntoView(data);
 
         if (data->hscroller)
-        { LONG prop_entries;
+        { 
+          LONG prop_entries;
           get(data->hscroller, MUIA_Prop_Entries, &prop_entries);
 
           if (prop_entries != data->longestline)
