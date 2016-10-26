@@ -929,10 +929,10 @@ DISPATCHER(_Dispatcher)
         if(data->CPos_X != oldx)
           ScrollIntoView(data);
 
-        if (data->hscroller)
+        if (data->hslider)
         { 
           LONG prop_entries;
-          get(data->hscroller, MUIA_Prop_Entries, &prop_entries);
+          get(data->hslider, MUIA_Prop_Entries, &prop_entries);
 
           if (prop_entries != data->longestline)
           {
@@ -1013,7 +1013,7 @@ DISPATCHER(_Dispatcher)
        data->longestline = LongestLine(data);
   }
 
-  if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap && data->hscroller)
+  if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap && data->hslider)
   {
     if(data->xpos != t_xpos || data->longestline != t_longestline)
     {
