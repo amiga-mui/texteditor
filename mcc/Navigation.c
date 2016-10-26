@@ -42,9 +42,9 @@ LONG FlowSpace(struct InstData *data, UWORD flow, STRPTR text)
 
   ENTER();
 
-  if((flow != MUIV_TextEditor_Flow_Left) && (textlength < _mwidth(obj)))
+  if((flow != MUIV_TextEditor_Flow_Left) && (textlength < _mwidth(data->object)))
   {
-    flowspace  = (_mwidth(obj) - textlength);
+    flowspace  = (_mwidth(data->object) - textlength);
     flowspace -= (data->CursorWidth == 6) ? TextLength(&data->tmprp, " ", 1) : data->CursorWidth;
     if(flow == MUIV_TextEditor_Flow_Center)
     {
