@@ -583,7 +583,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           }
           data->Pen = pen;
           AddColor(data, &data->blockinfo, &data->Pen);
-          data->HasChanged  = TRUE;
+          data->HasChanged = TRUE;
           data->ChangeEvent = TRUE;
         }
       }
@@ -805,7 +805,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           if(start-1+lines > data->maxlines)
             lines = data->maxlines-(start-1);
           DumpText(data, data->visual_y+start-1, start-1, start-1+lines, TRUE);
-          data->HasChanged  = TRUE;
+          data->HasChanged = TRUE;
           data->ChangeEvent = TRUE;
         }
       }
