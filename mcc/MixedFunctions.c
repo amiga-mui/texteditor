@@ -433,11 +433,15 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
   UWORD flow;
 
   if(data->rgbMode == TRUE)
-  { highlightColor.isRGB = TRUE;
-    highlightColor.color = data->highlightRGB;}
+  {
+    highlightColor.isRGB = TRUE;
+    highlightColor.color = data->highlightRGB;
+  }
   else
-  { highlightColor.isRGB = FALSE;
-    highlightColor.color = data->highlightColor;}
+  {
+    highlightColor.isRGB = FALSE;
+    highlightColor.color = data->highlightColor;
+  }
 
   ENTER();
 
