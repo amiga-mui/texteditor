@@ -603,6 +603,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
         DrawSeparator(data, rp, LeftX, Y, LeftWidth, Height);
       }
     }
+	  
     if(clipping)
       RemoveClipping(data);
   }
