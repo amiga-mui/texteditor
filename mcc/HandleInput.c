@@ -1190,7 +1190,7 @@ static void EraseBlock(struct InstData *data, ULONG flags)
   {
     DoBlock(data, flags|CUTF_CUT);
     data->HasChanged  = TRUE;
-    data->ChangeEvent = TRUE;                                // Alpyre Add-On
+    data->ChangeEvent = TRUE;
   }
   else
   {
