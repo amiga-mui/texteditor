@@ -30,8 +30,7 @@
 
 /// TextLengthNew
 
-  /* Alpyre Comment:
-     The TextLengthNew() function uses the system function TextLength() in its implementation.
+  /* The TextLengthNew() function uses the system function TextLength() in its implementation.
      TextLength() has WORD as its return value type. Very long lines can overflow this value.
      So here I've implemented a loop to build up the value in segments.
   */
@@ -53,21 +52,21 @@ LONG TextLengthNew(struct RastPort *rp, const char *string, ULONG count, LONG ta
       // we parsed the string until the end
       // add the remaining characters' width
       if(count0 != 0)
-      {                                                       // Alpyre Add-On
-        if (count0 <= C_LIMIT)                                // Alpyre Add-On
+      {
+        if (count0 <= C_LIMIT)
           result += TextLength(rp, tptr0, count0);
-        else                                                  // Alpyre Add-On
-        {                                                     // Alpyre Add-On
-          LONG l_count = count0;                              // Alpyre Add-On
-                                                              // Alpyre Add-On
-          while(l_count > C_LIMIT)                            // Alpyre Add-On
-          {                                                   // Alpyre Add-On
-            result += TextLength(rp, tptr0, C_LIMIT);         // Alpyre Add-On
-            l_count -= C_LIMIT;                               // Alpyre Add-On
-            tptr0 += C_LIMIT;                                 // Alpyre Add-On
-          }                                                   // Alpyre Add-On
-          result += TextLength(rp, tptr0, l_count);           // Alpyre Add-On
-        }                                                     // Alpyre Add-On
+        else
+        {
+          LONG l_count = count0;
+
+          while(l_count > C_LIMIT)
+          {
+            result += TextLength(rp, tptr0, C_LIMIT);
+            l_count -= C_LIMIT;
+            tptr0 += C_LIMIT;
+          }
+          result += TextLength(rp, tptr0, l_count);
+        }
       }
       break;
     }
@@ -78,21 +77,21 @@ LONG TextLengthNew(struct RastPort *rp, const char *string, ULONG count, LONG ta
     {
       // we found a TAB, calculate the characters' width so far
       if(count0 != 0)
-      {                                                       // Alpyre Add-On
-        if (count0 <= C_LIMIT)                                // Alpyre Add-On
+      {
+        if (count0 <= C_LIMIT)
           result += TextLength(rp, tptr0, count0);
-        else                                                  // Alpyre Add-On
-        {                                                     // Alpyre Add-On
-          LONG l_count = count0;                              // Alpyre Add-On
-                                                              // Alpyre Add-On
-          while(l_count > C_LIMIT)                            // Alpyre Add-On
-          {                                                   // Alpyre Add-On
-            result += TextLength(rp, tptr0, C_LIMIT);         // Alpyre Add-On
-            l_count -= C_LIMIT;                               // Alpyre Add-On
-            tptr0 += C_LIMIT;                                 // Alpyre Add-On
-          }                                                   // Alpyre Add-On
-          result += TextLength(rp, tptr0, l_count);           // Alpyre Add-On
-        }                                                     // Alpyre Add-On
+        else
+        {
+          LONG l_count = count0;
+
+          while(l_count > C_LIMIT)
+          {
+            result += TextLength(rp, tptr0, C_LIMIT);
+            l_count -= C_LIMIT;
+            tptr0 += C_LIMIT;
+          }
+          result += TextLength(rp, tptr0, l_count);
+        }
       }
 
       tptr0 = tptr;
@@ -120,13 +119,12 @@ ULONG TextFitNew(struct RastPort *rp, const char *string, ULONG strLen, struct T
   ULONG strLen0 = 0;
   const char *tptr = string;
   const char *tptr0 = string;
-  struct TextExtent textExtent;                                                // Alpyre Add-On
-  ULONG te_width  = 0;                                                         // Alpyre Add-On
-  ULONG te_height = constrainingBitHeight < rp->TxHeight ? 0 : rp->TxHeight;   // Alpyre Add-On
+  struct TextExtent textExtent;
+  ULONG te_width  = 0;
+  ULONG te_height = constrainingBitHeight < rp->TxHeight ? 0 : rp->TxHeight;
 
   ENTER();
-                                                                               // Following Code is so very edited by me
-                                                                               // that you can accept it as a re-write. Alpyre
+
   do
   {
     char c;
