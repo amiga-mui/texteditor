@@ -825,7 +825,7 @@ LONG LongestLine(struct InstData *data)
     line_nr++;
   }
 
-return(result + cursor_width);
+  return(result + cursor_width);
 }
 ///
 /// ScrollIntoView()
@@ -890,6 +890,6 @@ BOOL MovedIntoDisplay(struct InstData *data, struct line_node *oldline)
       oldline_nr++;
     }
 
-return (oldline_nr < data->visual_y || oldline_nr >= data->visual_y + data->maxlines);
+  return (oldline_nr < data->visual_y || oldline_nr >= data->visual_y + data->maxlines);
 }
 ///
