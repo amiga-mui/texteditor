@@ -371,7 +371,7 @@ int main(void)
   //                                MUIA_TextEditor_ReadOnly, TRUE,
   //                                MUIA_TextEditor_ActiveObjectOnClick, TRUE,
                                     MUIA_TextEditor_DoubleClickHook, &URLHook,
-  //                                MUIA_TextEditor_HorizontalScroll, FALSE,
+  //                                MUIA_TextEditor_HorizontalScrolling, FALSE,
                                     MUIA_TextEditor_ImportWrap, 10023,
   //                                MUIA_TextEditor_WrapBorder, wrap_border,
   //                                MUIA_TextEditor_ExportWrap, 80,
@@ -493,7 +493,7 @@ int main(void)
             set(wrapmode, MUIA_CycleChain, TRUE);
             set(wrapborder, MUIA_CycleChain, TRUE);
             set(editorgad, MUIA_TextEditor_Slider, slider);
-            set(editorgad, MUIA_TextEditor_HorizontalScroller, hscroller);
+            set(editorgad, MUIA_TextEditor_HorizontalScrollBar, hscroller);
             set(xslider, MUIA_CycleChain, TRUE);
             set(yslider, MUIA_CycleChain, TRUE);
             set(xyslider, MUIA_CycleChain, TRUE);
