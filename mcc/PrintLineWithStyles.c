@@ -146,13 +146,13 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     BOOL cursor = FALSE;
     struct TEColor textColor;
     struct TEColor highlightColor;
-    LONG mleft  = _mleft(data->object);                // Alpyre Add-On
-    LONG mright = _mright(data->object);               // Alpyre Add-On
-    LONG mwidth = _mwidth(data->object);               // Alpyre Add-On
-    LONG dleft  = (doublebuffer) ? 0      : mleft;     // Alpyre Add-On
-    LONG dright = (doublebuffer) ? mwidth : mright;    // Alpyre Add-On
-    LONG o_width;                                      // Alpyre Add-On
-    LONG pen_pos;                                      // Alpyre Add-On
+    LONG mleft  = _mleft(data->object);
+    LONG mright = _mright(data->object);
+    LONG mwidth = _mwidth(data->object);
+    LONG dleft  = (doublebuffer) ? 0      : mleft;
+    LONG dright = (doublebuffer) ? mwidth : mright;
+    LONG o_width;
+    LONG pen_pos;
 
     if(data->rgbMode == TRUE)
     {
@@ -175,13 +175,12 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     if(doublebuffer == FALSE)
     {
       starty = data->ypos+(data->fontheight * (line_nr-1));
-      xoffset = mleft - data->xpos;                   //Alpyre Edit
+      xoffset = mleft - data->xpos;
     }
-    else                                              //Alpyre Edit
-      xoffset -= data->xpos;                          //Alpyre Edit
+    else
+      xoffset -= data->xpos;
 
     flow = FlowSpace(data, line->line.Flow, text+x);
-    // Alpyre Remark
 
     if(Enabled(data))
     {
@@ -232,7 +231,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       LONG blockwidth = 0;
       struct RastPort *old = _rp(data->object);
 
-      LONG clr_left, clr_width; // Alpyre Add-On
+      LONG clr_left, clr_width;
 
       if(startx < x+c_length && stopx > x)
       {
@@ -241,7 +240,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         else
           startx = x;
 
-        blockwidth = ((stopx >= c_length+x) ? mwidth-(blockstart+flow) + data->xpos : TextLengthNew(&data->tmprp, text+startx, stopx-startx, data->TabSizePixels));  // Alpyre Edit
+        blockwidth = ((stopx >= c_length+x) ? mwidth-(blockstart+flow) + data->xpos : TextLengthNew(&data->tmprp, text+startx, stopx-startx, data->TabSizePixels));
       }
       else if(isFlagClear(data->flags, FLG_ReadOnly) &&
               isFlagClear(data->flags, FLG_Ghosted) &&
@@ -265,18 +264,18 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       SetDrMd(rp, JAM1);
       _rp(data->object) = rp;
 
-      clr_left  = dleft;                                              // Alpyre Add-On
-      clr_width = MIN(flow+blockstart - data->xpos, (ULONG)mwidth);   // Alpyre Add-On
+      clr_left  = dleft;
+      clr_width = MIN(flow+blockstart - data->xpos, (ULONG)mwidth);
                   
-      if (clr_width > 0)                                              // Alpyre Add-On
-      {                                                               // Alpyre Add-On
+      if (clr_width > 0)
+      {
         // clear the background first
-        DoMethod(data->object, MUIM_DrawBackground, clr_left, starty,                                          // Alpyre Edit
-                                                    clr_width, data->fontheight,                               // Alpyre Edit
-                                                    isFlagSet(data->flags, FLG_InVGrp) ? 0 : mleft,            // Alpyre Edit
+        DoMethod(data->object, MUIM_DrawBackground, clr_left, starty,
+                                                    clr_width, data->fontheight,
+                                                    isFlagSet(data->flags, FLG_InVGrp) ? 0 : mleft,
                                                     isFlagSet(data->flags, FLG_InVGrp) ? data->fontheight*(data->visual_y+line_nr-2) : _mtop(data->object)+data->fontheight * (data->visual_y+line_nr-2),
                                                     0);
-      }                                                               // Alpyre Add-On
+      }
 
       if(blockwidth)
       {
@@ -304,31 +303,31 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
            (flow && data->selectmode != 1 && startx-x == 0 && cursor == FALSE &&
             ((data->blockinfo.startline != data->blockinfo.stopline) || x > 0)))
         {               
-          LONG left  = MAX(xoffset, dleft);                                                                  // Alpyre Add-On
-          LONG right = MIN(dright, xoffset+flow+blockwidth-1);                                               // Alpyre Edit
+          LONG left  = MAX(xoffset, dleft);
+          LONG right = MIN(dright, xoffset+flow+blockwidth-1);
 
           SetAPen(rp, color);
-          if (left < dright || right > dleft)                                                                // Alpyre Add-On
-            RectFill(rp, left, starty, right, starty+data->fontheight-1);                                    // Alpyre Edit
+          if (left < dright || right > dleft)
+            RectFill(rp, left, starty, right, starty+data->fontheight-1);
         }
         else
         {              
-          LONG left  = MAX(xoffset+flow+blockstart, dleft);                                                  // Alpyre Add-On
-          LONG right = MIN(dright, xoffset+flow+blockstart+blockwidth-1);                                    // Alpyre Edit
+          LONG left  = MAX(xoffset+flow+blockstart, dleft);
+          LONG right = MIN(dright, xoffset+flow+blockstart+blockwidth-1);
                        
           SetAPen(rp, cursor ? MUIPEN(data->cursorcolor) : color);
-          if (left < dright || right > dleft)                                                                // Alpyre Add-On
-          {                                                                                                  // Alpyre Add-On
-            RectFill(rp, left, starty, right, starty+data->fontheight-1);                                    // Alpyre Edit
+          if (left < dright || right > dleft)
+          {
+            RectFill(rp, left, starty, right, starty+data->fontheight-1);
 
             // if the gadget is in inactive state we just draw a skeleton cursor instead
             if(cursor == TRUE &&
                isFlagClear(data->flags, FLG_Active) &&
                isFlagClear(data->flags, FLG_Activated))
             {
-              DoMethod(data->object, MUIM_DrawBackground, left+1, starty+1,                                  // Alpyre Edit
+              DoMethod(data->object, MUIM_DrawBackground, left+1, starty+1,
                                                           blockwidth-2, data->fontheight-2,
-                                                          isFlagSet(data->flags, FLG_InVGrp) ? 0 : mleft,    // Alpyre Edit
+                                                          isFlagSet(data->flags, FLG_InVGrp) ? 0 : mleft,
                                                           isFlagSet(data->flags, FLG_InVGrp) ? data->fontheight*(data->visual_y+line_nr-2) : _mtop(data->object)+data->fontheight * (data->visual_y+line_nr-2),
                                                           0);
             }
@@ -338,11 +337,11 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
                        
       {                  
-        LONG  x_start = MAX(dleft, (blockwidth ? xoffset+blockstart+blockwidth+flow : xoffset+blockstart+blockwidth)),  // Alpyre Edit
+        LONG  x_start = MAX(dleft, (blockwidth ? xoffset+blockstart+blockwidth+flow : xoffset+blockstart+blockwidth)),
               y_start = starty,
-              x_width = dright - x_start + 1,                                                                           // Alpyre Edit
+              x_width = dright - x_start + 1,
               y_width = data->fontheight,
-              x_ptrn = (blockwidth) ? (blockstart+blockwidth+flow) : (blockstart+blockwidth),                           // Alpyre Edit
+              x_ptrn = (blockwidth) ? (blockstart+blockwidth+flow) : (blockstart+blockwidth),
               y_ptrn = data->fontheight*(data->visual_y+line_nr-2);
 
         if(isFlagClear(data->flags, FLG_InVGrp))
@@ -361,13 +360,13 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
     SetColor(data, rp, line->line.Highlight ? &highlightColor : &textColor, FALSE, FALSE);
 
-    pen_pos  = xoffset + flow;                                               // Alpyre Add-On
-    o_width  = ((ULONG)flow > data->xpos ? 0 : data->xpos - flow);           // Alpyre Add-On
-    maxwidth = mwidth + data->xpos - flow;                                   // Alpyre Edit THIS NEEDS REVISING !!!!
+    pen_pos  = xoffset + flow;
+    o_width  = ((ULONG)flow > data->xpos ? 0 : data->xpos - flow);
+    maxwidth = mwidth + data->xpos - flow;                                   // THIS NEEDS REVISING !!!!
     while(c_length > 0)
     {
       LONG p_length = c_length;
-      struct TextExtentNew te;                                               // Alpyre Edit
+      struct TextExtentNew te;
 
       SetSoftStyle(rp, ConvertStyle(GetStyle(x, line)), AskSoftStyle(rp));
       if(styles != NULL)
@@ -411,27 +410,27 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       }
 */
       {
-        ULONG o_chars = 0;                                                                                             // Alpyre Add-On
-        LONG o_length = 0;                                                                                             // Alpyre Add-On
+        ULONG o_chars = 0;
+        LONG o_length = 0;
 
-        // calculate how many chars will be ommited from start because of xpos                                         // Alpyre Add-On
-        if (o_width && pen_pos < dleft)                                                                                // Alpyre Add-On
-        {                                                                                                              // Alpyre Add-On
-          o_chars   = TextFitNew(rp, text+x, p_length, &te, NULL, 1, o_width, data->fontheight, data->TabSizePixels);  // Alpyre Add-On
-          o_length  = te.te_Width;                                                                                     // Alpyre Add-On
-          o_width  -= o_length;                                                                                        // Alpyre Add-On
-          maxwidth -= o_length;                                                                                        // Alpyre Add-On
-          pen_pos  += o_length;                                                                                        // Alpyre Add-On
+        // calculate how many chars will be ommited from start because of xpos
+        if (o_width && pen_pos < dleft)
+        {
+          o_chars   = TextFitNew(rp, text+x, p_length, &te, NULL, 1, o_width, data->fontheight, data->TabSizePixels);
+          o_length  = te.te_Width;
+          o_width  -= o_length;
+          maxwidth -= o_length;
+          pen_pos  += o_length;
         }
-                                                                                                                      // Alpyre Add-On
-        // set the rastport pen pos to appropriate coordinates                                                        // Alpyre Add-On
-        Move(rp, pen_pos, starty+rp->TxBaseline);                                      // Alpyre Edit (previously was at Alpyre Remark)
+
+        // set the rastport pen pos to appropriate coordinates
+        Move(rp, pen_pos, starty+rp->TxBaseline);
         
         // check if there is space left to print some text
         if(maxwidth > 0)
         {
           // calculate how many characters really fit in the remaining space
-          ULONG fitting = TextFitNew(rp, text+x+o_chars, p_length - o_chars, &te, NULL, 1, maxwidth, data->fontheight, data->TabSizePixels);  // Alpyre Edit
+          ULONG fitting = TextFitNew(rp, text+x+o_chars, p_length - o_chars, &te, NULL, 1, maxwidth, data->fontheight, data->TabSizePixels);
 
           if(fitting > 0)
           {
@@ -465,7 +464,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       LeftWidth = LeftWidth < 0 ? 0 : LeftWidth;
       RightX = pen_pos - mleft + 4;
       RightX = RightX < dleft ? dleft : RightX;
-      RightWidth = dright > RightX ? dright - RightX : mwidth;                    // Alpyre Edit
+      RightWidth = dright > RightX ? dright - RightX : mwidth;
       Y = starty;
       Height = isFlagSet(line->line.Separator, LNSF_Thick) ? 2 : 1;
 
@@ -476,7 +475,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
       if(isFlagSet(line->line.Separator, LNSF_StrikeThru) || line->line.Length == 1)
       {
-        LeftWidth = mwidth;                                                            // Alpyre Edit
+        LeftWidth = mwidth;
       }
       else
       {
@@ -495,8 +494,8 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         ULONG ptrn1 = 0x11111111UL;
         ULONG ptrn2 = 0x44444444UL;
 
-        ptrn1 = ptrn1>>((mleft - xoffset)%16);                                         // Alpyre Edit
-        ptrn2 = ptrn2>>((mleft - xoffset)%16);                                         // Alpyre Edit
+        ptrn1 = ptrn1>>((mleft - xoffset)%16);
+        ptrn2 = ptrn2>>((mleft - xoffset)%16);
 
         if((data->fontheight*(data->visual_y+line_nr-2))%2 == 0)
         {
@@ -521,7 +520,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       SetDrMd(rp, JAM1);
       SetAPen(rp, _pens(data->object)[MPEN_SHADOW]);
       SetAfPt(rp, newPattern, 1);
-      RectFill(rp, xoffset, starty, xoffset+mwidth-1, starty+data->fontheight-1);     // Alpyre Edit
+      RectFill(rp, xoffset, starty, xoffset+mwidth-1, starty+data->fontheight-1);
       SetAfPt(rp, NULL, (UBYTE)-1);
     }
 
@@ -531,7 +530,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     {
       if(line_nr == 1)
       {
-        BltBitMapRastPort(rp->BitMap, 0, _mtop(data->object)-data->ypos, data->rport, mleft, _mtop(data->object)+(data->fontheight * (line_nr-1)), mwidth, data->fontheight-(_mtop(data->object)-data->ypos), (ABC|ABNC));  // Alpyre Edit
+        BltBitMapRastPort(rp->BitMap, 0, _mtop(data->object)-data->ypos, data->rport, mleft, _mtop(data->object)+(data->fontheight * (line_nr-1)), mwidth, data->fontheight-(_mtop(data->object)-data->ypos), (ABC|ABNC));
       }
       else
       {
@@ -539,12 +538,12 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         {
           if(_mtop(data->object) != data->ypos)
           {
-            BltBitMapRastPort(rp->BitMap, 0, 0, data->rport, mleft, data->ypos+(data->fontheight * (line_nr-1)), mwidth, _mtop(data->object)-data->ypos, (ABC|ABNC));  // Alpyre Edit
+            BltBitMapRastPort(rp->BitMap, 0, 0, data->rport, mleft, data->ypos+(data->fontheight * (line_nr-1)), mwidth, _mtop(data->object)-data->ypos, (ABC|ABNC));
           }
         }
         else
         {
-          BltBitMapRastPort(rp->BitMap, 0, 0, data->rport, mleft, data->ypos+(data->fontheight * (line_nr-1)), mwidth, data->fontheight, (ABC|ABNC));  // Alpyre Edit
+          BltBitMapRastPort(rp->BitMap, 0, 0, data->rport, mleft, data->ypos+(data->fontheight * (line_nr-1)), mwidth, data->fontheight, (ABC|ABNC));
         }
       }
     }
