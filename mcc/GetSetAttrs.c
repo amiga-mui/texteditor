@@ -471,7 +471,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
         else
         {
           data->xpos = ti_Data;
-          DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
+          DumpText(data, data->visual_y, 0, data->maxlines, TRUE);
         }
       }
       break;
