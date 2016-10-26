@@ -840,7 +840,6 @@ void ScrollIntoView(struct InstData *data)
   LONG cursor_width;
   LONG xmin = 0;
   LONG xmax;
-  LONG mwidth = _mwidth(data->object);
 
   if (isFlagClear(data->flags, FLG_HScroll))
     return;
@@ -862,9 +861,9 @@ void ScrollIntoView(struct InstData *data)
     data->xpos = xmin;
     DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
   }
-  else if (xmax > (LONG)(data->xpos + mwidth))
+  else if (xmax > (LONG)(data->xpos + _mwidth(obj)))
   {
-    data->xpos = xmax - mwidth;
+    data->xpos = xmax - _mwidth(obj);
     DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
   }
 }
