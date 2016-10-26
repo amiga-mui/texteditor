@@ -428,7 +428,6 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
                     MUI_EndRefresh(muiRenderInfo(obj), 0);
                   }
               }
-
               DumpText(data, data->visual_y, 0, lines, FALSE);
             }
             else
@@ -460,7 +459,6 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
         if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
           data->longestline = LongestLine(data);
       }                                                                            
-
       break;
 
       case MUIA_TextEditor_HScroller_Pos:
@@ -701,7 +699,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_TextEditor_HorizontalScrolling:
       {
-        if(ti_Data)                                                                       
+        if(ti_Data)
           setFlag(data->flags, FLG_HScroll);
         else
         {
