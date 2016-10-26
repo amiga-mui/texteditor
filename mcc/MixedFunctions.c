@@ -861,9 +861,9 @@ void ScrollIntoView(struct InstData *data)
     data->xpos = xmin;
     DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
   }
-  else if (xmax > (LONG)(data->xpos + _mwidth(obj)))
+  else if (xmax > (LONG)(data->xpos + _mwidth(data->object)))
   {
-    data->xpos = xmax - _mwidth(obj);
+    data->xpos = xmax - _mwidth(data->object);
     DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
   }
 }
