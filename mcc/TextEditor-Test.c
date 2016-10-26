@@ -176,7 +176,7 @@ static const char *page_titles[] = { "Shown", "Hidden", NULL };
 
 int main(void)
 {
-  void    *slider, *hscroller;
+  void    *slider, *hslider;
   long    argarray[6] = {0,0,0,0,0,0};
   struct  MUI_CustomClass *mcc;
   struct  RDArgs        *args;
@@ -371,7 +371,6 @@ int main(void)
   //                                MUIA_TextEditor_ReadOnly, TRUE,
   //                                MUIA_TextEditor_ActiveObjectOnClick, TRUE,
                                     MUIA_TextEditor_DoubleClickHook, &URLHook,
-  //                                MUIA_TextEditor_HorizontalScrolling, FALSE,
                                     MUIA_TextEditor_ImportWrap, 10023,
   //                                MUIA_TextEditor_WrapBorder, wrap_border,
   //                                MUIA_TextEditor_ExportWrap, 80,
@@ -433,7 +432,7 @@ int main(void)
                                   End,
                                   Child, slider = MUI_NewObject("Scrollbar.mui", End,
                                  End,
-                                  Child, hscroller = MUI_NewObject("Scrollbar.mui",
+                                  Child, hslider = MUI_NewObject("Scrollbar.mui",
                                   MUIA_Group_Horiz, TRUE, End,
                                 End,
                                 Child, VGroup,
@@ -493,7 +492,7 @@ int main(void)
             set(wrapmode, MUIA_CycleChain, TRUE);
             set(wrapborder, MUIA_CycleChain, TRUE);
             set(editorgad, MUIA_TextEditor_Slider, slider);
-            set(editorgad, MUIA_TextEditor_HorizontalScrollBar, hscroller);
+            set(editorgad, MUIA_TextEditor_HorizontalSlider, hslider);
             set(xslider, MUIA_CycleChain, TRUE);
             set(yslider, MUIA_CycleChain, TRUE);
             set(xyslider, MUIA_CycleChain, TRUE);
