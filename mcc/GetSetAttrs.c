@@ -138,9 +138,6 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
     case MUIA_TextEditor_HasChanged:
       ti_Data = data->HasChanged;
       break;
-    case MUIA_TextEditor_HorizontalScrolling:
-      ti_Data = isFlagSet(data->flags, FLG_HScroll);
-      break;
     case MUIA_TextEditor_ImportWrap:
       ti_Data = data->ImportWrap;
       break;
@@ -317,8 +314,9 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
         // make sure a possibly existing slider is disabled as well
         if(data->slider != NULL)
           set(data->slider, MUIA_Disabled, ti_Data);
-        if(data->hscroller != NULL)
-          set(data->hscroller, MUIA_Disabled, ti_Data);
+
+	if(data->hslider != NULL)
+          set(data->hslider, MUIA_Disabled, ti_Data);
       }
       break;
 
@@ -626,39 +624,48 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       }
       break;
 
-      case MUIA_TextEditor_HorizontalScrollBar:
+      case MUIA_TextEditor_HorizontalSlider:
       {
-        if(data->shown == FALSE)
-        {
-          data->hscroller = (void *)ti_Data;
+        if(ti_Data)
+	{
+          if(data->shown == FALSE)
+          {
+            data->hslider = (void *)ti_Data;
 
-          // disable the hscroller right away if the texteditor
-          // gadget is disabled as well.
-          if(isFlagSet(data->flags, FLG_Ghosted))
-            set(data->hscroller, MUIA_Disabled, TRUE);
+            // disable the hslider right away if the texteditor
+            // gadget is disabled as well.
+            if(isFlagSet(data->flags, FLG_Ghosted))
+              set(data->hslider, MUIA_Disabled, TRUE);
 
-          // Set the gadget to be always scrollable when there is a H.scroller
-          setFlag(data->flags, FLG_HScroll);
+            // Set the gadget to be always scrollable when there is a H.scroller
+            setFlag(data->flags, FLG_HScroll);
 
-          DoMethod(data->hscroller, MUIM_Notify,
-              MUIA_Prop_Release, MUIV_EveryTime,
-              obj, 3, MUIM_NoNotifySet, MUIA_TextEditor_Prop_Release, MUIV_TriggerValue);
-          DoMethod(data->hscroller, MUIM_Notify,
-              MUIA_Prop_First, MUIV_EveryTime,
-              obj, 3, MUIM_NoNotifySet, MUIA_TextEditor_HScroller_Pos, MUIV_TriggerValue);
-          DoMethod(obj, MUIM_Notify,
-              MUIA_TextEditor_HScroller_Pos, MUIV_EveryTime,
-              data->hscroller, 3, MUIM_NoNotifySet, MUIA_Prop_First, MUIV_TriggerValue);
-          DoMethod(obj, MUIM_Notify,
-              MUIA_TextEditor_HScroller_Ent, MUIV_EveryTime,
-              data->hscroller, 3, MUIM_NoNotifySet, MUIA_Prop_Entries, MUIV_TriggerValue);
-          DoMethod(obj, MUIM_Notify,
-              MUIA_TextEditor_HScroller_Vis, MUIV_EveryTime,
-              data->hscroller, 3, MUIM_NoNotifySet, MUIA_Prop_Visible, MUIV_TriggerValue);
-          DoMethod(obj, MUIM_Notify,
-              MUIA_TextEditor_Prop_DeltaFactor, MUIV_EveryTime,
-              data->hscroller, 3, MUIM_NoNotifySet, MUIA_Prop_DeltaFactor, MUIV_TriggerValue);
+            DoMethod(data->hslider, MUIM_Notify,
+                MUIA_Prop_Release, MUIV_EveryTime,
+                obj, 3, MUIM_NoNotifySet, MUIA_TextEditor_Prop_Release, MUIV_TriggerValue);
+            DoMethod(data->hslider, MUIM_Notify,
+                MUIA_Prop_First, MUIV_EveryTime,
+                obj, 3, MUIM_NoNotifySet, MUIA_TextEditor_HScroller_Pos, MUIV_TriggerValue);
+            DoMethod(obj, MUIM_Notify,
+                MUIA_TextEditor_HScroller_Pos, MUIV_EveryTime,
+                data->hslider, 3, MUIM_NoNotifySet, MUIA_Prop_First, MUIV_TriggerValue);
+            DoMethod(obj, MUIM_Notify,
+                MUIA_TextEditor_HScroller_Ent, MUIV_EveryTime,
+                data->hslider, 3, MUIM_NoNotifySet, MUIA_Prop_Entries, MUIV_TriggerValue);
+            DoMethod(obj, MUIM_Notify,
+                MUIA_TextEditor_HScroller_Vis, MUIV_EveryTime,
+                data->hslider, 3, MUIM_NoNotifySet, MUIA_Prop_Visible, MUIV_TriggerValue);
+            DoMethod(obj, MUIM_Notify,
+                MUIA_TextEditor_Prop_DeltaFactor, MUIV_EveryTime,
+                data->hslider, 3, MUIM_NoNotifySet, MUIA_Prop_DeltaFactor, MUIV_TriggerValue);
+          }
         }
+	else
+	{
+          clearFlag(data->flags, FLG_HScroll);
+          data->xpos = 0;
+          DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
+	}
       }
       break;
 
@@ -694,22 +701,6 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
         data->HasChanged = ti_Data;
         if(ti_Data == FALSE)
           clearFlag(data->flags, FLG_UndoLost);
-      }
-      break;
-
-      case MUIA_TextEditor_HorizontalScrolling:
-      {
-        if(ti_Data)
-          setFlag(data->flags, FLG_HScroll);
-        else
-        {
-          if (!data->hscroller)
-          {
-            clearFlag(data->flags, FLG_HScroll);
-            data->xpos = 0;
-            DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
-          }
-        }
       }
       break;
 
