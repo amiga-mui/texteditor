@@ -143,9 +143,9 @@
 // private/experimental attribute definitions
 #define MUIA_TextEditor_Prop_Release       (TextEditor_Dummy + 0x01)
 #define MUIA_TextEditor_PopWindow_Open     (TextEditor_Dummy + 0x03)
-#define MUIA_TextEditor_HScroller_Pos      (TextEditor_Dummy + 0x47)
-#define MUIA_TextEditor_HScroller_Vis      (TextEditor_Dummy + 0x48)
-#define MUIA_TextEditor_HScroller_Ent      (TextEditor_Dummy + 0x49)
+#define MUIA_TextEditor_HSlider_Pos        (TextEditor_Dummy + 0x47)
+#define MUIA_TextEditor_HSlider_Vis        (TextEditor_Dummy + 0x48)
+#define MUIA_TextEditor_HSlider_Ent        (TextEditor_Dummy + 0x49)
 
 // special flagging macros
 #define setFlag(mask, flag)             (mask) |= (flag)               // set the flag "flag" in "mask"
