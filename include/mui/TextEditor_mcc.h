@@ -109,8 +109,8 @@ extern "C" {
 #define MUIA_TextEditor_MatchedKeyword        (TextEditor_Dummy + 0x41)
 #define MUIA_TextEditor_CursorIndex           (TextEditor_Dummy + 0x42)
 #define MUIA_TextEditor_RGBMode               (TextEditor_Dummy + 0x45)
-#define MUIA_TextEditor_HorizontalScroll      (TextEditor_Dummy + 0x2d)
-#define MUIA_TextEditor_HorizontalScroller    (TextEditor_Dummy + 0x46)
+#define MUIA_TextEditor_HorizontalScrolling   (TextEditor_Dummy + 0x2d)
+#define MUIA_TextEditor_HorizontalScrollBar   (TextEditor_Dummy + 0x46)
 
 #define MUIM_TextEditor_HandleError           (TextEditor_Dummy + 0x1f)
 #define MUIM_TextEditor_AddKeyBindings        (TextEditor_Dummy + 0x22)
