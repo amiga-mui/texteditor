@@ -143,9 +143,9 @@
 // private/experimental attribute definitions
 #define MUIA_TextEditor_Prop_Release       (TextEditor_Dummy + 0x01)
 #define MUIA_TextEditor_PopWindow_Open     (TextEditor_Dummy + 0x03)
-#define MUIA_TextEditor_HScroller_Pos      (TextEditor_Dummy + 0x47)   // Alpyre Add-On
-#define MUIA_TextEditor_HScroller_Vis      (TextEditor_Dummy + 0x48)   // Alpyre Add-On
-#define MUIA_TextEditor_HScroller_Ent      (TextEditor_Dummy + 0x49)   // Alpyre Add-On
+#define MUIA_TextEditor_HScroller_Pos      (TextEditor_Dummy + 0x47)
+#define MUIA_TextEditor_HScroller_Vis      (TextEditor_Dummy + 0x48)
+#define MUIA_TextEditor_HScroller_Ent      (TextEditor_Dummy + 0x49)
 
 // special flagging macros
 #define setFlag(mask, flag)             (mask) |= (flag)               // set the flag "flag" in "mask"
@@ -321,12 +321,12 @@ struct Grow
   APTR pool;
 };
 
-struct TextExtentNew               // Alpyre Add-On     Regular TextExtend structure members has UWORD type
-{                                  // Alpyre Add-On     which easily overflow if the text passed is very long.
-    ULONG   te_Width;              // Alpyre Add-On
-    ULONG   te_Height;             // Alpyre Add-On     This new TextExtend structure has ULONG type members
-    struct Rect32 te_Extent;       // Alpyre Add-On     and is used by TextFitNew() function.
-};                                 // Alpyre Add-On
+struct TextExtentNew               // TextExtent struct in the Amiga API has UWORD type members
+{                                  // which easily overflow if the text passed is very long.
+    ULONG   te_Width;              // 
+    ULONG   te_Height;             // This new TextExtent structure has ULONG type members
+    struct Rect32 te_Extent;       // and is used by TextFitNew() function.
+};                                 // 
 
 struct InstData
 {
@@ -454,14 +454,14 @@ struct InstData
 
   char **Keywords;
 
-  ULONG  xpos;            /* xpos of gadget (for horizontal scrolling)                                                   Alpyre Add-On
-                             unlike visual_y this is a pixel value...                                                    Alpyre Add-On */
-  LONG   longestline;     /* the length (in pixels) of the longest one of the lines displayed                            Alpyre Add-On
-                             (this is used as the Prop_Entries value for the hscroller)                                  Alpyre Add-On */
-  BOOL   ChangeEvent;     /* Everytime something is changed in the text, this will be set TRUE along with HasChanged     Alpyre Add-On
-                             then will be used as a notification to recalculate the longestline in the Dispatcher        Alpyre Add-On
-                             and immediately set back to FALSE                                                           Alpyre Add-On*/
-  Object *hscroller;      // pointer to the horizontal scroller (if any).                                                Alpyre Add-On
+  ULONG  xpos;            /* xpos of gadget (for horizontal scrolling)
+                             unlike visual_y this is a pixel value... */
+  LONG   longestline;     /* the length (in pixels) of the longest one of the lines displayed
+                             (this is used as the Prop_Entries value for the hscroller) */
+  BOOL   ChangeEvent;     /* Everytime something is changed in the text, this will be set TRUE along with HasChanged
+                             then will be used as a notification to recalculate the longestline in the Dispatcher
+                             and immediately set back to FALSE */
+  Object *hscroller;      // pointer to the horizontal scroller (if any).
 
 };
 
@@ -589,9 +589,9 @@ void DumpText(struct InstData *, LONG, LONG, LONG, BOOL);
 void GetLine(struct InstData *, LONG, struct pos_info *);
 LONG LineToVisual(struct InstData *, struct line_node *);
 LONG CountLines(struct InstData *, struct MinList *);
-LONG LongestLine(struct InstData *);                          // Alpyre Add-on
-void ScrollIntoView(struct InstData *);                       // Alpyre Add-on
-BOOL MovedIntoDisplay(struct InstData *, struct line_node *); // Alpyre Add-on
+LONG LongestLine(struct InstData *);
+void ScrollIntoView(struct InstData *);
+BOOL MovedIntoDisplay(struct InstData *, struct line_node *);
 
 // Navigation.c
 void SetBookmark(struct InstData *, ULONG);
@@ -664,7 +664,7 @@ BOOL Redo(struct InstData *);
 
 // NewGfx.c
 LONG TextLengthNew(struct RastPort *rp, const char *string, ULONG count, LONG tabSizePixels);
-ULONG TextFitNew(struct RastPort *rp, const char *string, ULONG strLen, struct TextExtentNew *textExtent, const struct TextExtent *constrainingExtent, LONG strDirection, LONG constrainingBitWidth, LONG constrainingBitHeight, LONG tabSizePixels);      // Alpyre Edit
+ULONG TextFitNew(struct RastPort *rp, const char *string, ULONG strLen, struct TextExtentNew *textExtent, const struct TextExtent *constrainingExtent, LONG strDirection, LONG constrainingBitWidth, LONG constrainingBitHeight, LONG tabSizePixels);
 void TextNew(struct RastPort *rp, const char *string, ULONG count, LONG tabSizePixels);
 
 #if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
