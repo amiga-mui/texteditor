@@ -205,7 +205,7 @@ BOOL Undo(struct InstData *data)
 
       if(isFlagClear(data->flags, FLG_UndoLost))
       { data->HasChanged  = FALSE;
-        data->ChangeEvent = TRUE;                                // Alpyre Add-On
+        data->ChangeEvent = TRUE;
       }
     }
 
