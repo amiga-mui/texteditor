@@ -142,7 +142,7 @@ void AddColor(struct InstData *data, struct marking *realblock, const struct TEC
   ENTER();
 
   data->HasChanged = TRUE;
-//data->ChangeEvent = TRUE;    // Alpyre Add-On Color changes won't make any difference to textlengths, that's why it is commented out!
+//data->ChangeEvent = TRUE;    // Color changes won't make any difference to textlengths, that's why it is commented out!
 
   if(realblock->enabled == TRUE && (realblock->startx != realblock->stopx || realblock->startline != realblock->stopline))
   {
