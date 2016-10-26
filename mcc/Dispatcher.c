@@ -196,7 +196,7 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             // they were set during OM_NEW
             mSet(cl, obj, (struct opSet *)msg);
             data->visual_y = 1;
-            data->xpos     = 0;
+            data->xpos = 0;
 
             // start with an inactive cursor
             data->currentCursorState = CS_INACTIVE;
