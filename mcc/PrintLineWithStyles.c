@@ -303,7 +303,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
            (flow && data->selectmode != 1 && startx-x == 0 && cursor == FALSE &&
             ((data->blockinfo.startline != data->blockinfo.stopline) || x > 0)))
         {               
-          LONG left  = MAX(xoffset, dleft);
+          LONG left  = MIN(MAX(xoffset, dleft), dright);
           LONG right = MIN(dright, xoffset+flow+blockwidth-1);
 
           SetAPen(rp, color);
@@ -312,7 +312,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         }
         else
         {              
-          LONG left  = MAX(xoffset+flow+blockstart, dleft);
+          LONG left  = MIN(MAX(xoffset+flow+blockstart, dleft), dright);
           LONG right = MIN(dright, xoffset+flow+blockstart+blockwidth-1);
                        
           SetAPen(rp, cursor ? MUIPEN(data->cursorcolor) : color);
