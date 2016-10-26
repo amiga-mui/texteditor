@@ -235,7 +235,7 @@ void AddStyle(struct InstData *data, struct marking *realblock, UWORD style, BOO
     }
   }
   data->HasChanged  = TRUE;
-  data->ChangeEvent = TRUE;                                // Alpyre Add-On
+  data->ChangeEvent = TRUE;
 
   if(realblock->enabled == TRUE && (realblock->startx != realblock->stopx || realblock->startline != realblock->stopline))
   {
