@@ -497,7 +497,6 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
     MUIA_TextEditor_Prop_Visible,     data->maxlines*data->fontheight,
     TAG_DONE);
 
-  {
   SetAttrs(obj,
     MUIA_TextEditor_HScroller_Ent,
               (data->longestline - (LONG)(data->xpos) < _mwidth(obj)) ?
@@ -507,7 +506,6 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
     MUIA_TextEditor_HScroller_Pos, data->xpos,
     MUIA_TextEditor_HScroller_Vis, _mwidth(obj),
     TAG_DONE);
-  }
 
   // initialize the doublebuffering rastport
   bmwidth = _mwidth(obj)+((data->fontheight-data->font->tf_Baseline+1)>>1)+1;
