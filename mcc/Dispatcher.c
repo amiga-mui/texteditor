@@ -74,9 +74,9 @@ void ResetDisplay(struct InstData *data)
       MUIA_TextEditor_Prop_Visible,     data->maxlines*data->fontheight,
       MUIA_TextEditor_Prop_First,       (data->visual_y-1)*data->fontheight,
       MUIA_TextEditor_Prop_DeltaFactor, data->fontheight,
-      MUIA_TextEditor_HScroller_Ent,    data->longestline,
-      MUIA_TextEditor_HScroller_Vis,    _mwidth(data->object),
-      MUIA_TextEditor_HScroller_Pos,    data->xpos,
+      MUIA_TextEditor_HSlider_Ent,      data->longestline,
+      MUIA_TextEditor_HSlider_Vis,      _mwidth(data->object),
+      MUIA_TextEditor_HSlider_Pos,      data->xpos,
       TAG_DONE);
     data->NoNotify = FALSE;
 
@@ -498,13 +498,13 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
     TAG_DONE);
 
   SetAttrs(obj,
-    MUIA_TextEditor_HScroller_Ent,
+    MUIA_TextEditor_HSlider_Ent,
               (data->longestline - (LONG)(data->xpos) < _mwidth(obj)) ?
                ((data->xpos) + _mwidth(obj)) :
                ((_mwidth(obj) > data->longestline) ?
                  _mwidth(obj) : data->longestline),
-    MUIA_TextEditor_HScroller_Pos, data->xpos,
-    MUIA_TextEditor_HScroller_Vis, _mwidth(obj),
+    MUIA_TextEditor_HSlider_Pos, data->xpos,
+    MUIA_TextEditor_HSlider_Vis, _mwidth(obj),
     TAG_DONE);
 
   // initialize the doublebuffering rastport
@@ -936,7 +936,7 @@ DISPATCHER(_Dispatcher)
 
           if (prop_entries != data->longestline)
           {
-            SetAttrs(data->object, MUIA_TextEditor_HScroller_Ent,
+            SetAttrs(data->object, MUIA_TextEditor_HSlider_Ent,
                     (data->longestline - (LONG)(data->xpos) < _mwidth(obj)) ?
                     ((data->xpos) + _mwidth(obj)) :
                     ((_mwidth(obj) > data->longestline) ?
@@ -1017,12 +1017,12 @@ DISPATCHER(_Dispatcher)
   {
     if(data->xpos != t_xpos || data->longestline != t_longestline)
     {
-      SetAttrs(obj, MUIA_TextEditor_HScroller_Ent,
+      SetAttrs(obj, MUIA_TextEditor_HSlider_Ent,
                  (data->longestline - (LONG)(data->xpos) < _mwidth(obj)) ?
                   ((data->xpos) + _mwidth(obj)) :
                   ((_mwidth(obj) > data->longestline) ?
                     _mwidth(obj) : data->longestline),
-                MUIA_TextEditor_HScroller_Pos, data->xpos,
+                MUIA_TextEditor_HSlider_Pos, data->xpos,
                 TAG_DONE);
     }
   }
