@@ -485,7 +485,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
 
   next = GetNextLine(line);
 
-  data->HasChanged  = TRUE;
+  data->HasChanged = TRUE;
   data->ChangeEvent = TRUE;
   if(line->line.Length == 1)
   {
@@ -786,7 +786,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
     struct Grow newStyleGrow;
     struct Grow newColorGrow;
 
-    data->HasChanged  = TRUE;
+    data->HasChanged = TRUE;
     data->ChangeEvent = TRUE;
     Init_LineNode(data, newline, &line->line.Contents[x]);
     newline->line.Highlight = line->line.Highlight;
@@ -1273,7 +1273,7 @@ static void UpdateChange(struct InstData *data, LONG x, struct line_node *line, 
   {
     OptimizedPrint(data, skip, line, line_nr, width);
     ScrollIntoDisplay(data);
-    data->HasChanged  = TRUE;
+    data->HasChanged = TRUE;
     data->ChangeEvent = TRUE;
   }
 
