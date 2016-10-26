@@ -157,13 +157,13 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
     case MUIA_TextEditor_Prop_First:
       ti_Data = (data->visual_y-1)*data->fontheight;
       break;
-    case MUIA_TextEditor_HScroller_Pos:
+    case MUIA_TextEditor_HSlider_Pos:
       ti_Data = data->xpos;
       break;
-    case MUIA_TextEditor_HScroller_Vis:
+    case MUIA_TextEditor_HSlider_Vis:
       ti_Data = _mwidth(obj);
       break;
-    case MUIA_TextEditor_HScroller_Ent:
+    case MUIA_TextEditor_HSlider_Ent:
       ti_Data = data->longestline;
       break;
     case MUIA_TextEditor_ReadOnly:
@@ -459,7 +459,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       }                                                                            
       break;
 
-      case MUIA_TextEditor_HScroller_Pos:
+      case MUIA_TextEditor_HSlider_Pos:
       {
         // If the gadget is NOT in NoWrapMode ignore this.
         if (data->WrapMode != MUIV_TextEditor_WrapMode_NoWrap)
@@ -645,15 +645,15 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
                 obj, 3, MUIM_NoNotifySet, MUIA_TextEditor_Prop_Release, MUIV_TriggerValue);
             DoMethod(data->hslider, MUIM_Notify,
                 MUIA_Prop_First, MUIV_EveryTime,
-                obj, 3, MUIM_NoNotifySet, MUIA_TextEditor_HScroller_Pos, MUIV_TriggerValue);
+                obj, 3, MUIM_NoNotifySet, MUIA_TextEditor_HSlider_Pos, MUIV_TriggerValue);
             DoMethod(obj, MUIM_Notify,
-                MUIA_TextEditor_HScroller_Pos, MUIV_EveryTime,
+                MUIA_TextEditor_HSlider_Pos, MUIV_EveryTime,
                 data->hslider, 3, MUIM_NoNotifySet, MUIA_Prop_First, MUIV_TriggerValue);
             DoMethod(obj, MUIM_Notify,
-                MUIA_TextEditor_HScroller_Ent, MUIV_EveryTime,
+                MUIA_TextEditor_HSlider_Ent, MUIV_EveryTime,
                 data->hslider, 3, MUIM_NoNotifySet, MUIA_Prop_Entries, MUIV_TriggerValue);
             DoMethod(obj, MUIM_Notify,
-                MUIA_TextEditor_HScroller_Vis, MUIV_EveryTime,
+                MUIA_TextEditor_HSlider_Vis, MUIV_EveryTime,
                 data->hslider, 3, MUIM_NoNotifySet, MUIA_Prop_Visible, MUIV_TriggerValue);
             DoMethod(obj, MUIM_Notify,
                 MUIA_TextEditor_Prop_DeltaFactor, MUIV_EveryTime,
