@@ -138,7 +138,7 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
     case MUIA_TextEditor_HasChanged:
       ti_Data = data->HasChanged;
       break;
-    case MUIA_TextEditor_HorizontalScroll:
+    case MUIA_TextEditor_HorizontalScrolling:
       ti_Data = isFlagSet(data->flags, FLG_HScroll);
       break;
     case MUIA_TextEditor_ImportWrap:
@@ -628,7 +628,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       }
       break;
 
-      case MUIA_TextEditor_HorizontalScroller:
+      case MUIA_TextEditor_HorizontalScrollBar:
       {
         if(data->shown == FALSE)
         {
@@ -699,7 +699,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       }
       break;
 
-      case MUIA_TextEditor_HorizontalScroll:
+      case MUIA_TextEditor_HorizontalScrolling:
       {
         if(ti_Data)                                                                       
           setFlag(data->flags, FLG_HScroll);
