@@ -146,11 +146,8 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     BOOL cursor = FALSE;
     struct TEColor textColor;
     struct TEColor highlightColor;
-    const LONG mleft  = _mleft(data->object);
-    const LONG mright = _mright(data->object);
-    const LONG mwidth = _mwidth(data->object);
-    const LONG dleft  = (doublebuffer) ? 0      : mleft;
-    const LONG dright = (doublebuffer) ? mwidth : mright;
+    const LONG dleft  = (doublebuffer) ? 0 : _mleft(data->object);
+    const LONG dright = (doublebuffer) ? _mwidth(data->object) : _mright(data->object);
     LONG o_width;
     LONG pen_pos;
 
@@ -175,7 +172,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     if(doublebuffer == FALSE)
     {
       starty = data->ypos+(data->fontheight * (line_nr-1));
-      xoffset = mleft - data->xpos;
+      xoffset = _mleft(data->object) - data->xpos;
     }
     else
       xoffset -= data->xpos;
@@ -240,7 +237,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         else
           startx = x;
 
-        blockwidth = ((stopx >= c_length+x) ? mwidth-(blockstart+flow) + data->xpos : TextLengthNew(&data->tmprp, text+startx, stopx-startx, data->TabSizePixels));
+        blockwidth = ((stopx >= c_length+x) ? _mwidth(data->object)-(blockstart+flow) + data->xpos : TextLengthNew(&data->tmprp, text+startx, stopx-startx, data->TabSizePixels));
       }
       else if(isFlagClear(data->flags, FLG_ReadOnly) &&
               isFlagClear(data->flags, FLG_Ghosted) &&
@@ -265,14 +262,14 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       _rp(data->object) = rp;
 
       clr_left  = dleft;
-      clr_width = MIN(flow+blockstart - data->xpos, (ULONG)mwidth);
+      clr_width = MIN(flow+blockstart - data->xpos, (ULONG)_mwidth(data->object));
                   
       if (clr_width > 0)
       {
         // clear the background first
         DoMethod(data->object, MUIM_DrawBackground, clr_left, starty,
                                                     clr_width, data->fontheight,
-                                                    isFlagSet(data->flags, FLG_InVGrp) ? 0 : mleft,
+                                                    isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mleft(data->object),
                                                     isFlagSet(data->flags, FLG_InVGrp) ? data->fontheight*(data->visual_y+line_nr-2) : _mtop(data->object)+data->fontheight * (data->visual_y+line_nr-2),
                                                     0);
       }
@@ -327,7 +324,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
             {
               DoMethod(data->object, MUIM_DrawBackground, left+1, starty+1,
                                                           blockwidth-2, data->fontheight-2,
-                                                          isFlagSet(data->flags, FLG_InVGrp) ? 0 : mleft,
+                                                          isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mleft(data->object),
                                                           isFlagSet(data->flags, FLG_InVGrp) ? data->fontheight*(data->visual_y+line_nr-2) : _mtop(data->object)+data->fontheight * (data->visual_y+line_nr-2),
                                                           0);
             }
@@ -346,7 +343,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
         if(isFlagClear(data->flags, FLG_InVGrp))
         {
-          x_ptrn += mleft;
+          x_ptrn += _mleft(data->object);
           y_ptrn += _mtop(data->object);
         }
         if (x_start < dright)
@@ -363,8 +360,8 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     pen_pos  = xoffset + flow;
     o_width  = ((ULONG)flow > data->xpos ? 0 : data->xpos - flow);
     maxwidth = data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap ?
-              (MIN((mwidth + data->xpos - flow + rp->TxWidth), (ULONG)TextLengthNew(rp, text+x, c_length, data->TabSizePixels)))
-                    mwidth - flow; 
+              (MIN((_mwidth(data->object) + data->xpos - flow + rp->TxWidth), (ULONG)TextLengthNew(rp, text+x, c_length, data->TabSizePixels)))
+                    _mwidth(data->object) - flow; 
     while(c_length > 0)
     {
       LONG p_length = c_length;
@@ -464,9 +461,9 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       LeftX = dleft;
       LeftWidth = flow - data->xpos - 3;
       LeftWidth = LeftWidth < 0 ? 0 : LeftWidth;
-      RightX = pen_pos - mleft + 4;
+      RightX = pen_pos - _mleft(data->object) + 4;
       RightX = RightX < dleft ? dleft : RightX;
-      RightWidth = dright > RightX ? dright - RightX : mwidth;
+      RightWidth = dright > RightX ? dright - RightX : _mwidth(data->object);
       Y = starty;
       Height = isFlagSet(line->line.Separator, LNSF_Thick) ? 2 : 1;
 
@@ -477,7 +474,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
       if(isFlagSet(line->line.Separator, LNSF_StrikeThru) || line->line.Length == 1)
       {
-        LeftWidth = mwidth;
+        LeftWidth = _mwidth(data->object);
       }
       else
       {
@@ -496,8 +493,8 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         ULONG ptrn1 = 0x11111111UL;
         ULONG ptrn2 = 0x44444444UL;
 
-        ptrn1 = ptrn1>>((mleft - xoffset)%16);
-        ptrn2 = ptrn2>>((mleft - xoffset)%16);
+        ptrn1 = ptrn1>>((_mleft(data->object) - xoffset)%16);
+        ptrn2 = ptrn2>>((_mleft(data->object) - xoffset)%16);
 
         if((data->fontheight*(data->visual_y+line_nr-2))%2 == 0)
         {
@@ -522,7 +519,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       SetDrMd(rp, JAM1);
       SetAPen(rp, _pens(data->object)[MPEN_SHADOW]);
       SetAfPt(rp, newPattern, 1);
-      RectFill(rp, xoffset, starty, xoffset+mwidth-1, starty+data->fontheight-1);
+      RectFill(rp, xoffset, starty, xoffset+_mwidth(data->object)-1, starty+data->fontheight-1);
       SetAfPt(rp, NULL, (UBYTE)-1);
     }
 
@@ -532,7 +529,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     {
       if(line_nr == 1)
       {
-        BltBitMapRastPort(rp->BitMap, 0, _mtop(data->object)-data->ypos, data->rport, mleft, _mtop(data->object)+(data->fontheight * (line_nr-1)), mwidth, data->fontheight-(_mtop(data->object)-data->ypos), (ABC|ABNC));
+        BltBitMapRastPort(rp->BitMap, 0, _mtop(data->object)-data->ypos, data->rport, _mleft(data->object), _mtop(data->object)+(data->fontheight * (line_nr-1)), _mwidth(data->object), data->fontheight-(_mtop(data->object)-data->ypos), (ABC|ABNC));
       }
       else
       {
@@ -540,12 +537,12 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         {
           if(_mtop(data->object) != data->ypos)
           {
-            BltBitMapRastPort(rp->BitMap, 0, 0, data->rport, mleft, data->ypos+(data->fontheight * (line_nr-1)), mwidth, _mtop(data->object)-data->ypos, (ABC|ABNC));
+            BltBitMapRastPort(rp->BitMap, 0, 0, data->rport, _mleft(data->object), data->ypos+(data->fontheight * (line_nr-1)), _mwidth(data->object), _mtop(data->object)-data->ypos, (ABC|ABNC));
           }
         }
         else
         {
-          BltBitMapRastPort(rp->BitMap, 0, 0, data->rport, mleft, data->ypos+(data->fontheight * (line_nr-1)), mwidth, data->fontheight, (ABC|ABNC));
+          BltBitMapRastPort(rp->BitMap, 0, 0, data->rport, _mleft(data->object), data->ypos+(data->fontheight * (line_nr-1)), _mwidth(data->object), data->fontheight, (ABC|ABNC));
         }
       }
     }
