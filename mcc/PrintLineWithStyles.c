@@ -146,11 +146,11 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     BOOL cursor = FALSE;
     struct TEColor textColor;
     struct TEColor highlightColor;
-    LONG mleft  = _mleft(data->object);
-    LONG mright = _mright(data->object);
-    LONG mwidth = _mwidth(data->object);
-    LONG dleft  = (doublebuffer) ? 0      : mleft;
-    LONG dright = (doublebuffer) ? mwidth : mright;
+    const LONG mleft  = _mleft(data->object);
+    const LONG mright = _mright(data->object);
+    const LONG mwidth = _mwidth(data->object);
+    const LONG dleft  = (doublebuffer) ? 0      : mleft;
+    const LONG dright = (doublebuffer) ? mwidth : mright;
     LONG o_width;
     LONG pen_pos;
 
