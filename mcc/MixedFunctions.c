@@ -426,18 +426,18 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
 
   UWORD styles[3] = {0, 0, 0};
   struct TEColor colors[3];
-  struct TEColor highlightColor;                   // Alpyre Add-On (This is a bad quick fix and should be revised)
+  struct TEColor highlightColor;
   LONG start = 0;
   LONG stop = 0;
   LONG c;
   UWORD flow;
 
-  if(data->rgbMode == TRUE)                        // Alpyre Add-On (This is a bad quick fix and should be revised)
-  { highlightColor.isRGB = TRUE;                   // Alpyre Add-On (This is a bad quick fix and should be revised)
-    highlightColor.color = data->highlightRGB;}    // Alpyre Add-On (This is a bad quick fix and should be revised)
-  else                                             // Alpyre Add-On (This is a bad quick fix and should be revised)
-  { highlightColor.isRGB = FALSE;                  // Alpyre Add-On (This is a bad quick fix and should be revised)
-    highlightColor.color = data->highlightColor;}  // Alpyre Add-On (This is a bad quick fix and should be revised)
+  if(data->rgbMode == TRUE)
+  { highlightColor.isRGB = TRUE;
+    highlightColor.color = data->highlightRGB;}
+  else
+  { highlightColor.isRGB = FALSE;
+    highlightColor.color = data->highlightColor;}
 
   ENTER();
 
@@ -487,7 +487,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
     else
       cursor_width = data->CursorWidth;
 
-    xplace  = _mleft(data->object) - data->xpos + TextLengthNew(&data->tmprp, &line->line.Contents[x-pos.x], pos.x+start, data->TabSizePixels); //Alpyre Edit
+    xplace  = _mleft(data->object) - data->xpos + TextLengthNew(&data->tmprp, &line->line.Contents[x-pos.x], pos.x+start, data->TabSizePixels);
     flow = FlowSpace(data, line->line.Flow, &line->line.Contents[pos.bytes]);
     xplace += flow;
     yplace  = data->ypos + (data->fontheight * (line_nr + pos.lines - 1));
@@ -495,9 +495,9 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
 
     //D(DBF_STARTUP, "xplace: %ld, yplace: %ld cplace: %ld, innerwidth: %ld width: %ld %ld", xplace, yplace, cursorxplace, _mwidth(data->object), _width(data->object), _mleft(data->object));
 
-    if((data->font->tf_Flags & FPF_PROPORTIONAL) || data->WrapMode != MUIV_TextEditor_WrapMode_NoWrap)  // Alpyre Edit
-    {                                                                                                   // This was at the position
-      clipping = TRUE;                                                                                  // where Alpyre Remark below is!
+    if((data->font->tf_Flags & FPF_PROPORTIONAL) || data->WrapMode != MUIV_TextEditor_WrapMode_NoWrap)
+    {
+      clipping = TRUE;
       AddClipping(data);
     }
 
@@ -557,13 +557,11 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
       SetFont(rp, data->font);
       Move(rp, xplace, yplace + rp->TxBaseline);
 
-      // Alpyre Remark!
-
       for(c = start; c <= stop; c++)
       {
         SetColor(data, rp, &colors[1+c], line->line.Highlight, TRUE);
-        if (line->line.Highlight)                                       // Alpyre Add-On (This is a bad quick fix and should be revised)
-          SetColor(data, rp, &highlightColor, FALSE, FALSE);            // Alpyre Add-On (This is a bad quick fix and should be revised)
+        if (line->line.Highlight)
+          SetColor(data, rp, &highlightColor, FALSE, FALSE);
         SetSoftStyle(rp, ConvertStyle(styles[1+c]), AskSoftStyle(rp));
         TextNew(rp, (STRPTR)&chars[1+c], 1, data->TabSizePixels);
       }
@@ -577,11 +575,11 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
         LONG Y, Height;
 
         LeftX = _mleft(data->object);
-        LeftWidth = flow - data->xpos - 3;                    // Alpyre Edit
-        LeftWidth = LeftWidth < 0 ? 0 : LeftWidth;            // Alpyre Add-On
-        RightX = LeftX - data->xpos + flow + TextLengthNew(&data->tmprp, &line->line.Contents[pos.bytes], pos.extra-pos.bytes-1, data->TabSizePixels) + 3;  // Alpyre Edit
-        RightX = RightX < LeftX ? LeftX : RightX;             // Alpyre Add-On
-        RightWidth = LeftX +_mwidth(data->object) - RightX;   // Alpyre Edit
+        LeftWidth = flow - data->xpos - 3;
+        LeftWidth = LeftWidth < 0 ? 0 : LeftWidth;
+        RightX = LeftX - data->xpos + flow + TextLengthNew(&data->tmprp, &line->line.Contents[pos.bytes], pos.extra-pos.bytes-1, data->TabSizePixels) + 3;
+        RightX = RightX < LeftX ? LeftX : RightX;
+        RightWidth = LeftX +_mwidth(data->object) - RightX;
         Y = yplace;
         Height = isFlagSet(line->line.Separator, LNSF_Thick) ? 2 : 1;
 
@@ -600,11 +598,10 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
         }
         DrawSeparator(data, rp, LeftX, Y, LeftWidth, Height);
       }
-        // Alpyre Remark2!
     }
-    if(clipping)             // Alpyre Edit
-      RemoveClipping(data);  // This was at the position
-  }                          // where the Alpyre Remark2 is.
+    if(clipping)
+      RemoveClipping(data);
+  }
 
   LEAVE();
 }
@@ -793,7 +790,7 @@ LONG CountLines(struct InstData *data, struct MinList *lines)
 }
 
 ///
-/// LongestLine()    <-- Alpyre Add-On
+/// LongestLine()
 /*----------------------------------------------------------*
  * Find the graphically longest line of the displayed lines *
  *----------------------------------------------------------*/
@@ -831,7 +828,7 @@ LONG LongestLine(struct InstData *data)
 return(result + cursor_width);
 }
 ///
-/// ScrollIntoView() <-- Alpyre Add-On
+/// ScrollIntoView()
 /* ***************************************************************** /
 /  Scrolls the gadget horizontally to make the cursor visible again. /
 /  Do not mistake this with ScrollIntoDisplay() function!            /
@@ -873,7 +870,7 @@ void ScrollIntoView(struct InstData *data)
 }
 
 ///
-/// MovedIntoDisplay() <-- Alpyre Add-On
+/// MovedIntoDisplay()
 /*---------------------------------------------------------------*
  *  A function to test if the user moved the cursor into display *
  *  when it was scrolled out of it                               *
