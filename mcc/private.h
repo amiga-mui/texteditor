@@ -457,11 +457,11 @@ struct InstData
   ULONG  xpos;            /* xpos of gadget (for horizontal scrolling)
                              unlike visual_y this is a pixel value... */
   LONG   longestline;     /* the length (in pixels) of the longest one of the lines displayed
-                             (this is used as the Prop_Entries value for the hscroller) */
+                             (this is used as the Prop_Entries value for the hslider) */
   BOOL   ChangeEvent;     /* Everytime something is changed in the text, this will be set TRUE along with HasChanged
                              then will be used as a notification to recalculate the longestline in the Dispatcher
                              and immediately set back to FALSE */
-  Object *hscroller;      // pointer to the horizontal scroller (if any).
+  Object *hslider;        // pointer to the horizontal scrollbar (if any).
 
 };
 
