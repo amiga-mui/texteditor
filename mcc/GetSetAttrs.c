@@ -358,7 +358,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           crsr_y = ti_Data;
       break;
 
-      case MUIA_TextEditor_Prop_Release:                                                               
+      case MUIA_TextEditor_Prop_Release:
         data->smooth_wait = ti_Data;
       break;
 
