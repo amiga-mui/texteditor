@@ -493,8 +493,8 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         ULONG ptrn1 = 0x11111111UL;
         ULONG ptrn2 = 0x44444444UL;
 
-        ptrn1 = ptrn1>>((_mleft(data->object) - xoffset)%16);
-        ptrn2 = ptrn2>>((_mleft(data->object) - xoffset)%16);
+        ptrn1 = ptrn1>>((_mleft(data->object)-xoffset)%16);
+        ptrn2 = ptrn2>>((_mleft(data->object)-xoffset)%16);
 
         if((data->fontheight*(data->visual_y+line_nr-2))%2 == 0)
         {
