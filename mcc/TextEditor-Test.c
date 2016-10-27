@@ -360,6 +360,7 @@ int main(void)
                               Child, rgroup = RegisterGroup(page_titles),
                                 MUIA_Register_Frame, TRUE,
                                 Child, VGroup,
+                                 MUIA_Group_Spacing, 0,
                                  Child,HGroup,
                                   MUIA_Group_Spacing, 0,
                                   Child, editorgad = NewObject(mcc->mcc_Class, NULL,
