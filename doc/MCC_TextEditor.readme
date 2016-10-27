@@ -29,6 +29,8 @@ YAM or SimpleMail as the main text editing gadget. Its main features are:
 - Ability to have a bitmap as a background
 - Support for proportional fonts with floating word wrap, as well as
   antialiased fonts
+- Horizontal scrolling in no word wrap mode.
+- Support for very long lines (more than 50000 chars in a single line).
 - Pixel smooth scrolling
 - AREXX interface for scripted programming
 
