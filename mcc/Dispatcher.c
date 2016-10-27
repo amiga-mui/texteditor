@@ -52,7 +52,7 @@ void ResetDisplay(struct InstData *data)
 
   data->blockinfo.enabled = FALSE;
   data->visual_y = 1;
-  data->xpos     = 0;
+  data->xpos = 0;
   data->CPos_X = 0;
   data->pixel_x = 0;
   data->actualline = GetFirstLine(&data->linelist);
