@@ -18,6 +18,7 @@ TextEditor.mcc/MUIA_TextEditor_ExportWrap
 TextEditor.mcc/MUIA_TextEditor_FixedFont
 TextEditor.mcc/MUIA_TextEditor_Flow
 TextEditor.mcc/MUIA_TextEditor_HasChanged
+TextEditor.mcc/MUIA_TextEditor_HorizontalSlider
 TextEditor.mcc/MUIA_TextEditor_ImportHook
 TextEditor.mcc/MUIA_TextEditor_ImportWrap
 TextEditor.mcc/MUIA_TextEditor_InsertMode         (not yet implemented...)
@@ -511,6 +512,23 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
 
         ... but comments are welcome :)
 
+TextEditor.mcc/MUIA_TextEditor_HorizontalSlider
+
+    NAME
+        MUIA_TextEditor_HorizontalSlider -- [IS.], Object *
+
+    FUNCTION
+        You should give a pointer to a prop object to allow connection
+        between the editor gadget and the prop object for horizontal scrolling.
+
+        Passing a NULL as pointer will turn horizontal scrolling facilities off.
+
+        Horizontal scrolling is only available in NoWrap mode.
+
+    SEE ALSO
+        MUIA_TextEditor_Slider
+        MUIA_TextEditor_WrapMode
+
 TextEditor.mcc/MUIA_TextEditor_ImportHook
 
     NAME
@@ -955,6 +973,7 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
         the gadget needs to set two undocumented tags for the prop object.
 
     SEE ALSO
+        MUIA_TextEditor_HorizontalSlider,
         MUIA_TextEditor_Prop_DeltaFactor, MUIA_TextEditor_Prop_Entries
         MUIA_TextEditor_Prop_First, MUIA_TextEditor_Prop_Visible
 
