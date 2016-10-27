@@ -1189,7 +1189,7 @@ static void EraseBlock(struct InstData *data, ULONG flags)
   if(Enabled(data))
   {
     DoBlock(data, flags|CUTF_CUT);
-    data->HasChanged  = TRUE;
+    data->HasChanged = TRUE;
     data->ChangeEvent = TRUE;
   }
   else
