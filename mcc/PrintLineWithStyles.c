@@ -332,7 +332,6 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         }
       }
 
-                       
       {
         LONG x_start = MAX(dleft, (blockwidth ? xoffset+blockstart+blockwidth+flow : xoffset+blockstart+blockwidth));
         LONG y_start = starty;
@@ -362,6 +361,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     maxwidth = data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap ?
               (MIN((_mwidth(data->object) + data->xpos - flow + rp->TxWidth), (ULONG)TextLengthNew(rp, text+x, c_length, data->TabSizePixels))) :
                     _mwidth(data->object) - flow; 
+
     while(c_length > 0)
     {
       LONG p_length = c_length;

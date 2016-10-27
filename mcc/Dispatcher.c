@@ -1008,6 +1008,7 @@ DISPATCHER(_Dispatcher)
                 * data->fontheight,
               MUIA_TextEditor_Prop_First, (data->visual_y-1)*data->fontheight,
               TAG_DONE);
+
     // visual_y is changed it is best to recalculate longest visible line here
     if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
        data->longestline = LongestLine(data);
