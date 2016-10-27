@@ -3,6 +3,7 @@ MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
 2016-10-27 Alper Sönmez <amithlondestek@gmail.com>
+
   * mcc/CaseConversion.c, mcc/ColorOperators.c, mcc/Dispatcher.c, 
     mcc/EditorStuff.c, mcc/GetSetAttrs.c, mcc/HandleInput.c, MixedFunctions.c,
     mcc/Navigation.c, mcc/NewGfx.c, mcc/PrintLineWithStyles.c,
