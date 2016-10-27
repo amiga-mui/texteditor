@@ -466,8 +466,11 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           tag->ti_Tag = TAG_IGNORE;
         else
         {
-          data->xpos = ti_Data;
-          DumpText(data, data->visual_y, 0, data->maxlines, TRUE);
+          if(data->shown == TRUE && isFlagSet(data->flags, FLG_HScroll))
+          {
+            data->xpos = ti_Data;
+            DumpText(data, data->visual_y, 0, data->maxlines, TRUE);
+          }
         }
       }
       break;
@@ -664,7 +667,8 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 	{
           clearFlag(data->flags, FLG_HScroll);
           data->xpos = 0;
-          DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
+          if(data->shown == TRUE)
+            DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
 	}
       }
       break;
