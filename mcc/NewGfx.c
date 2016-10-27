@@ -91,6 +91,7 @@ LONG TextLengthNew(struct RastPort *rp, const char *string, ULONG count, LONG ta
             l_count -= C_LIMIT;
             tptr0 += C_LIMIT;
           }
+
           result += TextLength(rp, tptr0, l_count);
         }
       }
@@ -233,7 +234,7 @@ ULONG TextFitNew(struct RastPort *rp, const char *string, ULONG strLen, struct T
         break;
 
       constrainingBitWidth -= tabSizePixels;
-      te_width             += tabSizePixels;
+      te_width += tabSizePixels;
       result++;
 
       tptr0 = tptr;
