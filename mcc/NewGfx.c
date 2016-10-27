@@ -53,7 +53,7 @@ LONG TextLengthNew(struct RastPort *rp, const char *string, ULONG count, LONG ta
       // add the remaining characters' width
       if(count0 != 0)
       {
-        if (count0 <= C_LIMIT)
+        if(count0 <= C_LIMIT)
           result += TextLength(rp, tptr0, count0);
         else
         {
@@ -65,6 +65,7 @@ LONG TextLengthNew(struct RastPort *rp, const char *string, ULONG count, LONG ta
             l_count -= C_LIMIT;
             tptr0 += C_LIMIT;
           }
+
           result += TextLength(rp, tptr0, l_count);
         }
       }
@@ -78,7 +79,7 @@ LONG TextLengthNew(struct RastPort *rp, const char *string, ULONG count, LONG ta
       // we found a TAB, calculate the characters' width so far
       if(count0 != 0)
       {
-        if (count0 <= C_LIMIT)
+        if(count0 <= C_LIMIT)
           result += TextLength(rp, tptr0, count0);
         else
         {
@@ -121,9 +122,11 @@ ULONG TextFitNew(struct RastPort *rp, const char *string, ULONG strLen, struct T
   const char *tptr0 = string;
   struct TextExtent textExtent;
   ULONG te_width  = 0;
-  ULONG te_height = constrainingBitHeight < rp->TxHeight ? 0 : rp->TxHeight;
+  ULONG te_height;
 
   ENTER();
+
+  te_height = constrainingBitHeight < rp->TxHeight ? 0 : rp->TxHeight;
 
   do
   {
@@ -134,9 +137,9 @@ ULONG TextFitNew(struct RastPort *rp, const char *string, ULONG strLen, struct T
       // we parsed the string until the end
       // add the number of fitting remaining characters
 
-      if (constrainingBitWidth <= SHRT_MAX)
+      if(constrainingBitWidth <= SHRT_MAX)
       {
-        if (strLen0 != 0)
+        if(strLen0 != 0)
         {
           ULONG l_chars;
 
@@ -163,7 +166,7 @@ ULONG TextFitNew(struct RastPort *rp, const char *string, ULONG strLen, struct T
           tptr0   += l_chars;
           result  += l_chars;
         }
-        if (strLen0 > 0)
+        if(strLen0 > 0)
         {
           l_chars = TextFit(rp, tptr0, strLen0, &textExtent, constrainingExtent, strDirection, l_constBit, constrainingBitHeight);
           te_width += TextLengthNew(rp, tptr0, l_chars, tabSizePixels);
@@ -181,9 +184,10 @@ ULONG TextFitNew(struct RastPort *rp, const char *string, ULONG strLen, struct T
       ULONG c_length = 0;
 
       // we found a TAB, calculate the number of fitting characters so far
-      if (constrainingBitWidth <= SHRT_MAX)
+      if(constrainingBitWidth <= SHRT_MAX)
       {
         ULONG l_chars;
+
         if(strLen0 != 0)
         {
           l_chars  = TextFit(rp, tptr0, strLen0, &textExtent, constrainingExtent, strDirection, constrainingBitWidth, constrainingBitHeight);
@@ -212,7 +216,8 @@ ULONG TextFitNew(struct RastPort *rp, const char *string, ULONG strLen, struct T
           tptr0   += l_chars;
           result  += l_chars;
         }
-        if (strLen0 > 0)
+
+        if(strLen0 > 0)
         {
           l_chars   = TextFit(rp, tptr0, strLen0, &textExtent, constrainingExtent, strDirection, l_constBit, constrainingBitHeight);
           t_length += textExtent.te_Width;
@@ -221,7 +226,7 @@ ULONG TextFitNew(struct RastPort *rp, const char *string, ULONG strLen, struct T
       }
 
       constrainingBitWidth -= c_length;
-      te_width             += t_length;
+      te_width += t_length;
 
       // bail out if no space is left
       if(constrainingBitWidth <= 0)

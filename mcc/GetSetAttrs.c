@@ -462,7 +462,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       case MUIA_TextEditor_HSlider_Pos:
       {
         // If the gadget is NOT in NoWrapMode ignore this.
-        if (data->WrapMode != MUIV_TextEditor_WrapMode_NoWrap)
+        if(data->WrapMode != MUIV_TextEditor_WrapMode_NoWrap)
           tag->ti_Tag = TAG_IGNORE;
         else
         {
@@ -630,7 +630,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       case MUIA_TextEditor_HorizontalSlider:
       {
         if(ti_Data)
-	{
+        {
           if(data->shown == FALSE)
           {
             data->hslider = (void *)ti_Data;
@@ -663,13 +663,13 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
                 data->hslider, 3, MUIM_NoNotifySet, MUIA_Prop_DeltaFactor, MUIV_TriggerValue);
           }
         }
-	else
-	{
+        else
+        {
           clearFlag(data->flags, FLG_HScroll);
           data->xpos = 0;
           if(data->shown == TRUE)
             DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
-	}
+        }
       }
       break;
 

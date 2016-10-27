@@ -591,7 +591,6 @@ LONG LineToVisual(struct InstData *, struct line_node *);
 LONG CountLines(struct InstData *, struct MinList *);
 LONG LongestLine(struct InstData *);
 void ScrollIntoView(struct InstData *);
-BOOL MovedIntoDisplay(struct InstData *, struct line_node *);
 
 // Navigation.c
 void SetBookmark(struct InstData *, ULONG);

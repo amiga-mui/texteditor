@@ -264,7 +264,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       clr_left  = dleft;
       clr_width = MIN(flow+blockstart - data->xpos, (ULONG)_mwidth(data->object));
                   
-      if (clr_width > 0)
+      if(clr_width > 0)
       {
         // clear the background first
         DoMethod(data->object, MUIM_DrawBackground, clr_left, starty,
@@ -313,7 +313,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
           LONG right = MIN(dright, xoffset+flow+blockstart+blockwidth-1);
                        
           SetAPen(rp, cursor ? MUIPEN(data->cursorcolor) : color);
-          if (left < dright || right > dleft)
+          if(left < dright || right > dleft)
           {
             RectFill(rp, left, starty, right, starty+data->fontheight-1);
 
@@ -333,20 +333,20 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       }
 
                        
-      {                  
-        LONG  x_start = MAX(dleft, (blockwidth ? xoffset+blockstart+blockwidth+flow : xoffset+blockstart+blockwidth)),
-              y_start = starty,
-              x_width = dright - x_start + 1,
-              y_width = data->fontheight,
-              x_ptrn = (blockwidth) ? (blockstart+blockwidth+flow) : (blockstart+blockwidth),
-              y_ptrn = data->fontheight*(data->visual_y+line_nr-2);
+      {
+        LONG x_start = MAX(dleft, (blockwidth ? xoffset+blockstart+blockwidth+flow : xoffset+blockstart+blockwidth));
+        LONG y_start = starty;
+        LONG x_width = dright - x_start + 1;
+        LONG y_width = data->fontheight;
+        LONG x_ptrn = (blockwidth) ? (blockstart+blockwidth+flow) : (blockstart+blockwidth);
+        LONG y_ptrn = data->fontheight*(data->visual_y+line_nr-2);
 
         if(isFlagClear(data->flags, FLG_InVGrp))
         {
           x_ptrn += _mleft(data->object);
           y_ptrn += _mtop(data->object);
         }
-        if (x_start < dright)
+        if(x_start < dright)
           DoMethod(data->object, MUIM_DrawBackground, x_start, y_start, x_width, y_width, x_ptrn, y_ptrn, 0);
       }
       _rp(data->object) = old;
@@ -413,7 +413,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         LONG o_length = 0;
 
         // calculate how many chars will be ommited from start because of xpos
-        if (o_width && pen_pos < dleft)
+        if(o_width && pen_pos < dleft)
         {
           o_chars   = TextFitNew(rp, text+x, p_length, &te, NULL, 1, o_width, data->fontheight, data->TabSizePixels);
           o_length  = te.te_Width;

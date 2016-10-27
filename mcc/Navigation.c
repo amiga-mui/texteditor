@@ -34,13 +34,15 @@ struct pos_info pos;
 LONG FlowSpace(struct InstData *data, UWORD flow, STRPTR text)
 {
   LONG flowspace = 0;
-  LONG textlength = TextLengthNew(&data->tmprp, text, LineCharsWidth(data, text)-1, data->TabSizePixels);
+  LONG textlength = 0;
 
-  /* With these edits here, a line which is longer than the gadget width will have
+  /* With these changes here, a line which is longer than the gadget width will have
      zero flowspace (means will be alligned left) even if it is centered or right alligned.
      So that we can horizontally scroll it right to see the rest of it. */
 
   ENTER();
+
+  textlength = TextLengthNew(&data->tmprp, text, LineCharsWidth(data, text)-1, data->TabSizePixels);
 
   if((flow != MUIV_TextEditor_Flow_Left) && (textlength < _mwidth(data->object)))
   {

@@ -564,7 +564,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
       for(c = start; c <= stop; c++)
       {
         SetColor(data, rp, &colors[1+c], line->line.Highlight, TRUE);
-        if (line->line.Highlight)
+        if(line->line.Highlight)
           SetColor(data, rp, &highlightColor, FALSE, FALSE);
         SetSoftStyle(rp, ConvertStyle(styles[1+c]), AskSoftStyle(rp));
         TextNew(rp, (STRPTR)&chars[1+c], 1, data->TabSizePixels);
@@ -810,7 +810,6 @@ LONG LongestLine(struct InstData *data)
   /* Since this function will be only used in NoWrapMode and
      in that mode line_nr's will always match the real lines
      we can find the top (real) line just by traversing the list */
-
   while(line != NULL && line_nr != data->visual_y - 1)
   {
     line = GetNextLine(line);
@@ -822,7 +821,6 @@ LONG LongestLine(struct InstData *data)
 
   /* We found the top line displayed. Now we'll traverse until the
      last displayed line meanwhile calculating their pixel lengths */
-
   while(line != NULL && line_nr <= last_line)
   {
     result = MAX(result, TextLengthNew(&data->tmprp, line->line.Contents, line->line.Length - 1, data->TabSizePixels));
@@ -846,7 +844,7 @@ void ScrollIntoView(struct InstData *data)
   LONG xmin = 0;
   LONG xmax;
 
-  if (isFlagClear(data->flags, FLG_HScroll))
+  if(isFlagClear(data->flags, FLG_HScroll))
     return;
 
   xmin  = TextLengthNew(&data->tmprp, line->line.Contents, data->CPos_X, data->TabSizePixels);
@@ -861,7 +859,7 @@ void ScrollIntoView(struct InstData *data)
 
   xmax = xmin + cursor_width;
 
-  if (xmin < (LONG)data->xpos)
+  if(xmin < (LONG)data->xpos)
   {
     data->xpos = xmin;
     DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
@@ -873,28 +871,4 @@ void ScrollIntoView(struct InstData *data)
   }
 }
 
-///
-/// MovedIntoDisplay()
-/*---------------------------------------------------------------*
- *  A function to test if the user moved the cursor into display *
- *  when it was scrolled out of it                               *
- *  This function is supposed to work only in NoWrapMode         *
- *---------------------------------------------------------------*/
-BOOL MovedIntoDisplay(struct InstData *data, struct line_node *oldline)
-{
-    struct line_node *line = GetFirstLine(&data->linelist);
-    LONG oldline_nr = 1;
-
-    /* Since this function will be only used in NoWrapMode and
-     in that mode line_nr's will always match the real lines
-     we can find the top (real) line just by traversing the list */
-
-    while(line != NULL && line != oldline)
-    {
-      line = GetNextLine(line);
-      oldline_nr++;
-    }
-
-  return (oldline_nr < data->visual_y || oldline_nr >= data->visual_y + data->maxlines);
-}
 ///

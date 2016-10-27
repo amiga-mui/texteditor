@@ -929,12 +929,12 @@ DISPATCHER(_Dispatcher)
         if(data->CPos_X != oldx)
           ScrollIntoView(data);
 
-        if (data->hslider)
+        if(data->hslider)
         { 
           LONG prop_entries;
           get(data->hslider, MUIA_Prop_Entries, &prop_entries);
 
-          if (prop_entries != data->longestline)
+          if(prop_entries != data->longestline)
           {
             SetAttrs(data->object, MUIA_TextEditor_HSlider_Ent,
                     (data->longestline - (LONG)(data->xpos) < _mwidth(obj)) ?
