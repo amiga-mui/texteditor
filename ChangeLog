@@ -2,7 +2,7 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
-2016-10-27 Alper SÃ¶nmez <amithlondestek@gmail.com>
+2016-10-27 Alper Sönmez <amithlondestek@gmail.com>
   * mcc/CaseConversion.c, mcc/ColorOperators.c, mcc/Dispatcher.c, 
     mcc/EditorStuff.c, mcc/GetSetAttrs.c, mcc/HandleInput.c, MixedFunctions.c,
     mcc/Navigation.c, mcc/NewGfx.c, mcc/PrintLineWithStyles.c,
@@ -26,21 +26,21 @@ MUI TextEditor MCC class - ChangeLog
     - New public attribute MUIA_TextEditor_HorizontalSlider (passing a NULL to
       this attribute disables the horizontal scroll facilities).
 
-2016-09-07 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2016-09-07 Thore Böckelmann <tboeckel@gmx.de>
 
   * library.c: moved the system and CPU description behind the copyright part.
 
-2016-08-15 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2016-08-15 Thore Böckelmann <tboeckel@gmx.de>
 
   * all/Debug.c: declare inlined _INDENT() function as static to avoid warnings
     of GCC5.
 
-2016-08-12 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2016-08-12 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/Makefile: generate ISO8859-1 encoded catalogs instead of UTF8 encoded
     ones.
 
-2016-08-11 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2016-08-11 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ClipboardServer.c: fixed a missing initialization of the session local
     instance data pointer which caused a crash when copying text to the
@@ -53,7 +53,7 @@ MUI TextEditor MCC class - ChangeLog
   * misc: final v15.47 release preparations
   * include: updated SDI headers.
 
-2016-05-02 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2016-05-02 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Dispatcher.c: create a fully layered rastport for double buffering
     instead of using a non-layered one. This fixes the issues with italic text
@@ -61,7 +61,7 @@ MUI TextEditor MCC class - ChangeLog
     left of the desired text position and hence requires proper clipping. This
     closes #3.
 
-2016-02-04 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2016-02-04 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/GetSetAttrs.c, mcc/Dispatcher.c: implemented a new method to cause
     asynchronous redraws. This is necessary, because MUI4 forbids recursive
@@ -69,29 +69,29 @@ MUI TextEditor MCC class - ChangeLog
     would be to fix this in TextEditor.mcc directly and NOT to call MUI_Redraw()
     recursively. This fixes the invisible text in AmiKit8's LiveUpdate.
 
-2016-01-05 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2016-01-05 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/PrintLineWithStyles.c: fixed a coloring issue in pen mode.
 
-2015-09-22 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2015-09-22 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: implemented MUIA_TextEditor_RGBMode to completely avoid the usage
     of pens for text rendering. All pen numbers will be converted to direct
     RGB values as soon as their color information is available, i.e. MUIM_Setup
     was called for the TextEditor object.
 
-2015-09-08 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2015-09-08 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Dispatcher.c, mcc/PrintLineWithStyles.c: reworked the RGB color handling
     to be independent of patches like AfAOS on AmigaOS3.
 
-2015-09-02 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2015-09-02 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ExportHook.c: export the lower 24bits of the RGB color only for
     consistency with the documentation and the import functions.
   * mcc/PrintLineWithStyle.c: use SetRPAttrs() only to set the text color.
 
-2015-09-01 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2015-09-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc: implemented support for direct RGB color specs as known from MUI4's
     text engine. Use escape sequences like \033P[RRGGBB] to set the RGB color
@@ -100,7 +100,7 @@ MUI TextEditor MCC class - ChangeLog
     colors. The latter is true for AmigaOS 4, MorphOS and AROS. For AmigaOS 3.x
     a patch like AfAOS is required.
 
-2015-08-24 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2015-08-24 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Dispatcher.c, mcc/GetSetAttrs.c, mcc/MixedFunctions.c: implemented an
     alternative way to handle the current cursor position. This way no longer
@@ -114,20 +114,20 @@ MUI TextEditor MCC class - ChangeLog
 
   * misc: final v15.46 release preparations
 
-2015-03-16 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2015-03-16 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c, mcc/Navigation.c: reverted the type cast to ULONG as
     it does not produce the wanted code for direct calls on locale.library
     functions. Instead the characters are now explicitly ANDed with 0xff to make
     sure that no extended signs are passed to the called function.
 
-2015-03-15 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2015-03-15 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c, mcc/SpellChecker.c: cast all characters passed to any
     locale.library function to ULONG to avoid any possible sign extension which
     might cause the called function to return wrong results.
 
-2015-03-13 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2015-03-13 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Navigation.c: treat the character to be checked for being a separation
     character as an unsigned values instead of a simple "char". This works
@@ -135,24 +135,24 @@ MUI TextEditor MCC class - ChangeLog
     wrong result for negative character values due to sign extension by the
     compiler.
 
-2014-08-27 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2014-08-27 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale: added dutch, spanish and turkish translations and updated all
     other translations.
 
-2014-06-11 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2014-06-11 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/InitConfig.c: ensure that a custom fixed font is really a monospaced
     font. Otherwise the class will fall back to MUI's internal fixed font
     settings.
 
-2014-05-03 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2014-05-03 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/ObjectCreator.c: added some NULL pointer checks when setting up the new
     configuration. This closes MUI ticket #28.
   * mcc/PrintLineWithStyles.c: fix a wrong color pen handling.
 
-2014-04-28 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2014-04-28 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/KeyStorage: make sure that the saved keybindings contain no trash in the
     terminating entry to make them properly comparable when checking for a
@@ -166,7 +166,7 @@ MUI TextEditor MCC class - ChangeLog
     it is required. This solves the known issues with the realtime prefs of
     MUI4.
 
-2014-04-26 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2014-04-26 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc, mcp: reworked the complete configuration object handling to massively
     simplify things. Furthermore the .mcp and the .mcc class refer to the same
@@ -176,12 +176,12 @@ MUI TextEditor MCC class - ChangeLog
     settings to their default values should now really be working in a reliable
     fashion which was not the case before.
 
-2014-04-10 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2014-04-10 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/SpellChecker.c: fixed a possibly wrong index check when extracting words
     for the spell checker from the text.
 
-2014-04-08 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2014-04-08 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Dispatcher.c, mcp/CreatePrefsGroup.c: disable the custom selection
     pointer if MUI already handles this. The selection pointer can then be
@@ -193,12 +193,12 @@ MUI TextEditor MCC class - ChangeLog
 
   * misc: final v15.45 release preparations
 
-2014-04-01 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2014-04-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale: added a new header line to the .po files to specify a correct
     name for the generated .catalog file.
 
-2014-03-31 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2014-03-31 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/CreatePrefsGroup.c, locale: restored the missing bubble help texts which
     got lots during the transition to .po files. Please note that I copied over
@@ -219,12 +219,12 @@ MUI TextEditor MCC class - ChangeLog
 
   * misc: final v15.44 release preparations
 
-2014-01-25 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2014-01-25 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ImportText.c: remember the current export hook before doing the actual
     export with a different hook.
 
-2014-01-13 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2014-01-13 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale/danish.ct: updated danish translation kindly provided by Niels
     Bache.
@@ -236,7 +236,7 @@ MUI TextEditor MCC class - ChangeLog
     sequences. The root cause of the problem still have to be found but it
     seems that call is definitly misplaced here!
 
-2013-12-21 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2013-12-21 Thore Böckelmann <tboeckel@gmx.de>
 
   * demo/TextEditor-Demo.c: correct wrong count parameter for
     MUIM_Application_OpenConfigWindow.
@@ -262,7 +262,7 @@ MUI TextEditor MCC class - ChangeLog
   * Makefile: changed MorphOS build to use our own GetSucc, etc. functions and
     not rely on the AROS compatibility macros.
 
-2013-11-01 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2013-11-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/GetSetAttrs.c, mcc/HandleInput, mcc/SpellChecker.c: added a new
     mechanism to trigger an attribute if the last entered word was found in a
@@ -271,11 +271,11 @@ MUI TextEditor MCC class - ChangeLog
   * mcc/SpellChecker.c: simplified the word extraction process for the keyword
     check. This makes the extension check work.
 
-2013-10-15 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2013-10-15 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/TextEditor-Test.c: updated AmigaOS4 build for the latest SDK.
 
-2013-04-30 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2013-04-30 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale/greek.ct: updated greek translation kindly provided by Antonis
     Iliakis.
@@ -288,33 +288,33 @@ MUI TextEditor MCC class - ChangeLog
   * include/muiextra.h: added definition of MUII_PopFont as some MUI SDK might
     not have them yet.
 
-2013-04-24 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2013-04-24 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale/greek.ct: updated greek translation kindly provided by Antonis
     Iliakis.
 
-2013-04-22 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2013-04-22 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/CreatePrefsGroup.c: use the font popup button image for MUI 3.9+.
 
-2013-03-06 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2013-03-06 Thore Böckelmann <tboeckel@gmx.de>
 
   * include/mccinit.c, include/shellstart.c: rearranged the code to ensure that
     trying to start the final class from a shell does not crash.
 
-2013-01-11 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2013-01-11 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/AllocFunctions.c, misc: removed the wrapper functions for allocating
     and freeing a line as they covered a single line only.
 
-2013-01-10 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2013-01-10 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/AllocFunctions.c, mcc/EditorStuff.c, mcc/BlockOperators.c: check for
     possible references before removing/freeing a line, as getting the line's
     preceeding or successing line after it has been removed from the line list
     might dereference invalid pointers. This closes bug #107.
 
-2013-01-04 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2013-01-04 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c: for externally handled double clicks (i.e. the double
     click hook) the not yet happend mouse release event will nevertheless be
@@ -325,7 +325,7 @@ MUI TextEditor MCC class - ChangeLog
     happens when a URL is double clicked in YAM and if launching the browser
     takes some seconds. This closes bug #106.
 
-2012-12-22 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-12-22 Thore Böckelmann <tboeckel@gmx.de>
 
   * tools/mkrelease: add italian catalog to the release archive.
 
@@ -335,70 +335,70 @@ MUI TextEditor MCC class - ChangeLog
 
   * misc: final v15.40 release preparations
 
-2012-11-29 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-11-29 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/MixedFunctions.c, mcc/PrintLineWithStyle.c: apply MUIPEN() to all pen
     values allocated by MUI_ObtainPen().
 
-2012-11-19 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-11-19 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Pointer.c: make use of the standard mouse pointer images in the AmigaOS4
     build if intuition.library 53.37 is available.
 
-2012-09-20 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-09-20 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/ObjectCreator.c: don't trigger notifications in
     MUIM_Mccprefs_ConfigToGadgets.
   * mcp/ObjectCreator.c: save strings with their real length only instead of
     their maximum length to assist MUI4's realtime prefs.
 
-2012-09-12 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-09-12 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Dispatcher.c, mcc/InitConfig.c: apply the current configuration before
     calling the superclass' MUIM_Setup to ensure the frame settings are applied
     correctly.
 
-2012-09-03 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-09-03 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale/italian.ct: updated italian translation kindly provided by Samir
     Hawamdeh.
 
-2012-09-02 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-09-02 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/CreatePrefsGroup.c: the floattext object on the Spellchecking page now
     accepts wheel scroll events.
 
-2012-09-01 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-09-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale/italian.ct: added italian translation kindly provided by Samir
     Hawamdeh.
 
-2012-08-31 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-08-31 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: fixed a redraw bug due to a wrong index check when
     deleting characters at the end of a wrapped line.
 
-2012-08-28 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-08-28 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/CreatePrefsGroup.c: adjusted the crawling text to better match the
     capabilities of Crawling.mcc.
   * mcc/HandleInput.c: added support for the standard cut, copy, paste, undo and
     redo keys of MUI4.
 
-2012-08-27 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-08-27 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/SetBlock.c: added missing block enabling when style changes were
     requested along with setting the now block. Thanks to Andreas Falkenhahn for
     the hint.
 
-2012-08-24 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-08-24 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Navigation.c: fixed several "use before check" occurences.
   * mcc/HandleInput.c: fixed wrong handling of DEL key at the end of a line.
   * mcc/misc: removed all the senseless distinction between "fast" and "slow"
     background images. This makes the code a lot more understandable.
 
-2012-08-22 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-08-22 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: moved a check to a more appropriate location to avoid
     leaving a function somewhere in the middle.
@@ -412,19 +412,19 @@ MUI TextEditor MCC class - ChangeLog
     background area affected by redraw operations will always be cleared now no
     matter what type of font is used.
 
-2012-08-21 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-08-21 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/MixedFunctions.c: fixed an endless loop when splitting a non-empty line
     into two new lines.
 
-2012-08-20 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-08-20 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/MixedFunctions.c: put the line counting code into a separate function to
     reduce code replication.
   * mcc/PrintLineWithStyles.c: limit the drawing of the background of unwrapped
     lines to the visual area.
 
-2012-08-16 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-08-16 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/BlockOperators.c: simplified the cutting block function prototypes to
     carry less parameters and avoid double negation.
@@ -434,7 +434,7 @@ MUI TextEditor MCC class - ChangeLog
     in the clipboard these will be treated as clipboard entries created by TE.mcc
     itself and everything will be restored correctly now.
 
-2012-08-15 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-08-15 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/BlockOperators.c: implemented a new function to mark the complete text.
   * mcc/PrintLineWithStyles.c: correctly respect the maximum visibile width of
@@ -442,14 +442,14 @@ MUI TextEditor MCC class - ChangeLog
   * mcc/PrintLineWithStyles.c: don't print any text if there is no space left
     for at least one character.
 
-2012-08-14 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-08-14 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/GetSetAttrs.c: treat a NULL content pointer as an empty text. Otherwise
     setting a NULL content will have no effect.
   * mcc/GetSetAttrs.c: enabling/disabling the object will cause a redraw event
     only if the state really changes and MUI4 is not available.
 
-2012-08-09 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-08-09 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: avoid copying styles and colors too often.
 
@@ -459,7 +459,7 @@ MUI TextEditor MCC class - ChangeLog
 
   * misc: final v15.39 release preparations
 
-2012-08-02 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-08-02 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/InitConfig.c: restrict certain configuration values to their configurable
     limits.
@@ -474,19 +474,19 @@ MUI TextEditor MCC class - ChangeLog
     to let an application enforce a specific number of spaces per TAB character
     no matter what the user has configured.
 
-2012-07-20 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-07-20 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/GetSetAttrs.c: fixed a potential memory leak in case importing a text
     failed. In this case the former text buffer was not freed.
 
-2012-07-12 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-07-12 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: use memmove() instead of strlcpy() when moving characters
     backwards as the regions may overlap.
   * mcc/EditorStuff.c: rely on the existing line length information instead of
     calculating it from scratch when inserting or removing characters.
 
-2012-07-09 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-07-09 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: added some more boundary checks when inserting or
     deleting a range of characters. I hope this makes it possible to track down
@@ -500,20 +500,20 @@ MUI TextEditor MCC class - ChangeLog
   * mcc/misc: removed a global variable to keep the object's top position. This
     value is better obtained by using _mtop(obj).
 
-2012-06-20 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-06-20 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/KeyStorage.c: don't allocate locked memory here as well and replaced an
     AllocMem() call by AllocVec().
 
-2012-06-19 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-06-19 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: don't allocate locked memory.
 
-2012-05-16  PÃ¤r Boberg <pbobbenb@spray.se>
+2012-05-16  Pär Boberg <pbobbenb@spray.se>
 
   * mcp/locale/swedish.ct: updated and some minor corrections.
 
-2012-05-14 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-05-14 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/Makefile: removed .catalog files in clean target.
   * mcp/locale/TextEditor_mcp.cd: replaced non-7bit-ASCII character by a
@@ -531,7 +531,7 @@ MUI TextEditor MCC class - ChangeLog
     rely on the ChangeLog in future as it is too much work to update the .guide
     for every new release.
 
-2012-05-04 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-05-04 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c: restored the correct return code interpretation of the
     double click hook that was inverted in r756. Now everything is conformant to
@@ -565,11 +565,11 @@ MUI TextEditor MCC class - ChangeLog
     storing a number of spaces into the object according to the current settings.
     However, this was not possible at all.
 
-2012-04-05 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-04-05 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c: fixed handling of the TAB key as real input key.
 
-2012-04-04 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-04-04 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/GetSetAttrs.c: added missing #include.
 
@@ -586,14 +586,14 @@ MUI TextEditor MCC class - ChangeLog
   * Makefile: got rid of -funroll-loops option as this one is potentially
     dangerous under certain circumstances.
 
-2012-04-02 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-04-02 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/InitConfig.c: string pointers obtained from the MUI configuration must
     be copied instead of rembembered directly. With MUI4's realtime prefs the
     pointer might become invalid at any time and hence the class would operate
     on invalid data after that.
 
-2012-02-16 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-02-16 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ColorOperators.c: fixed adding new colors in case there was no color
     used at all yet on a line.
@@ -603,7 +603,7 @@ MUI TextEditor MCC class - ChangeLog
   * Backport of AROS fixes.
     SDI headers updated.
 
-2012-01-10 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2012-01-10 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c: mouse wheel events happening over the slider object are
     now handled in the same way as over the editor object. This makes scrolling
@@ -615,18 +615,18 @@ MUI TextEditor MCC class - ChangeLog
 
   * misc: final v15.37 release preparations
 
-2011-01-04 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2011-01-04 Thore Böckelmann <tboeckel@gmx.de>
 
   * all/Makefile: fixed the dependency generation to respect the system specific
     object file path.
 
-2010-11-17 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-11-17 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c: slightly deobfuscated the double click handling.
   * demo/TextEditor-Demo.c: obtain/release the pens in the MUIM_Setup/Cleanup
     methods instead of MUIM_Show/Hide.
 
-2010-10-05 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-10-05 Thore Böckelmann <tboeckel@gmx.de>
 
   * include/mccinit.c: make sure that removing the library during LibClose()
     really operates on the correct base. Calling LibExpunge() on MorphOS is
@@ -640,11 +640,11 @@ MUI TextEditor MCC class - ChangeLog
 
   * misc: final v15.36 release preparations
 
-2010-09-18  PÃ¤r Boberg <pbobbenb@spray.se>
+2010-09-18  Pär Boberg <pbobbenb@spray.se>
 
   * mcp/locale/swedish.ct: new file generated by FlexCat 2.7.
 
-2010-09-14 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-09-14 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Methods.c: trying to clear the contents of an already instance of TE.mcc
     caused an error message, because there was nothing to be deleted. Now the
@@ -655,11 +655,11 @@ MUI TextEditor MCC class - ChangeLog
 
   * AUTHORS: added translators section (please check and update missing persons).
 
-2010-09-07 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-09-07 Thore Böckelmann <tboeckel@gmx.de>
 
   * mccinit.c: added missing #include <string.h> for memset().
 
-2010-09-03 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-09-03 Thore Böckelmann <tboeckel@gmx.de>
 
   * mccinit.c, #?/ClipboardServer.c: updated to the latest version and clear all
     embedded semaphore structures before calling InitSemaphore().
@@ -670,11 +670,11 @@ MUI TextEditor MCC class - ChangeLog
 
   * misc: final v15.35 release preparations
 
-2010-08-17 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-08-17 Thore Böckelmann <tboeckel@gmx.de>
 
   * mccinit.c, SDI_compiler.h: updated to latest versions.
 
-2010-08-04 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-08-04 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/#?: replaced lots of direct references to MUI's area data and render
     info by the appropriate macro calls. This way we can rid of some private
@@ -684,7 +684,7 @@ MUI TextEditor MCC class - ChangeLog
     long lines would either be drawn outside the editors area or were not
     correctly displayed at all due to integer overflows in graphics.library.
 
-2010-07-30 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-07-30 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Debug.c, mcp/Debug.c: removed unused debug flags from the .mcp and made
     @mtrack user definable for both classes.
@@ -695,12 +695,12 @@ MUI TextEditor MCC class - ChangeLog
   * mcp: fixed MorphOS compile by applying debugging framework from mcc also
     on the mcp.
 
-2010-07-07 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-07-07 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c: the text was no longer refreshed in case the user tried
     to paste from an empty or non-text clipboard.
 
-2010-07-06 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-07-06 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Methods.c: clearing the complete text is now remembered as an action
     without cursor movement. Undoing this action will result in the cursor being
@@ -709,7 +709,7 @@ MUI TextEditor MCC class - ChangeLog
   * mcc/misc: use the SetAfPt() macro instead of poking directly into the
     RastPort structure.
 
-2010-07-05 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-07-05 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/CreatePrefsGroup.c: replaced the text editor object containing the
     instructions about the spell checking facility by a plain float text object.
@@ -720,7 +720,7 @@ MUI TextEditor MCC class - ChangeLog
     buffer. A resize from any number of steps to zero steps would not have freed
     any undo steps done so far.
 
-2010-07-03 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-07-03 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/ObjectCreator.c: removed the "undo steps" slider from the real time
     settings facility of MUI4 completely. First, adjusting the value will give
@@ -731,7 +731,7 @@ MUI TextEditor MCC class - ChangeLog
     excluded from the real time settings as well. Furthermore, please check if
     this change fixes bug #3024024.
 
-2010-07-02 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-07-02 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/UndoFunctions.c: the undo buffer will be preserved in case the number of
     undo steps is modified.
@@ -761,26 +761,26 @@ MUI TextEditor MCC class - ChangeLog
   * mcc/Makefile, mcc/private.h: Use standard AROS GetHead/Pred/Succ/Tail
     macros in MorphOS.
 
-2010-06-29 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-06-29 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale/swedish.ct: added ##codeset line.
 
-2010-06-27 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-06-27 Thore Böckelmann <tboeckel@gmx.de>
 
   * doc/MCC_TextEditor.guide: fixed wrong version information. This fixes bug
     #3021781.
 
-2010-06-11 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-06-11 Thore Böckelmann <tboeckel@gmx.de>
 
   * Install-MCC: extended the final message that a reboot might be necessary to
     be able to use the just installed version.
 
-2010-06-10 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-06-10 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: moved all sources which implement stuff which is missing on some
     systems to a separate "extrasrc" directory.
 
-2010-06-09 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-06-09 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Get#?.c: added GetHead/Pred/Succ/Tail implementation for those systems
     which don't implement these natively.
@@ -789,7 +789,7 @@ MUI TextEditor MCC class - ChangeLog
     the last place for possible buffer overruns if removing some styled text
     resulted in more style changes than before.
 
-2010-06-07 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-06-07 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: replaced all hand crafted style and color array allocations by
     growing arrays which are resized on demand. This makes buffer overruns
@@ -801,11 +801,11 @@ MUI TextEditor MCC class - ChangeLog
   * Fixes for 64-bit AROS: changed some ULONG to IPTR to get rid of warnings like
     "conversion from/to pointer to/from integer with different size"
 
-2010-06-03 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-06-03 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: fixed an off-by-one string copying.
 
-2010-06-02 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-06-02 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c, mcc/HandleARexx.c: replaced some memcpy() calls by more
     apropriate strlcpy() calls.
@@ -814,14 +814,14 @@ MUI TextEditor MCC class - ChangeLog
   * mcc/ClipboardServer.c: removed the ENTER()/LEAVE() macro calls from the
     server process' function as these are cluttering up the debug log.
 
-2010-06-01 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-06-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mccinit.c: added CleanupDebug() call to expunge function.
   * Debug.c, misc: implemented a basic check to verify that stuff is being freed
     using the correct function, i.e. FreeVec() for AllocVec()'ed memory.
   * Debug.c: fixed slightly wrong string parsing.
 
-2010-05-31 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-05-31 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/MixedFunctions.c: fixed a possible memory leak.
   * mcc/EditorStuff.c, mcc/Dispatcher.c: replaced some free line loops by a call
@@ -829,7 +829,7 @@ MUI TextEditor MCC class - ChangeLog
   * mcc/BlockOperators.c, mcc/ImportHook.c, mcc/HandleARexx.c: minor code
     cleanup.
 
-2010-05-27 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-05-27 Thore Böckelmann <tboeckel@gmx.de>
 
   * dist/Install-MCC: the supported languages are now collected dynamically
     instead of being defined statically. Furthermore the .mcc name must be
@@ -837,7 +837,7 @@ MUI TextEditor MCC class - ChangeLog
     to use the script for arbitrary classes without modification.
   * dist/icons: set some reasonable default icon positions.
 
-2010-05-26 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-05-26 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale/polish.ct: added a missing comment.
 
@@ -853,7 +853,7 @@ MUI TextEditor MCC class - ChangeLog
     in the AROS source
   * include/mccinit.c: updated with fixes for AROS V1 API
 
-2010-05-25 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-05-25 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleARexx.c: fixed a NULL pointer access when the "SELECTNONE"
     command was invoked without any text being selected before. This closes
@@ -869,11 +869,11 @@ MUI TextEditor MCC class - ChangeLog
   * tools\mkrelease.sh: added generating Polish catalog to release
   * mcp\makefile and mmakefile.src: added generating Polish catalog
 
-2010-05-20 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-05-20 Thore Böckelmann <tboeckel@gmx.de>
 
   * Makefiles: add varargs stubs only for those systems which really need it.
 
-2010-05-18 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-05-18 Thore Böckelmann <tboeckel@gmx.de>
 
  * mcc/UndoFunctions.c: use memmove() instead of memcpy() to shift the undo
    steps as the buffers definitely do overlap due to the in-place operation.
@@ -883,7 +883,7 @@ MUI TextEditor MCC class - ChangeLog
    instance will let this action fail.
  * added stuff for automated build of release archives.
 
-2010-05-17 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-05-17 Thore Böckelmann <tboeckel@gmx.de>
 
  * mcc/SpellChecker.c: slightly improved the setup of the Rexx messages to avoid
    accessing possible NULL pointers.
@@ -894,7 +894,7 @@ MUI TextEditor MCC class - ChangeLog
 
   * misc: final v15.33 release preparations
 
-2010-05-10 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-05-10 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/AllocBitMap.c: fixed wrong freeing of a memory block in case another
     allocation failed. This only could affect classic systems.
@@ -902,11 +902,11 @@ MUI TextEditor MCC class - ChangeLog
     as well as the AllocLine()/FreeLine() functions into the memory tracking
     framework.
 
-2010-05-07 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-05-07 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/InitConfig.c: fixed wrong pen allocation.
 
-2010-05-05 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-05-05 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: fixed a wrong deallocation which might have lead to a
     crash (FreeVec instead of FreeVecPooled).
@@ -919,7 +919,7 @@ MUI TextEditor MCC class - ChangeLog
 
   * misc: final v15.32 release preparations
 
-2010-04-30 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-04-30 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/library.c: added version check for NBitmap.mcc. Only version V15.8+ can
     handle raw image data.
@@ -929,23 +929,23 @@ MUI TextEditor MCC class - ChangeLog
   * mcp/icon.c: now the new NBitmap.mcc is explicitly used for displaying the
     32bit raw image data on OS3 and OS4.
 
-2010-04-28 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-04-28 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/library: implemented experimental fallback to NBitmap.mcc for raw image
     data in case Rawimage.mui is not available.
 
-2010-04-27 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-04-27 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/library: all systems now try to create a truecolor prefs image using
     Rawimage.mcc first before falling back to the old 8bit images.
 
-2010-04-26 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-04-26 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/misc: merged all converted image data into one file, moved the image
     files to a separate subdirectory, combined the prefs icon generation for
     all platform into one function.
 
-2010-04-24 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-04-24 Thore Böckelmann <tboeckel@gmx.de>
 
   * include/mccinit.c: updated to latest version. This fixes the stack swapping
     for AROS.
@@ -954,7 +954,7 @@ MUI TextEditor MCC class - ChangeLog
 
   * mcp/misc: use bzip2 compressed 32bit prefs image on MorphOS 2.
 
-2010-04-22 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-04-22 Thore Böckelmann <tboeckel@gmx.de>
 
   * ColorOperators.c, StyleOperators.c: the GetColor() and GetStyle() functions
     now handle invalid positions internally.
@@ -975,7 +975,7 @@ MUI TextEditor MCC class - ChangeLog
   * HandleInput.c, UndoFunctions.c: erasing a character with DEL will leave the
     cursor at the same position when undoing this operation.
 
-2010-04-21 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-04-21 Thore Böckelmann <tboeckel@gmx.de>
 
   * EditorStuff.c: slight optimization to shift style and color changes only if
     they need to be shifted when deleting text.
@@ -988,7 +988,7 @@ MUI TextEditor MCC class - ChangeLog
     because the implict color change at the end of the clip was not correctly
     handled. This is really weird stuff!
 
-2010-04-20 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-04-20 Thore Böckelmann <tboeckel@gmx.de>
 
   * Debug.c: added new debug flags DBF_IMPORT and DBF_EXPORT to debug the import
     and export hook functions.
@@ -1010,7 +1010,7 @@ MUI TextEditor MCC class - ChangeLog
     really change something? And what about colored text? How can be undo/redo
     colored text as well?
 
-2010-04-12 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-04-12 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/misc: added 32bit truecolor prefs image done by Martin 'Mason' Merz.
     This requires at least MUI3.9 and AmigaOS 4.1.
@@ -1025,19 +1025,19 @@ MUI TextEditor MCC class - ChangeLog
   * mcc/StyleOperators.c: fixed a minor compiler warning where the in-place
     invertation via '~' caused a compiler warning with GCC 4.4+
 
-2010-02-10 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2010-02-10 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/AllocBitMap.c: the CyberGraphics semaphore check was done without the
     necessary Forbid()/Permit() pair. Although it is absolutely unlikely that
     the semaphore will be removed it is better to follow the rules. This fixes
     bug #2948533.
 
-2009-11-28 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-11-28 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ClipboardServer.c: decreased the stack size from 16K to 8K as the server
     process doesn't really need much stack.
 
-2009-11-09 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-11-09 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: implemented MUIA_TextEditor_PasteColors/Styles to enable/disable
     pasting text with color and style information. This fulfils feature request
@@ -1046,7 +1046,7 @@ MUI TextEditor MCC class - ChangeLog
     the tag as if it was TRUE always thus making it impossible to deactivate it.
     This fixes YAM bug #2894042.
 
-2009-10-26 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-10-26 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/UndoFunctions.c: adding a new entry to the undo buffer will erase any
     previously done redo action. This is what all text editors do. Additionally
@@ -1058,7 +1058,7 @@ MUI TextEditor MCC class - ChangeLog
 
   * misc: final release preparations
 
-2009-10-21 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-10-21 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ImportHook.c: the import hooks didn't set the allocation size of the
     contents in the line structure which caused bogus error messages in the
@@ -1071,28 +1071,28 @@ MUI TextEditor MCC class - ChangeLog
     memory for the undo buffer. This was yet an other of Allan's ancient bugs...
   * mcc/Debug.c: added BLOCK debug class.
 
-2009-10-20 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-10-20 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/TextEditor-Test.c: the debug stuff was initialized after the starting
     the clipboard server which requires a fully set up debug environment.
   * mcc/ColorOperators.c, mcc/StyleOperators.c, mcc/ImportHook.c: added a
     missing #include.
 
-2009-10-19 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-10-19 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/SpellChecker.c: the spell checker no longer treats a missing ENV:Found
     variable as a failure and thus will no longer DisplayBeep() in this case.
   * mcc/misc: added an allocation size counter to each line to get rid of the
     necessity to peek around in memory to get an allocation's size.
 
-2009-10-12 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-10-12 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: added a proper definition for "no separator" and use it all over
     the place.
   * mcc/misc: cleaned up the dispatcher a bit. Now all method functions have the
     usual class/object/message parameters.
 
-2009-10-09 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-10-09 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/BlockOperators.c: cutting a line to the clipboard and deleting complete
     lines will now free the attached color informations as well. Before only the
@@ -1104,23 +1104,23 @@ MUI TextEditor MCC class - ChangeLog
   * mcc/Debug.c: implemented the memory tracking for the debug build as known
     from YAM to catch possible memory leaks.
 
-2009-10-08 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-10-08 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/UndoFunctions.c: when reusing an undo entry the former contents were not
     erased and could lead to double freeing if that entry contained a clip of
     pasted or deleted text. Now the contents are always cleared.
 
-2009-10-07 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-10-07 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc, mcp/misc: again *LOTS* of code cleanup to make this monster more
     readable and understandable.
 
-2009-10-06 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-10-06 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Debug.c, mcc/SpellChecker.c: added the SPELL debug flag to get some
     debug output from the spell checking process.
 
-2009-10-05 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-10-05 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/SpellChecker.c: added the usual ENTER()/LEAVE() macro calls.
   * mcc/UndoFunctions.c, mcc/Methods.c: fixed a double FreeMem() call and a
@@ -1138,45 +1138,45 @@ MUI TextEditor MCC class - ChangeLog
   * mcc/misc: *LOTS* of code cleanup. This code is a real mess! I really wonder
     what kind of mysterious crashes are still lurking in there :(
 
-2009-10-02 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-10-02 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: added some house keeping variables to the style and color handling
     to detect possible buffer overruns. These also make it possible to get rid
     of peeking around to get the size of a previous allocation.
 
-2009-09-29 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-09-29 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ClipboardServer.c: added the missing NP_CodeType=CODETYPE_PPC tag for
     the MOS build.
 
-2009-09-25 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-09-25 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: fixed a bug which treated columns numbers as color
     numbers.
   * mcc/misc: fixed some LONG variable to BOOL, as this is what they really are.
 
-2009-09-24 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-09-24 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: replaced the complete embedded clipboard stuff by a server process
     which does the dirty stuff. This fixes the issue that opening two write
     windows in YAM made pasting text impossible.
 
-2009-09-21 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-09-21 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Dispatcher.c: added a name the memory pool for the OS4 build.
 
-2009-09-07 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-09-07 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: replaced all custom "end of color" markers by a proper definition.
 
-2009-09-04 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-09-04 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: fixed yet another crash when removing lines. This old
     handling was a *real* *big* *mess*. Exploiting features of the C language
     is cool, as long as other persons understand it without asking more than
     twice. This stuff really was *far* beyond!! :(
 
-2009-08-31 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-08-31 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: fixed another style handling bug which lost some styles
     when pasting a text with styles from the clipboard.
@@ -1186,7 +1186,7 @@ MUI TextEditor MCC class - ChangeLog
     styles. This only works in the first column or if the text is pasted twice.
     The good news is that this also happened with the old style handling.
 
-2009-08-30 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-08-30 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: replaced accidental "+" by "*". This might have caused
     the recent crashes in case there were lots of different colors in one line.
@@ -1197,12 +1197,12 @@ MUI TextEditor MCC class - ChangeLog
 
   * misc: final release preparations
 
-2009-08-28 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-08-28 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/UndoFunctions.c: changed the return code of some functions from "long"
     to "BOOL" as this is what they really return.
 
-2009-08-27 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-08-27 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/misc: replaced the complete array based style and color stuff by proper
     structures which carry the starting column and style/color information
@@ -1212,7 +1212,7 @@ MUI TextEditor MCC class - ChangeLog
     Also replaced the absolutely ugly peeking into the ULONG ahead of an
     allocation to obtain the allocation size in bytes by a proper function call.
 
-2009-08-25 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-08-25 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: fixed a bad bug which made TE.mcc loose track about the
     styles and colors being in use. Added a function to dump all informations
@@ -1230,7 +1230,7 @@ MUI TextEditor MCC class - ChangeLog
   * mcc/all : Inserted special comment strings to better read
     sources on CubicIDE
 
-2009-08-14 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-08-14 Thore Böckelmann <tboeckel@gmx.de>
 
   * Makefiles: added "-g" to the debug flags. It seems the OS3 GCC 2.95.3 cross
     compiler needs this to generate debug infos at all.
@@ -1240,7 +1240,7 @@ MUI TextEditor MCC class - ChangeLog
   * mcc/CaseConversion.c : now ToUpper and ToLower operations
     are can be reverted by user;
 
-2009-06-30 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-06-30 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleArexx.c, mcp/KeyStorage.c: fixed two warnings.
 
@@ -1266,7 +1266,7 @@ MUI TextEditor MCC class - ChangeLog
     the autodoc for SetBlock suggests. In addition, several things have been
     cleaned up to better match our general code layout.
 
-2009-06-11 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-06-11 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ExportBlock.c, mcc/SetBlock.c: replaced some hand crafted flag checks by
     our isFlag#?() macros.
@@ -1291,11 +1291,11 @@ MUI TextEditor MCC class - ChangeLog
     AROS compiles. Now everything should compile/link fine for all AROS
     targets as well.
 
-2009-06-02 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-06-02 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: added missing variable initialization.
 
-2009-06-01 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-06-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: added safety check before pasting new characters into a
     line to prevent potential buffer overruns. Hopefully this fixes the still
@@ -1309,7 +1309,7 @@ MUI TextEditor MCC class - ChangeLog
   * version.h: fixed the identification of a PowerPC processor as the AROS
     compiler for ppc does not set __PPC__.
 
-2009-05-04 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-05-04 Thore Böckelmann <tboeckel@gmx.de>
 
   * include/SDI_lib.h: updated to the latest version.
 
@@ -1318,11 +1318,11 @@ MUI TextEditor MCC class - ChangeLog
   * include/mccinit.c: RTF_EXTENDED was not set for the MorphOS build making
     revision number ineffective.
 
-2009-04-30  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-04-30  Thore Böckelmann <tboeckel@gmx.de>
 
   * updated the SDI headers to their latest fixed versions.
 
-2009-04-18 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-04-18 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/C_c.sd: added missing SDI_compiler.h include to make IPTR type known.
 
@@ -1332,7 +1332,7 @@ MUI TextEditor MCC class - ChangeLog
     one generated with the latest sfdc 1.4 version.
   * mcp/C_c.sd: replaced a (ULONG) cast by the more portable (IPTR) cast.
 
-2009-04-01 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2009-04-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mccinit.c: fixed broken stackswap_call() prototype for the assembler
     version.
@@ -1357,7 +1357,7 @@ MUI TextEditor MCC class - ChangeLog
     only. For maximum performance VMEM bitmap is used. WaitBlit() is now called
     only for OS3 (CGX and P96 synchronise blitters automatically).
 
-2008-12-21 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2008-12-21 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/AllocBitMap.c: replaced the OS3 specific part (and the deprecated
     AllocMem and AllocVec calls) by simplified code.
@@ -1367,7 +1367,7 @@ MUI TextEditor MCC class - ChangeLog
   * Makefile: removed the printf usage with the ANSI codes and replaced them
     by the more intuitive CC/LD echo output.
 
-2008-12-17  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2008-12-17  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ExportHook.c: added some missing NULL pointer checks.
   * mcc/SpellChecker.c: replaced the obsolete CreateMsgPortl() and
@@ -1378,14 +1378,14 @@ MUI TextEditor MCC class - ChangeLog
     restored the old MEMF_ANY memory flags for the other platforms. For OS4
     MEMF_SHARED will be used as before.
 
-2008-12-08  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2008-12-08  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Dispatcher.c: added MEMF_CLEAR to the pool's memory flags to make sure
     that every allocation is cleared, as it seems the most prominent crashes are
     caused by unrestricted string accesses (i.e. by strlen() operating after the
     trailing NUL byte).
 
-2008-12-05  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2008-12-05  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/EditorStuff.c: slightly reworked the obscure width calculation in the
     UpdateChange() function and added a missing LEAVE() macro call.
@@ -1404,7 +1404,7 @@ MUI TextEditor MCC class - ChangeLog
     supported in MorphOS 2 only but could be made available to other platforms
     by using codesets.library respectively.
 
-2008-08-12  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2008-08-12  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleARexx.c: the GOTOLINE and GOTOCOLUMN commands now return the final
     line/column number instead of the boolean value TRUE. This makes it possible
@@ -1419,7 +1419,7 @@ MUI TextEditor MCC class - ChangeLog
     visibility check is also disabled when running under MorphOS2 (Intuition
     takes care of it automatically).
 
-2008-07-17  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2008-07-17  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/MixedFunctions.c, mcc/PrintLineWithStyles.c: removed the kerning check
     for proportional fonts upon setting the cursor to a new position. This
@@ -1449,16 +1449,16 @@ MUI TextEditor MCC class - ChangeLog
   * mcc/MixedFunctions.c: fixed a potential NUL pointer access which might have
     caused some crashes.
 
-2008-03-17  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2008-03-17  Thore Böckelmann <tboeckel@gmx.de>
 
   * #?/vastubs.c, #?/Makefile: added vararg stubs for OS3 to be able to link
     against clib2 which misses these stubs.
 
-2008-03-06 PÃ¤r Boberg <pbobbenb@spray.se>
+2008-03-06 Pär Boberg <pbobbenb@spray.se>
 
    * mcp/locale/swedish.ct: Updated according to changes.
 
-2008-03-04  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2008-03-04  Thore Böckelmann <tboeckel@gmx.de>
 
   * #?/Makefile: removed -lm from the linker libs as nothing needs floating
     point math. Also added dump as target.
@@ -1471,13 +1471,13 @@ MUI TextEditor MCC class - ChangeLog
     case the wheel is used more quickly and the wheel acceleration factor is
     properly configured in the SYS:Prefs/Input configuration.
 
-2008-02-19  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2008-02-19  Thore Böckelmann <tboeckel@gmx.de>
 
   * Debug.h: replaced all abort() usages in our ASSERT() macros with the
     respective calls to assert(). This should prevent the MorphOS compile
     from not linking and be a bit more intuitiv.
 
-2008-02-18  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2008-02-18  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/ExportBlock.c: make use of the new flag macros.
   * mcc/TextEditor-Test.c: fixed a typo.
@@ -1505,7 +1505,7 @@ MUI TextEditor MCC class - ChangeLog
     process was kinda strange. Now the whole undo level handling should be not
     only more safe, but also more transparent.
 
-2008-02-04  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2008-02-04  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/BlockOperators.c: adapted two parameters of CutBlock() to reflect their
     true boolean nature.
@@ -1534,7 +1534,7 @@ MUI TextEditor MCC class - ChangeLog
 
    * mcp/locale/czech.ct: updated Czech catalog translation.
 
-2008-01-04  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2008-01-04  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/rev.h: fixed broken date string.
    * include/mui/TextEditor_mcc.h: added version requirement to the new
@@ -1542,7 +1542,7 @@ MUI TextEditor MCC class - ChangeLog
    * mcc/HandleInput.c: the qualifiers being pressed during a double click are
      now also passed to the DoubleClickHook.
 
-2008-01-03  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2008-01-03  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/locale/#?.ct: changed all .ct file names to english names instead of
      translated ones.
@@ -1557,7 +1557,7 @@ MUI TextEditor MCC class - ChangeLog
 
    * misc: final release preparations.
 
-2007-12-14  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-12-14  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcc/ImportHook.c: fixed some indentations.
    * mcc/HandleInput.c: the select pointer will now only be shown if the mouse
@@ -1565,14 +1565,14 @@ MUI TextEditor MCC class - ChangeLog
      partly covered by another window the normal pointer will be shown. This
      fixes bug #1850317.
 
-2007-12-13  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-12-13  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcc/PrintWithStyles.c: fixed some indentations.
    * mcp/misc: replaced the old BitmapObject by a BodyChunkObject and added a
      IFF-ILBM image with proper transparent color. This should fix the broken
      display on the prefs image on some old machines.
 
-2007-12-12  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-12-12  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcc/HandleInput.c, mcc/Methods.c: fixed some indentations and comparisons.
    * mcc/Dispatcher.c, mcc/Pointer.c: the select pointer will now be set and
@@ -1584,7 +1584,7 @@ MUI TextEditor MCC class - ChangeLog
 
    * mcp/locale/czech.ct: added czech mcp catalog translation
 
-2007-11-22  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-11-22  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcc/MixedFunctions.c: changed the return code of some functions to BOOL to
      reflect the true nature of the return code.
@@ -1600,20 +1600,20 @@ MUI TextEditor MCC class - ChangeLog
    * mcp/CreatePrefsGroup.c: added a copyright crawling object to the bottom
      of the mcp to match the Look&Feel to our other classes.
 
-2007-11-03 PÃ¤r Boberg <pbobbenb@spray.se>
+2007-11-03 Pär Boberg <pbobbenb@spray.se>
 
    * mcp/locale/svenska.ct: Updated according to changes.
 
-2007-11-02  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-11-02  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/CreatePrefsGroup.c: added all missing buttons to the cycle chain.
 
-2007-10-29  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-10-29  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/locale/TextEditor_mcp.cd: fixed some small typos.
    * mcp/locale/deutsch.ct: Updated according to the latest changes.
 
-2007-10-28  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-10-28  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/CreatePrefsGroup.c: corrected some bubble help attributes, as these
      were placed completely wrong (for the sorrounding group instead of the
@@ -1648,7 +1648,7 @@ MUI TextEditor MCC class - ChangeLog
      visible last line didn't end up in the display being scrolled according to
      the vertical cursor change.
 
-2007-10-11  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-10-11  Thore Böckelmann <tboeckel@gmx.de>
 
    * mcc/Pointer.c: the combinated bitplane is now also declared as constant
      data instead of "calculating" it.
@@ -1679,7 +1679,7 @@ MUI TextEditor MCC class - ChangeLog
    * mcp/Makefile: modified makefile to use LOCALE as a variable for the
      locale directory.
 
-2007-09-23 PÃ¤r Boberg <pbobbenb@spray.se>
+2007-09-23 Pär Boberg <pbobbenb@spray.se>
 
    * mcp/locale/svenska.ct: Updated according to changes.
 
@@ -1724,11 +1724,11 @@ MUI TextEditor MCC class - ChangeLog
   * doc/TextEditor.doc: added missing documentation about the function of the
     MUIA_TextEditor_KeyUpFocus attribute.
 
-2007-09-01 PÃ¤r Boberg <pbobbenb@spray.se>
+2007-09-01 Pär Boberg <pbobbenb@spray.se>
 
    * mcp/locale/svenska.ct: Updated according to changes.
 
-2007-08-31  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-08-31  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c: key releases of known shortcuts (like cursor up/down)
     were not handled correctly and caused MUI to trigger the same action a
@@ -1758,7 +1758,7 @@ MUI TextEditor MCC class - ChangeLog
     ready as we still have just an example image up&running, but it is nice
     to be able to freely define a 32bit pointer on OS4.
 
-2007-08-29  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-08-29  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Pointer.c: just in case the 32bit pointer cannot be created the old
     bitmap is also passed in again.
@@ -1784,7 +1784,7 @@ MUI TextEditor MCC class - ChangeLog
   * mcp: implemented a new settings option to be able to enable/disable the new
     selection pointer.
 
-2007-08-27  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-08-27  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Pointer.c: when setting up the pointer image the colors matching white
     and black best are now calculated instead of guessed. This way the pointer
@@ -1811,7 +1811,7 @@ MUI TextEditor MCC class - ChangeLog
     and therefore ended up in a distorted text display. Now the ScrollUp/ScrollDown
     operations are done right before redrawing the content of the merge lines.
 
-2007-08-25 PÃ¤r Boberg <pbobbenb@spray.se>
+2007-08-25 Pär Boberg <pbobbenb@spray.se>
 
    * mcp/locale/svenska.ct: Updated according to changes.
 
@@ -1821,12 +1821,12 @@ MUI TextEditor MCC class - ChangeLog
     explicitly disabled in the preference program to get back the old behaviour.
     However, it will still be enabled per default to make use of it at all.
 
-2007-08-13  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-08-13  Thore Böckelmann <tboeckel@gmx.de>
 
   * include/mccinit.c: updated to 1.10 version which fixes a wrong memory
     access to the StackSwap structure if this is placed on the stack.
 
-2007-08-10  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-08-10  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/HandleInput.c: a read-only editor with a marked search result could not
     be scrolled by keyboard anymore if that would scroll the marked text out of
@@ -1840,7 +1840,7 @@ MUI TextEditor MCC class - ChangeLog
 
 #### v15.22 RELEASE ############################################################
 
-2007-07-25  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-07-25  Thore Böckelmann <tboeckel@gmx.de>
 
   * #?/library.c: now really uses the 3 parameter version of GETINTERFACE()
     defined in mccinit.c instead of the old obsolete version in mcc_common.h.
@@ -1857,7 +1857,7 @@ MUI TextEditor MCC class - ChangeLog
   * misc: adapted MEMF_#? allocation flags to use MEMF_SHARED whereever
     appropriate.
 
-2007-07-24  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-07-24  Thore Böckelmann <tboeckel@gmx.de>
 
   * include/mccinit.c: updated to latest 1.6 version which fixes an unbalanced
     if statement.
@@ -1893,7 +1893,7 @@ MUI TextEditor MCC class - ChangeLog
     assembler version for those platforms where a StackSwap() is required (e.g.
     MorphOS/AmigaOS3).
 
-2007-07-04  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-07-04  Thore Böckelmann <tboeckel@gmx.de>
 
   * include/mccinit.c: put the StackSwapStruct structure on the stack to avoid
     crashes.
@@ -1909,14 +1909,14 @@ MUI TextEditor MCC class - ChangeLog
   * include/mccinit.c: updated to latest 1.2 version which fixes some library
     manager initialization issues.
 
-2007-06-25  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-06-25  Thore Böckelmann <tboeckel@gmx.de>
 
   * misc: the number of undo levels can now be set by the application. A value
     of zero means that undo/redo is completely disabled. It is also possible to
     disable undo/redo globally by setting the level to zero. This fulfils
     feature request #1479534.
 
-2007-06-20  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-06-20  Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/locale/french.ct: updated the french translation which kindly has been
     provided by Alexandre Balaban.
@@ -1928,7 +1928,7 @@ MUI TextEditor MCC class - ChangeLog
     handle a zero return value. This should e.g. fix an endless loop situation when
     tripleclicking on a line.
 
-2007-06-13  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-06-13  Thore Böckelmann <tboeckel@gmx.de>
 
   * #?/Debug.c: unified the _DPRINTF() functions for all platforms.
 
@@ -1948,7 +1948,7 @@ MUI TextEditor MCC class - ChangeLog
     class. This should significantly reduce the possibility of race conditions
     in the mcc/library init code.
 
-2007-05-29  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-05-29  Thore Böckelmann <tboeckel@gmx.de>
 
   * include/mccheader.c: reworked the LibOpen() and LibClose() functions to
     increment/decrement the lib_Open counter before obtaining the semaphore to
@@ -1964,7 +1964,7 @@ MUI TextEditor MCC class - ChangeLog
    * mcp/locale/dansk.ct: added new danish translation kindly provided by
      Niels Bache.
 
-2007-03-23  Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-03-23  Thore Böckelmann <tboeckel@gmx.de>
 
    * #?/Debug.c: fixed wrong final output of debug classes and flags.
 
@@ -1973,12 +1973,12 @@ MUI TextEditor MCC class - ChangeLog
    * mcp/locale/russian.ct: applied patch to russian catalog description
      updates, kindly provided by Vinny Vinogradov.
 
-2007-03-11 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-03-11 Thore Böckelmann <tboeckel@gmx.de>
 
    * #?/Debug.c: disabling a debug flag was not possible due to a check for the
      '!' at a wrong index.
 
-2007-03-10 PÃ¤r Boberg <pbobbenb@spray.se>
+2007-03-10 Pär Boberg <pbobbenb@spray.se>
 
    * mcp/locale/svenska.ct: Updated according to changes.
 
@@ -1997,7 +1997,7 @@ MUI TextEditor MCC class - ChangeLog
    * mcp/Makefile: added 'catalogs' target to Makefile so that catalogs can
      be generated on-the-fly more easily.
 
-2007-03-02 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-03-02 Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/locale/deutsch.ct: updated the german translation according to the
      latest changes.
@@ -2013,7 +2013,7 @@ MUI TextEditor MCC class - ChangeLog
    * mcp/CreatePrefsGroup.c: replaced compile time _ASSERT() with our new
      runtime ASSERT() in Debug.c,h.
 
-2007-02-28 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-02-28 Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/locale/deutsch.ct: fixed wrong warning text.
    * mcp/locale/deutsch.ct: added updated german translation. I hope this one
@@ -2023,7 +2023,7 @@ MUI TextEditor MCC class - ChangeLog
      possible to enter combinations of qualifiers and keys, because as soon as
      a qualifier was pressed the snopping was deactivated.
 
-2007-02-27 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-02-27 Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/KeyStorage.c: hotkey parsing doesn't use loops anymore to prevent un-
      predictable side effects. Also added some safety check before accessing
@@ -2040,7 +2040,7 @@ MUI TextEditor MCC class - ChangeLog
      contained a wrong indexing and therefore did select the wrong item in the
      poplist of the keybindings.
 
-2007-02-26 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-02-26 Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/Keybindings.c: changed all occurences of IEQUALIFIER_RSHIFT to
      IEQUALIFIER_SHIFT as it unnecessary to force the user to use a specific
@@ -2072,12 +2072,12 @@ MUI TextEditor MCC class - ChangeLog
      always word wrapping at the cursor position only. This should make the word
      wrapping behaviour more consistent.
 
-2007-02-18 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-02-18 Thore Böckelmann <tboeckel@gmx.de>
 
    * mcp/KeyStorage.c: key combinations like "shift up" were always converted
      to "shift right" because of a wrong index calculation.
 
-2007-01-29 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2007-01-29 Thore Böckelmann <tboeckel@gmx.de>
 
    * mcc/Dispatcher.c: the OM_NEW method must be handled before the instance
      data are retrieved, because nobody can predict what INST_DATA() will return
@@ -2111,7 +2111,7 @@ MUI TextEditor MCC class - ChangeLog
      session so that we finally can hunt down that "crashes on YAM startup" with
      TextEditor.mcc involved.
 
-2006-11-27 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2006-11-27 Thore Böckelmann <tboeckel@gmx.de>
 
    * mcc/EditorStuff.c: when pasting a clip which contained some colors or
      styles we trashed memory because the allocation was always 2 bytes too
@@ -2180,12 +2180,12 @@ MUI TextEditor MCC class - ChangeLog
      Dispatcher functions accordingly.
    * mcc/classact: removed unrequired subdir.
 
-2006-10-03 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2006-10-03 Thore Böckelmann <tboeckel@gmx.de>
 
    * misc: removed all that ClassAct stuff, as TextEditor.mcc is an MUI class
      only now.
 
-2006-10-03 Thore BÃ¶ckelmann <tboeckel@gmx.de>
+2006-10-03 Thore Böckelmann <tboeckel@gmx.de>
 
    * Debug.c: added new 'clipboard' debug class.
    * mcc/EditorStuff.c: fixed bug #1462840 by replacing the handcrafted IFF
