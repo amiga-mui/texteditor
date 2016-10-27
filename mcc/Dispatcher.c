@@ -52,6 +52,7 @@ void ResetDisplay(struct InstData *data)
 
   data->blockinfo.enabled = FALSE;
   data->visual_y = 1;
+  data->xpos = 0;
   data->CPos_X = 0;
   data->pixel_x = 0;
   data->actualline = GetFirstLine(&data->linelist);
@@ -60,6 +61,7 @@ void ResetDisplay(struct InstData *data)
   if(data->shown == TRUE)
   {
     data->totallines = CountLines(data, &data->linelist);
+    data->longestline = LongestLine(data);
     GetColor(data, data->CPos_X, data->actualline, &data->Pen);
     data->Flow = data->actualline->line.Flow;
     data->Separator = data->actualline->line.Separator;
@@ -72,6 +74,9 @@ void ResetDisplay(struct InstData *data)
       MUIA_TextEditor_Prop_Visible,     data->maxlines*data->fontheight,
       MUIA_TextEditor_Prop_First,       (data->visual_y-1)*data->fontheight,
       MUIA_TextEditor_Prop_DeltaFactor, data->fontheight,
+      MUIA_TextEditor_HSlider_Ent,      data->longestline,
+      MUIA_TextEditor_HSlider_Vis,      _mwidth(data->object),
+      MUIA_TextEditor_HSlider_Pos,      data->xpos,
       TAG_DONE);
     data->NoNotify = FALSE;
 
@@ -159,6 +164,7 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             setFlag(data->flags, FLG_ActiveOnClick);
             setFlag(data->flags, FLG_PasteStyles);
             setFlag(data->flags, FLG_PasteColors);
+            setFlag(data->flags, FLG_HScroll);
 
             #if defined(__amigaos3__) || defined(__amigaos4__)
             if(MUIMasterBase->lib_Version > 20 || (MUIMasterBase->lib_Version == 20 && MUIMasterBase->lib_Revision >= 5640))
@@ -190,6 +196,7 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             // they were set during OM_NEW
             mSet(cl, obj, (struct opSet *)msg);
             data->visual_y = 1;
+            data->xpos = 0;
 
             // start with an inactive cursor
             data->currentCursorState = CS_INACTIVE;
@@ -469,6 +476,7 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
   data->ypos        = _mtop(obj);
 
   data->totallines = CountLines(data, &data->linelist);
+  data->longestline = LongestLine(data);
 
   data->shown = TRUE;
   data->update = FALSE;
@@ -487,6 +495,16 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
                 * data->fontheight,
     MUIA_TextEditor_Prop_First,     (data->visual_y-1)*data->fontheight,
     MUIA_TextEditor_Prop_Visible,     data->maxlines*data->fontheight,
+    TAG_DONE);
+
+  SetAttrs(obj,
+    MUIA_TextEditor_HSlider_Ent,
+              (data->longestline - (LONG)(data->xpos) < _mwidth(obj)) ?
+               ((data->xpos) + _mwidth(obj)) :
+               ((_mwidth(obj) > data->longestline) ?
+                 _mwidth(obj) : data->longestline),
+    MUIA_TextEditor_HSlider_Pos, data->xpos,
+    MUIA_TextEditor_HSlider_Vis, _mwidth(obj),
     TAG_DONE);
 
   // initialize the doublebuffering rastport
@@ -799,6 +817,8 @@ DISPATCHER(_Dispatcher)
   LONG t_totallines;
   LONG t_visual_y;
   BOOL t_haschanged;
+  ULONG t_xpos;
+  LONG t_longestline;
   struct TEColor t_pen;
   BOOL areamarked;
   IPTR result = 0;
@@ -834,6 +854,8 @@ DISPATCHER(_Dispatcher)
   t_haschanged = data->HasChanged;
   t_pen = data->Pen;
   areamarked = Enabled(data);
+  t_xpos        = data->xpos;
+  t_longestline = data->longestline;
 
 //  D(DBF_STARTUP, "cont...");
 
@@ -898,6 +920,30 @@ DISPATCHER(_Dispatcher)
           (data->actualline != oldy) ? MUIA_TextEditor_CursorY : TAG_IGNORE, cposY,
           MUIA_TextEditor_CursorIndex, index,
           TAG_DONE);
+      }                                                                                      
+
+      if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
+      { 
+        /* If we are in the NoWrapMode and the cursor position changed horizontally
+           we should check if the cursor got out of gadget bounds and scroll it into view! */
+        if(data->CPos_X != oldx)
+          ScrollIntoView(data);
+
+        if(data->hslider)
+        { 
+          LONG prop_entries;
+          get(data->hslider, MUIA_Prop_Entries, &prop_entries);
+
+          if(prop_entries != data->longestline)
+          {
+            SetAttrs(data->object, MUIA_TextEditor_HSlider_Ent,
+                    (data->longestline - (LONG)(data->xpos) < _mwidth(obj)) ?
+                    ((data->xpos) + _mwidth(obj)) :
+                    ((_mwidth(obj) > data->longestline) ?
+                      _mwidth(obj) : data->longestline),
+                      TAG_DONE);
+          }
+        }
       }
 
       // if the HandleInput() function didn't return
@@ -932,6 +978,12 @@ DISPATCHER(_Dispatcher)
   if(t_haschanged != data->HasChanged)
     set(obj, MUIA_TextEditor_HasChanged, data->HasChanged);
 
+  if(data->ChangeEvent)
+  {
+    data->longestline = LongestLine(data);
+    data->ChangeEvent = FALSE;
+  }
+
   if(msg->MethodID == OM_SET)
   {
     ULONG newresult = DoSuperMethodA(cl, obj, msg);
@@ -956,6 +1008,24 @@ DISPATCHER(_Dispatcher)
                 * data->fontheight,
               MUIA_TextEditor_Prop_First, (data->visual_y-1)*data->fontheight,
               TAG_DONE);
+
+    // visual_y is changed it is best to recalculate longest visible line here
+    if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
+       data->longestline = LongestLine(data);
+  }
+
+  if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap && data->hslider)
+  {
+    if(data->xpos != t_xpos || data->longestline != t_longestline)
+    {
+      SetAttrs(obj, MUIA_TextEditor_HSlider_Ent,
+                 (data->longestline - (LONG)(data->xpos) < _mwidth(obj)) ?
+                  ((data->xpos) + _mwidth(obj)) :
+                  ((_mwidth(obj) > data->longestline) ?
+                    _mwidth(obj) : data->longestline),
+                MUIA_TextEditor_HSlider_Pos, data->xpos,
+                TAG_DONE);
+    }
   }
 
   data->NoNotify = TRUE;

@@ -146,6 +146,10 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     BOOL cursor = FALSE;
     struct TEColor textColor;
     struct TEColor highlightColor;
+    const LONG dleft  = (doublebuffer) ? 0 : _mleft(data->object);
+    const LONG dright = (doublebuffer) ? _mwidth(data->object) : _mright(data->object);
+    LONG o_width;
+    LONG pen_pos;
 
     if(data->rgbMode == TRUE)
     {
@@ -168,11 +172,12 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     if(doublebuffer == FALSE)
     {
       starty = data->ypos+(data->fontheight * (line_nr-1));
-      xoffset = _mleft(data->object);
+      xoffset = _mleft(data->object) - data->xpos;
     }
+    else
+      xoffset -= data->xpos;
 
     flow = FlowSpace(data, line->line.Flow, text+x);
-    Move(rp, xoffset+flow, starty+rp->TxBaseline);
 
     if(Enabled(data))
     {
@@ -223,6 +228,8 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       LONG blockwidth = 0;
       struct RastPort *old = _rp(data->object);
 
+      LONG clr_left, clr_width;
+
       if(startx < x+c_length && stopx > x)
       {
         if(startx > x)
@@ -230,7 +237,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         else
           startx = x;
 
-        blockwidth = ((stopx >= c_length+x) ? _mwidth(data->object)-(blockstart+flow) : TextLengthNew(&data->tmprp, text+startx, stopx-startx, data->TabSizePixels));
+        blockwidth = ((stopx >= c_length+x) ? _mwidth(data->object)-(blockstart+flow) + data->xpos : TextLengthNew(&data->tmprp, text+startx, stopx-startx, data->TabSizePixels));
       }
       else if(isFlagClear(data->flags, FLG_ReadOnly) &&
               isFlagClear(data->flags, FLG_Ghosted) &&
@@ -254,12 +261,18 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       SetDrMd(rp, JAM1);
       _rp(data->object) = rp;
 
-      // clear the background first
-      DoMethod(data->object, MUIM_DrawBackground, xoffset, starty,
-                                                  flow+blockstart, data->fontheight,
-                                                  isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mleft(data->object),
-                                                  isFlagSet(data->flags, FLG_InVGrp) ? data->fontheight*(data->visual_y+line_nr-2) : _mtop(data->object)+data->fontheight * (data->visual_y+line_nr-2),
-                                                  0);
+      clr_left  = dleft;
+      clr_width = MIN(flow+blockstart - data->xpos, (ULONG)_mwidth(data->object));
+                  
+      if(clr_width > 0)
+      {
+        // clear the background first
+        DoMethod(data->object, MUIM_DrawBackground, clr_left, starty,
+                                                    clr_width, data->fontheight,
+                                                    isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mleft(data->object),
+                                                    isFlagSet(data->flags, FLG_InVGrp) ? data->fontheight*(data->visual_y+line_nr-2) : _mtop(data->object)+data->fontheight * (data->visual_y+line_nr-2),
+                                                    0);
+      }
 
       if(blockwidth)
       {
@@ -286,55 +299,54 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         if(data->selectmode == 2 ||
            (flow && data->selectmode != 1 && startx-x == 0 && cursor == FALSE &&
             ((data->blockinfo.startline != data->blockinfo.stopline) || x > 0)))
-        {
-          LONG right = MIN(_mright(data->object), xoffset+flow+blockwidth-1);
+        {               
+          LONG left  = MIN(MAX(xoffset, dleft), dright);
+          LONG right = MIN(dright, xoffset+flow+blockwidth-1);
 
           SetAPen(rp, color);
-          RectFill(rp, xoffset, starty, right, starty+data->fontheight-1);
+          if (left < dright || right > dleft)
+            RectFill(rp, left, starty, right, starty+data->fontheight-1);
         }
         else
-        {
-          LONG right = MIN(_mright(data->object), xoffset+flow+blockstart+blockwidth-1);
-
+        {              
+          LONG left  = MIN(MAX(xoffset+flow+blockstart, dleft), dright);
+          LONG right = MIN(dright, xoffset+flow+blockstart+blockwidth-1);
+                       
           SetAPen(rp, cursor ? MUIPEN(data->cursorcolor) : color);
-          RectFill(rp, xoffset+flow+blockstart, starty, right, starty+data->fontheight-1);
-
-          // if the gadget is in inactive state we just draw a skeleton cursor instead
-          if(cursor == TRUE &&
-             isFlagClear(data->flags, FLG_Active) &&
-             isFlagClear(data->flags, FLG_Activated))
+          if(left < dright || right > dleft)
           {
-            DoMethod(data->object, MUIM_DrawBackground, xoffset+flow+blockstart+1, starty+1,
-                                                        blockwidth-2, data->fontheight-2,
-                                                        isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mleft(data->object),
-                                                        isFlagSet(data->flags, FLG_InVGrp) ? data->fontheight*(data->visual_y+line_nr-2) : _mtop(data->object)+data->fontheight * (data->visual_y+line_nr-2),
-                                                        0);
+            RectFill(rp, left, starty, right, starty+data->fontheight-1);
+
+            // if the gadget is in inactive state we just draw a skeleton cursor instead
+            if(cursor == TRUE &&
+               isFlagClear(data->flags, FLG_Active) &&
+               isFlagClear(data->flags, FLG_Activated))
+            {
+              DoMethod(data->object, MUIM_DrawBackground, left+1, starty+1,
+                                                          blockwidth-2, data->fontheight-2,
+                                                          isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mleft(data->object),
+                                                          isFlagSet(data->flags, FLG_InVGrp) ? data->fontheight*(data->visual_y+line_nr-2) : _mtop(data->object)+data->fontheight * (data->visual_y+line_nr-2),
+                                                          0);
+            }
           }
         }
       }
 
-
       {
-        LONG  x_start = xoffset+blockstart+blockwidth,
-            y_start = starty,
-            x_width = _mwidth(data->object)-(blockstart+blockwidth),
-            y_width = data->fontheight,
-            x_ptrn = blockstart+blockwidth,
-            y_ptrn = data->fontheight*(data->visual_y+line_nr-2);
+        LONG x_start = MAX(dleft, (blockwidth ? xoffset+blockstart+blockwidth+flow : xoffset+blockstart+blockwidth));
+        LONG y_start = starty;
+        LONG x_width = dright - x_start + 1;
+        LONG y_width = data->fontheight;
+        LONG x_ptrn = (blockwidth) ? (blockstart+blockwidth+flow) : (blockstart+blockwidth);
+        LONG y_ptrn = data->fontheight*(data->visual_y+line_nr-2);
 
-        if(blockwidth)
-        {
-          x_start += flow;
-          x_width -= flow;
-          x_ptrn += flow;
-        }
         if(isFlagClear(data->flags, FLG_InVGrp))
         {
           x_ptrn += _mleft(data->object);
           y_ptrn += _mtop(data->object);
         }
-
-        DoMethod(data->object, MUIM_DrawBackground, x_start, y_start, x_width, y_width, x_ptrn, y_ptrn, 0);
+        if(x_start < dright)
+          DoMethod(data->object, MUIM_DrawBackground, x_start, y_start, x_width, y_width, x_ptrn, y_ptrn, 0);
       }
       _rp(data->object) = old;
     }
@@ -344,11 +356,16 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
     SetColor(data, rp, line->line.Highlight ? &highlightColor : &textColor, FALSE, FALSE);
 
-    maxwidth = _mwidth(data->object) - flow;
+    pen_pos  = xoffset + flow;
+    o_width  = ((ULONG)flow > data->xpos ? 0 : data->xpos - flow);
+    maxwidth = data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap ?
+              (MIN((_mwidth(data->object) + data->xpos - flow + rp->TxWidth), (ULONG)TextLengthNew(rp, text+x, c_length, data->TabSizePixels))) :
+                    _mwidth(data->object) - flow; 
+
     while(c_length > 0)
     {
       LONG p_length = c_length;
-      struct TextExtent te;
+      struct TextExtentNew te;
 
       SetSoftStyle(rp, ConvertStyle(GetStyle(x, line)), AskSoftStyle(rp));
       if(styles != NULL)
@@ -391,28 +408,47 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         }
       }
 */
-
-      // check if there is space left to print some text
-      if(maxwidth > 0)
       {
-        // calculate how many character really fit in the remaining space
-        ULONG fitting = TextFitNew(rp, text+x, p_length, &te, NULL, 1, maxwidth, data->fontheight, data->TabSizePixels);
+        ULONG o_chars = 0;
+        LONG o_length = 0;
 
-        if(fitting > 0)
+        // calculate how many chars will be ommited from start because of xpos
+        if(o_width && pen_pos < dleft)
         {
-          if(text[x+fitting-1] < ' ')
-            TextNew(rp, text+x, fitting-1, data->TabSizePixels);
-          else
-            TextNew(rp, text+x, fitting, data->TabSizePixels);
+          o_chars   = TextFitNew(rp, text+x, p_length, &te, NULL, 1, o_width, data->fontheight, data->TabSizePixels);
+          o_length  = te.te_Width;
+          o_width  -= o_length;
+          maxwidth -= o_length;
+          pen_pos  += o_length;
         }
 
-        // adjust the available horizontal pixel space
-        maxwidth -= te.te_Width;
-      }
+        // set the rastport pen pos to appropriate coordinates
+        Move(rp, pen_pos, starty+rp->TxBaseline);
+        
+        // check if there is space left to print some text
+        if(maxwidth > 0)
+        {
+          // calculate how many characters really fit in the remaining space
+          ULONG fitting = TextFitNew(rp, text+x+o_chars, p_length - o_chars, &te, NULL, 1, maxwidth, data->fontheight, data->TabSizePixels);
 
-      // add the length calculated before no matter how many character really fitted
-      x += p_length;
-      c_length -= p_length;
+          if(fitting > 0)
+          {
+            if(text[x+o_chars+fitting-1] < ' ')
+              TextNew(rp, text+x+o_chars, fitting-1, data->TabSizePixels);
+            else
+              TextNew(rp, text+x+o_chars, fitting, data->TabSizePixels);
+
+            pen_pos += te.te_Width;
+          }
+
+          // adjust the available horizontal pixel space
+          maxwidth -= te.te_Width;
+        }
+
+        // add the length calculated before no matter how many character really fitted
+        x += p_length;
+        c_length -= p_length;
+      }
     }
     SetSoftStyle(rp, FS_NORMAL, AskSoftStyle(rp));
 
@@ -422,10 +458,12 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       LONG RightX, RightWidth;
       LONG Y, Height;
 
-      LeftX = xoffset;
-      LeftWidth = flow-3;
-      RightX = rp->cp_x+3;
-      RightWidth = xoffset+_mwidth(data->object) - RightX;
+      LeftX = dleft;
+      LeftWidth = flow - data->xpos - 3;
+      LeftWidth = LeftWidth < 0 ? 0 : LeftWidth;
+      RightX = pen_pos - _mleft(data->object) + 4;
+      RightX = RightX < dleft ? dleft : RightX;
+      RightWidth = dright > RightX ? dright - RightX : _mwidth(data->object);
       Y = starty;
       Height = isFlagSet(line->line.Separator, LNSF_Thick) ? 2 : 1;
 
@@ -491,7 +529,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     {
       if(line_nr == 1)
       {
-        BltBitMapRastPort(rp->BitMap, xoffset, _mtop(data->object)-data->ypos, data->rport, _mleft(data->object), _mtop(data->object)+(data->fontheight * (line_nr-1)), _mwidth(data->object), data->fontheight-(_mtop(data->object)-data->ypos), (ABC|ABNC));
+        BltBitMapRastPort(rp->BitMap, 0, _mtop(data->object)-data->ypos, data->rport, _mleft(data->object), _mtop(data->object)+(data->fontheight * (line_nr-1)), _mwidth(data->object), data->fontheight-(_mtop(data->object)-data->ypos), (ABC|ABNC));
       }
       else
       {
@@ -499,18 +537,18 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         {
           if(_mtop(data->object) != data->ypos)
           {
-            BltBitMapRastPort(rp->BitMap, xoffset, 0, data->rport, _mleft(data->object), data->ypos+(data->fontheight * (line_nr-1)), _mwidth(data->object), _mtop(data->object)-data->ypos, (ABC|ABNC));
+            BltBitMapRastPort(rp->BitMap, 0, 0, data->rport, _mleft(data->object), data->ypos+(data->fontheight * (line_nr-1)), _mwidth(data->object), _mtop(data->object)-data->ypos, (ABC|ABNC));
           }
         }
         else
         {
-          BltBitMapRastPort(rp->BitMap, xoffset, 0, data->rport, _mleft(data->object), data->ypos+(data->fontheight * (line_nr-1)), _mwidth(data->object), data->fontheight, (ABC|ABNC));
+          BltBitMapRastPort(rp->BitMap, 0, 0, data->rport, _mleft(data->object), data->ypos+(data->fontheight * (line_nr-1)), _mwidth(data->object), data->fontheight, (ABC|ABNC));
         }
       }
     }
   }
 
-  if(isFlagSet(data->flags, FLG_HScroll))
+  if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
     length = line->line.Length;
 
   RETURN(length);

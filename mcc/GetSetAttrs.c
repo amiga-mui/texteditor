@@ -67,7 +67,7 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       else
         cursor_width = data->CursorWidth;
 
-      xplace  = _mleft(obj) + TextLength(&data->tmprp, &line->line.Contents[x-pos.x], pos.x);
+      xplace  = _mleft(obj) - data->xpos + TextLength(&data->tmprp, &line->line.Contents[x-pos.x], pos.x);
       xplace += FlowSpace(data, line->line.Flow, &line->line.Contents[pos.bytes]);
       yplace  = data->ypos + (data->fontheight * (line_nr + pos.lines - 1));
 
@@ -138,9 +138,6 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
     case MUIA_TextEditor_HasChanged:
       ti_Data = data->HasChanged;
       break;
-    case MUIA_TextEditor_HorizontalScroll:
-      ti_Data = isFlagSet(data->flags, FLG_HScroll);
-      break;
     case MUIA_TextEditor_ImportWrap:
       ti_Data = data->ImportWrap;
       break;
@@ -159,6 +156,15 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       break;
     case MUIA_TextEditor_Prop_First:
       ti_Data = (data->visual_y-1)*data->fontheight;
+      break;
+    case MUIA_TextEditor_HSlider_Pos:
+      ti_Data = data->xpos;
+      break;
+    case MUIA_TextEditor_HSlider_Vis:
+      ti_Data = _mwidth(obj);
+      break;
+    case MUIA_TextEditor_HSlider_Ent:
+      ti_Data = data->longestline;
       break;
     case MUIA_TextEditor_ReadOnly:
       ti_Data = isFlagSet(data->flags, FLG_ReadOnly);
@@ -308,6 +314,9 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
         // make sure a possibly existing slider is disabled as well
         if(data->slider != NULL)
           set(data->slider, MUIA_Disabled, ti_Data);
+
+	if(data->hslider != NULL)
+          set(data->hslider, MUIA_Disabled, ti_Data);
       }
       break;
 
@@ -417,7 +426,6 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
                     MUI_EndRefresh(muiRenderInfo(obj), 0);
                   }
               }
-
               DumpText(data, data->visual_y, 0, lines, FALSE);
             }
             else
@@ -444,6 +452,26 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
                       data->totallines))
                     * data->fontheight,
                   TAG_DONE);
+
+        // visual_y is changed it is best re-calculate the longest visible line here
+        if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
+          data->longestline = LongestLine(data);
+      }                                                                            
+      break;
+
+      case MUIA_TextEditor_HSlider_Pos:
+      {
+        // If the gadget is NOT in NoWrapMode ignore this.
+        if(data->WrapMode != MUIV_TextEditor_WrapMode_NoWrap)
+          tag->ti_Tag = TAG_IGNORE;
+        else
+        {
+          if(data->shown == TRUE && isFlagSet(data->flags, FLG_HScroll))
+          {
+            data->xpos = ti_Data;
+            DumpText(data, data->visual_y, 0, data->maxlines, TRUE);
+          }
+        }
       }
       break;
 
@@ -557,6 +585,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           data->Pen = pen;
           AddColor(data, &data->blockinfo, &data->Pen);
           data->HasChanged = TRUE;
+          data->ChangeEvent = TRUE;
         }
       }
       break;
@@ -598,6 +627,52 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       }
       break;
 
+      case MUIA_TextEditor_HorizontalSlider:
+      {
+        if(ti_Data)
+        {
+          if(data->shown == FALSE)
+          {
+            data->hslider = (void *)ti_Data;
+
+            // disable the hslider right away if the texteditor
+            // gadget is disabled as well.
+            if(isFlagSet(data->flags, FLG_Ghosted))
+              set(data->hslider, MUIA_Disabled, TRUE);
+
+            // Set the gadget to be always scrollable when there is a H.scroller
+            setFlag(data->flags, FLG_HScroll);
+
+            DoMethod(data->hslider, MUIM_Notify,
+                MUIA_Prop_Release, MUIV_EveryTime,
+                obj, 3, MUIM_NoNotifySet, MUIA_TextEditor_Prop_Release, MUIV_TriggerValue);
+            DoMethod(data->hslider, MUIM_Notify,
+                MUIA_Prop_First, MUIV_EveryTime,
+                obj, 3, MUIM_NoNotifySet, MUIA_TextEditor_HSlider_Pos, MUIV_TriggerValue);
+            DoMethod(obj, MUIM_Notify,
+                MUIA_TextEditor_HSlider_Pos, MUIV_EveryTime,
+                data->hslider, 3, MUIM_NoNotifySet, MUIA_Prop_First, MUIV_TriggerValue);
+            DoMethod(obj, MUIM_Notify,
+                MUIA_TextEditor_HSlider_Ent, MUIV_EveryTime,
+                data->hslider, 3, MUIM_NoNotifySet, MUIA_Prop_Entries, MUIV_TriggerValue);
+            DoMethod(obj, MUIM_Notify,
+                MUIA_TextEditor_HSlider_Vis, MUIV_EveryTime,
+                data->hslider, 3, MUIM_NoNotifySet, MUIA_Prop_Visible, MUIV_TriggerValue);
+            DoMethod(obj, MUIM_Notify,
+                MUIA_TextEditor_Prop_DeltaFactor, MUIV_EveryTime,
+                data->hslider, 3, MUIM_NoNotifySet, MUIA_Prop_DeltaFactor, MUIV_TriggerValue);
+          }
+        }
+        else
+        {
+          clearFlag(data->flags, FLG_HScroll);
+          data->xpos = 0;
+          if(data->shown == TRUE)
+            DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
+        }
+      }
+      break;
+
       case MUIA_TextEditor_FixedFont:
       {
         if(data->shown == FALSE)
@@ -630,15 +705,6 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
         data->HasChanged = ti_Data;
         if(ti_Data == FALSE)
           clearFlag(data->flags, FLG_UndoLost);
-      }
-      break;
-
-      case MUIA_TextEditor_HorizontalScroll:
-      {
-        if(ti_Data)
-          setFlag(data->flags, FLG_HScroll);
-        else
-          clearFlag(data->flags, FLG_HScroll);
       }
       break;
 
@@ -735,6 +801,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
             lines = data->maxlines-(start-1);
           DumpText(data, data->visual_y+start-1, start-1, start-1+lines, TRUE);
           data->HasChanged = TRUE;
+          data->ChangeEvent = TRUE;
         }
       }
       break;

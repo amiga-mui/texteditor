@@ -82,6 +82,7 @@ static void MangleCharacters(struct InstData *data, char (*change)(char c))
   }
 
   data->HasChanged = TRUE;
+  data->ChangeEvent = TRUE;
   RedrawArea(data, _startx, _startline, stopx, stopline);
 
   LEAVE();

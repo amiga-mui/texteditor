@@ -140,10 +140,12 @@
                           (data)->selectmode == 3))
 
 
-// private/expermental attribute definitions
-#define MUIA_TextEditor_HorizontalScroll  (TextEditor_Dummy + 0x2d)
-#define MUIA_TextEditor_Prop_Release      (TextEditor_Dummy + 0x01)
-#define MUIA_TextEditor_PopWindow_Open    (TextEditor_Dummy + 0x03)
+// private/experimental attribute definitions
+#define MUIA_TextEditor_Prop_Release       (TextEditor_Dummy + 0x01)
+#define MUIA_TextEditor_PopWindow_Open     (TextEditor_Dummy + 0x03)
+#define MUIA_TextEditor_HSlider_Pos        (TextEditor_Dummy + 0x47)
+#define MUIA_TextEditor_HSlider_Vis        (TextEditor_Dummy + 0x48)
+#define MUIA_TextEditor_HSlider_Ent        (TextEditor_Dummy + 0x49)
 
 // special flagging macros
 #define setFlag(mask, flag)             (mask) |= (flag)               // set the flag "flag" in "mask"
@@ -319,9 +321,16 @@ struct Grow
   APTR pool;
 };
 
+struct TextExtentNew               // TextExtent struct in the Amiga API has UWORD type members
+{                                  // which easily overflow if the text passed is very long.
+    ULONG   te_Width;              // 
+    ULONG   te_Height;             // This new TextExtent structure has ULONG type members
+    struct Rect32 te_Extent;       // and is used by TextFitNew() function.
+};                                 // 
+
 struct InstData
 {
-  LONG    ypos;             // ypos of gadget
+  LONG    ypos;             // ypos of gadget ( _mtop(obj) )
   LONG    fontheight;       // font height
 
   LONG    CPos_X;           // Cursor x pos.
@@ -444,6 +453,16 @@ struct InstData
   enum CursorState currentCursorState;
 
   char **Keywords;
+
+  ULONG  xpos;            /* xpos of gadget (for horizontal scrolling)
+                             unlike visual_y this is a pixel value... */
+  LONG   longestline;     /* the length (in pixels) of the longest one of the lines displayed
+                             (this is used as the Prop_Entries value for the hslider) */
+  BOOL   ChangeEvent;     /* Everytime something is changed in the text, this will be set TRUE along with HasChanged
+                             then will be used as a notification to recalculate the longestline in the Dispatcher
+                             and immediately set back to FALSE */
+  Object *hslider;        // pointer to the horizontal scrollbar (if any).
+
 };
 
 // AllocBitMap.c
@@ -570,6 +589,8 @@ void DumpText(struct InstData *, LONG, LONG, LONG, BOOL);
 void GetLine(struct InstData *, LONG, struct pos_info *);
 LONG LineToVisual(struct InstData *, struct line_node *);
 LONG CountLines(struct InstData *, struct MinList *);
+LONG LongestLine(struct InstData *);
+void ScrollIntoView(struct InstData *);
 
 // Navigation.c
 void SetBookmark(struct InstData *, ULONG);
@@ -642,7 +663,7 @@ BOOL Redo(struct InstData *);
 
 // NewGfx.c
 LONG TextLengthNew(struct RastPort *rp, const char *string, ULONG count, LONG tabSizePixels);
-ULONG TextFitNew(struct RastPort *rp, const char *string, ULONG strLen, struct TextExtent *textExtent, const struct TextExtent *constrainingExtent, LONG strDirection, LONG constrainingBitWidth, LONG constrainingBitHeight, LONG tabSizePixels);
+ULONG TextFitNew(struct RastPort *rp, const char *string, ULONG strLen, struct TextExtentNew *textExtent, const struct TextExtent *constrainingExtent, LONG strDirection, LONG constrainingBitWidth, LONG constrainingBitHeight, LONG tabSizePixels);
 void TextNew(struct RastPort *rp, const char *string, ULONG count, LONG tabSizePixels);
 
 #if !defined(__amigaos4__) && !defined(__MORPHOS__) && !defined(__AROS__)
