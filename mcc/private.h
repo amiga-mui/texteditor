@@ -146,11 +146,11 @@
 #define MUIA_TextEditor_HSlider_Pos        (TextEditor_Dummy + 0x47)
 #define MUIA_TextEditor_HSlider_Vis        (TextEditor_Dummy + 0x48)
 #define MUIA_TextEditor_HSlider_Ent        (TextEditor_Dummy + 0x49)
-#define MUIA_TextEditor_Slider_Behaviour   (TextEditor_Dummy + 0x50)
+// #define MUIA_TextEditor_Slider_Behaviour   (TextEditor_Dummy + 0x50)
 
 // private/experimental attribute values
-#define MUIV_TextEditor_Slider_Standard    0x00000000UL
-#define MUIV_TextEditor_Slider_MUI         0x00000001UL
+// #define MUIV_TextEditor_Slider_Standard    0x00000000UL
+// #define MUIV_TextEditor_Slider_MUI         0x00000001UL
 
 // special flagging macros
 #define setFlag(mask, flag)             (mask) |= (flag)               // set the flag "flag" in "mask"
@@ -468,7 +468,10 @@ struct InstData
                              then will be used as a notification to recalculate the longestline in the Dispatcher
                              and immediately set back to FALSE */
   Object *hslider;        // pointer to the horizontal scrollbar (if any).
-  ULONG  SliderBehaviour; // MUIV_TextEditor_Slider_Standard or MUIV_TextEditor_Slider_MUI
+
+//ULONG  SliderBehaviour; // Makes horizontal scrollers behave the way they behave in NList class gadgets.
+                          // This feature is currently disabled! To re-enable it search "Behaviour" phrase inside:
+                          // this file, Dispatcher.c, GetSetAttrs.c, MixedFunctions.c and un-comment related sections.
 };
 
 // AllocBitMap.c

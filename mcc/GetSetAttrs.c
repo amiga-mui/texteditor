@@ -673,9 +673,9 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       }
       break;
 
-      case MUIA_TextEditor_Slider_Behaviour:
+  /*  case MUIA_TextEditor_Slider_Behaviour:
         data->SliderBehaviour = ti_Data;
-      break;
+      break;                                 */
 
       case MUIA_TextEditor_FixedFont:
       {
