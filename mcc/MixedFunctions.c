@@ -810,14 +810,21 @@ LONG LongestLine(struct InstData *data)
   /* Since this function will be only used in NoWrapMode and
      in that mode line_nr's will always match the real lines
      we can find the top (real) line just by traversing the list */
-  while(line != NULL && line_nr != data->visual_y - 1)
-  {
-    line = GetNextLine(line);
-    line_nr++;
-  }
 
-  // Calculate the line_nr of the last line displayed
-  last_line = line_nr + data->maxlines - 1;
+  // Skip to first displayed line if SliderBehaviour is MUI
+  if(data->SliderBehaviour == MUIV_TextEditor_Slider_MUI)
+  {
+    while(line != NULL && line_nr != data->visual_y - 1)
+    {
+      line = GetNextLine(line);
+      line_nr++;
+    }
+
+    // Calculate the line_nr of the last line displayed
+    last_line = line_nr + data->maxlines - 1;
+  }
+  else
+    last_line = data->totallines -1;
 
   /* We found the top line displayed. Now we'll traverse until the
      last displayed line meanwhile calculating their pixel lengths */

@@ -61,7 +61,7 @@ void ResetDisplay(struct InstData *data)
   if(data->shown == TRUE)
   {
     data->totallines = CountLines(data, &data->linelist);
-    data->longestline = LongestLine(data);
+    data->longestline = data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap ? LongestLine(data) : _mwidth(data->object);
     GetColor(data, data->CPos_X, data->actualline, &data->Pen);
     data->Flow = data->actualline->line.Flow;
     data->Separator = data->actualline->line.Separator;
@@ -158,6 +158,7 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             data->GlobalTabSize = 4; // default to 4 spaces per TAB
             data->TabSizePixels = 4*8; // assume a fixed space width of 8 pixels per default
             data->ConvertTabs = TRUE; // convert tab to spaces per default
+            data->SliderBehaviour = MUIV_TextEditor_Slider_Standard;
 
             data->ExportHook = &ExportHookPlain;
             setFlag(data->flags, FLG_AutoClip);
@@ -978,7 +979,7 @@ DISPATCHER(_Dispatcher)
   if(t_haschanged != data->HasChanged)
     set(obj, MUIA_TextEditor_HasChanged, data->HasChanged);
 
-  if(data->ChangeEvent)
+  if(data->ChangeEvent && data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
   {
     data->longestline = LongestLine(data);
     data->ChangeEvent = FALSE;
@@ -1010,7 +1011,7 @@ DISPATCHER(_Dispatcher)
               TAG_DONE);
 
     // visual_y is changed it is best to recalculate longest visible line here
-    if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
+    if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap && data->SliderBehaviour == MUIV_TextEditor_Slider_MUI)
        data->longestline = LongestLine(data);
   }
 
