@@ -359,7 +359,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     pen_pos  = xoffset + flow;
     o_width  = ((ULONG)flow > data->xpos ? 0 : data->xpos - flow);
     maxwidth = data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap ?
-              (MIN((_mwidth(data->object) + data->xpos - flow + rp->TxHeight), (ULONG)TextLengthNew(rp, text+x, c_length, data->TabSizePixels)))+1 :
+              (MIN((_mwidth(data->object) + data->xpos - flow + rp->TxHeight), (ULONG)TextLengthNew(rp, text+x, c_length, data->TabSizePixels))) + 1 :
                     _mwidth(data->object) - flow; 
 
     while(c_length > 0)
@@ -443,7 +443,8 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
             {
               pen_pos += te.te_Width;
               x += p_length;
-            break;
+
+              break;
             }
 
             pen_pos += te.te_Width;
