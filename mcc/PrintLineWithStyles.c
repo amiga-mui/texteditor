@@ -359,7 +359,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     pen_pos  = xoffset + flow;
     o_width  = ((ULONG)flow > data->xpos ? 0 : data->xpos - flow);
     maxwidth = data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap ?
-              (MIN((_mwidth(data->object) + data->xpos - flow + rp->TxWidth), (ULONG)TextLengthNew(rp, text+x, c_length, data->TabSizePixels))) :
+              (MIN((_mwidth(data->object) + data->xpos - flow + rp->TxHeight), (ULONG)TextLengthNew(rp, text+x, c_length, data->TabSizePixels)))+1 :
                     _mwidth(data->object) - flow; 
 
     while(c_length > 0)
@@ -438,11 +438,19 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
             else
               TextNew(rp, text+x+o_chars, fitting, data->TabSizePixels);
 
+            // immediately bail out if end of line is reached
+            if(p_length +1 == length)
+            {
+              pen_pos += te.te_Width;
+              x += p_length;
+            break;
+            }
+
             pen_pos += te.te_Width;
           }
 
           // adjust the available horizontal pixel space
-          maxwidth -= te.te_Width;
+          maxwidth = fitting < (p_length - o_chars) ? 0 : maxwidth - te.te_Width;
         }
 
         // add the length calculated before no matter how many character really fitted
@@ -461,7 +469,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       LeftX = dleft;
       LeftWidth = flow - data->xpos - 3;
       LeftWidth = LeftWidth < 0 ? 0 : LeftWidth;
-      RightX = pen_pos - _mleft(data->object) + 4;
+      RightX = pen_pos + 3;
       RightX = RightX < dleft ? dleft : RightX;
       RightWidth = dright > RightX ? dright - RightX : _mwidth(data->object);
       Y = starty;
