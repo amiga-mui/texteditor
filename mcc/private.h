@@ -454,7 +454,7 @@ struct InstData
 
   char **Keywords;
 
-  ULONG  xpos;            /* xpos of gadget (for horizontal scrolling)
+  LONG   xpos;            /* xpos of gadget (for horizontal scrolling)
                              unlike visual_y this is a pixel value... */
   LONG   longestline;     /* the length (in pixels) of the longest one of the lines displayed
                              (this is used as the Prop_Entries value for the hslider)

@@ -262,14 +262,14 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       _rp(data->object) = rp;
 
       clr_left  = dleft;
-      clr_width = MIN(flow+blockstart - data->xpos, (ULONG)_mwidth(data->object));
+      clr_width = MIN(flow+blockstart - data->xpos, _mwidth(data->object));
                   
       if(clr_width > 0)
       {
         // clear the background first
         DoMethod(data->object, MUIM_DrawBackground, clr_left, starty,
                                                     clr_width, data->fontheight,
-                                                    isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mleft(data->object),
+                                                    isFlagSet(data->flags, FLG_InVGrp) ? data->xpos : _mleft(data->object) + data->xpos,
                                                     isFlagSet(data->flags, FLG_InVGrp) ? data->fontheight*(data->visual_y+line_nr-2) : _mtop(data->object)+data->fontheight * (data->visual_y+line_nr-2),
                                                     0);
       }
@@ -324,8 +324,8 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
             {
               DoMethod(data->object, MUIM_DrawBackground, left+1, starty+1,
                                                           blockwidth-2, data->fontheight-2,
-                                                          isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mleft(data->object),
-                                                          isFlagSet(data->flags, FLG_InVGrp) ? data->fontheight*(data->visual_y+line_nr-2) : _mtop(data->object)+data->fontheight * (data->visual_y+line_nr-2),
+                                                          isFlagSet(data->flags, FLG_InVGrp) ? data->xpos + 1 : _mleft(data->object) + data->xpos + 1,
+                                                          isFlagSet(data->flags, FLG_InVGrp) ? data->fontheight*(data->visual_y+line_nr-2) + 1 : _mtop(data->object)+data->fontheight * (data->visual_y+line_nr-2) + 1,
                                                           0);
             }
           }
@@ -337,7 +337,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         LONG y_start = starty;
         LONG x_width = dright - x_start + 1;
         LONG y_width = data->fontheight;
-        LONG x_ptrn = (blockwidth) ? (blockstart+blockwidth+flow) : (blockstart+blockwidth);
+        LONG x_ptrn = (blockwidth && x_start != dleft) ? (blockstart+blockwidth+flow) : data->xpos;
         LONG y_ptrn = data->fontheight*(data->visual_y+line_nr-2);
 
         if(isFlagClear(data->flags, FLG_InVGrp))
@@ -357,11 +357,11 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     SetColor(data, rp, line->line.Highlight ? &highlightColor : &textColor, FALSE, FALSE);
 
     pen_pos  = xoffset + flow;
-    o_width  = ((ULONG)flow > data->xpos ? 0 : data->xpos - flow);
+    o_width  = (flow > data->xpos ? 0 : data->xpos - flow);
     maxwidth = data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap ?
-              (MIN((_mwidth(data->object) + data->xpos - flow + rp->TxHeight), (ULONG)TextLengthNew(rp, text+x, c_length, data->TabSizePixels))) + 1 :
+              (MIN((_mwidth(data->object) + data->xpos - flow + rp->TxHeight), TextLengthNew(rp, text+x, c_length, data->TabSizePixels))) + 1 :
                     _mwidth(data->object) - flow; 
-
+               
     while(c_length > 0)
     {
       LONG p_length = c_length;

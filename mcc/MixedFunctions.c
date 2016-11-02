@@ -497,6 +497,11 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
     yplace  = data->ypos + (data->fontheight * (line_nr + pos.lines - 1));
     cursorxplace = xplace + TextLengthNew(&data->tmprp, &line->line.Contents[x+start], 0-start, data->TabSizePixels);
 
+    // do not do any draw operations if in NoWrap mode and the cursor is out of field of view (even partially)
+    if (data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
+      if (cursorxplace < _mleft(data->object) || (cursorxplace + cursor_width) > _mright(data->object))
+        return;
+
     //D(DBF_STARTUP, "xplace: %ld, yplace: %ld cplace: %ld, innerwidth: %ld width: %ld %ld", xplace, yplace, cursorxplace, _mwidth(data->object), _width(data->object), _mleft(data->object));
 
     if((data->font->tf_Flags & FPF_PROPORTIONAL) || data->WrapMode != MUIV_TextEditor_WrapMode_NoWrap)
@@ -511,8 +516,8 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
       DoMethod(data->object, MUIM_DrawBackground, xplace, yplace,
                                                   TextLengthNew(&data->tmprp, start == 0 ? (STRPTR)chars+1 : (STRPTR)chars, stop-start+1, data->TabSizePixels),
                                                   data->fontheight,
-                                                  cursorxplace - (isFlagSet(data->flags, FLG_InVGrp) ? _mleft(data->object) : 0),
-                                                  (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mtop(data->object)) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
+                                                  isFlagSet(data->flags, FLG_InVGrp) ? xplace + data->xpos - _mleft(data->object) : xplace + data->xpos,
+                                                  isFlagSet(data->flags, FLG_InVGrp) ? data->fontheight*(data->visual_y+line_nr+pos.lines-2) : _mtop(data->object) + data->fontheight*(data->visual_y+line_nr+pos.lines-2),
                                                   0);
 
       if(Set == TRUE ||
@@ -621,7 +626,8 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
   struct pos_info pos;
   struct line_node *line;
   LONG x;
-  BOOL drawbottom = (visual_y + (lines-line_nr) - 1) > data->totallines;
+  LONG y_smoothFix = _mtop(data->object) - data->ypos;
+  BOOL drawbottom = ((data->maxlines * data->fontheight) < _mheight(data->object) && y_smoothFix == 0) || (visual_y + lines - line_nr - 1) > data->totallines;
 
   ENTER();
 
@@ -650,15 +656,17 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
       x = 0;
     }
 
-    if(drawbottom && (data->maxlines > (data->totallines-data->visual_y+1)))
-    {
+    if(drawbottom)
+    {                              
+      LONG start_y = data->ypos + (MIN((data->totallines - data->visual_y + 1), data->maxlines))*data->fontheight;
+
       DoMethod(data->object, MUIM_DrawBackground,
             _mleft(data->object),
-            data->ypos+((data->totallines-data->visual_y+1)*data->fontheight),
+            start_y,
             _mwidth(data->object),
-            (data->maxlines*data->fontheight) - ((data->totallines-data->visual_y+1)*data->fontheight),
-            (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mleft(data->object)),
-            (isFlagSet(data->flags, FLG_InVGrp) ? 0 : _mtop(data->object)) + data->totallines*data->fontheight,
+            _mbottom(data->object) - start_y + 1,
+            isFlagSet(data->flags, FLG_InVGrp) ? data->xpos : _mleft(data->object) + data->xpos,
+            isFlagSet(data->flags, FLG_InVGrp) ? start_y - _mtop(data->object) + (data->visual_y - 1)*data->fontheight + y_smoothFix : start_y + (data->visual_y - 1)*data->fontheight + y_smoothFix,
             0);
 
       if(isFlagSet(data->flags, FLG_Ghosted) && isFlagClear(data->flags, FLG_MUI4))
@@ -680,9 +688,9 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
         SetAfPt(data->rport, newPattern, 1);
         RectFill(data->rport,
               _mleft(data->object),
-              data->ypos+((data->totallines-data->visual_y+1)*data->fontheight),
+              start_y,
               _mright(data->object),
-              data->ypos+((data->totallines-data->visual_y+1)*data->fontheight)+(data->maxlines*data->fontheight) - ((data->totallines-data->visual_y+1)*data->fontheight)-1);
+              _mbottom(data->object));
         SetAfPt(data->rport, NULL, (UBYTE)-1);
       }
     }
@@ -853,12 +861,12 @@ void ScrollIntoView(struct InstData *data)
 
   xmax = xmin + cursor_width;
 
-  if(xmin < (LONG)data->xpos)
+  if(xmin < data->xpos)
   {
     data->xpos = xmin;
     DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
   }
-  else if (xmax > (LONG)(data->xpos + _mwidth(data->object)))
+  else if (xmax > (data->xpos + _mwidth(data->object)))
   {
     data->xpos = xmax - _mwidth(data->object);
     DumpText(data, data->visual_y, 0, data->maxlines, FALSE);

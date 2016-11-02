@@ -378,14 +378,14 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
             data->scr_direction = 0;
 
           oldhook = InstallLayerHook(data->rport->Layer, LAYERS_NOBACKFILL);
-          cliphandle = MUI_AddClipping(muiRenderInfo(obj), _mleft(obj), _mtop(obj), _mwidth(obj), data->maxlines*data->fontheight);
+          cliphandle = MUI_AddClipping(muiRenderInfo(obj), _mleft(obj), _mtop(obj), _mwidth(obj), _mheight(obj));
           if(smooth > 0 && smooth < data->maxlines*data->fontheight)
           {
             LONG line_nr;
 
             ScrollRasterBF(data->rport, 0, smooth,
                           _mleft(obj), _mtop(obj),
-                          _mright(obj), _mtop(obj) + (data->maxlines * data->fontheight) - 1);
+                          _mright(obj), _mbottom(obj));
 
             data->ypos = _mtop(obj) - ti_Data%data->fontheight;
             line_nr = data->maxlines-(smooth/data->fontheight)-1;
@@ -403,7 +403,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
               }
             }
 
-            DumpText(data, data->visual_y+line_nr, line_nr, data->maxlines+1, FALSE);
+            DumpText(data, data->visual_y+line_nr, line_nr, data->maxlines+2, FALSE);
           }
           else
           {
@@ -413,9 +413,11 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 
               ScrollRasterBF(data->rport, 0, smooth,
                             _mleft(obj), _mtop(obj),
-                            _mright(obj), _mtop(obj) + (data->maxlines * data->fontheight) - 1);
+                            _mright(obj), _mbottom(obj));
+
               data->ypos = _mtop(obj) - ti_Data%data->fontheight;
               lines = (-smooth/data->fontheight)+2;
+
               {
                 struct Layer *layer = data->rport->Layer;
 
@@ -426,6 +428,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
                     MUI_EndRefresh(muiRenderInfo(obj), 0);
                   }
               }
+
               DumpText(data, data->visual_y, 0, lines, FALSE);
             }
             else
@@ -453,9 +456,9 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
                     * data->fontheight,
                   TAG_DONE);
 
-        // visual_y is changed it is best re-calculate the longest visible line here
+/*   // visual_y is changed it is best re-calculate the longest visible line here
         if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
-          data->longestline = LongestLine(data);
+          data->longestline = LongestLine(data); */
       }                                                                            
       break;
 
