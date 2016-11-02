@@ -360,8 +360,8 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     o_width  = (flow > data->xpos ? 0 : data->xpos - flow);
     maxwidth = data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap ?
               (MIN((_mwidth(data->object) + data->xpos - flow + rp->TxHeight), TextLengthNew(rp, text+x, c_length, data->TabSizePixels))) + 1 :
-                    _mwidth(data->object) - flow; 
-               
+                    _mwidth(data->object) - flow;
+
     while(c_length > 0)
     {
       LONG p_length = c_length;
