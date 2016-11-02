@@ -498,8 +498,8 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
     cursorxplace = xplace + TextLengthNew(&data->tmprp, &line->line.Contents[x+start], 0-start, data->TabSizePixels);
 
     // do not do any draw operations if in NoWrap mode and the cursor is out of field of view (even partially)
-    if (data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
-      if (cursorxplace < _mleft(data->object) || (cursorxplace + cursor_width) > _mright(data->object))
+    if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
+      if(cursorxplace < _mleft(data->object) || (cursorxplace + cursor_width) > _mright(data->object))
         return;
 
     //D(DBF_STARTUP, "xplace: %ld, yplace: %ld cplace: %ld, innerwidth: %ld width: %ld %ld", xplace, yplace, cursorxplace, _mwidth(data->object), _width(data->object), _mleft(data->object));
@@ -866,7 +866,7 @@ void ScrollIntoView(struct InstData *data)
     data->xpos = xmin;
     DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
   }
-  else if (xmax > (data->xpos + _mwidth(data->object)))
+  else if(xmax > (data->xpos + _mwidth(data->object)))
   {
     data->xpos = xmax - _mwidth(data->object);
     DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
