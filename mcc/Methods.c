@@ -387,7 +387,11 @@ IPTR mInputTrigger(struct IClass *cl, Object *obj, UNUSED Msg msg)
       data->NoNotify = TRUE;
 
       if(data->CPos_X != oldCPos_X)
+      {
         set(obj, MUIA_TextEditor_CursorX, data->CPos_X);
+        if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
+          ScrollIntoView(data);
+      }
 
       if(data->actualline != oldactualline)
         set(obj, MUIA_TextEditor_CursorY, LineNr(data, data->actualline)-1);
