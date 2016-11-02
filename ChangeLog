@@ -2,6 +2,16 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2016-11-03 Alper Sönmez <amithlondestek@gmail.com>
+
+  * mcc/Methods.c: horizontal autoscroll when block marking implemented.
+
+  * mcc/private.h, mcc/GetSetAttrs.c, mcc/Dispatcher.c,
+    mcc/MixedFunctions.c, mcc/PrintLinesWithStyles.c:
+    - Correct horizontal pattern calculations and scroll implementations.
+    - Graphic glithces at the bottom of the gadget removed.
+    - data->xpos made LONG and typecasts removed.
+ 
 2016-10-27 Alper Sönmez <amithlondestek@gmail.com>
 
   * mcc/CaseConversion.c, mcc/ColorOperators.c, mcc/Dispatcher.c, 
