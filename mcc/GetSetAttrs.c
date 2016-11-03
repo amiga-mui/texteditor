@@ -419,12 +419,11 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
               data->ypos = _mtop(obj) - ti_Data%data->fontheight;
               lines = (-smooth/data->fontheight)+2;
 
-              if(layer->DamageList && layer->DamageList->RegionRectangle)
-                if(MUI_BeginRefresh(muiRenderInfo(obj),0))
-                {
-                  MUI_Redraw(obj, MADF_DRAWOBJECT);
-                  MUI_EndRefresh(muiRenderInfo(obj), 0);
-                }
+              if(layer->DamageList && layer->DamageList->RegionRectangle && MUI_BeginRefresh(muiRenderInfo(obj),0))
+              {
+                MUI_Redraw(obj, MADF_DRAWOBJECT);
+                MUI_EndRefresh(muiRenderInfo(obj), 0);
+              }
 
               DumpText(data, data->visual_y, 0, lines, FALSE);
             }
