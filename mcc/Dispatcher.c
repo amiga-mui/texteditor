@@ -509,8 +509,7 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
 
   // initialize the doublebuffering rastport
   bmwidth = _mwidth(obj)+((data->fontheight-data->font->tf_Baseline+1)>>1)+1;
-  bmheight = _mheight(obj) + _mheight(obj) + _mheight(obj) ;
-//  bmheight = data->fontheight;
+  bmheight = data->fontheight;
   if((data->doublebuffer = MUIG_AllocBitMap(bmwidth, bmheight, GetBitMapAttr(data->rport->BitMap, BMA_DEPTH), (BMF_CLEAR | BMF_INTERLEAVED), data->rport->BitMap)) != NULL)
   {
     struct Layer_Info *li;
