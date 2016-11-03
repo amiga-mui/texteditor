@@ -409,6 +409,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           {
             if(smooth < 0 && -smooth < data->maxlines*data->fontheight)
             {
+              struct Layer *layer = data->rport->Layer;
               LONG lines;
 
               ScrollRasterBF(data->rport, 0, smooth,
@@ -418,16 +419,12 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
               data->ypos = _mtop(obj) - ti_Data%data->fontheight;
               lines = (-smooth/data->fontheight)+2;
 
-              {
-                struct Layer *layer = data->rport->Layer;
-
-                if(layer->DamageList && layer->DamageList->RegionRectangle)
-                  if(MUI_BeginRefresh(muiRenderInfo(obj),0))
-                  {
-                    MUI_Redraw(obj, MADF_DRAWOBJECT);
-                    MUI_EndRefresh(muiRenderInfo(obj), 0);
-                  }
-              }
+              if(layer->DamageList && layer->DamageList->RegionRectangle)
+                if(MUI_BeginRefresh(muiRenderInfo(obj),0))
+                {
+                  MUI_Redraw(obj, MADF_DRAWOBJECT);
+                  MUI_EndRefresh(muiRenderInfo(obj), 0);
+                }
 
               DumpText(data, data->visual_y, 0, lines, FALSE);
             }
@@ -455,10 +452,6 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
                       data->totallines))
                     * data->fontheight,
                   TAG_DONE);
-
-/*   // visual_y is changed it is best re-calculate the longest visible line here
-        if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
-          data->longestline = LongestLine(data); */
       }                                                                            
       break;
 

@@ -607,14 +607,6 @@ static IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
     ScrollIntoDisplay(data);
     data->update = TRUE;
 */
-/*
-    // we clear the very last part of the gadget
-    // content at the very bottom because that one will not be
-    // automatically cleared by PrintLine() later on
-    DoMethod(obj, MUIM_DrawBackground, _mleft(obj), _mtop(obj)+(data->fontheight * (data->maxlines)),
-                                       _mwidth(obj), (_mheight(obj)-(data->fontheight * (data->maxlines))),
-                                       _mleft(obj), _mtop(obj), 0);
-*/
     // dump all text now
     DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
 
