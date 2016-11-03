@@ -476,7 +476,7 @@ static IPTR mShow(struct IClass *cl, Object *obj, Msg msg)
   data->ypos        = _mtop(obj);
 
   data->totallines = CountLines(data, &data->linelist);
-  data->longestline = LongestLine(data);
+  data->longestline = data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap ? LongestLine(data) : _mwidth(data->object);
 
   data->shown = TRUE;
   data->update = FALSE;
@@ -607,14 +607,6 @@ static IPTR mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
     ScrollIntoDisplay(data);
     data->update = TRUE;
 */
-
-    // we clear the very last part of the gadget
-    // content at the very bottom because that one will not be
-    // automatically cleared by PrintLine() later on
-    DoMethod(obj, MUIM_DrawBackground, _mleft(obj), _mtop(obj)+(data->fontheight * (data->maxlines)),
-                                       _mwidth(obj), (_mheight(obj)-(data->fontheight * (data->maxlines))),
-                                       _mleft(obj), _mtop(obj), 0);
-
     // dump all text now
     DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
 
@@ -817,7 +809,7 @@ DISPATCHER(_Dispatcher)
   LONG t_totallines;
   LONG t_visual_y;
   BOOL t_haschanged;
-  ULONG t_xpos;
+  LONG t_xpos;
   LONG t_longestline;
   struct TEColor t_pen;
   BOOL areamarked;
@@ -1015,7 +1007,7 @@ DISPATCHER(_Dispatcher)
     if(data->xpos != t_xpos || data->longestline != t_longestline)
     {
       SetAttrs(obj, MUIA_TextEditor_HSlider_Ent,
-                 (data->longestline - (LONG)(data->xpos) < _mwidth(obj)) ?
+                 (data->longestline - data->xpos < _mwidth(obj)) ?
                   ((data->xpos) + _mwidth(obj)) :
                   ((_mwidth(obj) > data->longestline) ?
                     _mwidth(obj) : data->longestline),
