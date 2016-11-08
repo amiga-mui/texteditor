@@ -27,6 +27,7 @@ Its main features are:
 * Ability to have a bitmap as a background
 * Support for proportional fonts with floating word wrap, as well as antialiased fonts
 * Pixel smooth scrolling
+* Possibility to attach a horizontal- and vertical scroll bar
 * AREXX interface for scripted programming
 
 ## Downloads/Releases
@@ -73,6 +74,7 @@ See [COPYING](COPYING) for more detailed information.
 ## Authors
 
 * Allan Odgaard
+* Alper Sönmez
 * Gianfranco Gignina
 * Ilkka Lehtoranta
 * Jens Maus
