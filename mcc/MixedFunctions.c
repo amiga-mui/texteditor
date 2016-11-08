@@ -467,7 +467,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
   line_nr = LineToVisual(data, line) - 1;
   OffsetToLines(data, x, line, &pos);
 
-  if(line_nr + pos.lines <= data->maxlines && line_nr + pos.lines > 0)
+  if(line_nr + pos.lines <= data->maxlines+1 && line_nr + pos.lines > 0)
   {
     for(c = -1; c < 2; c++)
     {
@@ -497,10 +497,16 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
     yplace  = data->ypos + (data->fontheight * (line_nr + pos.lines - 1));
     cursorxplace = xplace + TextLengthNew(&data->tmprp, &line->line.Contents[x+start], 0-start, data->TabSizePixels);
 
-    // do not do any draw operations if in NoWrap mode and the cursor is out of field of view (even partially)
+    // do not do draw operations under some contitions if in NoWrap mode 
     if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
-      if(cursorxplace < _mleft(data->object) || (cursorxplace + cursor_width) > _mright(data->object))
+    {
+      // do not draw the cursor if it is not in the field of view (even partially)
+      if(Set == TRUE && (cursorxplace < _mleft(data->object) || (cursorxplace + cursor_width - 1) > _mright(data->object)))
         return;
+      // do not clear the cursor it is not in the field of view (totally)
+      else if(Set == FALSE && ((cursorxplace + cursor_width - 1) < _mleft(data->object) || cursorxplace > _mright(data->object)))
+        return;
+    }
 
     //D(DBF_STARTUP, "xplace: %ld, yplace: %ld cplace: %ld, innerwidth: %ld width: %ld %ld", xplace, yplace, cursorxplace, _mwidth(data->object), _width(data->object), _mleft(data->object));
 
@@ -627,9 +633,15 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
   struct line_node *line;
   LONG x;
   LONG y_smoothFix = _mtop(data->object) - data->ypos;
-  BOOL drawbottom = ((data->maxlines * data->fontheight) < _mheight(data->object) && y_smoothFix == 0) || (visual_y + lines - line_nr - 1) > data->totallines;
+  BOOL drawbottom;
 
   ENTER();
+
+  // if the gadget height is not proportional to fontheight print one more line to be partially visible at the bottom
+  if((data->maxlines * data->fontheight) < _mheight(data->object))
+    lines++;
+
+  drawbottom = (visual_y + lines - line_nr - 1) > data->totallines;
 
   if(data->update == TRUE && data->shown == TRUE && isFlagClear(data->flags, FLG_Quiet))
   {
@@ -637,7 +649,7 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
     line = pos.line;
     x = pos.x;
 
-    if(lines-line_nr < 3 || doublebuffer == TRUE)
+    if(doublebuffer == TRUE || lines-line_nr < 3 || lines > data->maxlines)
     {
       doublebuffer = TRUE;
     }

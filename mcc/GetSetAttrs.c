@@ -403,7 +403,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
               }
             }
 
-            DumpText(data, data->visual_y+line_nr, line_nr, data->maxlines+2, FALSE);
+            DumpText(data, data->visual_y+line_nr, line_nr, data->maxlines+1, FALSE);
           }
           else
           {

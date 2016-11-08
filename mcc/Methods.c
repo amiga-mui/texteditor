@@ -270,9 +270,13 @@ IPTR mInputTrigger(struct IClass *cl, Object *obj, UNUSED Msg msg)
       LONG limit = data->ypos;
 
       if(data->maxlines < (data->totallines-data->visual_y+1))
-        limit += (data->maxlines * data->fontheight);
+        limit += ((data->maxlines+1) * data->fontheight);
       else
         limit += (data->totallines-data->visual_y+1)*data->fontheight;
+
+      // if the user clicked the partially displayed line at the bottom (to prevent a non-stop scroll down)
+      if(MouseY < data->ypos+_mheight(data->object) && MouseY > data->ypos+(data->maxlines * data->fontheight))
+        MouseY -= data->fontheight;
 
       if(MouseY >= limit)
       {

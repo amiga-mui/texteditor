@@ -100,15 +100,18 @@ void DrawSeparator(struct InstData *data, struct RastPort *rp, LONG X, LONG Y, L
 {
   ENTER();
 
-  if(Width > 3*Height)
+  if(data->doublerp || (Y > _top(data->object) && Y+Height < _bottom(data->object)))
   {
-    SetAPen(rp, MUIPEN(data->separatorshadow));
-    RectFill(rp, X, Y, X+Width-2, Y);
-    RectFill(rp, X, Y, X, Y+Height);
+    if(Width > 3*Height)
+    {
+      SetAPen(rp, MUIPEN(data->separatorshadow));
+      RectFill(rp, X, Y, X+Width-2, Y);
+      RectFill(rp, X, Y, X, Y+Height);
 
-    SetAPen(rp, MUIPEN(data->separatorshine));
-    RectFill(rp, X+1, Y+Height, X+Width-1, Y+Height);
-    RectFill(rp, X+Width-1, Y, X+Width-1, Y+Height);
+      SetAPen(rp, MUIPEN(data->separatorshine));
+      RectFill(rp, X+1, Y+Height, X+Width-1, Y+Height);
+      RectFill(rp, X+Width-1, Y, X+Width-1, Y+Height);
+    }
   }
 
   LEAVE();
@@ -542,12 +545,10 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       }
       else
       {
-        if(line_nr == data->maxlines+1)
+
+        if(data->ypos+(data->fontheight * line_nr) > _mbottom(data->object))
         {
-          if(_mtop(data->object) != data->ypos)
-          {
-            BltBitMapRastPort(rp->BitMap, 0, 0, data->rport, _mleft(data->object), data->ypos+(data->fontheight * (line_nr-1)), _mwidth(data->object), _mtop(data->object)-data->ypos, (ABC|ABNC));
-          }
+          BltBitMapRastPort(rp->BitMap, 0, 0, data->rport, _mleft(data->object), data->ypos+(data->fontheight * (line_nr-1)), _mwidth(data->object), _mbottom(data->object) - data->ypos - (data->fontheight * (line_nr-1))+1, (ABC|ABNC));
         }
         else
         {
