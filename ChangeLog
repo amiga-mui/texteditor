@@ -2,6 +2,19 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2016-11-08 Alper Sönmez <amithlondestek@gmail.com>
+
+  * mcc/EditorStuff.c: Corrected raster scroll in accordance with bottom space
+    usage.
+  * mcc/GetSetAttrs.c: Corrected line dump in accordance w. bottom space usage.
+  * mcc/HandleInput.c, mcc/Methods.c:
+    Implemented new behaviour for user clicks in the bottom space.
+  * mcc/MixedFunctions.c: Better cursor drawing and drawbottom evaluations and
+    tweaks for bottom space usage
+  * mcc/Navigation.c : Tweaks for bottom space usage.
+  * mcc/PrintLinesWithStyles.c: A bug in separator drawing removed. Better
+    evaluation for partial line drawing in double buffer mode.
+
 2016-11-03 Alper Sönmez <amithlondestek@gmail.com>
 
   * mcc/Methods.c: horizontal autoscroll when block marking implemented.
