@@ -680,7 +680,7 @@ void PosFromCursor(struct InstData *data, LONG MouseX, LONG MouseY)
   ENTER();
 
   if(data->maxlines < data->totallines-data->visual_y+1)
-    limit += (data->maxlines * data->fontheight);
+    limit += ((data->maxlines+1) * data->fontheight);
   else
     limit += (data->totallines-data->visual_y+1)*data->fontheight;
 

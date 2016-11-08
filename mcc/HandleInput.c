@@ -970,7 +970,7 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
               if(imsg->MouseX >= _left(obj) &&
                  imsg->MouseX <= _right(obj) &&
                  imsg->MouseY >= data->ypos &&
-                 imsg->MouseY <  data->ypos+(data->maxlines * data->fontheight))
+                 imsg->MouseY < _bottom(obj))
               {
                 if(isFlagClear(data->flags, FLG_Active) &&
                    isFlagClear(data->flags, FLG_Activated) &&
@@ -994,6 +994,10 @@ IPTR mHandleInput(struct IClass *cl, Object *obj, struct MUIP_HandleEvent *msg)
                   setFlag(data->flags, FLG_Activated);
                   SetCursor(data, data->CPos_X, data->actualline, FALSE);
                   PosFromCursor(data, imsg->MouseX, imsg->MouseY);
+
+                  // if the user clicked the partially displayed line at the bottom : make it totally visible
+                  if(imsg->MouseY > data->ypos+(data->maxlines * data->fontheight))
+                    ScrollIntoDisplay(data);
 
                   if(isFlagSet(imsg->Qualifier, IEQUALIFIER_LSHIFT) || isFlagSet(imsg->Qualifier, IEQUALIFIER_RSHIFT))
                     data->selectmode = 0;
@@ -1541,8 +1545,8 @@ void MarkText(struct InstData *data, LONG x1, struct line_node *line1, LONG x2, 
     line_nr1 = 0;
 
   line_nr2 += pos2.lines-1;
-  if(line_nr2 >= data->maxlines)
-    line_nr2 = data->maxlines-1;
+  if(line_nr2 > data->maxlines)
+    line_nr2 = data->maxlines;
 
   if(line_nr1 <= line_nr2)
     DumpText(data, data->visual_y+line_nr1, line_nr1, line_nr2+1, FALSE);
