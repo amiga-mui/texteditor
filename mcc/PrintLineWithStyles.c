@@ -546,7 +546,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       else
       {
 
-        if (data->ypos+(data->fontheight * line_nr) > _mbottom(data->object))
+        if(data->ypos+(data->fontheight * line_nr) > _mbottom(data->object))
         {
           BltBitMapRastPort(rp->BitMap, 0, 0, data->rport, _mleft(data->object), data->ypos+(data->fontheight * (line_nr-1)), _mwidth(data->object), _mbottom(data->object) - data->ypos - (data->fontheight * (line_nr-1))+1, (ABC|ABNC));
         }

@@ -467,7 +467,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
   line_nr = LineToVisual(data, line) - 1;
   OffsetToLines(data, x, line, &pos);
 
-  if(line_nr + pos.lines <= data->maxlines +1 && line_nr + pos.lines > 0)
+  if(line_nr + pos.lines <= data->maxlines+1 && line_nr + pos.lines > 0)
   {
     for(c = -1; c < 2; c++)
     {
