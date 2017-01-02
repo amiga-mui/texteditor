@@ -200,14 +200,13 @@ ULONG TextFitNew(struct RastPort *rp, const char *string, ULONG strLen, struct T
       else
       {
         LONG l_constBit = constrainingBitWidth;
+        LONG l_length = 0;
         LONG l_chars;
 
         c_length += TextLengthNew(rp, tptr0, strLen0, 0);
 
         while(l_constBit > SHRT_MAX && strLen0 > 0)
         {
-          LONG l_length;
-
           l_chars   = TextFit(rp, tptr0, strLen0, &textExtent, constrainingExtent, strDirection, SHRT_MAX, constrainingBitHeight);
           l_length += textExtent.te_Width;
 

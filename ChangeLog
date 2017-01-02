@@ -2,6 +2,10 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2017-02-01 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/NewGfx.c: fixed a warning about using an uninitialized variable.
+
 2016-11-08 Alper Sönmez <amithlondestek@gmail.com>
 
   * mcc/EditorStuff.c: Corrected raster scroll in accordance with bottom space
@@ -24,17 +28,17 @@ MUI TextEditor MCC class - ChangeLog
     - Correct horizontal pattern calculations and scroll implementations.
     - Graphic glithces at the bottom of the gadget removed.
     - data->xpos made LONG and typecasts removed.
- 
+
 2016-10-27 Alper Sönmez <amithlondestek@gmail.com>
 
-  * mcc/CaseConversion.c, mcc/ColorOperators.c, mcc/Dispatcher.c, 
+  * mcc/CaseConversion.c, mcc/ColorOperators.c, mcc/Dispatcher.c,
     mcc/EditorStuff.c, mcc/GetSetAttrs.c, mcc/HandleInput.c, MixedFunctions.c,
     mcc/Navigation.c, mcc/NewGfx.c, mcc/PrintLineWithStyles.c,
     mcc/StyleOperators.c, mcc/UndoFunctions.c, mcc/private.h,
     include/mui/TextEditor_mcc.h:
     - Lots of (re-)implementations to support a horizontal scroller in
       NoWrapMode.
-    - TextFitNew() and TextLengthNew() are re-implemented to support very large 
+    - TextFitNew() and TextLengthNew() are re-implemented to support very large
       input/return values and instead of taking a dummy TextExtent, TextFitNew()
       now takes a TextExtentNew structure which uses LONG type members and fills
       it properly.
@@ -45,7 +49,7 @@ MUI TextEditor MCC class - ChangeLog
     - Issue of highlighted text changing color when edited resolved.
     - Passing a NULL to this  MUIA_TextEditor_HorizontalScroll now acts as a
       switch for turning off horizontal scrolling even in NoWrapMode.
-    - Behaviour of FLG_HScroll re-implemented 
+    - Behaviour of FLG_HScroll re-implemented
       (now keeps the state of horizontal scrolling on or off).
     - New public attribute MUIA_TextEditor_HorizontalSlider (passing a NULL to
       this attribute disables the horizontal scroll facilities).
