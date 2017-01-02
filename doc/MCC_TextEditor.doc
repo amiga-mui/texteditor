@@ -70,7 +70,7 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
 TextEditor.mcc/TextEditor.mcc
 
     *******************************************************************
-    Copyright (C) 2005-2016 TextEditor.mcc Open Source Team
+    Copyright (C) 2005-2017 TextEditor.mcc Open Source Team
     $Id$
 
     TextEditor.mcc is a multiline string gadget which holds most of the
