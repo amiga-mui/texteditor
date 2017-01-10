@@ -6,6 +6,9 @@ MUI TextEditor MCC class - ChangeLog
 
   * mcp/CreatePrefsGroup.c: removed the explicit column numbers from the title
     format. These are of no use when the column order is static.
+  * mcp/ObjectCreator.c: fixed the wrong attribute for the settings items
+    MUICFG_TextEditor_BlockQual. A numeric value must not be pen spec. This refs
+    #19.
 
 2017-02-01 Thore Böckelmann <tboeckel@gmx.de>
 
