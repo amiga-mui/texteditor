@@ -97,7 +97,7 @@ static BOOL MatchQual(struct InstData *data, ULONG input, ULONG match, UWORD act
   if(input == match)
     result = TRUE;
 
-  if(result == FALSE && ((input & ~data->blockqual) == match))
+  if(result == FALSE && data->blockqual != 0 && (input & ~data->blockqual) == match)
   {
     if(action == MUIV_TextEditor_KeyAction_Up           ||
        action == MUIV_TextEditor_KeyAction_Down         ||
@@ -610,13 +610,13 @@ static BOOL ReactOnRawKey(struct InstData *data, struct IntuiMessage *imsg)
     if(dummy == 1)
       data->pixel_x = 0;
 
-    if((data->CPos_X != oldCPos_X || oldactualline != data->actualline) || (!(imsg->Qualifier & data->blockqual) && data->blockinfo.enabled == TRUE))
+    if((data->CPos_X != oldCPos_X || oldactualline != data->actualline) || (data->blockqual != 0 && !(imsg->Qualifier & data->blockqual) && data->blockinfo.enabled == TRUE))
     {
       SetCursor(data, oldCPos_X, oldactualline, FALSE);
 
       if(isFlagClear(data->flags, FLG_ReadOnly))
       {
-        if(imsg->Qualifier & data->blockqual)
+        if(data->blockqual != 0 && (imsg->Qualifier & data->blockqual) != 0)
         {
           data->blockinfo.stopline = data->actualline;
           data->blockinfo.stopx = data->CPos_X;

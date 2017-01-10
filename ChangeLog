@@ -9,6 +9,8 @@ MUI TextEditor MCC class - ChangeLog
   * mcp/ObjectCreator.c: fixed the wrong attribute for the settings items
     MUICFG_TextEditor_BlockQual. A numeric value must not be pen spec. This refs
     #19.
+  * mcc/HandleInput.c: explicitly check for no block qualifier (mouse only).
+    This refs #19.
 
 2017-02-01 Thore Böckelmann <tboeckel@gmx.de>
 
