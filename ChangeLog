@@ -2,6 +2,11 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2017-02-10 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/CreatePrefsGroup.c: removed the explicit column numbers from the title
+    format. These are of no use when the column order is static.
+
 2017-02-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/NewGfx.c: fixed a warning about using an uninitialized variable.
