@@ -2,7 +2,9 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
-2017-02-10 Thore Böckelmann <tboeckel@gmx.de>
+#### v15.48 RELEASE (special MUI 5.0-2017R1 release) ###########################
+
+2017-01-10 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/CreatePrefsGroup.c: removed the explicit column numbers from the title
     format. These are of no use when the column order is static.
@@ -12,7 +14,7 @@ MUI TextEditor MCC class - ChangeLog
   * mcc/HandleInput.c: explicitly check for no block qualifier (mouse only).
     This refs #19.
 
-2017-02-01 Thore Böckelmann <tboeckel@gmx.de>
+2017-01-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/NewGfx.c: fixed a warning about using an uninitialized variable.
 
