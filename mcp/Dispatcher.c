@@ -116,6 +116,11 @@ BOOL CreateSubClasses(void)
     {
       if((text_mcc = MUI_CreateCustomClass(NULL, "Text.mui", NULL, 0, ENTRY(Text_Dispatcher))))
       {
+        // set up unique names for our custom classes
+        widthslider_mcc->mcc_Class->cl_ID = (ClassID)MUIC_TextEditor_mcp "/widthslider";
+        speedslider_mcc->mcc_Class->cl_ID = (ClassID)MUIC_TextEditor_mcp "/speedslider";
+        text_mcc->mcc_Class->cl_ID = (ClassID)MUIC_TextEditor_mcp "/text";
+
         return TRUE;
       }
     }

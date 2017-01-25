@@ -2,6 +2,10 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2017-01-25 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcp/Dispatcher.c: added unique names for private custom classes.
+
 #### v15.48 RELEASE (special MUI 5.0-2017R1 release) ###########################
 
 2017-01-10 Thore Böckelmann <tboeckel@gmx.de>
