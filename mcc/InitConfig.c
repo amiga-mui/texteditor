@@ -203,7 +203,6 @@ void InitConfig(struct IClass *cl, Object *obj)
   data->highlightColor    = GetPenAndRGB(data, MUICFG_TextEditor_HighlightColor, CFG_TextEditor_HighlightColor_Def, &data->highlightRGB);
 
   data->cursorcolor       = SetCol(obj, MUICFG_TextEditor_CursorColor,     CFG_TextEditor_CursorColor_Def);
-  data->cursortextcolor   = SetCol(obj, MUICFG_TextEditor_CursorTextColor, CFG_TextEditor_CursorTextColor_Def);
   data->markedcolor       = SetCol(obj, MUICFG_TextEditor_MarkedColor,     CFG_TextEditor_MarkedColor_Def);
   data->separatorshine    = SetCol(obj, MUICFG_TextEditor_SeparatorShine,  CFG_TextEditor_SeparatorShine_Def);
   data->separatorshadow   = SetCol(obj, MUICFG_TextEditor_SeparatorShadow, CFG_TextEditor_SeparatorShadow_Def);
@@ -532,11 +531,6 @@ void FreeConfig(struct IClass *cl, Object *obj)
   {
     MUI_ReleasePen(muiRenderInfo(obj), data->cursorcolor);
     data->cursorcolor = -1;
-  }
-  if(data->cursortextcolor != -1)
-  {
-    MUI_ReleasePen(muiRenderInfo(obj), data->cursortextcolor);
-    data->cursortextcolor = -1;
   }
   if(data->markedcolor != -1)
   {

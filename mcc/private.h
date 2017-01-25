@@ -323,10 +323,10 @@ struct Grow
 
 struct TextExtentNew               // TextExtent struct in the Amiga API has UWORD type members
 {                                  // which easily overflow if the text passed is very long.
-    ULONG   te_Width;              // 
+    ULONG   te_Width;              //
     ULONG   te_Height;             // This new TextExtent structure has ULONG type members
     struct Rect32 te_Extent;       // and is used by TextFitNew() function.
-};                                 // 
+};                                 //
 
 struct InstData
 {
@@ -386,7 +386,6 @@ struct InstData
   ULONG   highlightRGB;
   LONG    backgroundcolor;
   LONG    cursorcolor;
-  LONG    cursortextcolor;
   LONG    markedcolor;
   LONG    inactivecolor;
   LONG    separatorshine;

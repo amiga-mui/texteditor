@@ -342,7 +342,6 @@ static const struct
   { MCP_BlockQual,       MUICFG_TextEditor_BlockQual,       MUIA_Cycle_Active,      (APTR)CFG_TextEditor_BlockQual_Def       },
   { MCP_CheckWord,       MUICFG_TextEditor_CheckWord,       MUIA_Selected,          (APTR)CFG_TextEditor_CheckWord_Def       },
   { MCP_CursorColor,     MUICFG_TextEditor_CursorColor,     MUIA_Pendisplay_Spec,   (APTR)CFG_TextEditor_CursorColor_Def     },
-  { MCP_CursorTextColor, MUICFG_TextEditor_CursorTextColor, MUIA_Pendisplay_Spec,   (APTR)CFG_TextEditor_CursorTextColor_Def },
   { MCP_CursorWidth,     MUICFG_TextEditor_CursorWidth,     MUIA_Numeric_Value,     (APTR)CFG_TextEditor_CursorWidth_Def     },
   { MCP_FixedFont,       MUICFG_TextEditor_FixedFont,       MUIA_String_Contents,   (APTR)CFG_TextEditor_FixedFont_Def       },
   { MCP_Frame,           MUICFG_TextEditor_Frame,           MUIA_Framedisplay_Spec, (APTR)CFG_TextEditor_Frame_Def           },

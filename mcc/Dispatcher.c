@@ -206,7 +206,6 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             data->highlightColor = -1;
             data->highlightRGB = 0xff00000;
             data->cursorcolor = -1;
-            data->cursortextcolor = -1;
             data->markedcolor = -1;
             data->separatorshine = -1;
             data->separatorshadow = -1;
@@ -912,17 +911,17 @@ DISPATCHER(_Dispatcher)
           (data->actualline != oldy) ? MUIA_TextEditor_CursorY : TAG_IGNORE, cposY,
           MUIA_TextEditor_CursorIndex, index,
           TAG_DONE);
-      }                                                                                      
+      }
 
       if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
-      { 
+      {
         /* If we are in the NoWrapMode and the cursor position changed horizontally
            we should check if the cursor got out of gadget bounds and scroll it into view! */
         if(data->CPos_X != oldx)
           ScrollIntoView(data);
 
         if(data->hslider)
-        { 
+        {
           LONG prop_entries;
           get(data->hslider, MUIA_Prop_Entries, &prop_entries);
 

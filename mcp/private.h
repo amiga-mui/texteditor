@@ -130,7 +130,6 @@ enum
   MCP_BlockQual,
   MCP_CheckWord,
   MCP_CursorColor,
-  MCP_CursorTextColor,
   MCP_CursorWidth,
   MCP_FixedFont,
   MCP_Frame,

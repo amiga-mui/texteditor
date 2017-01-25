@@ -49,7 +49,7 @@ extern "C" {
 #define MUICFG_TextEditor_BlockQual        0xad000053UL
 #define MUICFG_TextEditor_CheckWord        0xad000050UL
 #define MUICFG_TextEditor_CursorColor      0xad000054UL
-#define MUICFG_TextEditor_CursorTextColor  0xad000055UL
+#define MUICFG_TextEditor_CursorTextColor  0xad000055UL /* UNUSED */
 #define MUICFG_TextEditor_CursorWidth      0xad000056UL
 #define MUICFG_TextEditor_FixedFont        0xad000057UL
 #define MUICFG_TextEditor_Frame            0xad000058UL
@@ -82,7 +82,6 @@ extern "C" {
 #define CFG_TextEditor_BlockQual_Def        0
 #define CFG_TextEditor_CheckWord_Def        FALSE
 #define CFG_TextEditor_CursorColor_Def      "m0"
-#define CFG_TextEditor_CursorTextColor_Def  "m5"
 #define CFG_TextEditor_CursorWidth_Def      6
 #define CFG_TextEditor_FixedFont_Def        ""
 #define CFG_TextEditor_Frame_Def            "302222"
