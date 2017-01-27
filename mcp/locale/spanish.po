@@ -3,15 +3,15 @@
 # 
 # version 2
 # Translators:
-# Javier de las Rivas <jabierdlr@gmail.com>, 2014
+# Javier Rivas <jabierdlr@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: MCC TextEditor\n"
 "Report-Msgid-Bugs-To: http://sf.net/p/texteditor-mcc/\n"
 "POT-Creation-Date: 2014-02-23 12:29+0100\n"
 "PO-Revision-Date: 2014-10-10 11:15+0000\n"
-"Last-Translator: Javier de las Rivas <jabierdlr@gmail.com>\n"
-"Language-Team: Spanish (http://www.transifex.com/projects/p/texteditor-mcc/language/es/)\n"
+"Last-Translator: Javier Rivas <jabierdlr@gmail.com>\n"
+"Language-Team: Spanish (http://www.transifex.com/ato/texteditor-mcc/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
