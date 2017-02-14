@@ -31,7 +31,7 @@
 # # to explicitly compile for AmigaOS3
 # > make OS=os3
 #
-# # to compile for AmigaOS4 but with debugging
+# # to compile for AmigaOS4 but without debugging
 # > make OS=os4 DEBUG=
 #
 
