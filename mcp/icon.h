@@ -20,12 +20,19 @@
 
 ***************************************************************************/
 
+#include <stdint.h>
+
 #if !defined(__MORPHOS__)
 // uncompressed ARGB data
-extern const unsigned long icon32[];
-#define ICON32_WIDTH  24
-#define ICON32_HEIGHT 20
-#define ICON32_DEPTH  32
+#if defined(__AROS__)
+extern const uint8_t icon32[];
+#else
+extern const uint32_t icon32[];
+#endif
+
+#define ICON32_WIDTH       24
+#define ICON32_HEIGHT      20
+#define ICON32_DEPTH       32
 #else
 // bzip2 compressed ARGB data
 extern const unsigned char icon32[];
