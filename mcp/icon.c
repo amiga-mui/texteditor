@@ -104,7 +104,6 @@ const uint32_t icon32[] =
 	0x15000000, 0x0a000000, 0x02000000, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff,
 };
 #endif
-};
 #else // !__MORPHOS__
 // bzip2 compressed ARGB data
 const uint8_t icon32[] =

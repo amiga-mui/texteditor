@@ -35,7 +35,7 @@ extern const uint32_t icon32[];
 #define ICON32_DEPTH       32
 #else
 // bzip2 compressed ARGB data
-extern const unsigned char icon32[];
+extern const uint8_t icon32[];
 #endif
 
 #ifdef USE_ICON8_COLORS
