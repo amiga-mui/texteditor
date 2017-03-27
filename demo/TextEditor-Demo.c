@@ -494,7 +494,14 @@ int main(VOID)
                     struct MsgPort *rexxport;
                     const char *script = "Rexx:TextEditor/Demo.Rexx";
 
-                    if((rexxport = FindPort((STRPTR)"REXX")) && (myport = CreateMsgPort()))
+                    rexxport = FindPort((STRPTR)"REXX");
+                    #if defined(__amigaos4__)
+                    myport = AllocSysObjectTags(ASOT_PORT, TAG_DONE);
+                    #else
+                    myport = CreateMsgPort();
+                    #endif
+
+                    if(rexxport != NULL && myport != NULL)
                     {
                       if(!rxstdout)
                         rxstdout = Open("CON://640/100/TextEditor-Demo, ARexx output:/Close/Wait/Auto/InActive", MODE_READWRITE);
@@ -519,7 +526,11 @@ int main(VOID)
 
                       DeleteArgstring((UBYTE *)rxmsg->rm_Args[0]);
                       DeleteRexxMsg(rxmsg);
+                      #if defined(__amigaos4__)
+                      FreeSysObject(ASOT_PORT, myport);
+                      #else
                       DeleteMsgPort(myport);
+                      #endif
                       myport = NULL;
                     }
 
