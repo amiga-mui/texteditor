@@ -507,7 +507,7 @@ int main(void)
             {
               if((fh = Open((char *)argarray[0], MODE_OLDFILE)))
               {
-                char  *text = AllocVec(50*1024, 0L);
+                char  *text = AllocVecShared(50*1024, 0L);
                 char  *buffer = text;
                 int size;
 
