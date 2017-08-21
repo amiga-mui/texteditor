@@ -2,6 +2,12 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2017-08-21 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Methods.c: the MUIM_TextEditor_IndexToCursorXY method now returns a
+    boolean value which indicates whether the index could be successfully
+    converted to an X/Y position pair or not.
+
 2017-01-25 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcp/Dispatcher.c: added unique names for private custom classes.

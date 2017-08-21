@@ -529,6 +529,7 @@ IPTR mIndexToCursorXY(struct InstData *data, struct MUIP_TextEditor_IndexToCurso
   LONG idx;
   LONG lineNumber = 0;
   struct line_node *line;
+  BOOL rc = TRUE;
 
   ENTER();
 
@@ -552,11 +553,15 @@ IPTR mIndexToCursorXY(struct InstData *data, struct MUIP_TextEditor_IndexToCurso
 	}
   }
 
+  // signal failure in case the requested index is beyond the last character
+  if(line == NULL && idx != 0)
+    rc = FALSE;
+
   *msg->x = idx;
   *msg->y = lineNumber;
 
-  RETURN(0);
-  return 0;
+  RETURN(rc);
+  return rc;
 }
 
 ///

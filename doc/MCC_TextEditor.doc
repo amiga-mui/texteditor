@@ -1409,10 +1409,17 @@ TextEditor.mcc/MUIA_TextEditor_HorizontalSlider
         MUIM_TextEditor_IndexToCursorXY (v15.47)
 
     SYNOPSIS
-        DoMethod(obj, MUIM_TextEditor_IndexToCursorXY, index, &xpos, &ypos);
+        BOOL success = DoMethod(obj, MUIM_TextEditor_IndexToCursorXY,
+                                     index, &xpos, &ypos);
 
     FUNCTION
         Convert an index value into an X/Y cursor position pair.
+
+    RESULT
+        Boolean value indicating whether the passed index lies within the
+        available text or not (v15.49). The X/Y cursor positions will *ALWAYS*
+        be updated, even if the index passed index is beyond the last character.
+        Hence the returned values might be inaccurate in case of failure.
 
 TextEditor.mcc/MUIM_TextEditor_InsertText
 
