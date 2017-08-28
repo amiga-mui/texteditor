@@ -34,7 +34,6 @@ struct pos_info pos;
 LONG FlowSpace(struct InstData *data, UWORD flow, STRPTR text)
 {
   LONG flowspace = 0;
-  LONG textlength = 0;
 
   /* With these changes here, a line which is longer than the gadget width will have
      zero flowspace (means will be alligned left) even if it is centered or right alligned.
@@ -42,15 +41,16 @@ LONG FlowSpace(struct InstData *data, UWORD flow, STRPTR text)
 
   ENTER();
 
-  textlength = TextLengthNew(&data->tmprp, text, LineCharsWidth(data, text)-1, data->TabSizePixels);
-
-  if((flow != MUIV_TextEditor_Flow_Left) && (textlength < _mwidth(data->object)))
+  if(flow != MUIV_TextEditor_Flow_Left)
   {
-    flowspace  = (_mwidth(data->object) - textlength);
-    flowspace -= (data->CursorWidth == 6) ? TextLength(&data->tmprp, " ", 1) : data->CursorWidth;
-    if(flow == MUIV_TextEditor_Flow_Center)
+    LONG textlength = TextLengthNew(&data->tmprp, text, LineCharsWidth(data, text)-1, data->TabSizePixels);
+
+    if(textlength < _mwidth(data->object))
     {
-      flowspace /= 2;
+      flowspace  = (_mwidth(data->object) - textlength);
+      flowspace -= (data->CursorWidth == 6) ? TextLength(&data->tmprp, " ", 1) : data->CursorWidth;
+      if(flow == MUIV_TextEditor_Flow_Center)
+        flowspace /= 2;
     }
   }
 
