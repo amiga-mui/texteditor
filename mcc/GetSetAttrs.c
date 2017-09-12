@@ -130,7 +130,7 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = data->Pen.color;
       break;
     case MUIA_TextEditor_Flow:
-      ti_Data = data->Flow;
+      ti_Data = (data->Flow == MUIV_TextEditor_Flow_Global) ? data->GlobalFlow : data->Flow;
       break;
     case MUIA_TextEditor_Separator:
       ti_Data = data->Separator;
@@ -232,6 +232,10 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
 
     case MUIA_TextEditor_RGBMode:
       ti_Data = data->rgbMode;
+    break;
+
+    case MUIA_TextEditor_GlobalFlow:
+      ti_Data = data->GlobalFlow;
     break;
 
     default:
@@ -451,7 +455,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
                       data->totallines))
                     * data->fontheight,
                   TAG_DONE);
-      }                                                                            
+      }
       break;
 
       case MUIA_TextEditor_HSlider_Pos:
@@ -916,6 +920,27 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_TextEditor_RGBMode:
         data->rgbMode = ti_Data;
+      break;
+
+      case MUIA_TextEditor_GlobalFlow:
+      {
+        struct line_node *node;
+
+        data->GlobalFlow = ti_Data;
+
+        node = GetFirstLine(&data->linelist);
+        while(node != NULL)
+        {
+          struct line_node *next = GetNextLine(node);
+
+          node->line.Flow = MUIV_TextEditor_Flow_Global;
+          node = next;
+        }
+
+        DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
+        data->HasChanged = TRUE;
+        data->ChangeEvent = TRUE;
+      }
       break;
     }
   }

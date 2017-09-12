@@ -2,6 +2,11 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2017-09-12 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/GetSetAttrs.c, mcc/Navigation.c: implemented MUIA_TextEditor_GlobalFlow
+    to set a global text alignment instead of a line based one. This refs #20.
+
 2017-08-21 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Methods.c: the MUIM_TextEditor_IndexToCursorXY method now returns a

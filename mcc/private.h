@@ -338,6 +338,7 @@ struct InstData
   LONG    pixel_x;          // Pixel x-pos of cursor. (for up/down movement)
   UWORD   style;            // Current style (bold-italic-underline)
   UWORD   Flow;
+  UWORD   GlobalFlow;
   UWORD   Separator;
 
   LONG    visual_y;         // The line nr of the top line
@@ -844,5 +845,7 @@ struct  MUIP_WhichPointerType   { ULONG MethodID; LONG mx; LONG my; };
 #ifndef MUIV_PointerType_Text
 #define MUIV_PointerType_Text   30
 #endif
+
+#define MUIV_TextEditor_Flow_Global            0x0000ffffUL
 
 #endif /* TEXTEDITOR_MCC_PRIV_H */

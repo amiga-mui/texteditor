@@ -486,6 +486,29 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
         If an area is marked while you set this attribute, then the new
         alignment will be set for the complete area.
 
+    SEE ALSO
+        MUIA_TextEditor_GlobalFlow
+
+TextEditor.mcc/MUIA_TextEditor_GlobalFlow
+
+    NAME
+        MUIA_TextEditor_GlobalFlow -- [ISG], UWORD
+
+    SPECIAL INPUTS
+        MUIV_TextEditor_Flow_Left
+        MUIV_TextEditor_Flow_Right
+        MUIV_TextEditor_Flow_Center
+        MUIV_TextEditor_Flow_Justified (not yet implemented)
+
+    FUNCTION
+        Set/get the current global alignment.
+
+        In contrast to MUIA_TextEditor_Flow this attribute sets the alignment
+        of *ALL* lines and thus overrides any previous individual alignment.
+
+    SEE ALSO
+        MUIA_TextEditor_Flow
+
 TextEditor.mcc/MUIA_TextEditor_HasChanged
 
     NAME

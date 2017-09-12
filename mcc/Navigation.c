@@ -41,6 +41,9 @@ LONG FlowSpace(struct InstData *data, UWORD flow, STRPTR text)
 
   ENTER();
 
+  if(flow == MUIV_TextEditor_Flow_Global)
+    flow = data->GlobalFlow;
+
   if(flow != MUIV_TextEditor_Flow_Left)
   {
     LONG textlength = TextLengthNew(&data->tmprp, text, LineCharsWidth(data, text)-1, data->TabSizePixels);
