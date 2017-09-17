@@ -17,6 +17,7 @@ TextEditor.mcc/MUIA_TextEditor_ExportHook
 TextEditor.mcc/MUIA_TextEditor_ExportWrap
 TextEditor.mcc/MUIA_TextEditor_FixedFont
 TextEditor.mcc/MUIA_TextEditor_Flow
+TextEditor.mcc/MUIA_TextEditor_GlobalFlow
 TextEditor.mcc/MUIA_TextEditor_HasChanged
 TextEditor.mcc/MUIA_TextEditor_HorizontalSlider
 TextEditor.mcc/MUIA_TextEditor_ImportHook
