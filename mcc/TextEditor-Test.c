@@ -391,6 +391,7 @@ int main(void)
                                     MUIA_ControlChar, 'a',
                                     MUIA_TextEditor_RGBMode, TRUE,
                                     MUIA_TextEditor_GlobalFlow, TRUE,
+                                    MUIA_TextEditor_Flow, MUIV_TextEditor_Flow_Right,
                                     MUIA_TextEditor_Contents,
 
                                       "\n"
