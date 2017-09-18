@@ -41,7 +41,7 @@ LONG FlowSpace(struct InstData *data, UWORD flow, STRPTR text)
 
   ENTER();
 
-  if(flow == MUIV_TextEditor_Flow_Global)
+  if(isFlagSet(data->flags, FLG_GlobalFlow))
     flow = data->GlobalFlow;
 
   if(flow != MUIV_TextEditor_Flow_Left)

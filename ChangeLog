@@ -2,6 +2,12 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2017-09-18 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/GetSetAttrs.c: reworked the global alignment handling. Setting the
+    global alignment no longer destroys any previously set line based alignment
+    and can also be set during OM_NEW. This finally closes #20.
+
 2017-09-12 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/GetSetAttrs.c, mcc/Navigation.c: implemented MUIA_TextEditor_GlobalFlow

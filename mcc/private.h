@@ -764,6 +764,7 @@ enum
   FLG_PasteStyles    = 1L << 21, // respect styles when pasting text
   FLG_PasteColors    = 1L << 22, // respect colors when pasting text
   FLG_ForcedTabSize  = 1L << 23, // override the user defined TAB size
+  FLG_GlobalFlow     = 1L << 24, // global flow instead of line based flow
   FLG_SetupDone      = 1L << 29, // MUIM_Setup finished successfully
   FLG_Truecolor      = 1L << 30, // truecolor screen
   FLG_MUI4           = 1L << 31, // running under MUI4
@@ -845,7 +846,5 @@ struct  MUIP_WhichPointerType   { ULONG MethodID; LONG mx; LONG my; };
 #ifndef MUIV_PointerType_Text
 #define MUIV_PointerType_Text   30
 #endif
-
-#define MUIV_TextEditor_Flow_Global            0x0000ffffUL
 
 #endif /* TEXTEDITOR_MCC_PRIV_H */

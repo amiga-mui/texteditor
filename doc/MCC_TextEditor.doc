@@ -482,7 +482,9 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
         MUIV_TextEditor_Flow_Justified (not yet implemented)
 
     FUNCTION
-        Set/get the current paragraph's alignment.
+        Set/get the current paragraph's alignment, unless
+        MUIA_TextEditor_GlobalFlow is set to TRUE. In the latter case this
+        attribute will affect the global alignment instead.
 
         If an area is marked while you set this attribute, then the new
         alignment will be set for the complete area.
@@ -493,19 +495,13 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
 TextEditor.mcc/MUIA_TextEditor_GlobalFlow
 
     NAME
-        MUIA_TextEditor_GlobalFlow -- [ISG], UWORD
-
-    SPECIAL INPUTS
-        MUIV_TextEditor_Flow_Left
-        MUIV_TextEditor_Flow_Right
-        MUIV_TextEditor_Flow_Center
-        MUIV_TextEditor_Flow_Justified (not yet implemented)
+        MUIA_TextEditor_GlobalFlow -- [ISG], BOOL
 
     FUNCTION
-        Set/get the current global alignment.
+        Enable/disable the global alignment setting. If set to TRUE then the
+        individual line based alignment will be disabled temporarily.
 
-        In contrast to MUIA_TextEditor_Flow this attribute sets the alignment
-        of *ALL* lines and thus overrides any previous individual alignment.
+        Defaults to FALSE.
 
     SEE ALSO
         MUIA_TextEditor_Flow

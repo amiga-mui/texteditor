@@ -130,7 +130,7 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = data->Pen.color;
       break;
     case MUIA_TextEditor_Flow:
-      ti_Data = (data->Flow == MUIV_TextEditor_Flow_Global) ? data->GlobalFlow : data->Flow;
+      ti_Data = isFlagSet(data->flags, FLG_GlobalFlow) ? data->GlobalFlow : data->Flow;
       break;
     case MUIA_TextEditor_Separator:
       ti_Data = data->Separator;
@@ -235,7 +235,7 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
     break;
 
     case MUIA_TextEditor_GlobalFlow:
-      ti_Data = data->GlobalFlow;
+      ti_Data = isFlagSet(data->flags, FLG_GlobalFlow);
     break;
 
     default:
@@ -769,35 +769,45 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
         {
           LONG start, lines = 0;
 
-          data->Flow = ti_Data;
-          if(Enabled(data))
+          if(isFlagSet(data->flags, FLG_GlobalFlow))
           {
-            struct marking newblock;
-            struct line_node *startline;
-
-            NiceBlock(&data->blockinfo, &newblock);
-            startline = newblock.startline;
-            start = LineToVisual(data, startline);
-
-            do
-            {
-              lines += startline->visual;
-              startline->line.Flow = ti_Data;
-              startline = GetNextLine(startline);
-            }
-            while(startline != GetNextLine(newblock.stopline));
+            data->GlobalFlow = ti_Data;
+            start = 1;
+            lines = data->maxlines;
           }
           else
           {
-            start = LineToVisual(data, data->actualline);
-            lines = data->actualline->visual;
-            data->actualline->line.Flow = ti_Data;
-            data->pixel_x = 0;
+            data->Flow = ti_Data;
+            if(Enabled(data))
+            {
+              struct marking newblock;
+              struct line_node *startline;
+
+              NiceBlock(&data->blockinfo, &newblock);
+              startline = newblock.startline;
+              start = LineToVisual(data, startline);
+
+              do
+              {
+                lines += startline->visual;
+                startline->line.Flow = ti_Data;
+                startline = GetNextLine(startline);
+              }
+              while(startline != GetNextLine(newblock.stopline));
+            }
+            else
+            {
+              start = LineToVisual(data, data->actualline);
+              lines = data->actualline->visual;
+              data->actualline->line.Flow = ti_Data;
+              data->pixel_x = 0;
+            }
+            if(start < 1)
+              start = 1;
+            if(start-1+lines > data->maxlines)
+              lines = data->maxlines-(start-1);
           }
-          if(start < 1)
-            start = 1;
-          if(start-1+lines > data->maxlines)
-            lines = data->maxlines-(start-1);
+
           DumpText(data, data->visual_y+start-1, start-1, start-1+lines, TRUE);
           data->HasChanged = TRUE;
           data->ChangeEvent = TRUE;
@@ -924,22 +934,29 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 
       case MUIA_TextEditor_GlobalFlow:
       {
-        struct line_node *node;
+        BOOL changed;
 
-        data->GlobalFlow = ti_Data;
-
-        node = GetFirstLine(&data->linelist);
-        while(node != NULL)
+        if(ti_Data && isFlagClear(data->flags, FLG_GlobalFlow))
         {
-          struct line_node *next = GetNextLine(node);
-
-          node->line.Flow = MUIV_TextEditor_Flow_Global;
-          node = next;
+          setFlag(data->flags, FLG_GlobalFlow);
+          changed = TRUE;
+        }
+        else if(!ti_Data && isFlagSet(data->flags, FLG_GlobalFlow))
+        {
+          clearFlag(data->flags, FLG_GlobalFlow);
+          changed = TRUE;
+        }
+        else
+        {
+          changed = FALSE;
         }
 
-        DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
-        data->HasChanged = TRUE;
-        data->ChangeEvent = TRUE;
+        if(changed == TRUE)
+        {
+          DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
+          data->HasChanged = TRUE;
+          data->ChangeEvent = TRUE;
+        }
       }
       break;
     }
