@@ -331,7 +331,7 @@ void InitConfig(struct IClass *cl, Object *obj)
   else
     clearFlag(data->flags, FLG_CheckWords);
 
-  data->Flow = data->actualline->line.Flow;
+  data->Flow = isFlagSet(data->flags, FLG_GlobalFlow) ? data->GlobalFlow : data->actualline->line.Flow;
   GetColor(data, data->CPos_X, data->actualline, &data->Pen);
 
   if(isFlagClear(data->flags, FLG_FirstInit))

@@ -1031,10 +1031,15 @@ DISPATCHER(_Dispatcher)
   if(IsSameColor(&t_pen, &data->Pen) == FALSE)
     set(obj, MUIA_TextEditor_Pen, data->Pen.color);
 
-  if(data->actualline->line.Flow != data->Flow)
+  if(isFlagClear(data->flags, FLG_GlobalFlow) && data->actualline->line.Flow != data->Flow)
   {
     data->Flow = data->actualline->line.Flow;
     set(obj, MUIA_TextEditor_Flow, data->actualline->line.Flow);
+  }
+  else if(isFlagSet(data->flags, FLG_GlobalFlow) && data->GlobalFlow != data->Flow)
+  {
+    data->Flow = data->GlobalFlow;
+    set(obj, MUIA_TextEditor_Flow, data->GlobalFlow);
   }
 
   if(data->actualline->line.Separator != data->Separator)
