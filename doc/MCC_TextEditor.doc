@@ -489,6 +489,10 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
         If an area is marked while you set this attribute, then the new
         alignment will be set for the complete area.
 
+        If you want to set the global alignment MUIA_TextEditor_Global MUST
+        be set to TRUE ahead of MUIA_TextEditor_Flow, otherwise the previous
+        (and most probably line based) alignment will be set instead.
+
     SEE ALSO
         MUIA_TextEditor_GlobalFlow
 
