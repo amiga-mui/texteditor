@@ -1194,6 +1194,8 @@ static void EraseBlock(struct InstData *data, ULONG flags)
   {
     DoBlock(data, flags|CUTF_CUT);
     data->HasChanged = TRUE;
+    data->ContentsChanged = TRUE;
+    #warning MetaData?
     data->ChangeEvent = TRUE;
   }
   else

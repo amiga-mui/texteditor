@@ -2,6 +2,15 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2017-09-21 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc: implemented the attributes MUIA_TextEditor_ContentsChanged and
+    MUIA_TextEditor_MetaDataChanged to complement the already existing but more
+    global attribute MUIA_TextEditor_HasChanged. The latter attribute can
+    reflect arbitrary changes only, while the former two attributes will
+    distinguish between changed textual contents and changed meta data like
+    alignment, color or style.
+
 2017-09-18 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/GetSetAttrs.c: reworked the global alignment handling. Setting the

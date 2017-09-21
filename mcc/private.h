@@ -463,6 +463,9 @@ struct InstData
                              then will be used as a notification to recalculate the longestline in the Dispatcher
                              and immediately set back to FALSE */
   Object *hslider;        // pointer to the horizontal scrollbar (if any).
+
+  BOOL            ContentsChanged;
+  BOOL            MetaDataChanged;
 };
 
 // AllocBitMap.c

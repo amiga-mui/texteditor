@@ -204,8 +204,10 @@ BOOL Undo(struct InstData *data)
       set(data->object, MUIA_TextEditor_UndoAvailable, FALSE);
 
       if(isFlagClear(data->flags, FLG_UndoLost))
-      { 
+      {
         data->HasChanged = FALSE;
+        data->ContentsChanged = FALSE;
+        data->MetaDataChanged = FALSE;
         data->ChangeEvent = TRUE;
       }
     }

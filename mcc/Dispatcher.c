@@ -807,7 +807,9 @@ DISPATCHER(_Dispatcher)
   struct InstData *data;
   LONG t_totallines;
   LONG t_visual_y;
-  BOOL t_haschanged;
+  BOOL t_hasChanged;
+  BOOL t_contentsChanged;
+  BOOL t_metaDataChanged;
   LONG t_xpos;
   LONG t_longestline;
   struct TEColor t_pen;
@@ -842,7 +844,9 @@ DISPATCHER(_Dispatcher)
   // set some variables:
   t_totallines = data->totallines;
   t_visual_y = data->visual_y;
-  t_haschanged = data->HasChanged;
+  t_hasChanged = data->HasChanged;
+  t_contentsChanged = data->ContentsChanged;
+  t_metaDataChanged = data->MetaDataChanged;
   t_pen = data->Pen;
   areamarked = Enabled(data);
   t_xpos        = data->xpos;
@@ -966,8 +970,12 @@ DISPATCHER(_Dispatcher)
     default:                              result = DoSuperMethodA(cl, obj, msg);            RETURN(result); return result; break;
   }
 
-  if(t_haschanged != data->HasChanged)
+  if(t_hasChanged != data->HasChanged)
     set(obj, MUIA_TextEditor_HasChanged, data->HasChanged);
+  if(t_contentsChanged != data->ContentsChanged)
+    set(obj, MUIA_TextEditor_ContentsChanged, data->ContentsChanged);
+  if(t_metaDataChanged != data->MetaDataChanged)
+    set(obj, MUIA_TextEditor_MetaDataChanged, data->MetaDataChanged);
 
   if(data->ChangeEvent && data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
   {

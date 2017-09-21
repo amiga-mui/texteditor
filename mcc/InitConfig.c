@@ -346,6 +346,8 @@ void InitConfig(struct IClass *cl, Object *obj)
       MUIA_TextEditor_UndoAvailable, FALSE,
       MUIA_TextEditor_RedoAvailable, FALSE,
       MUIA_TextEditor_HasChanged, FALSE,
+      MUIA_TextEditor_ContentsChanged, FALSE,
+      MUIA_TextEditor_MetaDataChanged, FALSE,
       TAG_DONE);
     data->NoNotify = FALSE;
   }

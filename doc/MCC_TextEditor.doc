@@ -7,6 +7,7 @@ TextEditor.mcc/MUIA_TextEditor_AutoClip
 TextEditor.mcc/MUIA_TextEditor_ColorMap
 TextEditor.mcc/MUIA_TextEditor_Columns
 TextEditor.mcc/MUIA_TextEditor_Contents
+TextEditor.mcc/MUIA_TextEditor_ContentsChanged
 TextEditor.mcc/MUIA_TextEditor_ConvertTabs
 TextEditor.mcc/MUIA_TextEditor_CursorIndex
 TextEditor.mcc/MUIA_TextEditor_CursorPosition
@@ -27,6 +28,7 @@ TextEditor.mcc/MUIA_TextEditor_InVirtualGroup
 TextEditor.mcc/MUIA_TextEditor_KeyUpFocus
 TextEditor.mcc/MUIA_TextEditor_Keywords
 TextEditor.mcc/MUIA_TextEditor_MatchedKeyword
+TextEditor.mcc/MUIA_TextEditor_MetaDataChanged
 TextEditor.mcc/MUIA_TextEditor_PasteColors
 TextEditor.mcc/MUIA_TextEditor_PasteStyles
 TextEditor.mcc/MUIA_TextEditor_Pen
@@ -265,6 +267,31 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
     SEE ALSO
         MUIA_TextEditor_ConvertTabs, MUIA_TextEditor_ImportHook
         MUIM_TextEditor_InsertText
+
+TextEditor.mcc/MUIA_TextEditor_ContentsChanged
+
+    NAME
+        MUIA_TextEditor_ContentsChanged -- [ISG], BOOL
+
+    FUNCTION
+        This tag will show if the contents of the gadget have changed.
+        In contrast to MUIA_TextEditor_HasChanged it will reflect changes to
+        the textual contents only, but not changes to the metadata like
+        alignment, color or style.
+        You can take notify on this tag, so that you can connect it with
+        a checkmark or text object.
+
+        You should set this tag to FALSE whenever you reacted on a change and
+        want to be notified about new changes.
+
+        The tag is currently not affected by:
+         MUIA_TextEditor_Contents, MUIM_TextEditor_ClearText
+         MUIM_TextEditor_Export, MUIM_TextEditor_Import
+
+        ... but comments are welcome :)
+
+    SEE ALSO
+        MUIA_TextEditor_HasChanged, MUIA_TextEditor_MetaDataChanged
 
 TextEditor.mcc/MUIA_TextEditor_ConvertTabs
 
@@ -523,6 +550,11 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
         You should set this tag to FALSE whenever you export the contents
         of the gadget or overwrite them with something new.
 
+        Setting this attribute will automatically apply the same value to
+        these attributes as well:
+          - MUIA_TextEditor_ContentsChanged
+          - MUIA_TextEditor_MetaDataChanged
+
         Even if you have set up notification on this tag, you should
         still get() it before you kill the text, because this makes it
         possible to do some advanced testing to see if the text has
@@ -536,7 +568,10 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
 
         ... but comments are welcome :)
 
-TextEditor.mcc/MUIA_TextEditor_HorizontalSlider
+    SEE ALSO
+        MUIA_TextEditor_ContentsChanged, MUIA_TextEditor_MetaChanged
+
+TextEditor.mcc/MUIA_TextEditor_HorizontalSlider
 
     NAME
         MUIA_TextEditor_HorizontalSlider -- [IS.], Object *
@@ -746,6 +781,31 @@ TextEditor.mcc/MUIA_TextEditor_HorizontalSlider
 
     SEE ALSO
         MUIA_TextEditor_Keywords
+
+TextEditor.mcc/MUIA_TextEditor_MetaDataChanged
+
+    NAME
+        MUIA_TextEditor_MetaDataChanged -- [ISG], BOOL
+
+    FUNCTION
+        This tag will show if the metadata of the gadget have changed.
+        In contrast to MUIA_TextEditor_HasChanged it will reflect changes to
+        the metadata only, like alignment, color or style, but not changes to
+        textual contents.
+        You can take notify on this tag, so that you can connect it with
+        a checkmark or text object.
+
+        You should set this tag to FALSE whenever you reacted on a change and
+        want to be notified about new changes.
+
+        The tag is currently not affected by:
+         MUIA_TextEditor_Contents, MUIM_TextEditor_ClearText
+         MUIM_TextEditor_Export, MUIM_TextEditor_Import
+
+        ... but comments are welcome :)
+
+    SEE ALSO
+        MUIA_TextEditor_ContentsChanged, MUIA_TextEditor_HasChanged
 
 TextEditor.mcc/MUIA_TextEditor_PasteColors
 

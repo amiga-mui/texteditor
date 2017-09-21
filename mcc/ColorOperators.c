@@ -142,6 +142,7 @@ void AddColor(struct InstData *data, struct marking *realblock, const struct TEC
   ENTER();
 
   data->HasChanged = TRUE;
+  data->MetaDataChanged = TRUE;
 //data->ChangeEvent = TRUE;    // Color changes won't make any difference to textlengths, that's why it is commented out!
 
   if(realblock->enabled == TRUE && (realblock->startx != realblock->stopx || realblock->startline != realblock->stopline))

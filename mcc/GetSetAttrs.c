@@ -238,6 +238,14 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = isFlagSet(data->flags, FLG_GlobalFlow);
     break;
 
+    case MUIA_TextEditor_ContentsChanged:
+      ti_Data = data->ContentsChanged;
+    break;
+
+    case MUIA_TextEditor_MetaDataChanged:
+      ti_Data = data->MetaDataChanged;
+    break;
+
     default:
       LEAVE();
       return(DoSuperMethodA(cl, obj, (Msg)msg));
@@ -583,8 +591,6 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           }
           data->Pen = pen;
           AddColor(data, &data->blockinfo, &data->Pen);
-          data->HasChanged = TRUE;
-          data->ChangeEvent = TRUE;
         }
       }
       break;
@@ -702,6 +708,8 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       case MUIA_TextEditor_HasChanged:
       {
         data->HasChanged = ti_Data;
+        data->ContentsChanged = ti_Data;
+        data->MetaDataChanged = ti_Data;
         if(ti_Data == FALSE)
           clearFlag(data->flags, FLG_UndoLost);
       }
@@ -810,6 +818,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 
           DumpText(data, data->visual_y+start-1, start-1, start-1+lines, TRUE);
           data->HasChanged = TRUE;
+          data->MetaDataChanged = TRUE;
           data->ChangeEvent = TRUE;
         }
       }
@@ -955,8 +964,21 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
         {
           DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
           data->HasChanged = TRUE;
+          data->MetaDataChanged = TRUE;
           data->ChangeEvent = TRUE;
         }
+      }
+      break;
+
+      case MUIA_TextEditor_ContentsChanged:
+      {
+        data->ContentsChanged = ti_Data;
+      }
+      break;
+
+      case MUIA_TextEditor_MetaDataChanged:
+      {
+        data->MetaDataChanged = ti_Data;
       }
       break;
     }

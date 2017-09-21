@@ -111,6 +111,8 @@ extern "C" {
 #define MUIA_TextEditor_RGBMode               (TextEditor_Dummy + 0x45)
 #define MUIA_TextEditor_HorizontalSlider      (TextEditor_Dummy + 0x46)
 #define MUIA_TextEditor_GlobalFlow            (TextEditor_Dummy + 0x4a)
+#define MUIA_TextEditor_ContentsChanged       (TextEditor_Dummy + 0x4b)
+#define MUIA_TextEditor_MetaDataChanged       (TextEditor_Dummy + 0x4c)
 
 #define MUIM_TextEditor_HandleError           (TextEditor_Dummy + 0x1f)
 #define MUIM_TextEditor_AddKeyBindings        (TextEditor_Dummy + 0x22)

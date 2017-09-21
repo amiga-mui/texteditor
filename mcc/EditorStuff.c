@@ -477,6 +477,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
   BOOL highlight = line->line.Highlight;
   UWORD flow = line->line.Flow;
   UWORD separator = line->line.Separator;
+  BOOL metaDataChanged = FALSE;
 
   ENTER();
 
@@ -486,6 +487,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
   next = GetNextLine(line);
 
   data->HasChanged = TRUE;
+  data->ContentsChanged = TRUE;
   data->ChangeEvent = TRUE;
   if(line->line.Length == 1)
   {
@@ -565,6 +567,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
           {
             D(DBF_STYLE, "prepending style 0x%04lx at column %ld", line1Styles->style, line1Styles->column);
             AddToGrow(&styleGrow, line1Styles);
+            metaDataChanged = TRUE;
             line1Styles++;
           }
         }
@@ -589,6 +592,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
             newStyle.column = line2Styles->column + line->line.Length - 1;
             newStyle.style = line2Styles->style;
             AddToGrow(&styleGrow, &newStyle);
+            metaDataChanged = TRUE;
 
             line2Styles++;
           }
@@ -615,6 +619,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
           D(DBF_STYLE, "applying color change from %ld/%ld to %ld/%ld in column %ld (1)", end_color.color, end_color.isRGB, line1Colors->color, line1Colors->color.isRGB, line1Colors->column);
           end_color = line1Colors->color;
           AddToGrow(&colorGrow, line1Colors);
+          metaDataChanged = TRUE;
           line1Colors++;
         }
 
@@ -629,6 +634,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
         newColor.column = line->line.Length;
         SetDefaultColor(data, &newColor.color);
         AddToGrow(&colorGrow, &newColor);
+        metaDataChanged = TRUE;
 
         SetDefaultColor(data, &end_color);
       }
@@ -649,6 +655,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
           newColor.column = line2Colors->column + line->line.Length-1;
           newColor.color = line2Colors->color;
           AddToGrow(&colorGrow, &newColor);
+          metaDataChanged = TRUE;
 
           end_color = line2Colors->color;
           line2Colors++;
@@ -749,6 +756,8 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
       DumpText(data, data->visual_y, 0, data->maxlines, TRUE);
     }
 
+    data->MetaDataChanged |= metaDataChanged;
+
     result = TRUE;
   }
 
@@ -785,8 +794,10 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
     struct LineColor *colors = line->line.Colors;
     struct Grow newStyleGrow;
     struct Grow newColorGrow;
+    BOOL metaDataChanged = FALSE;
 
     data->HasChanged = TRUE;
+    data->ContentsChanged = TRUE;
     data->ChangeEvent = TRUE;
     Init_LineNode(data, newline, &line->line.Contents[x]);
     newline->line.Highlight = line->line.Highlight;
@@ -832,6 +843,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
         newStyle.column = 1;
         newStyle.style = BOLD;
         AddToGrow(&newStyleGrow, &newStyle);
+        metaDataChanged = TRUE;
       }
       if(isFlagSet(style, ITALIC))
       {
@@ -841,6 +853,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
         newStyle.column = 1;
         newStyle.style = ITALIC;
         AddToGrow(&newStyleGrow, &newStyle);
+        metaDataChanged = TRUE;
       }
       if(isFlagSet(style, UNDERLINE))
       {
@@ -850,6 +863,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
         newStyle.column = 1;
         newStyle.style = UNDERLINE;
         AddToGrow(&newStyleGrow, &newStyle);
+        metaDataChanged = TRUE;
       }
 
       // add the remaining style changes to the new line
@@ -883,6 +897,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
         newStyle.column = x+1;
         newStyle.style = ~BOLD;
         AddToGrow(&oldStyleGrow, &newStyle);
+        metaDataChanged = TRUE;
       }
       if(isFlagSet(style, ITALIC))
       {
@@ -892,6 +907,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
         newStyle.column = x+1;
         newStyle.style = ~ITALIC;
         AddToGrow(&oldStyleGrow, &newStyle);
+        metaDataChanged = TRUE;
       }
       if(isFlagSet(style, UNDERLINE))
       {
@@ -901,6 +917,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
         newStyle.column = x+1;
         newStyle.style = ~UNDERLINE;
         AddToGrow(&oldStyleGrow, &newStyle);
+        metaDataChanged = TRUE;
       }
 
       if(newStyleGrow.itemCount > 0)
@@ -955,6 +972,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
         newColor.column = 1;
         newColor.color = color;
         AddToGrow(&newColorGrow, &newColor);
+        metaDataChanged = TRUE;
       }
 
       // add the remaining color changes to the new line
@@ -1135,6 +1153,8 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
 
       result = TRUE;
     }
+
+    data->MetaDataChanged |= metaDataChanged;
   }
 
   RETURN(result);
@@ -1274,6 +1294,7 @@ static void UpdateChange(struct InstData *data, LONG x, struct line_node *line, 
     OptimizedPrint(data, skip, line, line_nr, width);
     ScrollIntoDisplay(data);
     data->HasChanged = TRUE;
+    data->ContentsChanged = TRUE;
     data->ChangeEvent = TRUE;
   }
 
