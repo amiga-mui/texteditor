@@ -220,7 +220,7 @@ int main(void)
           GETINTERFACE(IMUIMaster, MUIMasterBase))
         {
             Object *app, *window, *clear, *cut, *copy, *paste, *erase,
-                   *bold, *italic, *underline, *ischanged, *undo, *redo, *string,
+                   *bold, *italic, *underline, *ischanged, *contentschanged, *metadatachanged, *undo, *redo, *string,
                    *xslider, *yslider, *xyslider, *flow, *search, *replace, *wrapmode, *wrapborder,
                    *rgroup, *isdisabled, *isreadonly, *converttabs, *wrapwords;
             Object *lower,*upper;
@@ -301,6 +301,8 @@ int main(void)
                         End,
 
                         Child, ischanged = MUI_MakeObject(MUIO_Checkmark, "Is changed?"),
+                        Child, contentschanged = MUI_MakeObject(MUIO_Checkmark, "Contents changed?"),
+                        Child, metadatachanged = MUI_MakeObject(MUIO_Checkmark, "Metadata changed?"),
                         Child, isdisabled = MUI_MakeObject(MUIO_Checkmark, "Is disabled?"),
                         Child, isreadonly = MUI_MakeObject(MUIO_Checkmark, "Is read-only?"),
                         Child, flow = MUI_MakeObject(MUIO_Cycle, NULL, flow_text),
@@ -489,6 +491,8 @@ int main(void)
             set(lower, MUIA_CycleChain, TRUE);
             set(upper, MUIA_CycleChain, TRUE);
             set(ischanged, MUIA_CycleChain, TRUE);
+            set(contentschanged, MUIA_CycleChain, TRUE);
+            set(metadatachanged, MUIA_CycleChain, TRUE);
             set(isdisabled, MUIA_CycleChain, TRUE);
             set(isreadonly, MUIA_CycleChain, TRUE);
             set(flow, MUIA_CycleChain, TRUE);
@@ -566,6 +570,14 @@ int main(void)
             DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_HasChanged, MUIV_EveryTime, ischanged, 3, MUIM_NoNotifySet, MUIA_Selected, MUIV_TriggerValue);
             DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_HasChanged, MUIV_EveryTime, ischanged, 3, MUIM_NoNotifySet, MUIA_Image_State, MUIV_TriggerValue);
             DoMethod(ischanged, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_HasChanged, MUIV_TriggerValue);
+
+            DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_ContentsChanged, MUIV_EveryTime, contentschanged, 3, MUIM_NoNotifySet, MUIA_Selected, MUIV_TriggerValue);
+            DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_ContentsChanged, MUIV_EveryTime, contentschanged, 3, MUIM_NoNotifySet, MUIA_Image_State, MUIV_TriggerValue);
+            DoMethod(contentschanged, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_ContentsChanged, MUIV_TriggerValue);
+
+            DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_MetaDataChanged, MUIV_EveryTime, metadatachanged, 3, MUIM_NoNotifySet, MUIA_Selected, MUIV_TriggerValue);
+            DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_MetaDataChanged, MUIV_EveryTime, metadatachanged, 3, MUIM_NoNotifySet, MUIA_Image_State, MUIV_TriggerValue);
+            DoMethod(metadatachanged, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_MetaDataChanged, MUIV_TriggerValue);
 
             DoMethod(isdisabled, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_Set, MUIA_Disabled, MUIV_TriggerValue);
             DoMethod(isreadonly, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_Set, MUIA_TextEditor_ReadOnly, MUIV_TriggerValue);

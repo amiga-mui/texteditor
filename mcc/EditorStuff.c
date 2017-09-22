@@ -477,7 +477,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
   BOOL highlight = line->line.Highlight;
   UWORD flow = line->line.Flow;
   UWORD separator = line->line.Separator;
-  BOOL metaDataChanged = FALSE;
+  BOOL metaDataChanged = data->MetaDataChanged;
 
   ENTER();
 
@@ -756,7 +756,7 @@ BOOL MergeLines(struct InstData *data, struct line_node *line)
       DumpText(data, data->visual_y, 0, data->maxlines, TRUE);
     }
 
-    data->MetaDataChanged |= metaDataChanged;
+    data->MetaDataChanged = metaDataChanged;
 
     result = TRUE;
   }
@@ -794,7 +794,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
     struct LineColor *colors = line->line.Colors;
     struct Grow newStyleGrow;
     struct Grow newColorGrow;
-    BOOL metaDataChanged = FALSE;
+    BOOL metaDataChanged = data->MetaDataChanged;
 
     data->HasChanged = TRUE;
     data->ContentsChanged = TRUE;
@@ -1154,7 +1154,7 @@ BOOL SplitLine(struct InstData *data, LONG x, struct line_node *line, BOOL move_
       result = TRUE;
     }
 
-    data->MetaDataChanged |= metaDataChanged;
+    data->MetaDataChanged = metaDataChanged;
   }
 
   RETURN(result);

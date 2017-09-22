@@ -258,7 +258,6 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
 }
 
 ///
-void kprintf(const char *,...);
 /// mSet()
 IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 {
@@ -708,8 +707,6 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       case MUIA_TextEditor_HasChanged:
       {
         data->HasChanged = ti_Data;
-        data->ContentsChanged = ti_Data;
-        data->MetaDataChanged = ti_Data;
         if(ti_Data == FALSE)
           clearFlag(data->flags, FLG_UndoLost);
       }

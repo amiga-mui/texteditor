@@ -236,7 +236,7 @@ void AddStyle(struct InstData *data, struct marking *realblock, UWORD style, BOO
   }
   data->HasChanged = TRUE;
   data->MetaDataChanged = TRUE;
-  data->ChangeEvent = TRUE;
+//data->ChangeEvent = TRUE; // Style changes won't make any difference to textlengths, that's why it is commented out!
 
   if(realblock->enabled == TRUE && (realblock->startx != realblock->stopx || realblock->startline != realblock->stopline))
   {

@@ -970,12 +970,14 @@ DISPATCHER(_Dispatcher)
     default:                              result = DoSuperMethodA(cl, obj, msg);            RETURN(result); return result; break;
   }
 
-  if(t_hasChanged != data->HasChanged)
-    set(obj, MUIA_TextEditor_HasChanged, data->HasChanged);
-  if(t_contentsChanged != data->ContentsChanged)
-    set(obj, MUIA_TextEditor_ContentsChanged, data->ContentsChanged);
-  if(t_metaDataChanged != data->MetaDataChanged)
-    set(obj, MUIA_TextEditor_MetaDataChanged, data->MetaDataChanged);
+  if(t_hasChanged != data->HasChanged || t_contentsChanged != data->ContentsChanged || t_metaDataChanged != data->MetaDataChanged)
+  {
+    SetAttrs(obj,
+      t_hasChanged != data->HasChanged           ? MUIA_TextEditor_HasChanged      : TAG_IGNORE, data->HasChanged,
+      t_contentsChanged != data->ContentsChanged ? MUIA_TextEditor_ContentsChanged : TAG_IGNORE, data->ContentsChanged,
+      t_metaDataChanged != data->MetaDataChanged ? MUIA_TextEditor_MetaDataChanged : TAG_IGNORE, data->MetaDataChanged,
+      TAG_DONE);
+  }
 
   if(data->ChangeEvent && data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
   {

@@ -188,7 +188,6 @@ LONG GetPenAndRGB(struct InstData *data, LONG item, CONST_APTR def, ULONG *rgb)
 
 ///
 /// InitConfig()
-void kprintf(const char *,...);
 void InitConfig(struct IClass *cl, Object *obj)
 {
   struct InstData *data = INST_DATA(cl, obj);

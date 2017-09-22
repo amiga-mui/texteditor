@@ -2,6 +2,12 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2017-09-22 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc: optimized the handling of the new attributes to get notified about
+    changes of contents and metadata. I.e. changing the alignment should no
+    longer trigger MUIA_TextEditor_ContentsChanged.
+
 2017-09-21 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc: implemented the attributes MUIA_TextEditor_ContentsChanged and
