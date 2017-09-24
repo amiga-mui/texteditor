@@ -887,7 +887,7 @@ void ScrollIntoView(struct InstData *data)
 
 ///
 /// ContainsMetaData()
-BOOL ContainsMetaData(struct Data *data)
+BOOL ContainsMetaData(struct InstData *data)
 {
   struct marking newblock;
   struct line_node *startline;
