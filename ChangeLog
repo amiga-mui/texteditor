@@ -6,6 +6,8 @@ MUI TextEditor MCC class - ChangeLog
 
   * mcc/Dispatcher.c: forget about any possible detected changes due to the
     initial text import right during OM_NEW.
+  * mcc/HandleInput.c: respect any meta data for triggering the attribute
+    MUIA_TextEditor_MetaDataChanged in case a deleted block contains some.
 
 2017-09-22 Thore Böckelmann <tboeckel@gmx.de>
 

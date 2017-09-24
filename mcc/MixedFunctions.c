@@ -497,7 +497,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
     yplace  = data->ypos + (data->fontheight * (line_nr + pos.lines - 1));
     cursorxplace = xplace + TextLengthNew(&data->tmprp, &line->line.Contents[x+start], 0-start, data->TabSizePixels);
 
-    // do not do draw operations under some contitions if in NoWrap mode 
+    // do not do draw operations under some contitions if in NoWrap mode
     if(data->WrapMode == MUIV_TextEditor_WrapMode_NoWrap)
     {
       // do not draw the cursor if it is not in the field of view (even partially)
@@ -614,7 +614,7 @@ void SetCursor(struct InstData *data, LONG x, struct line_node *line, BOOL Set)
         DrawSeparator(data, rp, LeftX, Y, LeftWidth, Height);
       }
     }
-	  
+
     if(clipping)
       RemoveClipping(data);
   }
@@ -669,7 +669,7 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
     }
 
     if(drawbottom)
-    {                              
+    {
       LONG start_y = data->ypos + (MIN((data->totallines - data->visual_y + 1), data->maxlines))*data->fontheight;
 
       DoMethod(data->object, MUIM_DrawBackground,
@@ -883,6 +883,50 @@ void ScrollIntoView(struct InstData *data)
     data->xpos = xmax - _mwidth(data->object);
     DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
   }
+}
+
+///
+/// ContainsMetaData()
+BOOL ContainsMetaData(struct Data *data)
+{
+  struct marking newblock;
+  struct line_node *startline;
+  struct line_node *stopline;
+  BOOL hasMetaData = FALSE;
+
+  ENTER();
+
+  NiceBlock(&data->blockinfo, &newblock);
+  startline = newblock.startline;
+  stopline  = newblock.stopline;
+
+  if(startline->line.Colors != NULL ||
+     startline->line.Styles != NULL ||
+     startline->line.Flow != MUIV_TextEditor_Flow_Left)
+  {
+    hasMetaData = TRUE;
+  }
+
+  if(hasMetaData == FALSE && startline != stopline)
+  {
+    struct line_node *line = GetNextLine(startline);
+
+    while(line != stopline)
+    {
+      if(line->line.Colors != NULL ||
+         line->line.Styles != NULL ||
+         line->line.Flow != MUIV_TextEditor_Flow_Left)
+      {
+        hasMetaData = TRUE;
+        break;
+      }
+
+      line = GetNextLine(line);
+    }
+  }
+
+  RETURN(hasMetaData);
+  return hasMetaData;
 }
 
 ///

@@ -1192,10 +1192,13 @@ static void EraseBlock(struct InstData *data, ULONG flags)
 
   if(Enabled(data))
   {
+    // check whether the block contains any meta data
+    BOOL hasMetaData = ContainsMetaData(data);
+
     DoBlock(data, flags|CUTF_CUT);
     data->HasChanged = TRUE;
     data->ContentsChanged = TRUE;
-    #warning MetaData?
+    data->MetaDataChanged |= hasMetaData;
     data->ChangeEvent = TRUE;
   }
   else
