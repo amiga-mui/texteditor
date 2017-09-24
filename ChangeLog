@@ -2,6 +2,11 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2017-09-24 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Dispatcher.c: forget about any possible detected changes due to the
+    initial text import right during OM_NEW.
+
 2017-09-22 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc: optimized the handling of the new attributes to get notified about
