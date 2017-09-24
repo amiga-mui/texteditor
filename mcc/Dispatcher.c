@@ -113,12 +113,34 @@ void RejectInput(struct InstData *data)
 }
 
 ///
+/// DoSuperNew()
+#if !defined(__MORPHOS__)
+Object * VARARGS68K DoSuperNew(struct IClass *cl, Object *obj, ...)
+{
+  Object *rc;
+  VA_LIST args;
+
+  VA_START(args, obj);
+  #if defined(__AROS__)
+  rc = (Object *)DoSuperNewTagList(cl, obj, NULL, (struct TagItem *)VA_ARG(args, IPTR));
+  #else
+  rc = (Object *)DoSuperMethod(cl, obj, OM_NEW, VA_ARG(args, ULONG), NULL);
+  #endif
+  VA_END(args);
+
+  return rc;
+}
+#endif // !__MORPHOS
+
+///
 /// mNew()
 static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
 {
   ENTER();
 
-  if((obj = (Object *)DoSuperMethodA(cl, obj, (Msg)msg)) != NULL)
+  if((obj = (Object *)DoSuperNew(cl, obj,
+    MUIA_PointerType, MUIV_PointerType_Text,
+    TAG_MORE, msg->ops_AttrList)) != NULL)
   {
     struct InstData *data = INST_DATA(cl, obj);
     data->object = obj;
@@ -190,11 +212,9 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             // initialize our temporary rastport
             InitRastPort(&data->tmprp);
 
-            set(obj, MUIA_PointerType, MUIV_PointerType_Text);
-
             // walk through all attributes and check if
             // they were set during OM_NEW
-            mSet(cl, obj, (struct opSet *)msg);
+            mSet(cl, obj, msg);
             data->visual_y = 1;
             data->xpos = 0;
 
@@ -212,7 +232,7 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             data->inactivecolor = -1;
             data->backgroundcolor = -1;
 
-            // forget about any possible changes due to the initial text import
+            // forget about any possible detected changes due to the initial text import
             data->HasChanged = FALSE;
             data->ContentsChanged = FALSE;
             data->MetaDataChanged = FALSE;
