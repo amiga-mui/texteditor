@@ -212,6 +212,12 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
             data->inactivecolor = -1;
             data->backgroundcolor = -1;
 
+            // forget about any possible changes due to the initial text import
+            data->HasChanged = FALSE;
+            data->ContentsChanged = FALSE;
+            data->MetaDataChanged = FALSE;
+            data->ChangeEvent = FALSE;
+
             RETURN((IPTR)obj);
             return (IPTR)obj;
           }
