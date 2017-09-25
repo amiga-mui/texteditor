@@ -536,6 +536,7 @@ IPTR mHandleARexx(struct IClass *cl, Object *obj, struct MUIP_TextEditor_ARexxCm
 
             snprintf(buffer, length+2, "%s\n", txtargs);
 
+            // the artificial type cast to APTR is necessary to avoid warnings for certain systems
             myrdargs->RDA_Source.CS_Buffer = (APTR)buffer;
             myrdargs->RDA_Source.CS_Length = length+1;
             myrdargs->RDA_Source.CS_CurChr = 0;
