@@ -536,7 +536,7 @@ IPTR mHandleARexx(struct IClass *cl, Object *obj, struct MUIP_TextEditor_ARexxCm
 
             snprintf(buffer, length+2, "%s\n", txtargs);
 
-            myrdargs->RDA_Source.CS_Buffer = buffer;
+            myrdargs->RDA_Source.CS_Buffer = (APTR)buffer;
             myrdargs->RDA_Source.CS_Length = length+1;
             myrdargs->RDA_Source.CS_CurChr = 0;
             myrdargs->RDA_Flags |= RDAF_NOPROMPT;
@@ -547,13 +547,17 @@ IPTR mHandleARexx(struct IClass *cl, Object *obj, struct MUIP_TextEditor_ARexxCm
 
               FreeArgs(ra_result);
             }
+
             FreeVecPooled(data->mypool, buffer);
           }
+
           FreeDosObject(DOS_RDARGS, myrdargs);
         }
       }
       else
+      {
         result = CallFunction(data, function, Args, (char *)txtargs);
+      }
     }
   }
 
