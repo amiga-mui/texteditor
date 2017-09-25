@@ -44,6 +44,8 @@
 
 #include "SDI_hook.h"
 
+//#define USE_EXPORT_BLOCK_HOOK 1
+
 // global data
 Object *editorgad = NULL;
 
@@ -66,6 +68,7 @@ HOOKPROTONHNO(URLHookCode, LONG, struct ClickMessage *cm)
 }
 MakeStaticHook(URLHook, URLHookCode);
 
+#if defined(USE_EXPORT_BLOCK_HOOK)
 HOOKPROTONHNONP(PosHookCode, void)
 {
   unsigned int x, y, sx, sy;
@@ -78,7 +81,9 @@ HOOKPROTONHNONP(PosHookCode, void)
     printf("Cursor: (%d, %d) - (%d, %d)\n", crsr->MinX, crsr->MinY, crsr->MaxX, crsr->MaxY);
 }
 MakeStaticHook(PosHook, PosHookCode);
+#endif
 
+#if defined(USE_EXPORT_BLOCK_HOOK)
 HOOKPROTONHNONP(ExportBlockCode, void)
 {
   STRPTR text;
@@ -93,6 +98,7 @@ HOOKPROTONHNONP(ExportBlockCode, void)
   }
 }
 MakeStaticHook(ExportBlockHook, ExportBlockCode);
+#endif
 
 HOOKPROTONH(ARexxHookCode, LONG, Object *app, struct RexxMsg *rexxmsg)
 {
@@ -583,7 +589,9 @@ int main(void)
             DoMethod(isreadonly, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_Set, MUIA_TextEditor_ReadOnly, MUIV_TriggerValue);
 
             DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "Clear");
-  //          DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_CallHook, &ExportBlockHook);
+          #if defined(USE_EXPORT_BLOCK_HOOK)
+            DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_CallHook, &ExportBlockHook);
+          #endif
   //          DoMethod(clear, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_HasChanged, FALSE);
 
             DoMethod(cut,   MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "Cut");
