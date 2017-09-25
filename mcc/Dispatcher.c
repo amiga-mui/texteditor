@@ -952,8 +952,7 @@ DISPATCHER(_Dispatcher)
 
         if(data->hslider)
         {
-          LONG prop_entries;
-          get(data->hslider, MUIA_Prop_Entries, &prop_entries);
+          LONG prop_entries = xget(data->hslider, MUIA_Prop_Entries);
 
           if(prop_entries != data->longestline)
           {
