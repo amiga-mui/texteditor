@@ -144,6 +144,7 @@ static BOOL SendRexx(CONST_STRPTR word, CONST_STRPTR command)
       SHOWSTRING(DBF_SPELL, buffer);
 
       rxmsg->rm_Action = RXCOMM;
+      // the artificial type cast to APTR is necessary to avoid warnings for certain systems
       if((rxmsg->rm_Args[0] = (APTR)CreateArgstring(buffer, strlen(buffer))) != 0)
       {
         if(SafePutMsg("REXX", (struct Message *)rxmsg) == TRUE)

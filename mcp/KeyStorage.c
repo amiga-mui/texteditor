@@ -145,7 +145,8 @@ void ConvertKeyString(STRPTR keystring, UWORD action, struct KeyAction *storage)
       strlcpy(buffer, keystring, length + 1);
       buffer[length] = '\n';
       buffer[length+1] = '\0';
-      myrdargs->RDA_Source.CS_Buffer = buffer;
+      // the artificial type cast to APTR is necessary to avoid warnings for certain systems
+      myrdargs->RDA_Source.CS_Buffer = (APTR)buffer;
       myrdargs->RDA_Source.CS_Length = length+1;
       myrdargs->RDA_Source.CS_CurChr = 0;
       myrdargs->RDA_Flags |= RDAF_NOPROMPT;
