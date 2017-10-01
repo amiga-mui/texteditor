@@ -997,7 +997,16 @@ DISPATCHER(_Dispatcher)
 
   if(t_hasChanged != data->HasChanged || t_contentsChanged != data->ContentsChanged || t_metaDataChanged != data->MetaDataChanged)
   {
+    // don't trigger unwanted notifications in case an application sets an attribute
+    // like MUIA_TextEditor_HasChanged in parallel with MUIA_NoNotify=TRUE
+    BOOL nonotify;
+    if(msg->MethodID == OM_SET)
+      nonotify = GetTagData(MUIA_NoNotify, FALSE, ((struct opSet *)msg)->ops_AttrList);
+    else
+      nonotify = FALSE;
+
     SetAttrs(obj,
+      MUIA_NoNotify, nonotify,
       t_hasChanged != data->HasChanged           ? MUIA_TextEditor_HasChanged      : TAG_IGNORE, data->HasChanged,
       t_contentsChanged != data->ContentsChanged ? MUIA_TextEditor_ContentsChanged : TAG_IGNORE, data->ContentsChanged,
       t_metaDataChanged != data->MetaDataChanged ? MUIA_TextEditor_MetaDataChanged : TAG_IGNORE, data->MetaDataChanged,

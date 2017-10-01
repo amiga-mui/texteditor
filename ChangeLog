@@ -2,6 +2,12 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2017-10-01 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Dispatcher.c: don't trigger unwanted notifications in case an
+    application sets an attribute like MUIA_TextEditor_HasChanged in parallel
+    with MUIA_NoNotify=TRUE.
+
 2017-09-24 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Dispatcher.c: forget about any possible detected changes due to the
