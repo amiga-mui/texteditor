@@ -2,6 +2,8 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+#### v15.49 RELEASE (special MUI 5.0-2017R3 release) ###########################
+
 2017-10-01 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Dispatcher.c: don't trigger unwanted notifications in case an
