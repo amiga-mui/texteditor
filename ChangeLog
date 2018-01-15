@@ -2,6 +2,11 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2018-01-15 Thore Böckelmann <tboeckel@gmx.de>
+
+  * misc: add the unique names for private custom classes for MUI4 and up only.
+    With MUI 3.8 this causes crashes.
+
 #### v15.49 RELEASE (special MUI 5.0-2017R3 release) ###########################
 
 2017-10-01 Thore Böckelmann <tboeckel@gmx.de>
