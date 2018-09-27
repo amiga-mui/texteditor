@@ -77,12 +77,7 @@ void FreeTextMem(struct InstData *data, struct MinList *lines)
 
   while((line = RemFirstLine(lines)) != NULL)
   {
-    FreeVecPooled(data->mypool, line->line.Contents);
-    if(line->line.Styles != NULL)
-      FreeVecPooled(data->mypool, line->line.Styles);
-    if(line->line.Colors != NULL)
-      FreeVecPooled(data->mypool, line->line.Colors);
-
+    Free_LineNode(data, line);
     FreeVecPooled(data->mypool, line);
   }
 
@@ -136,6 +131,21 @@ BOOL Init_LineNode(struct InstData *data, struct line_node *line, CONST_STRPTR t
 
   RETURN(success);
   return(success);
+}
+
+///
+/// Free_LineNode()
+void Free_LineNode(struct InstData *data, struct line_node *line)
+{
+  ENTER();
+
+  FreeVecPooled(data->mypool, line->line.Contents);
+  if(line->line.Styles != NULL)
+    FreeVecPooled(data->mypool, line->line.Styles);
+  if(line->line.Colors != NULL)
+    FreeVecPooled(data->mypool, line->line.Colors);
+
+  LEAVE();
 }
 
 ///
@@ -659,13 +669,20 @@ void DumpText(struct InstData *data, LONG visual_y, LONG line_nr, LONG lines, BO
       doublebuffer = FALSE;
     }
 
-    while(line != NULL && line_nr != lines)
+    if(isFlagClear(data->flags, FLG_Active) && IsEmptyContents(data) == TRUE)
     {
-      while(x < line->line.Length && line_nr != lines)
-        x = x + PrintLine(data, x, line, ++line_nr, doublebuffer);
+      PrintLine(data, x, &data->inactiveContents, 1, doublebuffer);
+    }
+    else
+    {
+      while(line != NULL && line_nr != lines)
+      {
+        while(x < line->line.Length && line_nr != lines)
+          x = x + PrintLine(data, x, line, ++line_nr, doublebuffer);
 
-      line = GetNextLine(line);
-      x = 0;
+        line = GetNextLine(line);
+        x = 0;
+      }
     }
 
     if(drawbottom)
@@ -927,6 +944,25 @@ BOOL ContainsMetaData(struct InstData *data)
 
   RETURN(hasMetaData);
   return hasMetaData;
+}
+
+///
+/// IsEmptyContents
+BOOL IsEmptyContents(struct InstData *data)
+{
+  BOOL empty;
+  struct line_node *first;
+
+  ENTER();
+
+  first = GetFirstLine(&data->linelist);
+  if(strcmp(first->line.Contents, "\n") != 0 || HasNextLine(first) == TRUE)
+    empty = FALSE;
+  else
+    empty = TRUE;
+
+  RETURN(empty);
+  return empty;
 }
 
 ///

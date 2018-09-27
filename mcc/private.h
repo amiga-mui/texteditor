@@ -466,6 +466,8 @@ struct InstData
 
   BOOL            ContentsChanged;
   BOOL            MetaDataChanged;
+
+  struct  line_node inactiveContents;
 };
 
 // AllocBitMap.c
@@ -502,6 +504,7 @@ LONG ClientReadLine(IPTR session, struct line_node **line, ULONG *cset);
 // ColorOperators.c
 void GetColor(struct InstData *, LONG, struct line_node *, struct TEColor *);
 void AddColor(struct InstData *, struct marking *, const struct TEColor *);
+void AddColorToLine(struct InstData *, LONG, struct line_node *, LONG, const struct TEColor *);
 void SetDefaultColor(struct InstData *, struct TEColor *);
 BOOL IsDefaultColor(struct InstData *, const struct TEColor *);
 ULONG ConvertSinglePenToRGB(struct InstData *, LONG);
@@ -578,6 +581,7 @@ void AddClipping(struct InstData *);
 void RemoveClipping(struct InstData *);
 void FreeTextMem(struct InstData *, struct MinList *);
 BOOL Init_LineNode(struct InstData *, struct line_node *, CONST_STRPTR);
+void Free_LineNode(struct InstData *, struct line_node *);
 BOOL ExpandLine(struct InstData *, struct line_node *, LONG);
 BOOL CompressLine(struct InstData *, struct line_node *);
 void InsertLines(struct MinList *lines, struct line_node *after);
@@ -595,6 +599,7 @@ LONG CountLines(struct InstData *, struct MinList *);
 LONG LongestLine(struct InstData *);
 void ScrollIntoView(struct InstData *);
 BOOL ContainsMetaData(struct InstData *);
+BOOL IsEmptyContents(struct InstData *);
 
 // Navigation.c
 void SetBookmark(struct InstData *, ULONG);

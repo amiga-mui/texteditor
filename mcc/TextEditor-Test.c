@@ -229,7 +229,7 @@ int main(void)
                    *bold, *italic, *underline, *ischanged, *contentschanged, *metadatachanged, *undo, *redo, *string,
                    *xslider, *yslider, *xyslider, *flow, *search, *replace, *wrapmode, *wrapborder,
                    *rgroup, *isdisabled, *isreadonly, *converttabs, *wrapwords;
-            Object *lower,*upper;
+            Object *lower,*upper, *foo, *bar, *null;
             Object *undoslider;
 
             const char *flow_text[] = { "Left", "Center", "Right", NULL };
@@ -268,6 +268,9 @@ int main(void)
                         Child, replace = MUI_MakeObject(MUIO_Button, "Replace"),
                         Child, lower = MUI_MakeObject(MUIO_Button, "lower"),
                         Child, upper = MUI_MakeObject(MUIO_Button, "upper"),
+                        Child, foo = MUI_MakeObject(MUIO_Button, "foo"),
+                        Child, bar = MUI_MakeObject(MUIO_Button, "bar"),
+                        Child, null = MUI_MakeObject(MUIO_Button, "null"),
 
                       End,
 
@@ -399,7 +402,11 @@ int main(void)
                                     MUIA_ControlChar, 'a',
                                     MUIA_TextEditor_RGBMode, TRUE,
                                     MUIA_TextEditor_GlobalFlow, TRUE,
-                                    MUIA_TextEditor_Flow, MUIV_TextEditor_Flow_Right,
+//                                    MUIA_TextEditor_Flow, MUIV_TextEditor_Flow_Right,
+                                    MUIA_TextEditor_InactiveContents, "bla",
+                                    MUIA_TextEditor_Contents, "blubb",
+#if 1
+#else
                                     MUIA_TextEditor_Contents,
 
                                       "\n"
@@ -440,6 +447,7 @@ int main(void)
                                       "  \33u  Delete combinations:  \33n\n"
                                       "Ctrl + Backspace, Delete = \"Delele To BOL\", \"Delele To EOL\".\n"
                                       "Alt + Backspace, Delete = \"Delele To BOW\", \"Delete To NextWord\".\n",
+#endif
                                   End,
                                   Child, slider = MUI_NewObject("Scrollbar.mui", End,
                                  End,
@@ -605,6 +613,9 @@ int main(void)
             DoMethod(replace, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 3, MUIM_TextEditor_Replace, "replaced", 0);
             DoMethod(lower, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "ToLower");
             DoMethod(upper, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 2, MUIM_TextEditor_ARexxCmd, "ToUpper");
+            DoMethod(foo, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 3, MUIM_Set, MUIA_TextEditor_InactiveContents, "foo");
+            DoMethod(bar, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 3, MUIM_Set, MUIA_TextEditor_InactiveContents, "bar");
+            DoMethod(null, MUIM_Notify, MUIA_Pressed, FALSE, editorgad, 3, MUIM_Set, MUIA_TextEditor_InactiveContents, NULL);
 
             DoMethod(bold,      MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_StyleBold, MUIV_TriggerValue);
             DoMethod(italic,    MUIM_Notify, MUIA_Selected, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_StyleItalic, MUIV_TriggerValue);

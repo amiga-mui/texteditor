@@ -23,6 +23,7 @@ TextEditor.mcc/MUIA_TextEditor_HasChanged
 TextEditor.mcc/MUIA_TextEditor_HorizontalSlider
 TextEditor.mcc/MUIA_TextEditor_ImportHook
 TextEditor.mcc/MUIA_TextEditor_ImportWrap
+TextEditor.mcc/MUIA_TextEditor_InactiveContents
 TextEditor.mcc/MUIA_TextEditor_InsertMode         (not yet implemented...)
 TextEditor.mcc/MUIA_TextEditor_InVirtualGroup
 TextEditor.mcc/MUIA_TextEditor_KeyUpFocus
@@ -730,6 +731,19 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
 
     FUNCTION
         Not yet implemented...
+
+TextEditor.mcc/MUIA_TextEditor_InactiveContents
+
+    NAME
+        MUIA_TextEditor_InactiveContents (v15.51) -- [ISG], STRPTR
+
+    FUNCTION
+        Set this to attribute to an alternative text, which will be displayed
+        when no other text has been entered by the user or been set by the
+        application and the editor object is not the active object.
+
+    SEE ALSO
+        MUIA_TextEditor_Contents
 
 TextEditor.mcc/MUIA_TextEditor_InVirtualGroup
 

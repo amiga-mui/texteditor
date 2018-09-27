@@ -2,6 +2,13 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2018-09-27 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/misc: implemented MUIA_TextEditor_InactiveContents to set an alternative
+    text, which will be displayed when no other text has been entered by the
+    user or been set by the application and the editor object is not the active
+    object. This closes #22.
+
 #### v15.50 RELEASE ############################################################
 
 2018-01-15 Thore Böckelmann <tboeckel@gmx.de>

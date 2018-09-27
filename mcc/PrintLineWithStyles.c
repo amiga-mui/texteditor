@@ -266,7 +266,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
       clr_left  = dleft;
       clr_width = MIN(flow+blockstart - data->xpos, _mwidth(data->object));
-                  
+
       if(clr_width > 0)
       {
         // clear the background first
@@ -302,7 +302,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
         if(data->selectmode == 2 ||
            (flow && data->selectmode != 1 && startx-x == 0 && cursor == FALSE &&
             ((data->blockinfo.startline != data->blockinfo.stopline) || x > 0)))
-        {               
+        {
           LONG left  = MIN(MAX(xoffset, dleft), dright);
           LONG right = MIN(dright, xoffset+flow+blockwidth-1);
 
@@ -311,10 +311,10 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
             RectFill(rp, left, starty, right, starty+data->fontheight-1);
         }
         else
-        {              
+        {
           LONG left  = MIN(MAX(xoffset+flow+blockstart, dleft), dright);
           LONG right = MIN(dright, xoffset+flow+blockstart+blockwidth-1);
-                       
+
           SetAPen(rp, cursor ? MUIPEN(data->cursorcolor) : color);
           if(left < dright || right > dleft)
           {
@@ -427,7 +427,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
 
         // set the rastport pen pos to appropriate coordinates
         Move(rp, pen_pos, starty+rp->TxBaseline);
-        
+
         // check if there is space left to print some text
         if(maxwidth > 0)
         {

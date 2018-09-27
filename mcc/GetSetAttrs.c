@@ -20,6 +20,9 @@
 
 ***************************************************************************/
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <intuition/classes.h>
 #include <utility/tagitem.h>
 #include <clib/alib_protos.h>
@@ -114,73 +117,96 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
     case MUIA_TextEditor_AreaMarked:
       ti_Data = Enabled(data);
       break;
+
     case MUIA_TextEditor_CursorX:
       ti_Data = data->CPos_X;
       break;
+
     case MUIA_TextEditor_CursorY:
       ti_Data = LineNr(data, data->actualline)-1;
       break;
+
     case MUIA_TextEditor_ExportWrap:
       ti_Data = data->ExportWrap;
       break;
+
     case MUIA_TextEditor_FixedFont:
       ti_Data = data->use_fixedfont;
       break;
+
     case MUIA_TextEditor_Pen:
       ti_Data = data->Pen.color;
       break;
+
     case MUIA_TextEditor_Flow:
       ti_Data = isFlagSet(data->flags, FLG_GlobalFlow) ? data->GlobalFlow : data->Flow;
       break;
+
     case MUIA_TextEditor_Separator:
       ti_Data = data->Separator;
       break;
+
     case MUIA_TextEditor_HasChanged:
       ti_Data = data->HasChanged;
       break;
+
     case MUIA_TextEditor_ImportWrap:
       ti_Data = data->ImportWrap;
       break;
+
 /*    case MUIA_TextEditor_InsertMode:
       ti_Data = data->InsertMode;
       break;
 */
+
     case MUIA_TextEditor_Prop_Entries:
       ti_Data = data->totallines;
       break;
+
     case MUIA_TextEditor_Prop_Visible:
       ti_Data = data->maxlines;
       break;
+
     case MUIA_TextEditor_Prop_DeltaFactor:
       ti_Data = data->fontheight;
       break;
+
     case MUIA_TextEditor_Prop_First:
       ti_Data = (data->visual_y-1)*data->fontheight;
       break;
+
     case MUIA_TextEditor_HSlider_Pos:
       ti_Data = data->xpos;
       break;
+
     case MUIA_TextEditor_HSlider_Vis:
       ti_Data = _mwidth(obj);
       break;
+
     case MUIA_TextEditor_HSlider_Ent:
       ti_Data = data->longestline;
       break;
+
     case MUIA_TextEditor_ReadOnly:
       ti_Data = isFlagSet(data->flags, FLG_ReadOnly);
       break;
+
     case MUIA_TextEditor_Quiet:
       ti_Data = isFlagSet(data->flags, FLG_Quiet);
       break;
+
     case MUIA_TextEditor_StyleBold:
       ti_Data = ((GetStyle(data->CPos_X, data->actualline) & BOLD) ? TRUE : FALSE);
       break;
+
     case MUIA_TextEditor_StyleItalic:
       ti_Data = ((GetStyle(data->CPos_X, data->actualline) & ITALIC) ? TRUE : FALSE);
       break;
+
     case MUIA_TextEditor_StyleUnderline:
       ti_Data = ((GetStyle(data->CPos_X, data->actualline) & UNDERLINE) ? TRUE : FALSE);
       break;
+
     case MUIA_TextEditor_TypeAndSpell:
       ti_Data = data->TypeAndSpell;
       break;
@@ -246,15 +272,19 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = data->MetaDataChanged;
     break;
 
+    case MUIA_TextEditor_InactiveContents:
+      ti_Data = (IPTR)data->inactiveContents.line.Contents;
+    break;
+
     default:
       LEAVE();
-      return(DoSuperMethodA(cl, obj, (Msg)msg));
+      return DoSuperMethodA(cl, obj, (Msg)msg);
   }
 
   *msg->opg_Storage = ti_Data;
 
   RETURN(TRUE);
-  return(TRUE);
+  return TRUE;
 }
 
 ///
@@ -326,7 +356,7 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
         if(data->slider != NULL)
           set(data->slider, MUIA_Disabled, ti_Data);
 
-	if(data->hslider != NULL)
+        if(data->hslider != NULL)
           set(data->hslider, MUIA_Disabled, ti_Data);
       }
       break;
@@ -976,6 +1006,41 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
       case MUIA_TextEditor_MetaDataChanged:
       {
         data->MetaDataChanged = ti_Data;
+      }
+      break;
+
+      case MUIA_TextEditor_InactiveContents:
+      {
+        LONG length;
+
+        if(ti_Data)
+        {
+          // string + 2 Spaces + LF
+          // 2 additional spaces are required to ensure that the rightmost slanted
+          // pixels of the string remain visible
+          length = strlen((const char *)ti_Data)+2+1;
+
+          // string + 2 Spaces + LF + NUL must fit
+          if(length+1 <= data->inactiveContents.line.allocatedContents ||
+             ExpandLine(data, &data->inactiveContents, length+1) == TRUE)
+          {
+            strlcpy(data->inactiveContents.line.Contents, (const char *)ti_Data, data->inactiveContents.line.allocatedContents);
+            strlcat(data->inactiveContents.line.Contents, "  ", data->inactiveContents.line.allocatedContents);
+          }
+        }
+        else
+        {
+          length = 1;
+          data->inactiveContents.line.Contents[0] = '\0';
+        }
+
+        strlcat(data->inactiveContents.line.Contents, "\n", data->inactiveContents.line.allocatedContents);
+        data->inactiveContents.line.Length = length;
+
+        AddStyleToLine(data, 0, &data->inactiveContents, length, ITALIC);
+
+        if(isFlagClear(data->flags, FLG_Active) && IsEmptyContents(data) == TRUE)
+          ScrollUpDown(data);
       }
       break;
     }

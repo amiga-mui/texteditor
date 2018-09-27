@@ -49,7 +49,7 @@ void GetColor(struct InstData *data, LONG x, struct line_node *line, struct TECo
 
 ///
 /// AddColorToLine()
-static void AddColorToLine(struct InstData *data, LONG x, struct line_node *line, LONG length, const struct TEColor *color)
+void AddColorToLine(struct InstData *data, LONG x, struct line_node *line, LONG length, const struct TEColor *color)
 {
   struct Grow colorGrow;
   struct LineColor *colors;

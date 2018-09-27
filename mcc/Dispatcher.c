@@ -167,79 +167,82 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
         {
           if(Init_LineNode(data, firstLine, "\n") == TRUE)
           {
-            AddLine(&data->linelist, firstLine);
-
-            data->actualline = firstLine;
-            data->update = TRUE;
-            data->ImportHook = &ImPlainHook;
-            data->ImportWrap = 1023;
-            data->WrapBorder = 0;
-            data->WrapMode = MUIV_TextEditor_WrapMode_HardWrap;
-            data->WrapWords = TRUE; // wrap at word boundaries
-            data->TabSize = 4;       // default to 4 spaces per TAB
-            data->GlobalTabSize = 4; // default to 4 spaces per TAB
-            data->TabSizePixels = 4*8; // assume a fixed space width of 8 pixels per default
-            data->ConvertTabs = TRUE; // convert tab to spaces per default
-
-            data->ExportHook = &ExportHookPlain;
-            setFlag(data->flags, FLG_AutoClip);
-            setFlag(data->flags, FLG_ActiveOnClick);
-            setFlag(data->flags, FLG_PasteStyles);
-            setFlag(data->flags, FLG_PasteColors);
-            setFlag(data->flags, FLG_HScroll);
-
-            #if defined(__amigaos3__) || defined(__amigaos4__)
-            if(MUIMasterBase->lib_Version > 20 || (MUIMasterBase->lib_Version == 20 && MUIMasterBase->lib_Revision >= 5640))
+            if(Init_LineNode(data, &data->inactiveContents, "\n") == TRUE)
             {
-              // MUI 4.0 for AmigaOS4 does the disabled pattern drawing itself,
-              // no need to do this on our own
-              setFlag(data->flags, FLG_MUI4);
+              AddLine(&data->linelist, firstLine);
+
+              data->actualline = firstLine;
+              data->update = TRUE;
+              data->ImportHook = &ImPlainHook;
+              data->ImportWrap = 1023;
+              data->WrapBorder = 0;
+              data->WrapMode = MUIV_TextEditor_WrapMode_HardWrap;
+              data->WrapWords = TRUE; // wrap at word boundaries
+              data->TabSize = 4;       // default to 4 spaces per TAB
+              data->GlobalTabSize = 4; // default to 4 spaces per TAB
+              data->TabSizePixels = 4*8; // assume a fixed space width of 8 pixels per default
+              data->ConvertTabs = TRUE; // convert tab to spaces per default
+
+              data->ExportHook = &ExportHookPlain;
+              setFlag(data->flags, FLG_AutoClip);
+              setFlag(data->flags, FLG_ActiveOnClick);
+              setFlag(data->flags, FLG_PasteStyles);
+              setFlag(data->flags, FLG_PasteColors);
+              setFlag(data->flags, FLG_HScroll);
+
+              #if defined(__amigaos3__) || defined(__amigaos4__)
+              if(MUIMasterBase->lib_Version > 20 || (MUIMasterBase->lib_Version == 20 && MUIMasterBase->lib_Revision >= 5640))
+              {
+                // MUI 4.0 for AmigaOS4 does the disabled pattern drawing itself,
+                // no need to do this on our own
+                setFlag(data->flags, FLG_MUI4);
+              }
+              #elif defined(__MORPHOS__)
+              if(MUIMasterBase->lib_Version > 20 || (MUIMasterBase->lib_Version == 20 && MUIMasterBase->lib_Revision >= 6906))
+              {
+                // MUI 4.0 for MorphOS does the disabled pattern drawing itself,
+                // no need to do this on our own
+                setFlag(data->flags, FLG_MUI4);
+              }
+              #endif
+
+              if(FindTagItem(MUIA_Background, msg->ops_AttrList))
+                setFlag(data->flags, FLG_OwnBackground);
+              if(FindTagItem(MUIA_Frame, msg->ops_AttrList))
+                setFlag(data->flags, FLG_OwnFrame);
+
+              // initialize our temporary rastport
+              InitRastPort(&data->tmprp);
+
+              // walk through all attributes and check if
+              // they were set during OM_NEW
+              mSet(cl, obj, msg);
+              data->visual_y = 1;
+              data->xpos = 0;
+
+              // start with an inactive cursor
+              data->currentCursorState = CS_INACTIVE;
+
+              data->textColor = -1;
+              data->textRGB = 0xff000000;
+              data->highlightColor = -1;
+              data->highlightRGB = 0xff00000;
+              data->cursorcolor = -1;
+              data->markedcolor = -1;
+              data->separatorshine = -1;
+              data->separatorshadow = -1;
+              data->inactivecolor = -1;
+              data->backgroundcolor = -1;
+
+              // forget about any possible detected changes due to the initial text import
+              data->HasChanged = FALSE;
+              data->ContentsChanged = FALSE;
+              data->MetaDataChanged = FALSE;
+              data->ChangeEvent = FALSE;
+
+              RETURN((IPTR)obj);
+              return (IPTR)obj;
             }
-            #elif defined(__MORPHOS__)
-            if(MUIMasterBase->lib_Version > 20 || (MUIMasterBase->lib_Version == 20 && MUIMasterBase->lib_Revision >= 6906))
-            {
-              // MUI 4.0 for MorphOS does the disabled pattern drawing itself,
-              // no need to do this on our own
-              setFlag(data->flags, FLG_MUI4);
-            }
-            #endif
-
-            if(FindTagItem(MUIA_Background, msg->ops_AttrList))
-              setFlag(data->flags, FLG_OwnBackground);
-            if(FindTagItem(MUIA_Frame, msg->ops_AttrList))
-              setFlag(data->flags, FLG_OwnFrame);
-
-            // initialize our temporary rastport
-            InitRastPort(&data->tmprp);
-
-            // walk through all attributes and check if
-            // they were set during OM_NEW
-            mSet(cl, obj, msg);
-            data->visual_y = 1;
-            data->xpos = 0;
-
-            // start with an inactive cursor
-            data->currentCursorState = CS_INACTIVE;
-
-            data->textColor = -1;
-            data->textRGB = 0xff000000;
-            data->highlightColor = -1;
-            data->highlightRGB = 0xff00000;
-            data->cursorcolor = -1;
-            data->markedcolor = -1;
-            data->separatorshine = -1;
-            data->separatorshadow = -1;
-            data->inactivecolor = -1;
-            data->backgroundcolor = -1;
-
-            // forget about any possible detected changes due to the initial text import
-            data->HasChanged = FALSE;
-            data->ContentsChanged = FALSE;
-            data->MetaDataChanged = FALSE;
-            data->ChangeEvent = FALSE;
-
-            RETURN((IPTR)obj);
-            return (IPTR)obj;
           }
         }
       }
@@ -266,6 +269,7 @@ static IPTR mDispose(struct IClass *cl, Object *obj, Msg msg)
 
   // free all lines with their contents
   FreeTextMem(data, &data->linelist);
+  Free_LineNode(data, &data->inactiveContents);
 
   FreeKeywords(data);
 
@@ -669,6 +673,9 @@ IPTR mGoActive(struct IClass *cl, Object *obj, Msg msg)
 
   if(data->shown == TRUE)
   {
+    if(IsEmptyContents(data) == TRUE)
+      DumpText(data, data->visual_y, 0, data->maxlines, FALSE);
+
     SetCursor(data, data->CPos_X, data->actualline, TRUE);
 
     // in case we ought to show a selected area in a different
@@ -723,12 +730,20 @@ IPTR mGoInactive(struct IClass *cl, Object *obj, Msg msg)
     data->BlinkSpeed = 1;
   }
 
-  SetCursor(data, data->CPos_X, data->actualline, FALSE);
+  if(IsEmptyContents(data) == TRUE)
+  {
+    PrintLine(data, 0, &data->inactiveContents, 1, TRUE);
+    SetCursor(data, data->CPos_X, data->actualline, FALSE);
+  }
+  else
+  {
+    SetCursor(data, data->CPos_X, data->actualline, FALSE);
 
-  // in case we ought to show a selected area in a different
-  // color than in inactive state we call MarkText()
-  if(isFlagSet(data->flags, FLG_ActiveOnClick) && Enabled(data))
-    MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
+    // in case we ought to show a selected area in a different
+    // color than in inactive state we call MarkText()
+    if(isFlagSet(data->flags, FLG_ActiveOnClick) && Enabled(data))
+      MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
+  }
 
   result = DoSuperMethodA(cl, obj, msg);
 

@@ -113,6 +113,7 @@ extern "C" {
 #define MUIA_TextEditor_GlobalFlow            (TextEditor_Dummy + 0x4a)
 #define MUIA_TextEditor_ContentsChanged       (TextEditor_Dummy + 0x4b)
 #define MUIA_TextEditor_MetaDataChanged       (TextEditor_Dummy + 0x4c)
+#define MUIA_TextEditor_InactiveContents      (TextEditor_Dummy + 0x4d)
 
 #define MUIM_TextEditor_HandleError           (TextEditor_Dummy + 0x1f)
 #define MUIM_TextEditor_AddKeyBindings        (TextEditor_Dummy + 0x22)
