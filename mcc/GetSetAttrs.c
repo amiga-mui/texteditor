@@ -1037,7 +1037,21 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
         strlcat(data->inactiveContents.line.Contents, "\n", data->inactiveContents.line.allocatedContents);
         data->inactiveContents.line.Length = length;
 
-        AddStyleToLine(data, 0, &data->inactiveContents, length, ITALIC);
+        // transparent text is supported on certain platforms only
+        #if defined(__amigaos4__) || defined(__MORPHOS__) || defined(__AROS__)
+        if(data->rgbMode == TRUE)
+        {
+          struct TEColor color;
+
+          color.isRGB = TRUE;
+          color.color = 0x80000000 | data->textRGB;
+          AddColorToLine(data, 0, &data->inactiveContents, length, &color);
+		}
+		else
+		#endif
+		{
+          AddStyleToLine(data, 0, &data->inactiveContents, length, ITALIC);
+        }
 
         if(isFlagClear(data->flags, FLG_Active) && IsEmptyContents(data) == TRUE)
           ScrollUpDown(data);
