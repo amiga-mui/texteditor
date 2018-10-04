@@ -733,7 +733,6 @@ IPTR mGoInactive(struct IClass *cl, Object *obj, Msg msg)
   if(IsEmptyContents(data) == TRUE)
   {
     PrintLine(data, 0, &data->inactiveContents, 1, TRUE);
-    SetCursor(data, data->CPos_X, data->actualline, FALSE);
   }
   else
   {

@@ -7,6 +7,8 @@ MUI TextEditor MCC class - ChangeLog
   * mcc/GetSetAttrs.c: the alternative text will be displayed with 50%
     transparency if the editor object has the RGB mode enabled and if the system
     supports this feature. Otherwise it will be displayed in italics as usual.
+  * mcc/Dispatcher.c: don't show a ghost cursor in case the alternative text is
+    displayed in inactive state.
 
 2018-09-27 Thore Böckelmann <tboeckel@gmx.de>
 
