@@ -468,7 +468,9 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     {
       LONG p_length = c_length;
       struct TextExtentNew te;
+      #if defined(__amigaos3__)
       BOOL alpha = FALSE;
+      #endif
 
       SetSoftStyle(rp, ConvertStyle(GetStyle(x, line)), AskSoftStyle(rp));
       if(styles != NULL)
@@ -484,8 +486,10 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       {
         while(colors->column-1 <= x)
         {
+          #if defined(__amigaos3__)
           if((colors->color.color & 0xff000000) != 0xff000000)
             alpha = TRUE;
+          #endif
 
           SetColor(data, rp, &colors->color, line->line.Highlight, TRUE);
           colors++;
