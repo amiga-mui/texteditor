@@ -541,17 +541,21 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
           {
             if(text[x+o_chars+fitting-1] < ' ')
             {
+              #if defined(__amigaos3__)
               if(alpha == TRUE)
                 AlphaText(rp, text+x+o_chars, fitting-1, 0x00000000, 0x80000000);
               else
-                TextNew(rp, text+x+o_chars, fitting-1, data->TabSizePixels);
+              #endif
+              TextNew(rp, text+x+o_chars, fitting-1, data->TabSizePixels);
             }
             else
             {
+              #if defined(__amigaos3__)
               if(alpha == TRUE)
                 AlphaText(rp, text+x+o_chars, fitting, 0x00000000, 0x80000000);
               else
-                TextNew(rp, text+x+o_chars, fitting, data->TabSizePixels);
+              #endif
+              TextNew(rp, text+x+o_chars, fitting, data->TabSizePixels);
             }
 
             // immediately bail out if end of line is reached
