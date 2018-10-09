@@ -32,10 +32,10 @@
 #include <proto/graphics.h>
 #include <proto/intuition.h>
 
-#include "private.h"
-#include "Debug.h"
-
 #if defined(__amigaos3__)
+#include <cybergraphx/cybergraphics.h>
+#include <proto/cybergraphics.h>
+
 #ifndef RPTAG_PenMode
 #define RPTAG_PenMode         0x80000080
 #endif
@@ -47,6 +47,105 @@
 #endif
 #endif
 
+#include "private.h"
+#include "Debug.h"
+
+/// reconstructAlpha()
+#if defined(__amigaos3__)
+static void reconstructAlpha(ULONG *pix, ULONG width, ULONG height, ULONG text, ULONG back)
+{
+  LONG tr = (text >> 16) & 0xff;
+  LONG tg = (text >>  8) & 0xff;
+  LONG tb = (text >>  0) & 0xff;
+  LONG br = (back >> 16) & 0xff;
+  LONG bg = (back >>  8) & 0xff;
+  LONG bb = (back >>  0) & 0xff;
+  // calculate the difference between text and background color
+  LONG tmb_r = tr - br;
+  LONG tmb_g = tg - bg;
+  LONG tmb_b = tb - bb;
+  ULONG i;
+
+  ENTER();
+
+  for(i = 0; i < width*height; i++)
+  {
+    ULONG p = *pix & 0x00ffffff;
+
+    if(p == text)
+    {
+      // text is always opaque
+      p |= 0xff000000;
+    }
+    else if(p != back)
+    {
+      // reconstruct the alpha value for all non-background pixels from the
+      // difference between the current color and the background color in
+      // respect to the text color
+      LONG r = (p >> 16) & 0xff;
+      LONG g = (p >>  8) & 0xff;
+      LONG b = (p >>  0) & 0xff;
+      LONG p_r = ((r - br) * 0xff) / tmb_r;
+      LONG p_g = ((g - bg) * 0xff) / tmb_g;
+      LONG p_b = ((b - bb) * 0xff) / tmb_b;
+
+      p |= (((p_r + p_g + p_b) / 3) << 24);
+    }
+
+    *pix++ = p;
+  }
+
+  LEAVE();
+}
+#endif
+
+///
+/// AlphaText()
+#if defined(__amigaos3__)
+static void AlphaText(struct RastPort *rp, const char *txt, LONG len, ULONG fgcolor, ULONG alpha)
+{
+  struct TextExtent te;
+  struct BitMap *bm;
+  LONG w;
+  LONG h;
+
+  ENTER();
+
+  TextExtent(rp, txt, len, &te);
+  // use a one pixel border around the text to ensure we have at least one background colored pixel
+  w = te.te_Width+2;
+  h = te.te_Height+2;
+  if((bm = AllocBitMap(w, h, 32, BMF_CLEAR|BMF_MINPLANES|BMF_DISPLAYABLE, rp->BitMap)) != NULL)
+  {
+    struct RastPort _rp;
+    ULONG *pix;
+
+    _rp = *rp;
+    _rp.BitMap = bm;
+    _rp.Layer = NULL;
+
+    Move(&_rp, 1, _rp.TxBaseline+1);
+    Text(&_rp, txt, len);
+
+    if((pix = AllocVec(w * h * sizeof(ULONG), MEMF_ANY)) != NULL)
+    {
+      ReadPixelArray(pix, 0, 0, w*4, &_rp, 0, 0, w, h, RECTFMT_ARGB);
+      reconstructAlpha(pix, w, h, fgcolor, pix[0] & 0x00ffffff);
+      WritePixelArrayAlpha(pix, 1, 1, w*4, rp, rp->cp_x, rp->cp_y - rp->TxBaseline, te.te_Width, te.te_Height, alpha);
+
+      FreeVec(pix);
+    }
+
+    FreeBitMap(bm);
+  }
+
+  Move(rp, rp->cp_x + te.te_Width, rp->cp_y);
+
+  LEAVE();
+}
+#endif
+
+///
 /// ConvertStyle()
 ULONG ConvertStyle(UWORD style)
 {
@@ -369,6 +468,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
     {
       LONG p_length = c_length;
       struct TextExtentNew te;
+      BOOL alpha = FALSE;
 
       SetSoftStyle(rp, ConvertStyle(GetStyle(x, line)), AskSoftStyle(rp));
       if(styles != NULL)
@@ -384,6 +484,9 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
       {
         while(colors->column-1 <= x)
         {
+          if((colors->color.color & 0xff000000) != 0xff000000)
+            alpha = TRUE;
+
           SetColor(data, rp, &colors->color, line->line.Highlight, TRUE);
           colors++;
         }
@@ -437,9 +540,19 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
           if(fitting > 0)
           {
             if(text[x+o_chars+fitting-1] < ' ')
-              TextNew(rp, text+x+o_chars, fitting-1, data->TabSizePixels);
+            {
+              if(alpha == TRUE)
+                AlphaText(rp, text+x+o_chars, fitting-1, 0x00000000, 0x80000000);
+              else
+                TextNew(rp, text+x+o_chars, fitting-1, data->TabSizePixels);
+            }
             else
-              TextNew(rp, text+x+o_chars, fitting, data->TabSizePixels);
+            {
+              if(alpha == TRUE)
+                AlphaText(rp, text+x+o_chars, fitting, 0x00000000, 0x80000000);
+              else
+                TextNew(rp, text+x+o_chars, fitting, data->TabSizePixels);
+            }
 
             // immediately bail out if end of line is reached
             if(p_length +1 == length)

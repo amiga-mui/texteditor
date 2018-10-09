@@ -1019,7 +1019,6 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           // 2 additional spaces are required to ensure that the rightmost slanted
           // pixels of the string remain visible
           length = strlen((const char *)ti_Data)+2+1;
-
           // string + 2 Spaces + LF + NUL must fit
           if(length+1 <= data->inactiveContents.line.allocatedContents ||
              ExpandLine(data, &data->inactiveContents, length+1) == TRUE)
@@ -1037,8 +1036,6 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
         strlcat(data->inactiveContents.line.Contents, "\n", data->inactiveContents.line.allocatedContents);
         data->inactiveContents.line.Length = length;
 
-        // transparent text is supported on certain platforms only
-        #if defined(__amigaos4__) || defined(__MORPHOS__) || defined(__AROS__)
         if(data->rgbMode == TRUE)
         {
           struct TEColor color;
@@ -1048,7 +1045,6 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           AddColorToLine(data, 0, &data->inactiveContents, length, &color);
 		}
 		else
-		#endif
 		{
           AddStyleToLine(data, 0, &data->inactiveContents, length, ITALIC);
         }
@@ -1110,4 +1106,3 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 }
 
 ///
-

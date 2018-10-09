@@ -68,6 +68,7 @@ struct Library *LayersBase = NULL;
 struct Library *LocaleBase = NULL;
 struct Library *RexxSysBase = NULL;
 struct Library *WorkbenchBase = NULL;
+struct Library *CyberGfxBase = NULL;
 
 #if defined(__amigaos4__)
 struct DiskfontIFace *IDiskfont = NULL;
@@ -76,6 +77,7 @@ struct LayersIFace *ILayers = NULL;
 struct LocaleIFace *ILocale = NULL;
 struct RexxSysIFace *IRexxSys = NULL;
 struct Interface *IWorkbench = NULL;
+struct CyberGfxIFace *ICyberGfx = NULL;
 #endif
 
 /******************************************************************************/
@@ -123,6 +125,11 @@ static BOOL ClassInit(UNUSED struct Library *base)
                 }
               }
 
+              // cybergraphics.library is allowed to fail
+              if((CyberGfxBase = OpenLibrary("cybergraphics.library", 41)) &&
+                 GETINTERFACE(ICyberGfx, struct CyberGfxIFace *, CyberGfxBase))
+              { }
+
               RETURN(TRUE);
               return(TRUE);
             }
@@ -162,6 +169,13 @@ static VOID ClassExpunge(UNUSED struct Library *base)
   ENTER();
 
   ShutdownClipboardServer();
+
+  if(CyberGfxBase)
+  {
+    DROPINTERFACE(ICyberGfx);
+    CloseLibrary(CyberGfxBase);
+    CyberGfxBase = NULL;
+  }
 
   if(WorkbenchBase)
   {

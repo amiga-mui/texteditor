@@ -135,6 +135,7 @@ struct Library *MUIMasterBase = NULL;
 struct Library *RexxSysBase = NULL;
 struct Library *UtilityBase = NULL;
 struct Library *WorkbenchBase = NULL;
+struct Library *CyberGfxBase = NULL;
 #elif defined(__MORPHOS__)
 struct Library *DiskfontBase = NULL;
 struct GfxBase *GfxBase = NULL;
@@ -146,6 +147,7 @@ struct Library *MUIMasterBase = NULL;
 struct Library *RexxSysBase = NULL;
 struct Library *UtilityBase = NULL;
 struct Library *WorkbenchBase = NULL;
+struct Library *CyberGfxBase = NULL;
 #else
 struct Library *DiskfontBase = NULL;
 struct GfxBase *GfxBase = NULL;
@@ -161,6 +163,7 @@ struct UtilityBase *UtilityBase = NULL;
 struct Library *UtilityBase = NULL;
 #endif
 struct Library *WorkbenchBase = NULL;
+struct Library *CyberGfxBase = NULL;
 #endif
 
 #if defined(__amigaos4__)
@@ -174,6 +177,7 @@ struct MUIMasterIFace *IMUIMaster = NULL;
 struct RexxSysIFace *IRexxSys = NULL;
 struct UtilityIFace *IUtility = NULL;
 struct WorkbenchIFace *IWorkbench = NULL;
+struct CyberGfxIFace *ICyberGfx = NULL;
 #endif
 
 DISPATCHERPROTO(_Dispatcher);
@@ -213,6 +217,11 @@ int main(void)
         WorkbenchBase = NULL;
       }
     }
+
+    // cybergraphics.library is allowed to fail
+    if((CyberGfxBase = OpenLibrary("cybergraphics.library", 41)) &&
+      GETINTERFACE(ICyberGfx, CyberGfxBase))
+    { }
 
     #if defined(DEBUG)
     SetupDebug();
@@ -723,10 +732,17 @@ int main(void)
     #endif
   }
 
+  if(CyberGfxBase)
+  {
+    DROPINTERFACE(ICyberGfx);
+    CloseLibrary(CyberGfxBase);
+  }
+
+
   if(WorkbenchBase)
   {
     DROPINTERFACE(IWorkbench);
-    WorkbenchBase = NULL;
+    CloseLibrary(WorkbenchBase);
   }
 
   if(UtilityBase)
