@@ -2,6 +2,8 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+#### v15.51 RELEASE ############################################################
+
 2018-10-09 Thore Böckelmann <tboeckel@gmx.de>
 
   * PrintLineWithStyles.c: integrated the display of transparent text for
