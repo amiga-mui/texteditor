@@ -66,7 +66,7 @@ To report bugs use the [bug/issue tracker](https://github.com/amiga-mui/textedit
 
 TextEditor.mcc was originally written in 1997 and is Copyright (C) 1997-2000 by Allan Odgaard.
 As of version 15.10, released in April 2005, the gadget is maintained and
-Copyright (C) 2005-2018 TextEditor.mcc Open Source Team.
+Copyright (C) 2005-2019 TextEditor.mcc Open Source Team.
 
 TextEditor is distributed and licensed under the GNU Lesser General Public License Version 2.1.
 See [COPYING](COPYING) for more detailed information.
