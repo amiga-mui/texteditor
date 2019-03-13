@@ -510,7 +510,8 @@ BOOL IsDefaultColor(struct InstData *, const struct TEColor *);
 ULONG ConvertSinglePenToRGB(struct InstData *, LONG);
 void ConvertPensToRGB(struct InstData *);
 #define IsSameColor(c1, c2) ((c1)->color == (c2)->color && (c1)->isRGB == (c2)->isRGB)
-#define IsRGBColor(c)       (c)->isRGB
+#define IsRGBColor(c)       ((c)->isRGB == TRUE)
+#define HasAlphaChannel(c)  (((c)->color & 0xff000000) != 0xff000000)
 
 // Dispatcher.c
 void ResetDisplay(struct InstData *);

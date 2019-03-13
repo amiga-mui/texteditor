@@ -2,6 +2,12 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2019-03-13 Thore Böckelmann <tboeckel@gmx.de>
+
+  * PrintLineWithStyles.c: fixed a wrong alpha channel check which caused
+    crashes on AmigaOS3 in case the system/screen does not support transparency
+    at all. This closes #23.
+
 #### v15.51 RELEASE ############################################################
 
 2018-10-09 Thore Böckelmann <tboeckel@gmx.de>
