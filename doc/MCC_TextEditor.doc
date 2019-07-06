@@ -1394,10 +1394,17 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
         MUIM_TextEditor_CursorXYToIndex (v15.47)
 
     SYNOPSIS
-        DoMethod(obj, MUIM_TextEditor_CursorXYToIndex, xpos, ypos, &index);
+        BOOL success = DoMethod(obj, MUIM_TextEditor_CursorXYToIndex,
+                                xpos, ypos, &index);
 
     FUNCTION
         Convert an X/Y cursor position pair into an index value.
+
+    RESULT
+        Boolean value indicating whether the passed coordinates lie withing the
+        available text or not (v15.49). The index will *ALWAYS* be updated, even
+        if the coordinates passed in are beyond the last character. Hence the
+        returned values might be inaccurate in case of failure.
 
 TextEditor.mcc/MUIM_TextEditor_ExportBlock
 
@@ -1516,7 +1523,7 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
     RESULT
         Boolean value indicating whether the passed index lies within the
         available text or not (v15.49). The X/Y cursor positions will *ALWAYS*
-        be updated, even if the index passed index is beyond the last character.
+        be updated, even if the index passed in is beyond the last character.
         Hence the returned values might be inaccurate in case of failure.
 
 TextEditor.mcc/MUIM_TextEditor_InsertText
