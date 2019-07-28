@@ -2,6 +2,12 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2019-07-28 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/UndoFunctions.c: moved the triggering of MUIA_TextEditor_Undo and _Redo
+    a few lines further down so that a hook being triggered by these attributes
+    and which get()'s the attributes reads the correct states. This closes #25.
+
 2019-07-06 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Methods.c: let MUIM_CursorXYToIndex return a success code to signal
