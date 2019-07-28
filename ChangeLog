@@ -7,6 +7,8 @@ MUI TextEditor MCC class - ChangeLog
   * mcc/UndoFunctions.c: moved the triggering of MUIA_TextEditor_Undo and _Redo
     a few lines further down so that a hook being triggered by these attributes
     and which get()'s the attributes reads the correct states. This closes #25.
+  * demo/TextEditor-Demo.c: enable/disable the Undo/Redo buttons according to
+    the Undo/Redo availability state.
 
 2019-07-06 Thore Böckelmann <tboeckel@gmx.de>
 
