@@ -47,6 +47,17 @@
 #endif
 #endif
 
+#if defined(__amigaos4__)
+#define COLOR_TAGS(color)     RPTAG_APenColor, (color)
+#define PEN_TAGS(pen)         RPTAG_APen, (pen)
+#elif defined(__amigaos3__) || defined(__AROS__)
+#define COLOR_TAGS(color)     RPTAG_PenMode, FALSE, RPTAG_FgColor, (color)
+#define PEN_TAGS(pen)         RPTAG_PenMode, TRUE,  RPTAG_APen, (pen)
+#elif defined(__MORPHOS__)
+#define COLOR_TAGS(color)     RPTAG_AlphaMode, TRUE,  RPTAG_PenMode, FALSE, RPTAG_FgColor, (color)
+#define PEN_TAGS(pen)         RPTAG_AlphaMode, FALSE, RPTAG_PenMode, TRUE,  RPTAG_APen, (pen)
+#endif
+
 #include "private.h"
 #include "Debug.h"
 
@@ -700,26 +711,14 @@ void SetColor(struct InstData *data, struct RastPort *rp, const struct TEColor *
         // set the appropriate RGB color for the exclusive pen and use it
         SetRGB32(&_screen(data->object)->ViewPort, data->exclusivePen, (c->color & 0xff0000) << 8, (c->color & 0x00ff00) << 16, (c->color & 0x0000ff) << 24);
         SetRPAttrs(rp,
-          #if defined(__MORPHOS__)
-          RPTAG_PenMode,   TRUE,
-          RPTAG_AlphaMode, FALSE,
-          #endif
-          RPTAG_APen, data->exclusivePen,
+          PEN_TAGS(data->exclusivePen),
           TAG_DONE);
       }
       else
       {
         // we can use RGB colors directly
         SetRPAttrs(rp,
-          #if defined(__MORPHOS__)
-          RPTAG_PenMode,   FALSE,
-          RPTAG_AlphaMode, FALSE,
-          #endif
-          #if defined(__amigaos4__)
-          RPTAG_APenColor, c->color,
-          #else
-          RPTAG_FgColor,   c->color,
-          #endif
+          COLOR_TAGS(c->color),
           TAG_DONE);
       }
     }
@@ -727,22 +726,14 @@ void SetColor(struct InstData *data, struct RastPort *rp, const struct TEColor *
     {
       // fall back to the standard foreground color
       SetRPAttrs(rp,
-        #if defined(__MORPHOS__)
-        RPTAG_PenMode,   TRUE,
-        RPTAG_AlphaMode, FALSE,
-        #endif
-        RPTAG_APen, convert == TRUE ? ConvertPen(data, 1, highlight) : 1,
+        PEN_TAGS(convert == TRUE ? ConvertPen(data, 1, highlight) : 1),
         TAG_DONE);
     }
   }
   else
   {
     SetRPAttrs(rp,
-      #if defined(__MORPHOS__)
-      RPTAG_PenMode,   TRUE,
-      RPTAG_AlphaMode, FALSE,
-      #endif
-      RPTAG_APen, convert == TRUE ? ConvertPen(data, MUIPEN(c->color), highlight) : MUIPEN(c->color),
+      PEN_TAGS(convert == TRUE ? ConvertPen(data, MUIPEN(c->color), highlight) : MUIPEN(c->color)),
       TAG_DONE);
   }
 

@@ -2,6 +2,12 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2019-08-29 Thore Böckelmann <tboeckel@gmx.de>
+
+  * PrintLineWithStyles.c: simplified the SetRPAttrs() call for all systems,
+    since each system has different requirements on mandatory tags. This refs
+    #26.
+
 #### v15.52 RELEASE ############################################################
 
 2019-03-13 Thore Böckelmann <tboeckel@gmx.de>
