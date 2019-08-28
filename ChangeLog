@@ -8,11 +8,25 @@ MUI TextEditor MCC class - ChangeLog
     since each system has different requirements on mandatory tags. This refs
     #26.
 
+2019-07-28 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/UndoFunctions.c: moved the triggering of MUIA_TextEditor_Undo and _Redo
+    a few lines further down so that a hook being triggered by these attributes
+    and which get()'s the attributes reads the correct states. This closes #25.
+  * demo/TextEditor-Demo.c: enable/disable the Undo/Redo buttons according to
+    the Undo/Redo availability state.
+
+2019-07-06 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Methods.c: let MUIM_CursorXYToIndex return a success code to signal
+    whether the given coordinates really pointed to a position within the text
+    or not.
+
 #### v15.52 RELEASE ############################################################
 
 2019-03-13 Thore Böckelmann <tboeckel@gmx.de>
 
-  * PrintLineWithStyles.c: fixed a wrong alpha channel check which caused
+  * mcc/PrintLineWithStyles.c: fixed a wrong alpha channel check which caused
     crashes on AmigaOS3 in case the system/screen does not support transparency
     at all. This closes #23.
 
@@ -20,7 +34,7 @@ MUI TextEditor MCC class - ChangeLog
 
 2018-10-09 Thore Böckelmann <tboeckel@gmx.de>
 
-  * PrintLineWithStyles.c: integrated the display of transparent text for
+  * mcc/PrintLineWithStyles.c: integrated the display of transparent text for
     AmigaOS3 as known from MUI5 for AmigaOS. Now the alternative text can be
     displayed with 50% transparency on AmigaOS3, too.
 

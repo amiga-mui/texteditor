@@ -501,6 +501,7 @@ IPTR mCursorXYToIndex(struct InstData *data, struct MUIP_TextEditor_CursorXYToIn
   LONG idx = 0;
   LONG lineNumber = 0;
   struct line_node *line;
+  BOOL rc = TRUE;
 
   ENTER();
 
@@ -516,10 +517,14 @@ IPTR mCursorXYToIndex(struct InstData *data, struct MUIP_TextEditor_CursorXYToIn
   // add the X position
   idx += msg->x;
 
+  // signal failure if the requested position is beyond the last character
+  if(line == NULL || msg->x > line->line.Length-1)
+    rc = FALSE;
+
   *msg->index = idx;
 
-  RETURN(0);
-  return 0;
+  RETURN(rc);
+  return rc;
 }
 
 ///

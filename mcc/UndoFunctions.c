@@ -77,16 +77,15 @@ BOOL Undo(struct InstData *data)
       MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
     }
 
-    // as the redo operation automatically
-    // becomes available when undo is used we just
-    // check here if we didn't yet set RedoAvailable
-    // as we only want to set it once
-    if(data->nextUndoStep == data->usedUndoSteps)
-      set(data->object, MUIA_TextEditor_RedoAvailable, TRUE);
-
     // go one step back
     data->nextUndoStep--;
     action = &data->undoSteps[data->nextUndoStep];
+
+    // as the redo operation automatically becomes available when
+    // undo is used we just check here if we didn't yet set RedoAvailable
+    // as we only want to set it once
+    if(data->nextUndoStep == data->usedUndoSteps-1)
+      set(data->object, MUIA_TextEditor_RedoAvailable, TRUE);
 
 //    if(data->actualline != LineNode(data, buffer->y) || data->CPos_X != buffer->x)
     SetCursor(data, data->CPos_X, data->actualline, FALSE);
@@ -247,14 +246,14 @@ BOOL Redo(struct InstData *data)
       MarkText(data, data->blockinfo.startx, data->blockinfo.startline, data->blockinfo.stopx, data->blockinfo.stopline);
     }
 
-    // in case nextUndoStep is equal zero then we have to
-    // set the undoavailable attribute to true to signal
-    // others that undo is available
-    if(data->nextUndoStep == 0)
-      set(data->object, MUIA_TextEditor_UndoAvailable, TRUE);
-
     action = &data->undoSteps[data->nextUndoStep];
     data->nextUndoStep++;
+
+    // in case nextUndoStep represents the first undo step then we have to
+    // set the undoavailable attribute to true to signal others that undo
+    // is available
+    if(data->nextUndoStep == 1)
+      set(data->object, MUIA_TextEditor_UndoAvailable, TRUE);
 
 //    if(data->actualline != LineNode(data, buffer->y) || data->CPos_X != buffer->x)
     SetCursor(data, data->CPos_X, data->actualline, FALSE);
