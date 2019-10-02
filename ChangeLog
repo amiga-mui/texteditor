@@ -4,6 +4,12 @@ MUI TextEditor MCC class - ChangeLog
 
 #### v15.53 RELEASE ############################################################
 
+2019-08-29 Thore Böckelmann <tboeckel@gmx.de>
+
+  * PrintLineWithStyles.c: simplified the SetRPAttrs() call for all systems,
+    since each system has different requirements on mandatory tags. This refs
+    #26.
+
 2019-07-28 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/UndoFunctions.c: moved the triggering of MUIA_TextEditor_Undo and _Redo
