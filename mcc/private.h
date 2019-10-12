@@ -857,4 +857,9 @@ struct  MUIP_WhichPointerType   { ULONG MethodID; LONG mx; LONG my; };
 #define MUIV_PointerType_Text   30
 #endif
 
+#define ARGB32_TO_ALPHA(a) (((a) >> 24) & 0xff)
+#define ARGB32_TO_RED(a)   (((a) >> 16) & 0xff)
+#define ARGB32_TO_GREEN(a) (((a) >>  8) & 0xff)
+#define ARGB32_TO_BLUE(a)  (((a)      ) & 0xff)
+
 #endif /* TEXTEDITOR_MCC_PRIV_H */

@@ -96,9 +96,9 @@ static void reconstructAlpha(ULONG *pix, ULONG width, ULONG height, ULONG text, 
       LONG r = (p >> 16) & 0xff;
       LONG g = (p >>  8) & 0xff;
       LONG b = (p >>  0) & 0xff;
-      LONG p_r = ((r - br) * 0xff) / tmb_r;
-      LONG p_g = ((g - bg) * 0xff) / tmb_g;
-      LONG p_b = ((b - bb) * 0xff) / tmb_b;
+      LONG p_r = (tmb_r != 0) ? ((r - br) * 0xff) / tmb_r : 0;
+      LONG p_g = (tmb_g != 0) ? ((g - bg) * 0xff) / tmb_g : 0;
+      LONG p_b = (tmb_b != 0) ? ((b - bb) * 0xff) / tmb_b : 0;
 
       p |= (((p_r + p_g + p_b) / 3) << 24);
     }
@@ -113,8 +113,9 @@ static void reconstructAlpha(ULONG *pix, ULONG width, ULONG height, ULONG text, 
 ///
 /// AlphaText()
 #if defined(__amigaos3__)
-static void AlphaText(struct RastPort *rp, const char *txt, LONG len, ULONG fgcolor, ULONG alpha)
+static void AlphaText(struct InstData *data, struct MUI_RenderInfo *mri, const char *txt, LONG len, ULONG fgcolor, ULONG alpha)
 {
+  struct RastPort *rp = data->doublerp;
   struct TextExtent te;
   struct BitMap *bm;
   LONG w;
@@ -123,9 +124,8 @@ static void AlphaText(struct RastPort *rp, const char *txt, LONG len, ULONG fgco
   ENTER();
 
   TextExtent(rp, txt, len, &te);
-  // use a one pixel border around the text to ensure we have at least one background colored pixel
-  w = te.te_Width+2;
-  h = te.te_Height+2;
+  w = te.te_Width;
+  h = te.te_Height;
   if((bm = AllocBitMap(w, h, 32, BMF_CLEAR|BMF_MINPLANES|BMF_DISPLAYABLE, rp->BitMap)) != NULL)
   {
     struct RastPort _rp;
@@ -135,14 +135,19 @@ static void AlphaText(struct RastPort *rp, const char *txt, LONG len, ULONG fgco
     _rp.BitMap = bm;
     _rp.Layer = NULL;
 
-    Move(&_rp, 1, _rp.TxBaseline+1);
+	// prepare a completely white background
+    FillPixelArray(&_rp, 0, 0, w, h, 0xffffffff);
+    // draw the text with the desired color
+    SetRGB32(&mri->mri_Screen->ViewPort, data->exclusivePen, ARGB32_TO_RED(fgcolor) << 24, ARGB32_TO_GREEN(fgcolor) << 24, ARGB32_TO_BLUE(fgcolor) << 24);
+    SetRPAttrs(&_rp, PEN_TAGS(data->exclusivePen), TAG_DONE);
+    Move(&_rp, 0, _rp.TxBaseline);
     Text(&_rp, txt, len);
 
     if((pix = AllocVec(w * h * sizeof(ULONG), MEMF_ANY)) != NULL)
     {
       ReadPixelArray(pix, 0, 0, w*4, &_rp, 0, 0, w, h, RECTFMT_ARGB);
-      reconstructAlpha(pix, w, h, fgcolor, pix[0] & 0x00ffffff);
-      WritePixelArrayAlpha(pix, 1, 1, w*4, rp, rp->cp_x, rp->cp_y - rp->TxBaseline, te.te_Width, te.te_Height, alpha);
+      reconstructAlpha(pix, w, h, fgcolor & 0x00ffffff, /*pix[0] &*/ 0x00ffffff);
+      WritePixelArrayAlpha(pix, 0, 0, w*4, rp, rp->cp_x, rp->cp_y - rp->TxBaseline, te.te_Width, te.te_Height, alpha);
 
       FreeVec(pix);
     }
@@ -557,7 +562,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
             {
               #if defined(__amigaos3__)
               if(alpha == TRUE)
-                AlphaText(rp, text+x+o_chars, fitting-1, 0x00000000, 0x80000000);
+                AlphaText(data, muiRenderInfo(data->object), text+x+o_chars, fitting-1, 0x00000000, 0x80000000);
               else
               #endif
               TextNew(rp, text+x+o_chars, fitting-1, data->TabSizePixels);
@@ -566,7 +571,7 @@ LONG PrintLine(struct InstData *data, LONG x, struct line_node *line, LONG line_
             {
               #if defined(__amigaos3__)
               if(alpha == TRUE)
-                AlphaText(rp, text+x+o_chars, fitting, 0x00000000, 0x80000000);
+                AlphaText(data, muiRenderInfo(data->object), text+x+o_chars, fitting, 0x00000000, 0x80000000);
               else
               #endif
               TextNew(rp, text+x+o_chars, fitting, data->TabSizePixels);
