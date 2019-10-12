@@ -146,7 +146,7 @@ static void AlphaText(struct InstData *data, struct MUI_RenderInfo *mri, const c
     if((pix = AllocVec(w * h * sizeof(ULONG), MEMF_ANY)) != NULL)
     {
       ReadPixelArray(pix, 0, 0, w*4, &_rp, 0, 0, w, h, RECTFMT_ARGB);
-      reconstructAlpha(pix, w, h, fgcolor & 0x00ffffff, /*pix[0] &*/ 0x00ffffff);
+      reconstructAlpha(pix, w, h, fgcolor & 0x00ffffff, 0x00ffffff);
       WritePixelArrayAlpha(pix, 0, 0, w*4, rp, rp->cp_x, rp->cp_y - rp->TxBaseline, te.te_Width, te.te_Height, alpha);
 
       FreeVec(pix);
