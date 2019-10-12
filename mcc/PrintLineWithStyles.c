@@ -118,15 +118,11 @@ static void AlphaText(struct InstData *data, struct MUI_RenderInfo *mri, const c
   struct RastPort *rp = data->doublerp;
   struct TextExtent te;
   struct BitMap *bm;
-  LONG w;
-  LONG h;
 
   ENTER();
 
   TextExtent(rp, txt, len, &te);
-  w = te.te_Width;
-  h = te.te_Height;
-  if((bm = AllocBitMap(w, h, 32, BMF_CLEAR|BMF_MINPLANES|BMF_DISPLAYABLE, rp->BitMap)) != NULL)
+  if((bm = AllocBitMap(te.te_Width, te.te_Height, 32, BMF_CLEAR|BMF_MINPLANES|BMF_DISPLAYABLE, rp->BitMap)) != NULL)
   {
     struct RastPort _rp;
     ULONG *pix;
@@ -136,18 +132,18 @@ static void AlphaText(struct InstData *data, struct MUI_RenderInfo *mri, const c
     _rp.Layer = NULL;
 
 	// prepare a completely white background
-    FillPixelArray(&_rp, 0, 0, w, h, 0xffffffff);
+    FillPixelArray(&_rp, 0, 0, te.te_Width, te.te_Height, 0xffffffff);
     // draw the text with the desired color
     SetRGB32(&mri->mri_Screen->ViewPort, data->exclusivePen, ARGB32_TO_RED(fgcolor) << 24, ARGB32_TO_GREEN(fgcolor) << 24, ARGB32_TO_BLUE(fgcolor) << 24);
     SetRPAttrs(&_rp, PEN_TAGS(data->exclusivePen), TAG_DONE);
     Move(&_rp, 0, _rp.TxBaseline);
     Text(&_rp, txt, len);
 
-    if((pix = AllocVec(w * h * sizeof(ULONG), MEMF_ANY)) != NULL)
+    if((pix = AllocVec(te.te_Width * te.te_Height * sizeof(ULONG), MEMF_ANY)) != NULL)
     {
-      ReadPixelArray(pix, 0, 0, w*4, &_rp, 0, 0, w, h, RECTFMT_ARGB);
-      reconstructAlpha(pix, w, h, fgcolor & 0x00ffffff, 0x00ffffff);
-      WritePixelArrayAlpha(pix, 0, 0, w*4, rp, rp->cp_x, rp->cp_y - rp->TxBaseline, te.te_Width, te.te_Height, alpha);
+      ReadPixelArray(pix, 0, 0, te.te_Width*4, &_rp, 0, 0, te.te_Width, te.te_Height, RECTFMT_ARGB);
+      reconstructAlpha(pix, te.te_Width, te.te_Height, fgcolor & 0x00ffffff, 0x00ffffff);
+      WritePixelArrayAlpha(pix, 0, 0, te.te_Width*4, rp, rp->cp_x, rp->cp_y - rp->TxBaseline, te.te_Width, te.te_Height, alpha);
 
       FreeVec(pix);
     }
