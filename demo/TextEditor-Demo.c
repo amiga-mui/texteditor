@@ -79,6 +79,12 @@ struct RexxSysIFace *IRexxSys;
 #endif
 #define MUIV_RunARexxScript           0xad800000
 
+#if defined(__amigaos4__)
+#define AllocVecShared(size, flags)  AllocVecTags((size), AVT_Type, MEMF_SHARED, AVT_Lock, FALSE, ((flags)&MEMF_CLEAR) ? AVT_ClearWithValue : TAG_IGNORE, 0, TAG_DONE)
+#else
+#define AllocVecShared(size, flags)  AllocVec((size), (flags))
+#endif
+
 long __stack = 16384;
 
 Object *app, *window, *editorgad;
@@ -384,7 +390,7 @@ int main(VOID)
 
               if(argarray[0] && (fh = Open((STRPTR)argarray[0], MODE_OLDFILE)))
               {
-                STRPTR  text = AllocVec(300*1024, 0L);
+                STRPTR  text = AllocVecShared(300*1024, 0L);
                 STRPTR  buffer = text;
                 LONG    size;
 
