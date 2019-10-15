@@ -61,6 +61,91 @@
 #include "private.h"
 #include "Debug.h"
 
+/// WritePixelArrayAlpha()
+#if defined(__amigaos3__)
+// custom implementation WritePixelArrayAlpha() based on ReadPixelArray() and WritePixelArray()
+// WritePixelArrayAlpha() requires cybergraphics.library V45+
+static LONG do_alpha(LONG a, LONG v)
+{
+  LONG tmp  = (a*v);
+  return ((tmp<<8) + tmp + 32768)>>16;
+}
+
+static ULONG _WritePixelArrayAlpha(APTR src, ULONG srcx, ULONG srcy, ULONG srcmod, struct RastPort *rp, ULONG destx, ULONG desty, ULONG width, ULONG height, ULONG globalalpha)
+{
+  if(LIB_VERSION_IS_AT_LEAST(CyberGfxBase, 45, 0) == TRUE)
+  {
+    return WritePixelArrayAlpha(src, srcx, srcy, srcmod, rp, destx, desty, width, height, globalalpha);
+  }
+  else
+  {
+    ULONG pixels = 0;
+
+    if(width > 0 && height > 0)
+    {
+      ULONG *buf;
+
+      if((buf = AllocVec(width * height * 4, MEMF_ANY)) != NULL)
+      {
+        ULONG x, y;
+        ULONG *spix;
+        ULONG *dpix = buf;
+
+        ReadPixelArray(buf, 0, 0, width * 4, rp, destx, desty, width, height, RECTFMT_ARGB);
+
+        // Incorrect but cant bother with alpha channel math for now
+        globalalpha = 255 - (globalalpha >> 24);
+
+        for(y = 0; y < height; y++)
+        {
+          spix = (ULONG *)((char *)src + (srcy + y) * srcmod + srcx * 4);
+
+          for(x = 0; x < width; x++)
+          {
+            ULONG srcpix, r, g, b;
+            LONG a;
+
+            srcpix = *spix++;
+
+            a = (srcpix >> 24) & 0xff;
+            r = (srcpix >> 16) & 0xff;
+            g = (srcpix >> 8) & 0xff;
+            b = (srcpix >> 0) & 0xff;
+
+            a = a - globalalpha;
+
+            if(a > 0)
+            {
+              ULONG dstpix, dest_r, dest_g, dest_b;
+
+              dstpix = *dpix;
+
+              dest_r = (dstpix >> 16) & 0xff;
+              dest_g = (dstpix >> 8) & 0xff;
+              dest_b = (dstpix >> 0) & 0xff;
+
+              dest_r += do_alpha(a, r - dest_r);
+              dest_g += do_alpha(a, g - dest_g);
+              dest_b += do_alpha(a, b - dest_b);
+
+              *dpix = 0xff000000 | dest_r << 16 | dest_g << 8 | dest_b;
+            }
+
+            dpix++;
+          }
+        }
+        WritePixelArray(buf, 0, 0, width * 4, rp, destx, desty, width, height, RECTFMT_ARGB);
+        FreeVec(buf);
+        pixels = width * height;
+      }
+    }
+
+    return pixels;
+  }
+}
+#endif
+
+///
 /// reconstructAlpha()
 #if defined(__amigaos3__)
 static void reconstructAlpha(ULONG *pix, ULONG width, ULONG height, ULONG text, ULONG back)
@@ -143,7 +228,7 @@ static void AlphaText(struct InstData *data, struct MUI_RenderInfo *mri, const c
     {
       ReadPixelArray(pix, 0, 0, te.te_Width*4, &_rp, 0, 0, te.te_Width, te.te_Height, RECTFMT_ARGB);
       reconstructAlpha(pix, te.te_Width, te.te_Height, fgcolor & 0x00ffffff, 0x00ffffff);
-      WritePixelArrayAlpha(pix, 0, 0, te.te_Width*4, rp, rp->cp_x, rp->cp_y - rp->TxBaseline, te.te_Width, te.te_Height, alpha);
+      _WritePixelArrayAlpha(pix, 0, 0, te.te_Width*4, rp, rp->cp_x, rp->cp_y - rp->TxBaseline, te.te_Width, te.te_Height, alpha);
 
       FreeVec(pix);
     }
