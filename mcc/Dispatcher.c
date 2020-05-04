@@ -119,13 +119,13 @@ Object * VARARGS68K DoSuperNew(struct IClass *cl, Object *obj, ...)
 {
   Object *rc;
   VA_LIST args;
+  struct opSet msg;
 
   VA_START(args, obj);
-  #if defined(__AROS__)
-  rc = (Object *)DoSuperNewTagList(cl, obj, NULL, (struct TagItem *)VA_ARG(args, IPTR));
-  #else
-  rc = (Object *)DoSuperMethod(cl, obj, OM_NEW, VA_ARG(args, ULONG), NULL);
-  #endif
+  msg.MethodID = OM_NEW;
+  msg.ops_AttrList = VA_ARG(args, struct TagItem *);
+  msg.ops_GInfo = NULL;
+  rc = (Object *)DoSuperMethodA(cl, obj, (Msg)&msg);
   VA_END(args);
 
   return rc;
