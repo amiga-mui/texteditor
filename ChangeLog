@@ -2,6 +2,13 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2020-06-10 Thore Böckelmann <tboeckel@gmx.de>
+
+  * ClipboarsServer.c: set "MUI:" as default "CURRDIR:" and "PROGDIR:" for the
+    global clipboard server process to avoid locking the directory of the first
+    started MUI application using this class until it is eventually flushed from
+    memory.
+
 2019-10-15 Thore Böckelmann <tboeckel@gmx.de>
 
   * PrintLineWithStyles.c: added a custom implementation of

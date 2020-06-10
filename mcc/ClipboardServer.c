@@ -37,6 +37,10 @@
 #include "private.h"
 #include "Debug.h"
 
+#ifndef NP_ProgramDir
+#define NP_ProgramDir NP_HomeDir
+#endif
+
 static struct Library *IFFParseBase = NULL;
 #if defined(__amigaos4__)
 static struct IFFParseIFace *IIFFParse = NULL;
@@ -956,6 +960,8 @@ BOOL StartClipboardServer(void)
                                       #elif defined(__MORPHOS__)
                                       NP_CodeType, CODETYPE_PPC,
                                       #endif
+                                      NP_CurrentDir, "MUI:",
+                                      NP_ProgramDir, "MUI:",
                                       TAG_DONE);
     if(serverProcess !=  NULL)
     {
