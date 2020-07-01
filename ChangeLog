@@ -2,6 +2,8 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+#### v15.54 RELEASE ############################################################
+
 2020-06-10 Thore Böckelmann <tboeckel@gmx.de>
 
   * ClipboarsServer.c: set "MUI:" as default "CURRDIR:" and "PROGDIR:" for the
