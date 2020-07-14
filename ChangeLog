@@ -2,6 +2,12 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2020-07-14 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/GetSetAttrs.c: added a workaround to skip the artifical nesting of
+    OM_SET in MUIM_Draw in order to avoid double triggers of attributes like
+    MUIA_ContextMenuTrigger. This closes #28.
+
 #### v15.54 RELEASE ############################################################
 
 2020-06-10 Thore Böckelmann <tboeckel@gmx.de>

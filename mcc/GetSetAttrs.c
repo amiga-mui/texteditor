@@ -298,10 +298,22 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
   LONG crsr_x = INT_MAX;
   LONG crsr_y = INT_MAX;
   BOOL reimport = FALSE;
+  BOOL needsRedraw = TRUE;
 
   ENTER();
 
-  if(data->shown == TRUE && isFlagClear(data->flags, FLG_Draw))
+  // A quite ugly workaround for an essential design flaw of TextEditor class.
+  // To be easily able to draw whenever it might be necessary this method is
+  // put on hold to be called again inside an artificial MUIM_Draw caused by
+  // the MUI_Redraw() call below. Unforturnately OM_SET is then called a second
+  // time from the dispatcher. If no special precaution is taken this will cause
+  // popup menus to be triggered twice due to the two OM_SET invokations. Hence
+  // try to skip the MUI_Redraw() call here when certain attributes are contained
+  // in the list
+  if(FindTagItem(MUIA_ContextMenuTrigger, msg->ops_AttrList))
+    needsRedraw = FALSE;
+
+  if(data->shown == TRUE && isFlagClear(data->flags, FLG_Draw) && needsRedraw == TRUE)
   {
     // handle the disabled flag only if we are not under control of MUI4
     if(isFlagClear(data->flags, FLG_MUI4) && (tag = FindTagItem(MUIA_Disabled, msg->ops_AttrList)) != NULL)
