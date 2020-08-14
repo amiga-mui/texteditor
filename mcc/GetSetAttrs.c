@@ -225,11 +225,11 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
 
     case MUIA_Font:
       ti_Data = (IPTR)data->font;
-      break;
+    break;
 
     case MUIA_TextEditor_UndoLevels:
       ti_Data = data->maxUndoSteps;
-      break;
+    break;
 
     case MUIA_TextEditor_PasteStyles:
       ti_Data = isFlagSet(data->flags, FLG_PasteStyles);
@@ -372,6 +372,10 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
           set(data->hslider, MUIA_Disabled, ti_Data);
       }
       break;
+
+      case MUIA_Font:
+        data->ownfont = (struct TextFont *)tag->ti_Data;
+	  break;
 
       case MUIA_TextEditor_Rows:
         data->Rows = ti_Data;

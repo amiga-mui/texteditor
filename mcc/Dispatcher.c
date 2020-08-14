@@ -210,6 +210,8 @@ static IPTR mNew(struct IClass *cl, Object *obj, struct opSet *msg)
                 setFlag(data->flags, FLG_OwnBackground);
               if(FindTagItem(MUIA_Frame, msg->ops_AttrList))
                 setFlag(data->flags, FLG_OwnFrame);
+              if(FindTagItem(MUIA_Font, msg->ops_AttrList))
+                setFlag(data->flags, FLG_OwnFont);
 
               // initialize our temporary rastport
               InitRastPort(&data->tmprp);
@@ -320,7 +322,11 @@ static IPTR mSetup(struct IClass *cl, Object *obj, Msg msg)
 
     // now we check whether we have a valid font or not
     // and if not we take the default one of our muiAreaData
-    data->font = (data->use_fixedfont == TRUE) ? data->fixedfont : data->normalfont;
+    if(isFlagClear(data->flags, FLG_OwnFont))
+      data->font = (data->use_fixedfont == TRUE) ? data->fixedfont : data->normalfont;
+    else
+      data->font = NULL;
+
     if(data->font == NULL)
       data->font = _font(obj);
 

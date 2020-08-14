@@ -2,6 +2,12 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2020-08-14 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/InitConfig.c: a custom font can now be set via MUIA_Font. Any valid
+    TextFont structure as well as MUI's MUIV_Font_XXX definitions will be
+    accepted. This closes #29 again.
+
 2020-07-14 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/GetSetAttrs.c: added a workaround to skip the artifical nesting of

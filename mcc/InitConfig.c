@@ -256,21 +256,28 @@ void InitConfig(struct IClass *cl, Object *obj)
   else
     data->CursorWidth = CFG_TextEditor_CursorWidth_Def;
 
-  data->normalfont = GetFont(obj, MUICFG_TextEditor_NormalFont, CFG_TextEditor_NormalFont_Def);
-  data->fixedfont = GetFont(obj, MUICFG_TextEditor_FixedFont, CFG_TextEditor_FixedFont_Def);
-
-  if(data->fixedfont != NULL && isFlagSet(data->fixedfont->tf_Flags, FPF_PROPORTIONAL))
+  if(isFlagSet(data->flags, FLG_OwnFont))
   {
-    // somehow the user managed to choose a proportional font as fixed font,
-    // reject this one and fall back to MUI's internal fixed font if required
-    CloseFont(data->fixedfont);
-    data->fixedfont = NULL;
+    set(obj, MUIA_Font, data->ownfont);
   }
+  else
+  {
+    data->normalfont = GetFont(obj, MUICFG_TextEditor_NormalFont, CFG_TextEditor_NormalFont_Def);
+    data->fixedfont = GetFont(obj, MUICFG_TextEditor_FixedFont, CFG_TextEditor_FixedFont_Def);
 
-  if(data->use_fixedfont == TRUE && data->fixedfont == NULL)
-    set(obj, MUIA_Font, MUIV_Font_Fixed);
-  else if(data->normalfont == NULL)
-    set(obj, MUIA_Font, MUIV_Font_Normal);
+    if(data->fixedfont != NULL && isFlagSet(data->fixedfont->tf_Flags, FPF_PROPORTIONAL))
+    {
+      // somehow the user managed to choose a proportional font as fixed font,
+      // reject this one and fall back to MUI's internal fixed font if required
+      CloseFont(data->fixedfont);
+      data->fixedfont = NULL;
+    }
+
+    if(data->use_fixedfont == TRUE && data->fixedfont == NULL)
+      set(obj, MUIA_Font, MUIV_Font_Fixed);
+    else if(data->normalfont == NULL)
+      set(obj, MUIA_Font, MUIV_Font_Normal);
+  }
 
   if(DoMethod(obj, MUIM_GetConfigItem, MUICFG_TextEditor_BlockQual, &setting))
     value = *(LONG *)setting;
@@ -560,9 +567,18 @@ void FreeConfig(struct IClass *cl, Object *obj)
   }
 
   if(data->normalfont != NULL)
+  {
     CloseFont(data->normalfont);
+    data->normalfont = NULL;
+  }
   if(data->fixedfont != NULL)
+  {
     CloseFont(data->fixedfont);
+    data->fixedfont = NULL;
+  }
+
+  // forget the previously used font
+  data->font = NULL;
 
   if(data->BlinkSpeed == 2)
   {
