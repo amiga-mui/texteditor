@@ -2,6 +2,12 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2020-09-09 Thore Böckelmann <tboeckel@gmx.de>
+
+  * ClipboardServer.c: changed the default path for "CURRDIR:" and "PROGDIR:" to
+    "T:", because the "MUI:" assign does not exist on all systems, i.e. AROS.
+    This closes #31.
+
 2020-08-14 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/InitConfig.c: a custom font can now be set via MUIA_Font. Any valid

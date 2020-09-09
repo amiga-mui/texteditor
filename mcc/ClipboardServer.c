@@ -960,8 +960,8 @@ BOOL StartClipboardServer(void)
                                       #elif defined(__MORPHOS__)
                                       NP_CodeType, CODETYPE_PPC,
                                       #endif
-                                      NP_CurrentDir, Lock("MUI:", SHARED_LOCK),
-                                      NP_ProgramDir, Lock("MUI:", SHARED_LOCK),
+                                      NP_CurrentDir, Lock("T:", SHARED_LOCK),
+                                      NP_ProgramDir, Lock("T:", SHARED_LOCK),
                                       TAG_DONE);
     if(serverProcess !=  NULL)
     {
