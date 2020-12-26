@@ -1,5 +1,5 @@
 ;
-; $VER: Install-MCC 1.5 (21.5.2012)
+; $VER: Install-MCC 1.8 (23.12.2020)
 ;
 ; $Id$
 ;
@@ -17,8 +17,9 @@
 ;   1.4   11.06.2010: extended the final message that a reboot might be
 ;                     necessary to be able to use the just installed version.
 ;   1.5   21.05.2012: fixed the wrong selection of the builtin language.
-;   1.6   20.12.2013: changed MorphOS desription to include 3.x
+;   1.6   20.12.2013: changed MorphOS description to include 3.x
 ;   1.7   03.02.2017: added support for slovak language
+;   1.8   23.12.2020: added swedish translation for the installer.
 
 ;----------------------------------------------------------------------------
 ; /// language bit definition, do not change these!!
@@ -46,7 +47,7 @@
 ;----------------------------------------------------------------------------
 ; /// default language detection
 (set #i 0)
-(while (<> @language (select #i "deutsch" @language))
+(while (<> @language (select #i "deutsch" "english" "svenska" @language))
     (set #i (+ #i 1))
 )
 (if (= #i 1) ; LANGUAGE
@@ -56,7 +57,7 @@
 
 (set #i 0)
 (set #defaultLanguages %10000000000000000)
-(while (<> #language (select #i "czech" "russian" "türkçe" "greek" "magyar" "suomi" "polski" "svenska" "norsk" "nederlands" "italiano" "dansk" "español" "français" "deutsch" #language))
+(while (<> #language (select #i "slovak" "czech" "russian" "türkçe" "greek" "magyar" "suomi" "polski" "svenska" "norsk" "nederlands" "italiano" "dansk" "español" "français" "deutsch" #language))
     (
         (set #i (+ #i 1))
         (set #defaultLanguages (shiftright #defaultLanguages 1))
@@ -108,6 +109,22 @@
                                  "\n"
                                  "Gegebenenfalls ist ein Neustart des Systems\n"
                                  "nötig, um die Installation abzuschließen!"))
+    )
+)
+
+; ///
+; /// ***** Svenska
+(if (= #language "svenska")
+    (
+        (set #acknowledgeOS (cat "Var god verifiera den automatiska\n"
+                                 "detekteringen av ditt operativsystem:"))
+        (set #lang_catalog  (cat "Vilken katalogfil vill du installera?\n"
+                                 "(Engelska är inbyggt)"))
+        (set #done          (cat "\n"
+                                 @app-name " har framgångsrikt installerats.\n"
+                                 "\n"
+                                 "En omstart kan vara nödvändig\n"
+                                 "för att slutföra installationen!"))
     )
 )
 ; ///
