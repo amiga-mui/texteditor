@@ -1,5 +1,5 @@
 ;
-; $VER: Install-MCC 1.8 (23.12.2020)
+; $VER: Install-MCC 1.9 (03.01.2021)
 ;
 ; $Id$
 ;
@@ -20,6 +20,7 @@
 ;   1.6   20.12.2013: changed MorphOS description to include 3.x
 ;   1.7   03.02.2017: added support for slovak language
 ;   1.8   23.12.2020: added swedish translation for the installer.
+;   1.9   03.01.2021: added italian translation for the installer.
 
 ;----------------------------------------------------------------------------
 ; /// language bit definition, do not change these!!
@@ -127,6 +128,23 @@
                                  "för att slutföra installationen!"))
     )
 )
+
+; ///
+; /// ***** Italiano
+(if (= #language "italiano")
+(
+    (set #acknowledgeOS (cat "Per favore conferma il rilevamento\n"
+                             "automatico del sistema operativo in uso:"))
+    (set #lang_catalog  (cat "Quale catalogo di lingua si desidera installare?\n"
+                             "(La lingua inglese è incorporata)"))
+    (set #done          (cat "\n"
+                             @app-name " è stata installata correttamente.\n"
+                             "\n"
+                             "Potrebbe essere necessario un riavvio\n"
+                             "per completare questa installazione!"))
+    )
+)
+
 ; ///
 
 ;----------------------------------------------------------------------------
