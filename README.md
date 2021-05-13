@@ -1,6 +1,6 @@
 # TextEditor.mcc
 
-[![Build Status](https://travis-ci.org/amiga-mui/texteditor.svg?branch=master)](https://travis-ci.org/amiga-mui/texteditor) [![Code Climate](https://codeclimate.com/github/amiga-mui/texteditor/badges/gpa.svg)](https://codeclimate.com/github/amiga-mui/texteditor) [![License](http://img.shields.io/:license-lgpl2-blue.svg?style=flat)](http://www.gnu.org/licenses/lgpl-2.1.html) [![Github Issues](http://githubbadges.herokuapp.com/amiga-mui/texteditor/issues.svg)](https://github.com/amiga-mui/texteditor/issues)
+[![Build](https://github.com/amiga-mui/texteditor/workflows/CI/badge.svg)](https://github.com/amiga-mui/texteditor/actions)
 
 TextEditor.mcc is a multiline string gadget for Amiga systems which offers most
 of the common features you can find in a typical text editor, but embedded in a
