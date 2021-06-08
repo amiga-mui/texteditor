@@ -583,7 +583,7 @@ IPTR mTestPos(struct InstData *data, struct MUIP_TextEditor_TestPos *msg)
   *msg->cursorx = -1;
   *msg->cursory = -1;
 
-  if(FLAG_IS_SET(data->flags, FLG_SetupDone) && mx >= _left(data->object) && mx <= _right(data->object) && my >= data->ypos && my < _bottom(data->object))
+  if(isFlagSet(data->flags, FLG_SetupDone) && mx >= _left(data->object) && mx <= _right(data->object) && my >= data->ypos && my < _bottom(data->object))
   {
     LONG old_CPos_X = data->CPos_X;
     LONG old_pixel_x = data->pixel_x;
