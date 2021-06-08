@@ -2,6 +2,12 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+2021-06-08 Thore Böckelmann <tboeckel@gmx.de>
+
+  * mcc/Methods.c: implemented the method MUIM_TextEditor_TestPos similar to the
+    MUIM_List_TestPos method of MUI's List class to obtain some information
+    based on mouse coordinates. This closes #35.
+
 2021-01-03 Thore Böckelmann <tboeckel@gmx.de>
 
   * dist: added italian translation to Installer script kindly provided by Samir

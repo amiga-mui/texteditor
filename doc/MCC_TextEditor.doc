@@ -71,6 +71,7 @@ TextEditor.mcc/MUIM_TextEditor_QueryKeyAction
 TextEditor.mcc/MUIM_TextEditor_Replace
 TextEditor.mcc/MUIM_TextEditor_Search
 TextEditor.mcc/MUIM_TextEditor_SetBlock
+TextEditor.mcc/MUIM_TextEditor_TestPos
 TextEditor.mcc/TextEditor.mcc
 
     *******************************************************************
@@ -1779,5 +1780,26 @@ TextEditor.mcc/MUIM_TextEditor_SetBlock
         MUIA_TextEditor_ColorMap
         MUIA_TextEditor_Pen
         MUIA_TextEditor_Flow
+
+TextEditor.mcc/MUIM_TextEditor_TestPos
+
+    NAME
+        MUIM_TextEditor_TestPos
+
+    SYNOPSIS
+        DoMethod(obj, MUIM_TextEditor_TestPos, LONG mx,
+                                               LONG my,
+                                               LONG *index,
+                                               LONG *cursorx,
+                                               LONG *cursory);
+
+    FUNCTION
+        Calculate the index within the text and the corresponding cursor
+        position from the given mouse coordinates.
+
+    RESULT
+        TRUE if the object is visible and the mouse coordinates were inside the
+        object's area. In this case the calculated index and cursor position
+        will be valid. Otherwise the calculated values will be -1.
 
 

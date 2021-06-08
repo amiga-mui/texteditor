@@ -577,6 +577,7 @@ IPTR mInputTrigger(struct IClass *, Object *, Msg);
 ULONG InsertText(struct InstData *, STRPTR, BOOL);
 IPTR mCursorXYToIndex(struct InstData *, struct MUIP_TextEditor_CursorXYToIndex *);
 IPTR mIndexToCursorXY(struct InstData *, struct MUIP_TextEditor_IndexToCursorXY *);
+IPTR mTestPos(struct InstData *, struct MUIP_TextEditor_TestPos *);
 
 // MixedFunctions.c
 void AddClipping(struct InstData *);

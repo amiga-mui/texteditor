@@ -570,3 +570,59 @@ IPTR mIndexToCursorXY(struct InstData *data, struct MUIP_TextEditor_IndexToCurso
 }
 
 ///
+///
+IPTR mTestPos(struct InstData *data, struct MUIP_TextEditor_TestPos *msg)
+{
+  BOOL rc = FALSE;
+  LONG mx = msg->mx;
+  LONG my = msg->my;
+
+  ENTER();
+
+  *msg->index = -1;
+  *msg->cursorx = -1;
+  *msg->cursory = -1;
+
+  if(FLAG_IS_SET(data->flags, FLG_SetupDone) && mx >= _left(data->object) && mx <= _right(data->object) && my >= data->ypos && my < _bottom(data->object))
+  {
+    LONG old_CPos_X = data->CPos_X;
+    LONG old_pixel_x = data->pixel_x;
+    struct line_node *old_actualline = data->actualline;
+    struct line_node *line;
+    LONG lineNumber;
+    LONG idx;
+
+    PosFromCursor(data, mx, my);
+
+    // count the length of all lines up to the requested one
+    line = GetFirstLine(&data->linelist);
+    lineNumber = 0;
+    idx = 0;
+    while(line != NULL && line != data->actualline)
+    {
+      idx += line->line.Length;
+      line = GetNextLine(line);
+      lineNumber++;
+    }
+
+    if(line != NULL)
+      idx += data->CPos_X;
+
+    *msg->index = idx;
+    *msg->cursorx = data->CPos_X;
+    *msg->cursory = lineNumber;
+
+    // restore all modified values to their former contents
+    data->CPos_X = old_CPos_X;
+    data->pixel_x = old_pixel_x;
+    data->actualline = old_actualline;
+
+    rc = TRUE;
+  }
+
+  RETURN(rc);
+  return rc;
+}
+
+///
+

@@ -134,6 +134,7 @@ extern "C" {
 #define MUIM_TextEditor_CursorXYToIndex       (TextEditor_Dummy + 0x43)
 #define MUIM_TextEditor_IndexToCursorXY       (TextEditor_Dummy + 0x44)
 #define MUIM_TextEditor_Redraw                (TextEditor_Dummy + 0x45)
+#define MUIM_TextEditor_TestPos               (TextEditor_Dummy + 0x4e)
 
 struct MUIP_TextEditor_ARexxCmd          { STACKED ULONG MethodID; STACKED STRPTR command; };
 struct MUIP_TextEditor_BlockInfo         { STACKED ULONG MethodID; STACKED LONG *startx; STACKED LONG *starty; STACKED LONG *stopx; STACKED LONG *stopy; };
@@ -150,6 +151,7 @@ struct MUIP_TextEditor_SetBlock          { STACKED ULONG MethodID; STACKED LONG 
 struct MUIP_TextEditor_CursorXYToIndex   { STACKED ULONG MethodID; STACKED LONG x; STACKED LONG y; STACKED LONG *index; };
 struct MUIP_TextEditor_IndexToCursorXY   { STACKED ULONG MethodID; STACKED LONG index; STACKED LONG *x; STACKED LONG *y; };
 struct MUIP_TextEditor_Redraw            { STACKED ULONG MethodID; STACKED LONG flags; };
+struct MUIP_TextEditor_TestPos           { STACKED ULONG MethodID; STACKED LONG mx; STACKED LONG my; STACKED LONG *index; STACKED LONG *cursorx; STACKED LONG *cursory; };
 
 #define MUIV_TextEditor_ExportHook_Plain       0x00000000UL
 #define MUIV_TextEditor_ExportHook_EMail       0x00000001UL

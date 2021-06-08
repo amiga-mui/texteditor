@@ -78,6 +78,7 @@ struct RexxSysIFace *IRexxSys;
 #define MUIA_Application_UsedClasses  0x8042e9a7  /* V20 STRPTR * i.. */
 #endif
 #define MUIV_RunARexxScript           0xad800000
+#define MUIV_TestPos                  0xad800001
 
 #if defined(__amigaos4__)
 #define AllocVecShared(size, flags)  AllocVecTags((size), AVT_Type, MEMF_SHARED, AVT_Lock, FALSE, ((flags)&MEMF_CLEAR) ? AVT_ClearWithValue : TAG_IGNORE, 0, TAG_DONE)
@@ -304,7 +305,7 @@ int main(VOID)
         app = ApplicationObject,
                 MUIA_Application_Author,      "TextEditor.mcc Open Source Team",
                 MUIA_Application_Base,        "TextEditor-Demo",
-                MUIA_Application_Copyright,   "(c) 2005-2010 by TextEditor.mcc Open Source Team",
+                MUIA_Application_Copyright,   "(c) 2005-2021 by TextEditor.mcc Open Source Team",
                 MUIA_Application_Description, "TextEditor.mcc demonstration program",
                 MUIA_Application_RexxHook,    &ARexxHook,
                 MUIA_Application_Title,       "TextEditor-Demo",
@@ -446,6 +447,7 @@ int main(VOID)
               DoMethod(window, MUIM_Notify, MUIA_Window_CloseRequest, TRUE, MUIV_Notify_Application, 2, MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit);
 
               DoMethod(window, MUIM_Notify, MUIA_Window_InputEvent, "f1", MUIV_Notify_Application, 2, MUIM_Application_ReturnID, MUIV_RunARexxScript);
+              DoMethod(window, MUIM_Notify, MUIA_Window_InputEvent, "f2", MUIV_Notify_Application, 2, MUIM_Application_ReturnID, MUIV_TestPos);
 
               DoMethod(flow, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime, editorgad, 3, MUIM_NoNotifySet, MUIA_TextEditor_Flow, MUIV_TriggerValue);
               DoMethod(editorgad, MUIM_Notify, MUIA_TextEditor_Flow, MUIV_EveryTime, flow, 3, MUIM_NoNotifySet, MUIA_Cycle_Active, MUIV_TriggerValue);
@@ -527,6 +529,14 @@ int main(VOID)
                       PutMsg(rexxport, (struct Message *)rxmsg);
                     }
                   }
+                  else if(ReturnID == MUIV_TestPos)
+                  {
+					  LONG idx=1;
+					  LONG cursorx=2;
+					  LONG cursory=3;
+					  DoMethod(editorgad, MUIM_TextEditor_TestPos, _window(editorgad)->MouseX, _window(editorgad)->MouseY, &idx, &cursorx, &cursory);
+					  printf("testpos: idx %5ld, cursorx %4ld, cursory %4ld\n", idx, cursorx, cursory);
+				  }
 
                   if(sigs)
                   {

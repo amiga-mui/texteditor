@@ -1012,6 +1012,7 @@ DISPATCHER(_Dispatcher)
     case MUIM_TextEditor_CursorXYToIndex: result = mCursorXYToIndex(data, (APTR)msg);       RETURN(result); return result; break;
     case MUIM_TextEditor_IndexToCursorXY: result = mIndexToCursorXY(data, (APTR)msg);       RETURN(result); return result; break;
     case MUIM_TextEditor_Redraw:          result = mRedraw(cl, obj, (APTR)msg);             RETURN(result); return result; break;
+    case MUIM_TextEditor_TestPos:         result = mTestPos(data, (APTR)msg);               RETURN(result); return result; break;
     default:                              result = DoSuperMethodA(cl, obj, msg);            RETURN(result); return result; break;
   }
 
