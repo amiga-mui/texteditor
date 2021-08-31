@@ -2,6 +2,8 @@
 MUI TextEditor MCC class - ChangeLog
 ------------------------------------
 
+#### v15.56 RELEASE ############################################################
+
 2021-06-08 Thore Böckelmann <tboeckel@gmx.de>
 
   * mcc/Methods.c: implemented the method MUIM_TextEditor_TestPos similar to the
