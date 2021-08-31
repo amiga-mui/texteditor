@@ -571,7 +571,6 @@ IPTR mIndexToCursorXY(struct InstData *data, struct MUIP_TextEditor_IndexToCurso
 
 ///
 ///
-void kprintf(const char *,...);
 IPTR mTestPos(struct InstData *data, struct MUIP_TextEditor_TestPos *msg)
 {
   BOOL rc = FALSE;
@@ -608,8 +607,6 @@ IPTR mTestPos(struct InstData *data, struct MUIP_TextEditor_TestPos *msg)
 
     if(line != NULL)
       idx += data->CPos_X;
-
-kprintf("found line %08lx cposx %ld %ld\n", line, data->CPos_X, line->line.Length-1);
 
     *msg->index = idx;
     *msg->cursorx = data->CPos_X;
