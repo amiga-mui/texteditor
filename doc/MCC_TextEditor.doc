@@ -18,6 +18,8 @@ TextEditor.mcc/MUIA_TextEditor_ExportHook
 TextEditor.mcc/MUIA_TextEditor_ExportWrap
 TextEditor.mcc/MUIA_TextEditor_FixedFont
 TextEditor.mcc/MUIA_TextEditor_Flow
+TextEditor.mcc/MUIA_TextEditor_FreeHoriz
+TextEditor.mcc/MUIA_TextEditor_FreeVert
 TextEditor.mcc/MUIA_TextEditor_GlobalFlow
 TextEditor.mcc/MUIA_TextEditor_HasChanged
 TextEditor.mcc/MUIA_TextEditor_HorizontalSlider
@@ -244,6 +246,7 @@ TextEditor.mcc/MUIM_TextEditor_TestPos
         Set the desired width, in characters.
 
     SEE ALSO
+        MUIA_TextEditor_FreeHoriz, MUIA_TextEditor_FreeVert,
         MUIA_TextEditor_Rows
 
 TextEditor.mcc/MUIA_TextEditor_Contents
@@ -524,6 +527,36 @@ TextEditor.mcc/MUIM_TextEditor_TestPos
 
     SEE ALSO
         MUIA_TextEditor_GlobalFlow
+
+TextEditor.mcc/MUIA_TextEditor_FreeHoriz
+
+    NAME
+        MUIA_TextEditor_FreeHoriz -- [ISG], BOOL
+
+    FUNCTION
+        When MUIA_TextEditor_Columns is set to a non-zero value the object
+        cannot be resized larger than the set amount of columns. Settings this
+        attribute to TRUE will override that limitation.
+
+        Defaults to FALSE.
+
+    SEE ALSO
+        MUIA_TextEditor_Columns
+
+TextEditor.mcc/MUIA_TextEditor_FreeVert
+
+    NAME
+        MUIA_TextEditor_FreeVert -- [ISG], BOOL
+
+    FUNCTION
+        When MUIA_TextEditor_Rows is set to a non-zero value the object
+        cannot be resized larger than the set amount of rows. Settings this
+        attribute to TRUE will override that limitation.
+
+        Defaults to FALSE.
+
+    SEE ALSO
+        MUIA_TextEditor_Rows
 
 TextEditor.mcc/MUIA_TextEditor_GlobalFlow
 
@@ -1029,7 +1062,8 @@ TextEditor.mcc/MUIM_TextEditor_TestPos
         Set the desired height, in lines.
 
     SEE ALSO
-        MUIA_TextEditor_Columns
+        MUIA_TextEditor_Columns, MUIA_TextEditor_FreeHoriz,
+        MUIA_TextEditor_FreeVert
 
 TextEditor.mcc/MUIA_TextEditor_Separator
 

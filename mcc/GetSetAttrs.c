@@ -276,6 +276,14 @@ IPTR mGet(struct IClass *cl, Object *obj, struct opGet *msg)
       ti_Data = (IPTR)data->inactiveContents.line.Contents;
     break;
 
+    case MUIA_TextEditor_FreeHoriz:
+      ti_Data = isFlagSet(data->flags, FLG_FreeHoriz);
+    break;
+
+    case MUIA_TextEditor_FreeVert:
+      ti_Data = isFlagSet(data->flags, FLG_FreeVert);
+    break;
+
     default:
       LEAVE();
       return DoSuperMethodA(cl, obj, (Msg)msg);
@@ -1068,6 +1076,24 @@ IPTR mSet(struct IClass *cl, Object *obj, struct opSet *msg)
         if(isFlagClear(data->flags, FLG_Active) && IsEmptyContents(data) == TRUE)
           ScrollUpDown(data);
       }
+      break;
+
+      case MUIA_TextEditor_FreeHoriz:
+      {
+        if(tag->ti_Data)
+          setFlag(data->flags, FLG_FreeHoriz);
+        else
+          clearFlag(data->flags, FLG_FreeHoriz);
+	  }
+      break;
+
+      case MUIA_TextEditor_FreeVert:
+      {
+        if(tag->ti_Data)
+          setFlag(data->flags, FLG_FreeVert);
+        else
+          clearFlag(data->flags, FLG_FreeVert);
+	  }
       break;
     }
   }

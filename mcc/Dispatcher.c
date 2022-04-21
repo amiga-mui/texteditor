@@ -459,7 +459,10 @@ static IPTR mAskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *ms
 
     mi->MinWidth += width;
     mi->DefWidth += width;
-    mi->MaxWidth += width;
+    if(isFlagSet(data->flags, FLG_FreeHoriz))
+      mi->MaxWidth = MUI_MAXMAX;
+    else
+      mi->MaxWidth += width;
   }
   else
   {
@@ -475,7 +478,10 @@ static IPTR mAskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *ms
 
     mi->MinHeight += height;
     mi->DefHeight += height;
-    mi->MaxHeight += height;
+    if(isFlagSet(data->flags, FLG_FreeVert))
+      mi->MaxHeight = MUI_MAXMAX;
+    else
+      mi->MaxHeight += height;
   }
   else
   {

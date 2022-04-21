@@ -778,6 +778,8 @@ enum
   FLG_ForcedTabSize  = 1L << 23, // override the user defined TAB size
   FLG_GlobalFlow     = 1L << 24, // global flow instead of line based flow
   FLG_OwnFont        = 1L << 25,
+  FLG_FreeHoriz      = 1L << 26, // allow horizontal resizing even with MUIA_TextEditor_Columns set
+  FLG_FreeVert       = 1L << 27, // allow vertical resizing even with MUIA_TextEditor_Rows set
   FLG_SetupDone      = 1L << 29, // MUIM_Setup finished successfully
   FLG_Truecolor      = 1L << 30, // truecolor screen
   FLG_MUI4           = 1L << 31, // running under MUI4
